@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: postgres
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB:${POSTGRES_DB}
+      - POSTGRES_USER:${POSTGRES_USER}
+      - POSTGRES_PASSWORD:${POSTGRES_PASSWORD}
+    volumes:
+      - syshdb:/var/lib/postgresql/data
+    ports:
+      - '5432'
+      
+volumes:
+  syshdb:

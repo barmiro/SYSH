@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      
