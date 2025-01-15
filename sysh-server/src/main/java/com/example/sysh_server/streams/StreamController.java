@@ -27,20 +27,27 @@ public class StreamController {
 		return streamService.findAll();
 	}
 	
+	@GetMapping("/getTracks")
+	List<Track> getTracks() {
+		return streamService.allTracks();
+	}
+	
 	@PostMapping("/addJson")
 	String addJson(@RequestBody List<Stream> streams) {
-		Integer rowsAffected = 0;
+		Integer streamsAdded = 0;
+		Integer tracksAdded = 0;
 		for (Stream stream:streams) {
 			if (stream.spotify_track_uri() != null) {
-				rowsAffected += streamService.addNew(stream);
+				streamsAdded += streamService.addNew(stream);
+				tracksAdded += streamService.addTracks(stream);
 			}
 		}
 		
-		return rowsAffected + "rows affected.\n";
+		return streamsAdded + " streams added.\n" + tracksAdded + " tracks added or updated.\n";
 	}
 	
 	@DeleteMapping("/wipe")
 	String wipe() {
-		return streamService.wipe() + "rows affected.\n";
+		return streamService.wipe() + " rows affected.\n";
 	}
 }
