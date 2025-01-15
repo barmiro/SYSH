@@ -1,4 +1,4 @@
-package com.example.sysh_server;
+package com.github.barmiro.sysh_server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

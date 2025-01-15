@@ -1,4 +1,4 @@
-package com.example.sysh_server.streams;
+package com.github.barmiro.sysh_server.streams;
 
 import java.sql.Types;
 import java.util.ArrayList;

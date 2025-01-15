@@ -1,4 +1,4 @@
-package com.example.sysh_server;
+package com.github.barmiro.sysh_server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
