@@ -32,6 +32,11 @@ public class StreamController {
 		return streamService.allTracks();
 	}
 	
+	@GetMapping("/topTracks")
+	List<Track> topTracks() {
+		return streamService.topTracks();
+	}
+	
 	@PostMapping("/addJson")
 	String addJson(@RequestBody List<Stream> streams) {
 		Integer streamsAdded = 0;

@@ -32,7 +32,11 @@ public class StreamService {
 		return this.jdbcClient.sql("DELETE FROM Streams").update();
 	}
 
-	
+	List<Track> topTracks() {
+		return jdbcClient.sql("SELECT * FROM Tracks ORDER BY stream_number DESC")
+				.query(Track.class)
+				.list();
+	}
 	
 	Integer addTracks(Stream stream) {
 		String newTrack = ("INSERT INTO Tracks("
