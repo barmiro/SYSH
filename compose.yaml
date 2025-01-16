@@ -10,6 +10,7 @@ services:
       - POSTGRES_DB:${POSTGRES_DB}
       - POSTGRES_USER:${POSTGRES_USER}
       - POSTGRES_PASSWORD:${POSTGRES_PASSWORD}
+      - SPOTIFY_CLIENT_ID:${SPOTIFY_CLIENT_ID}
     ports:
       - '8080:8080'
     depends_on:

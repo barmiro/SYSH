@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.streams;
+package com.github.barmiro.sysh_server.tracks;
 
 import java.sql.Timestamp;
 
@@ -9,6 +9,7 @@ public record Track(
 		String master_metadata_album_album_name,
 		Integer stream_number,
 		Integer total_ms_played,
-		Timestamp first_played
+		Timestamp first_played,
+		Integer stream_count
 ){
 }
