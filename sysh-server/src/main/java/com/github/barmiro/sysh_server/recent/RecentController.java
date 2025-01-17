@@ -5,7 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.auth.TokenService;
+import com.github.barmiro.sysh_server.recent.dto.ItemsWrapper;
 
 @RestController
 public class RecentController {
@@ -18,8 +21,10 @@ public class RecentController {
 		this.recentClient = recentClient;
 	}
 	
+	ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	
 	@GetMapping("/recent")
-	public String recent() throws Exception {
+	public ItemsWrapper recent() throws Exception {
 		ResponseEntity<String> response = recentClient
 				.get()
 				.uri("me/player/recently-played")
@@ -27,6 +32,7 @@ public class RecentController {
 				.retrieve()
 				.toEntity(String.class);
 		
-		return response.getBody();
+		
+		return objectMapper.readValue(response.getBody(), ItemsWrapper.class);
 	}
 }
