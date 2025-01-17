@@ -22,13 +22,16 @@ import com.github.barmiro.sysh_server.utils.GetRandom;
 public class AuthController {
 	
 	private RestClient tokenClient;
-	private RestClient recentClient;
-	private AuthResponseBody responseBody;
+	private TokenService tkn;
 	
-	public AuthController(RestClient tokenClient, RestClient recentClient) {
+	public AuthController(RestClient tokenClient, TokenService tkn) {
 		this.tokenClient = tokenClient;
-		this.recentClient = recentClient;
+
+		this.tkn = tkn;
 	}
+	
+	ObjectMapper objectMapper = new ObjectMapper();
+	private AuthResponseBody responseBody;
 	
 	private final String clientId = System.getenv("SPOTIFY_CLIENT_ID");
 	private final String clientSecret = System.getenv("SPOTIFY_CLIENT_SECRET");
@@ -73,7 +76,6 @@ public class AuthController {
 				.retrieve()
 				.toEntity(String.class);
 		
-		ObjectMapper objectMapper = new ObjectMapper();
 		
 		try {
 			responseBody = objectMapper.readValue(newEntity.getBody(), AuthResponseBody.class);
@@ -83,18 +85,7 @@ public class AuthController {
 			e.printStackTrace();
 		}
 		
+		tkn.setToken(responseBody.access_token());
 		return newEntity.getStatusCode();
 	};
-	
-	
-	@GetMapping("/recent")
-	public String recent() throws Exception {
-		ResponseEntity<String> response = recentClient
-				.get()
-				.uri("me/player/recently-played")
-				.header("Authorization", "Bearer " + responseBody.access_token())
-				.retrieve()
-				.toEntity(String.class);
-		return response.getBody();
-	}
 }
