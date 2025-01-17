@@ -2,7 +2,6 @@ package com.github.barmiro.sysh_server.auth;
 
 import java.util.Base64;
 
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
@@ -59,7 +58,7 @@ public class AuthController {
 	
 //	TODO: catch exceptions
 	@GetMapping("/callback")
-	public HttpStatusCode callback(@RequestParam(required=false) String code, @RequestParam(required=true) String state) {
+	public RedirectView callback(@RequestParam(required=false) String code, @RequestParam(required=true) String state) {
 		if (!state.equals(this.state)) {
 			return null;
 		}
@@ -86,6 +85,6 @@ public class AuthController {
 		}
 		
 		tkn.setToken(responseBody.access_token());
-		return newEntity.getStatusCode();
+		return new RedirectView("/recent");	
 	};
 }

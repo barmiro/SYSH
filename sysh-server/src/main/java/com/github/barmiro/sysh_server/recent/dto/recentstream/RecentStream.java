@@ -1,11 +1,13 @@
 package com.github.barmiro.sysh_server.recent.dto.recentstream;
 
+import java.sql.Timestamp;
+
 import com.github.barmiro.sysh_server.recent.dto.recentstream.context.Context;
 import com.github.barmiro.sysh_server.recent.dto.recentstream.recenttrack.RecentTrack;
 
 public record RecentStream(
 		RecentTrack track,
-		String played_at,
+		Timestamp played_at,
 		Context context,
 		String uri
 		) {
