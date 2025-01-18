@@ -6,12 +6,10 @@ CREATE TABLE Streams (
 
 CREATE TABLE Tracks (
     spotify_track_id varchar UNIQUE NOT NULL,
-    master_metadata_track_name varchar,
-    master_metadata_album_artist_name varchar,
-    master_metadata_album_album_name varchar,
     stream_number integer NOT NULL DEFAULT 0,
     total_ms_played integer NOT NULL DEFAULT 0,
-    first_played timestamp
+    first_played timestamp,
+    stream_count integer
 );
 
 CREATE TABLE Albums (

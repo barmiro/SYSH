@@ -46,7 +46,7 @@ public class TrackService {
 
 	}
 	
-	public Integer addTracks(Stream stream) {
+	public Integer addTrack(Stream stream) {
 		String newTrack = ("INSERT INTO Tracks("
 				+ "spotify_track_id,"
 				+ "stream_number,"

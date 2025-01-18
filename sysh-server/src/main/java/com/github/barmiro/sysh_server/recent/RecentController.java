@@ -11,6 +11,7 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.auth.TokenService;
+import com.github.barmiro.sysh_server.catalog.tracks.TrackService;
 import com.github.barmiro.sysh_server.recent.dto.ItemsWrapper;
 import com.github.barmiro.sysh_server.recent.dto.recentstream.RecentStream;
 import com.github.barmiro.sysh_server.streams.Stream;
@@ -21,12 +22,14 @@ public class RecentController {
 	
 	TokenService tkn;
 	RestClient recentClient;
-	StreamService ss;
+	StreamService strs;
+	TrackService trs;
 	
-	public RecentController(TokenService tkn, RestClient recentClient, StreamService ss) {
+	public RecentController(TokenService tkn, RestClient recentClient, StreamService strs, TrackService trs) {
 		this.tkn = tkn;
 		this.recentClient = recentClient;
-		this.ss = ss;
+		this.strs = strs;
+		this.trs = trs;
 	}
 	
 	ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -40,21 +43,23 @@ public class RecentController {
 				.retrieve()
 				.toEntity(String.class);
 		
-		List<Stream> previous = ss.find(20);
+		List<Stream> previous = strs.find(20);
 		int streamsAdded = 0;
+		int tracksAdded = 0;
 		
 		List<RecentStream> items = objectMapper.readValue(response.getBody(), ItemsWrapper.class).items();
 		for (RecentStream item:items) {
 			
 			Timestamp ts = item.played_at();
 			Integer ms_played = item.track().duration_ms();
-			String spotify_track_id = item.track().uri().replace("spotify:track", "");
+			String spotify_track_id = item.track().uri().replace("spotify:track:", "");
 			
 			Stream stream = new Stream(ts, ms_played, spotify_track_id);
 			if (!previous.contains(stream)) {
-				streamsAdded += ss.addNew(stream);				
+				streamsAdded += strs.addNew(stream);
+				tracksAdded += trs.addTrack(stream);
 			}
 		}
-		return streamsAdded + "streams added.";
+		return streamsAdded + " streams added.\n" + tracksAdded + " new tracks added.";
 	}
 }
