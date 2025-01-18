@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server;
+package com.github.barmiro.sysh_server.json;
 
 import java.util.List;
 
@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.barmiro.sysh_server.catalog.tracks.TrackService;
 import com.github.barmiro.sysh_server.streams.Stream;
 import com.github.barmiro.sysh_server.streams.StreamService;
-import com.github.barmiro.sysh_server.tracks.TrackService;
 
 @RestController
 public class JsonController {
@@ -22,11 +22,15 @@ public class JsonController {
 	}
 	
 	@PostMapping("/addJson")
-	String addJson(@RequestBody List<Stream> streams) {
+	String addJson(@RequestBody List<StreamDTO> streamDTOs) {
 		Integer streamsAdded = 0;
 		Integer tracksAdded = 0;
-		for (Stream stream:streams) {
-			if (stream.spotify_track_uri() != null) {
+		
+		for (StreamDTO streamDTO:streamDTOs) {
+			if (streamDTO.spotify_track_uri() != null) {
+				Stream stream = new Stream(streamDTO.ts(),
+						streamDTO.ms_played(),
+						streamDTO.spotify_track_uri().replace("spotify:track:", ""));
 				streamsAdded += streamService.addNew(stream);
 				tracksAdded += trackService.addTracks(stream);
 			}

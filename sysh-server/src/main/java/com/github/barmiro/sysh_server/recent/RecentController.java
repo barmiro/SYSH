@@ -48,12 +48,9 @@ public class RecentController {
 			
 			Timestamp ts = item.played_at();
 			Integer ms_played = item.track().duration_ms();
-			String master_metadata_track_name = item.track().name();
-			String master_metadata_album_artist_name = item.track().artists().get(0).name();	// THIS IS VERY WRONG, BUT TEMPORARY FOR TESTING
-			String master_metadata_album_album_name = item.track().album().name();
-			String spotify_track_uri = item.track().uri();
+			String spotify_track_id = item.track().uri().replace("spotify:track", "");
 			
-			Stream stream = new Stream(ts, ms_played, master_metadata_track_name, master_metadata_album_artist_name, master_metadata_album_album_name, spotify_track_uri);
+			Stream stream = new Stream(ts, ms_played, spotify_track_id);
 			if (!previous.contains(stream)) {
 				streamsAdded += ss.addNew(stream);				
 			}

@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.tracks;
+package com.github.barmiro.sysh_server.catalog.tracks;
 
 import java.sql.Types;
 import java.util.List;
@@ -31,14 +31,11 @@ public class TrackService {
 	
 	List<Track> topTracksNew() {
 		
-		String sql = ("SELECT Tracks.*, COUNT(Streams.spotify_track_uri) AS stream_count "
+		String sql = ("SELECT Tracks.*, COUNT(Streams.spotify_track_id) AS stream_count "
 				+ "FROM Tracks "
-				+ "LEFT JOIN Streams ON Tracks.spotify_track_uri = Streams.spotify_track_uri "
+				+ "LEFT JOIN Streams ON Tracks.spotify_track_id = Streams.spotify_track_id "
 				+ "GROUP BY "
-				+ "Tracks.spotify_track_uri,"
-				+ "Tracks.master_metadata_track_name,"
-				+ "Tracks.master_metadata_album_artist_name,"
-				+ "Tracks.master_metadata_album_album_name,"
+				+ "Tracks.spotify_track_id,"
 				+ "Tracks.stream_number,"
 				+ "Tracks.total_ms_played,"
 				+ "Tracks.first_played "
@@ -51,22 +48,16 @@ public class TrackService {
 	
 	public Integer addTracks(Stream stream) {
 		String newTrack = ("INSERT INTO Tracks("
-				+ "spotify_track_uri,"
-				+ "master_metadata_track_name,"
-				+ "master_metadata_album_artist_name,"
-				+ "master_metadata_album_album_name,"
+				+ "spotify_track_id,"
 				+ "stream_number,"
 				+ "total_ms_played,"
 				+ "first_played"
 				+ ") VALUES ("
-				+ ":spotify_track_uri,"
-				+ ":master_metadata_track_name,"
-				+ ":master_metadata_album_artist_name,"
-				+ ":master_metadata_album_album_name,"
+				+ ":spotify_track_id,"
 				+ "1,"
 				+ ":ms_played,"
 				+ ":ts)"
-				+ "ON CONFLICT(spotify_track_uri)"
+				+ "ON CONFLICT(spotify_track_id)"
 				+ "DO UPDATE SET ("
 				+ "stream_number,"
 				+ "total_ms_played"
@@ -77,10 +68,7 @@ public class TrackService {
 		return jdbcClient.sql(newTrack)
 				.param("ts", stream.ts(), Types.TIMESTAMP)
 				.param("ms_played", stream.ms_played(), Types.INTEGER)
-				.param("master_metadata_track_name", stream.master_metadata_track_name(), Types.VARCHAR)
-				.param("master_metadata_album_artist_name", stream.master_metadata_album_artist_name(), Types.VARCHAR)
-				.param("master_metadata_album_album_name", stream.master_metadata_album_album_name(), Types.VARCHAR)
-				.param("spotify_track_uri", stream.spotify_track_uri(), Types.VARCHAR)
+				.param("spotify_track_id", stream.spotify_track_id(), Types.VARCHAR)
 				.update();
 		
 		}

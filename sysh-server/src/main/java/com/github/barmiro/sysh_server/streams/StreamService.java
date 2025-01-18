@@ -38,25 +38,16 @@ public class StreamService {
 		String sql = ("INSERT INTO Streams("
 				+ "ts,"
 				+ "ms_played,"
-				+ "master_metadata_track_name,"
-				+ "master_metadata_album_artist_name,"
-				+ "master_metadata_album_album_name,"
-				+ "spotify_track_uri"
+				+ "spotify_track_id"
 				+ ") VALUES ("
 				+ ":ts,"
 				+ ":ms_played,"
-				+ ":master_metadata_track_name,"
-				+ ":master_metadata_album_artist_name,"
-				+ ":master_metadata_album_album_name,"
-				+ ":spotify_track_uri)");
+				+ ":spotify_track_id)");
 		
 		return this.jdbcClient.sql(sql)
 				.param("ts", stream.ts(), Types.TIMESTAMP)
 				.param("ms_played", stream.ms_played(), Types.INTEGER)
-				.param("master_metadata_track_name", stream.master_metadata_track_name(), Types.VARCHAR)
-				.param("master_metadata_album_artist_name", stream.master_metadata_album_artist_name(), Types.VARCHAR)
-				.param("master_metadata_album_album_name", stream.master_metadata_album_album_name(), Types.VARCHAR)
-				.param("spotify_track_uri", stream.spotify_track_uri(), Types.VARCHAR)
+				.param("spotify_track_id", stream.spotify_track_id(), Types.VARCHAR)
 				.update();
 	}
 }

@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.tracks;
+package com.github.barmiro.sysh_server.catalog.tracks;
 
 import java.util.List;
 
