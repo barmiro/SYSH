@@ -22,6 +22,12 @@ public class StreamService {
 				.list();
 	}
 	
+	public List<Stream> find(Integer limit) {
+		return jdbcClient.sql("SELECT * FROM Streams LIMIT :limit")
+				.param("limit", limit, Types.INTEGER)
+				.query(Stream.class)
+				.list();
+	}
 	
 	Integer wipe() {
 		return this.jdbcClient.sql("DELETE FROM Streams").update();

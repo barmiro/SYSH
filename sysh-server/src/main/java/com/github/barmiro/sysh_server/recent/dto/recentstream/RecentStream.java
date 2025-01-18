@@ -8,8 +8,7 @@ import com.github.barmiro.sysh_server.recent.dto.recentstream.recenttrack.Recent
 public record RecentStream(
 		RecentTrack track,
 		Timestamp played_at,
-		Context context,
-		String uri
+		Context context
 		) {
 
 }
