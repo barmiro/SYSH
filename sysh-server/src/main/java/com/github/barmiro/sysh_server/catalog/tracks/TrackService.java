@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class TrackService {
 
-	private final JdbcClient jdbcClient;
+	private final JdbcClient jdbc;
 	
-	TrackService(JdbcClient jdbcClient) {
-		this.jdbcClient = jdbcClient;
+	TrackService(JdbcClient jdbc) {
+		this.jdbc = jdbc;
 	}
 	
 	public List<Track> allTracks() {
-		return jdbcClient.sql("SELECT * FROM Tracks")
+		return jdbc.sql("SELECT * FROM Tracks")
 				.query(Track.class)
 				.list();
 	}
@@ -32,7 +32,7 @@ public class TrackService {
 				+ "Tracks.spotify_track_id,"
 				+ "Tracks.name,"
 				+ "ORDER BY stream_count DESC;");
-		return jdbcClient.sql(sql)
+		return jdbc.sql(sql)
 				.query(TrackStats.class)
 				.list();
 
@@ -55,7 +55,7 @@ public class TrackService {
 		Integer tracksAdded = 0;
 		
 		try {
-			tracksAdded = jdbcClient.sql(newTrack)
+			tracksAdded = jdbc.sql(newTrack)
 				.param("spotify_track_id", track.spotify_track_id(), Types.VARCHAR)
 				.param("name", track.name(), Types.VARCHAR)
 				.param("duration_ms", track.duration_ms(), Types.INTEGER)
@@ -87,7 +87,7 @@ public class TrackService {
 //				+ "Tracks.stream_number + 1,"
 //				+ "Tracks.total_ms_played + :ms_played);");
 //
-//		return jdbcClient.sql(newTrack)
+//		return jdbc.sql(newTrack)
 //				.param("ts", stream.ts(), Types.TIMESTAMP)
 //				.param("ms_played", stream.ms_played(), Types.INTEGER)
 //				.param("spotify_track_id", stream.spotify_track_id(), Types.VARCHAR)

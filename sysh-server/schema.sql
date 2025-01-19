@@ -1,5 +1,9 @@
 CREATE TABLE Albums (
-    id varchar PRIMARY KEY
+    id varchar PRIMARY KEY,
+    name varchar,
+    total_tracks integer,
+    release_date varchar,
+    
 );
 
 CREATE TABLE Artists (
@@ -25,4 +29,18 @@ CREATE TABLE Tracks_Artists (
     artist_id varchar REFERENCES Artists(id),
     artist_order integer,
     PRIMARY KEY (spotify_track_id, artist_id)
-)
+);
+
+CREATE TABLE Albums_Tracks (
+    album_id varchar REFERENCES Albums(id),
+    spotify_track_id varchar REFERENCES Tracks(spotify_track_id),
+    track_number integer,
+    PRIMARY KEY (album_id, spotify_track_id)
+);
+
+CREATE TABLE Artists_Albums (
+    artist_id varchar REFERENCES Artists(id),
+    album_id varchar REFERENCES Albums(id),
+    artist_order integer,
+    PRIMARY KEY (artist_id, album_id)
+);

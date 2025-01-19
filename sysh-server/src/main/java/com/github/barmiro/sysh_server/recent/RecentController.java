@@ -22,18 +22,18 @@ import com.github.barmiro.sysh_server.streams.StreamService;
 public class RecentController {
 	
 	TokenService tkn;
-	RestClient recentClient;
+	RestClient apiClient;
 	StreamService strs;
 	TrackService trs;
 	TrackApiService trApi;
 	
 	public RecentController(TokenService tkn,
-			RestClient recentClient,
+			RestClient apiClient,
 			StreamService strs,
 			TrackService trs,
 			TrackApiService trApi) {
 		this.tkn = tkn;
-		this.recentClient = recentClient;
+		this.apiClient = apiClient;
 		this.strs = strs;
 		this.trs = trs;
 		this.trApi = trApi;
@@ -45,7 +45,7 @@ public class RecentController {
 	
 	@GetMapping("/recent")
 	public String recent() throws Exception {
-		ResponseEntity<String> response = recentClient
+		ResponseEntity<String> response = apiClient
 				.get()
 				.uri("me/player/recently-played")
 				.header("Authorization", "Bearer " + tkn.getToken())

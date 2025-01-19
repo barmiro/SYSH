@@ -8,7 +8,7 @@ import org.springframework.web.client.RestClient;
 public class SyshServerConfig {
 	
 	@Bean
-	RestClient recentClient(RestClient.Builder builder) {
+	RestClient apiClient(RestClient.Builder builder) {
 		return builder.baseUrl("https://api.spotify.com/v1/").build();
 	}
 	

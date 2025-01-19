@@ -9,28 +9,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class StreamService {
 	
-	private final JdbcClient jdbcClient;
+	private final JdbcClient jdbc;
 	
-	StreamService(JdbcClient jdbcClient) {
-		this.jdbcClient = jdbcClient;
+	StreamService(JdbcClient jdbc) {
+		this.jdbc = jdbc;
 	}
 	
 	
 	public List<Stream> findAll() {
-		return jdbcClient.sql("SELECT * FROM Streams")
+		return jdbc.sql("SELECT * FROM Streams")
 				.query(Stream.class)
 				.list();
 	}
 	
 	public List<Stream> find(Integer limit) {
-		return jdbcClient.sql("SELECT * FROM Streams LIMIT :limit")
+		return jdbc.sql("SELECT * FROM Streams LIMIT :limit")
 				.param("limit", limit, Types.INTEGER)
 				.query(Stream.class)
 				.list();
 	}
 	
 	Integer wipe() {
-		return this.jdbcClient.sql("DELETE FROM Streams").update();
+		return this.jdbc.sql("DELETE FROM Streams").update();
 	}
 
 	
@@ -44,7 +44,7 @@ public class StreamService {
 				+ ":ms_played,"
 				+ ":spotify_track_id)");
 		
-		return this.jdbcClient.sql(sql)
+		return this.jdbc.sql(sql)
 				.param("ts", stream.ts(), Types.TIMESTAMP)
 				.param("ms_played", stream.ms_played(), Types.INTEGER)
 				.param("spotify_track_id", stream.spotify_track_id(), Types.VARCHAR)

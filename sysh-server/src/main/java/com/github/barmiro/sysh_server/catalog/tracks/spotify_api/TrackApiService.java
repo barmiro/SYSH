@@ -22,17 +22,17 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiT
 @Service
 public class TrackApiService {
 
-	private final JdbcClient jdbcClient;
-	private final RestClient trackClient;
+	private final JdbcClient jdbc;
+	private final RestClient apiClient;
 	private final TokenService tkn;
 	private final TrackService trackService;
 	
-	TrackApiService(JdbcClient jdbcClient, 
-			RestClient trackClient, 
+	TrackApiService(JdbcClient jdbc, 
+			RestClient apiClient, 
 			TokenService tkn,
 			TrackService trackService) {
-		this.jdbcClient = jdbcClient;
-		this.trackClient = trackClient;
+		this.jdbc = jdbc;
+		this.apiClient = apiClient;
 		this.tkn = tkn;
 		this.trackService = trackService;
 	}
@@ -48,7 +48,7 @@ public class TrackApiService {
 		if (trackID == "") {
 			return;
 		}
-		int exists = jdbcClient.sql("SELECT * FROM Tracks "
+		int exists = jdbc.sql("SELECT * FROM Tracks "
 				+ "WHERE spotify_track_id = :trackID "
 				+ "LIMIT 1")
 				.param("trackID", trackID, Types.VARCHAR)
@@ -80,7 +80,7 @@ public class TrackApiService {
 		if (IDlist.size() == 0 || IDlist.size() > 50) {
 			return null;
 		}
-		ResponseEntity<String> response = trackClient
+		ResponseEntity<String> response = apiClient
 				.get()
 				.uri(stringify(IDlist))
 				.header("Authorization", "Bearer " + tkn.getToken())
