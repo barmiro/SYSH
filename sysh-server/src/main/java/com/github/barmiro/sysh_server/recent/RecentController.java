@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackService;
+import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiService;
 import com.github.barmiro.sysh_server.recent.dto.ItemsWrapper;
 import com.github.barmiro.sysh_server.recent.dto.recentstream.RecentStream;
 import com.github.barmiro.sysh_server.streams.Stream;
@@ -24,15 +25,23 @@ public class RecentController {
 	RestClient recentClient;
 	StreamService strs;
 	TrackService trs;
+	TrackApiService trApi;
 	
-	public RecentController(TokenService tkn, RestClient recentClient, StreamService strs, TrackService trs) {
+	public RecentController(TokenService tkn,
+			RestClient recentClient,
+			StreamService strs,
+			TrackService trs,
+			TrackApiService trApi) {
 		this.tkn = tkn;
 		this.recentClient = recentClient;
 		this.strs = strs;
 		this.trs = trs;
+		this.trApi = trApi;
 	}
 	
-	ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	ObjectMapper objectMapper = new ObjectMapper()
+			.configure(DeserializationFeature
+					.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	
 	@GetMapping("/recent")
 	public String recent() throws Exception {
@@ -47,7 +56,10 @@ public class RecentController {
 		int streamsAdded = 0;
 		int tracksAdded = 0;
 		
-		List<RecentStream> items = objectMapper.readValue(response.getBody(), ItemsWrapper.class).items();
+		List<RecentStream> items = objectMapper
+				.readValue(response.getBody(), ItemsWrapper.class)
+				.items();
+		
 		for (RecentStream item:items) {
 			
 			Timestamp ts = item.played_at();
@@ -57,7 +69,7 @@ public class RecentController {
 			Stream stream = new Stream(ts, ms_played, spotify_track_id);
 			if (!previous.contains(stream)) {
 				streamsAdded += strs.addNew(stream);
-				tracksAdded += trs.addTrack(stream);
+				tracksAdded += trApi.addNewTracks(stream.spotify_track_id());
 			}
 		}
 		return streamsAdded + " streams added.\n" + tracksAdded + " new tracks added.";

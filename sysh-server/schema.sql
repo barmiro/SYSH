@@ -1,19 +1,28 @@
+CREATE TABLE Albums (
+    id varchar PRIMARY KEY
+);
+
+CREATE TABLE Artists (
+    id varchar PRIMARY KEY
+);
+
+CREATE TABLE Tracks (
+    spotify_track_id varchar PRIMARY KEY,
+    name varchar,
+    duration_ms integer,
+    album_id varchar
+);
+
 CREATE TABLE Streams (
+    id SERIAL PRIMARY KEY,
     ts timestamp NOT NULL,
     ms_played integer NOT NULL,
     spotify_track_id varchar NOT NULL
 );
 
-CREATE TABLE Tracks (
-    spotify_track_id varchar UNIQUE NOT NULL,
-    stream_number integer NOT NULL DEFAULT 0,
-    total_ms_played integer NOT NULL DEFAULT 0,
-    first_played timestamp,
-    stream_count integer
-);
-
-CREATE TABLE Albums (
-);
-
-CREATE TABLE Artists (
-);
+CREATE TABLE Tracks_Artists (
+    spotify_track_id varchar REFERENCES Tracks(spotify_track_id),
+    artist_id varchar REFERENCES Artists(id),
+    artist_order integer,
+    PRIMARY KEY (spotify_track_id, artist_id)
+)

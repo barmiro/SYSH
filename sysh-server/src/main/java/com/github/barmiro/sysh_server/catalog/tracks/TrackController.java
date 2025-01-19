@@ -19,12 +19,8 @@ public class TrackController {
 	}
 	
 	@GetMapping("/topTracksNew")
-	List<Track> topTracksNew() {
+	List<TrackStats> topTracksNew() {
 		return trackService.topTracksNew();
 	}
 	
-	@GetMapping("/topTracks")
-	List<Track> topTracks() {
-		return trackService.topTracks();
-	}
 }
