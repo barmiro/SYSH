@@ -69,9 +69,11 @@ public class RecentController {
 			Stream stream = new Stream(ts, ms_played, spotify_track_id);
 			if (!previous.contains(stream)) {
 				streamsAdded += strs.addNew(stream);
-				tracksAdded += trApi.addNewTracks(stream.spotify_track_id());
+				tracksAdded += trApi.addNewTracks(stream.spotify_track_id(), false);
 			}
 		}
+
+		tracksAdded += trApi.addNewTracks("", true);
 		return streamsAdded + " streams added.\n" + tracksAdded + " new tracks added.";
 	}
 }

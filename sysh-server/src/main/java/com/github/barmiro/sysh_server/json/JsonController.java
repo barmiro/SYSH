@@ -33,10 +33,10 @@ public class JsonController {
 						streamDTO.ms_played(),
 						streamDTO.spotify_track_uri().replace("spotify:track:", ""));
 				streamsAdded += streamService.addNew(stream);
-				tracksAdded += trackApiService.addNewTracks(stream.spotify_track_id());
+				tracksAdded += trackApiService.addNewTracks(stream.spotify_track_id(), false);
 			}
 		}
-		
+		tracksAdded += trackApiService.addNewTracks("", true);
 		return streamsAdded + " streams added.\n" + tracksAdded + " tracks added or updated.\n";
 	}
 }

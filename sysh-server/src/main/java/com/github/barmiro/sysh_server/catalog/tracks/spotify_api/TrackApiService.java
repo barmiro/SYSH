@@ -45,16 +45,21 @@ public class TrackApiService {
 	
 	
 	void makeList(String trackID) {
-		int exists = jdbcClient.sql("SELECT 1 FROM Tracks "
+		if (trackID == "") {
+			return;
+		}
+		int exists = jdbcClient.sql("SELECT * FROM Tracks "
 				+ "WHERE spotify_track_id = :trackID "
 				+ "LIMIT 1")
 				.param("trackID", trackID, Types.VARCHAR)
-				.query(Integer.class)
+				.query(Track.class)
 				.list()
 				.size();
 		
-		if (exists == 0) {
-			newIDs.add(trackID);			
+		if (exists == 0 && !newIDs.contains(trackID)) {
+			newIDs.add(trackID);
+		} else {
+			System.out.println("Failed: Track " + trackID + "already exists");
 		}
 		
 	}
@@ -70,11 +75,14 @@ public class TrackApiService {
 		return sb.toString();
 	}
 	
-	private ResponseEntity<String> getList() throws Exception {
-		System.out.println(stringify(newIDs));
+	private ResponseEntity<String> getList(List<String> IDlist) throws Exception {
+		
+		if (IDlist.size() == 0 || IDlist.size() > 50) {
+			return null;
+		}
 		ResponseEntity<String> response = trackClient
 				.get()
-				.uri(stringify(newIDs))
+				.uri(stringify(IDlist))
 				.header("Authorization", "Bearer " + tkn.getToken())
 				.retrieve()
 				.toEntity(String.class);
@@ -84,7 +92,7 @@ public class TrackApiService {
 	
 	private Integer addToTracks(ResponseEntity<String> getList) 
 			throws JsonMappingException, JsonProcessingException {
-//		TODO: IMPLEMENT SQL AND DTOs
+
 		int added = 0;
 		
 		List<ApiTrack> apiTracks = mapper
@@ -111,29 +119,31 @@ public class TrackApiService {
 		return added;
 	}
 	
-	public Integer addNewTracks(String track_id) {
+	public Integer addNewTracks(String track_id, boolean end) {
 		
 		makeList(track_id);
 		
-		if (newIDs.size() < 20) {
+		if (newIDs.size() < 50 && !end) {
 			return 0;
 		}
 		
 		ResponseEntity<String> response = null;
 		
 		try {
-			response = getList();
+			response = getList(newIDs);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return 0;
 		}
 		
+		if (response == null) {
+			System.out.println("The ID list is either empty or too big.");
+			return 0;
+		}
 		try {
 			newIDs.clear();
 			return addToTracks(response);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return 0;
 		}
