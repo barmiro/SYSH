@@ -24,6 +24,7 @@ public class JsonController {
 	
 	@PostMapping("/addJson")
 	String addJson(@RequestBody List<StreamDTO> streamDTOs) {
+		long start = System.currentTimeMillis();
 		Integer streamsAdded = 0;
 		Integer tracksAdded = 0;
 		
@@ -37,6 +38,9 @@ public class JsonController {
 			}
 		}
 		tracksAdded += trackApiService.addNewTracks("", true);
+		long end = System.currentTimeMillis();
+		long time = (end - start) / 1000;
+		System.out.println("Time elapsed: " + time);
 		return streamsAdded + " streams added.\n" + tracksAdded + " tracks added or updated.\n";
 	}
 }
