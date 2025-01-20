@@ -53,6 +53,13 @@ public class TrackService implements CatalogService {
 		return tracksAdded;
 	}
 	
+	public Integer addTracks(List<Track> tracks) {
+		Integer added = 0;
+		for (Track track:tracks) {
+			added += addNewTrack(track);
+		}
+		return added;
+	}
 	
 	
 	List<TrackStats> topTracksNew() {

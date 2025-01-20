@@ -33,31 +33,38 @@ public abstract class SpotifyApiService<
 		this.catalogService = catalogService;
 	}
 	
-	protected List<String> newIDs = new ArrayList<>();
-	
 	protected ObjectMapper mapper = new ObjectMapper()
 			.configure(DeserializationFeature
 					.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	
 	
-	protected void makeList(String entityID, String idName, Class<EntityClass> entCls) {
-		if (entityID == "") {
-			return;
-		}
-		int exists = jdbc.sql("SELECT * FROM "
-				+ entCls.getSimpleName() + "s "
-				+ "WHERE " + idName + " = :entityID "
-				+ "LIMIT 1")
-				.param("entityID", entityID, Types.VARCHAR)
-				.query(entCls)
-				.list()
-				.size();
+	protected List<String> getNewIDs(List<String> entityIDs,
+			String idName, 
+			Class<EntityClass> entCls) {
 		
-		if (exists == 0 && !newIDs.contains(entityID)) {
-			newIDs.add(entityID);
-		} else {
-			System.out.println(entCls.getSimpleName() + " " + entityID + " already exists");
+		List<String> newIDs = new ArrayList<>();
+		
+		for(String entityID:entityIDs) {
+			
+			if (entityID == "") {
+				continue;
+			}
+			
+			int exists = jdbc.sql("SELECT * FROM "
+					+ entCls.getSimpleName() + "s "
+					+ "WHERE " + idName + " = :entityID "
+					+ "LIMIT 1")
+					.param("entityID", entityID, Types.VARCHAR)
+					.query(entCls)
+					.list()
+					.size();
+			
+			if (exists == 0 && !newIDs.contains(entityID)) {
+				newIDs.add(entityID);
+			}
+			
 		}
+		return newIDs;
 		
 	}
 	
@@ -72,18 +79,38 @@ public abstract class SpotifyApiService<
 		return sb.toString();
 	}
 
-	protected ResponseEntity<String> getList(
+	protected List<String> prepIdPackets(
 			List<String> IDlist,
 			Class<EntityClass> entCls,
 			int limit
 			) throws Exception {
 		
-		if (IDlist.size() == 0 || IDlist.size() > limit) {
-			return null;
+		int listSize = IDlist.size();
+		
+		if (listSize == 0) {
+			return new ArrayList<>();
 		}
+		
+		List<String> idPackets = new ArrayList<>();
+		
+		for(int i = 0; i < listSize; i += limit) {
+			
+			if (i + limit >= listSize) {
+				limit = listSize - i;
+			}
+			
+			String idPacket = stringify(IDlist.subList(i, i + limit), entCls);
+			idPackets.add(idPacket);
+
+		}
+		
+		return idPackets;
+	}
+	
+	protected ResponseEntity<String> getResponse(String packet) {
 		ResponseEntity<String> response = apiClient
 				.get()
-				.uri(stringify(IDlist, entCls))
+				.uri(packet)
 				.header("Authorization", "Bearer " + tkn.getToken())
 				.retrieve()
 				.toEntity(String.class);

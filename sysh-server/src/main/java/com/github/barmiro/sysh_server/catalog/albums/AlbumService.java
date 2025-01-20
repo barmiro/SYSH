@@ -52,6 +52,12 @@ public class AlbumService implements CatalogService {
 		return albumsAdded;
 	}
 	
-	
+	public Integer addAlbums(List<Album> albums) {
+		Integer added = 0;
+		for (Album album:albums) {
+			added += addAlbum(album);
+		}
+		return added;
+	}
 	
 }

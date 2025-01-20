@@ -50,4 +50,13 @@ public class StreamService {
 				.param("spotify_track_id", stream.spotify_track_id(), Types.VARCHAR)
 				.update();
 	}
+	
+	public Integer addAll(List<Stream> streams) {
+		Integer added = 0;
+		for (Stream stream:streams) {
+			added += addNew(stream);
+		}
+		
+		return added;
+	}
 }

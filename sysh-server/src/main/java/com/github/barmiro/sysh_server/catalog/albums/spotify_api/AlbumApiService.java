@@ -1,5 +1,6 @@
 package com.github.barmiro.sysh_server.catalog.albums.spotify_api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -23,14 +24,17 @@ public class AlbumApiService extends SpotifyApiService<AlbumService, Album>{
 		super(jdbc, apiClient, tkn, catalogService);
 	}
 
-	private Integer addToAlbums(ResponseEntity<String> getList) 
-			throws JsonMappingException, JsonProcessingException {
-
-		int added = 0;
+	private List<ApiAlbum> mapApiAlbums(ResponseEntity<String> response
+			) throws JsonMappingException, JsonProcessingException {
 		
-		List<ApiAlbum> apiAlbums = mapper
-				.readValue(getList.getBody(), AlbumsWrapper.class)
+		return mapper
+				.readValue(response.getBody(), AlbumsWrapper.class)
 				.albums();
+	}
+	
+	public List<Album> convertApiAlbums(List<ApiAlbum> apiAlbums) {
+		
+		List<Album> addedAlbums = new ArrayList<>();
 		
 		for (ApiAlbum album:apiAlbums) {
 			String id = album.id();
@@ -43,44 +47,58 @@ public class AlbumApiService extends SpotifyApiService<AlbumService, Album>{
 					name,
 					total_tracks,
 					release_date);
-
 			
-			added += catalogService.addAlbum(newAlbum);
-			
-//			List<ApiTrackArtist> artists = track.artists();
+			addedAlbums.add(newAlbum);
 		}
 		
-		return added;
+		return addedAlbums;
 	}
 	
-	public Integer addNewAlbums(String id, boolean end) {
+
+	
+	public List<Album> addNewAlbums(List<String> album_ids) {
 		
-		makeList(id, "id", Album.class);
 		
-		if (newIDs.size() < 20 && !end) {
-			return 0;
-		}
+		List<String> newIDs = getNewIDs(album_ids, "id", Album.class);
 		
-		ResponseEntity<String> response = null;
-		
+		List<String> packets = new ArrayList<>();
 		try {
-			response = getList(newIDs, Album.class, 50);
+			packets = prepIdPackets(newIDs, Album.class, 20);			
 		} catch (Exception e) {
 			e.printStackTrace();
-			return 0;
+			System.out.println("Method prepIdPackets threw an exception.");
+			return new ArrayList<Album>();
 		}
 		
-		if (response == null) {
-			System.out.println("The ID list is either empty or too big.");
-			return 0;
+		List<ApiAlbum> apiAlbums = new ArrayList<>();
+		for (String packet:packets) {
+			
+			ResponseEntity<String> response = null;
+			response = getResponse(packet);
+			
+			if (response == null) {
+				continue;
+			}
+			
+			try {
+				apiAlbums.addAll(mapApiAlbums(response));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+				System.out.println("Method mapApiAlbums threw an exception");
+			}
 		}
-		try {
-			newIDs.clear();
-			return addToAlbums(response);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-			return 0;
+		
+		if (apiAlbums.size() == 0) {
+			System.out.println("No albums to add.");
+			return new ArrayList<Album>();
 		}
+		
+		List<Album> albums = convertApiAlbums(apiAlbums);
+		
+		Integer albumsAdded = catalogService.addAlbums(albums);
+		
+		System.out.println(albumsAdded + " new albums added");
+		return albums;
 		
 	}
 }

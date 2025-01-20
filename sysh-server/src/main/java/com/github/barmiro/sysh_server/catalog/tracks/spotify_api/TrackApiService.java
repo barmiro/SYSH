@@ -1,5 +1,6 @@
 package com.github.barmiro.sysh_server.catalog.tracks.spotify_api;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.SpotifyApiService;
-import com.github.barmiro.sysh_server.catalog.albums.spotify_api.AlbumApiService;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackService;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.TracksWrapper;
@@ -20,20 +20,22 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiT
 @Service
 public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 
-	private final AlbumApiService albumApiService;
-	TrackApiService(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackService catalogService, AlbumApiService albumApiService) {
+
+	TrackApiService(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackService catalogService) {
 		super(jdbc, apiClient, tkn, catalogService);
-		this.albumApiService = albumApiService;
 	}
 
-	
-	private Integer addToTracks(ResponseEntity<String> getList) 
-			throws JsonMappingException, JsonProcessingException {
-
-		int added = 0;
-		List<ApiTrack> apiTracks = mapper
-				.readValue(getList.getBody(), TracksWrapper.class)
+	private List<ApiTrack> mapApiTracks(ResponseEntity<String> response
+			) throws JsonMappingException, JsonProcessingException {
+		
+		return mapper
+				.readValue(response.getBody(), TracksWrapper.class)
 				.tracks();
+	}
+	
+	public List<Track> convertApiTracks(List<ApiTrack> apiTracks) {
+		
+		List<Track> addedTracks = new ArrayList<>();
 		
 		for (ApiTrack track:apiTracks) {
 			String spotify_track_id = track.id();
@@ -47,42 +49,56 @@ public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 					duration_ms,
 					album_id);
 			
-			added += catalogService.addNewTrack(newTrack);
-			added += (albumApiService.addNewAlbums(album_id, false) * 1000000);
-//			List<ApiTrackArtist> artists = track.artists();
+			addedTracks.add(newTrack);
 		}
-		added += (albumApiService.addNewAlbums("", true) * 1000000);
-		return added;
+		
+		return addedTracks;
 	}
 	
-	public Integer addNewTracks(String track_id, boolean end) {
+
+	public List<Track> addNewTracks(List<String> track_ids) {
 		
-		makeList(track_id, "spotify_track_id", Track.class);
+		List<String> newIDs = getNewIDs(track_ids, "spotify_track_id", Track.class);
 		
-		if (newIDs.size() < 50 && !end) {
-			return 0;
-		}
-		
-		ResponseEntity<String> response = null;
-		
+		List<String> packets = new ArrayList<>();
 		try {
-			response = getList(newIDs, Track.class, 50);
+			packets = prepIdPackets(newIDs, Track.class, 50);			
 		} catch (Exception e) {
 			e.printStackTrace();
-			return 0;
+			System.out.println("Method prepIdPackets threw an exception.");
+			return new ArrayList<Track>();
 		}
 		
-		if (response == null) {
-			System.out.println("The ID list is either empty or too big.");
-			return 0;
+		List<ApiTrack> apiTracks = new ArrayList<>();
+		for (String packet:packets) {
+			
+			ResponseEntity<String> response = null;
+			response = getResponse(packet);
+			
+			if (response == null) {
+				System.out.println("Response for " + packet + " is null.");
+				continue;
+			}
+			
+			try {
+				apiTracks.addAll(mapApiTracks(response));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+				System.out.println("Method mapApiTracks threw an exception");
+			}
 		}
-		try {
-			newIDs.clear();
-			return addToTracks(response);
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-			return 0;
+		
+		if (apiTracks.size() == 0) {
+			System.out.println("No tracks to add.");
+			return new ArrayList<Track>();
 		}
+		
+		List<Track> tracks = convertApiTracks(apiTracks);
+		
+		Integer tracksAdded = catalogService.addTracks(tracks);
+		
+		System.out.println(tracksAdded + " new tracks added");
+		return tracks;
 		
 	}
 }
