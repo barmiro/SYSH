@@ -16,19 +16,10 @@ public class StreamController {
 		this.streamService = streamService;
 	}
 	
-	@GetMapping("/hello")
-	String hello() {
-		return "hello";
-	}
 	
 	@GetMapping("/getStreams")
 	List<Stream> getStreams() {
 		return streamService.findAll();
 	}
 	
-	
-	@DeleteMapping("/wipe")
-	String wipe() {
-		return streamService.wipe() + " rows affected.\n";
-	}
 }

@@ -76,30 +76,4 @@ public class TrackService implements CatalogService {
 				.list();
 		
 	}
-//	public Integer addTrack(Stream stream) {
-//		String newTrack = ("INSERT INTO Tracks("
-//				+ "spotify_track_id,"
-//				+ "stream_number,"
-//				+ "total_ms_played,"
-//				+ "first_played"
-//				+ ") VALUES ("
-//				+ ":spotify_track_id,"
-//				+ "1,"
-//				+ ":ms_played,"
-//				+ ":ts)"
-//				+ "ON CONFLICT(spotify_track_id)"
-//				+ "DO UPDATE SET ("
-//				+ "stream_number,"
-//				+ "total_ms_played"
-//				+ ") = ("
-//				+ "Tracks.stream_number + 1,"
-//				+ "Tracks.total_ms_played + :ms_played);");
-//
-//		return jdbc.sql(newTrack)
-//				.param("ts", stream.ts(), Types.TIMESTAMP)
-//				.param("ms_played", stream.ms_played(), Types.INTEGER)
-//				.param("spotify_track_id", stream.spotify_track_id(), Types.VARCHAR)
-//				.update();
-//		
-//		}
 }
