@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.SpotifyApiService;
+import com.github.barmiro.sysh_server.catalog.albums.spotify_api.AlbumApiService;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackService;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.TracksWrapper;
@@ -19,8 +20,10 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiT
 @Service
 public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 
-	TrackApiService(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackService catalogService) {
+	private final AlbumApiService albumApiService;
+	TrackApiService(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackService catalogService, AlbumApiService albumApiService) {
 		super(jdbc, apiClient, tkn, catalogService);
+		this.albumApiService = albumApiService;
 	}
 
 	
@@ -28,7 +31,6 @@ public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 			throws JsonMappingException, JsonProcessingException {
 
 		int added = 0;
-		
 		List<ApiTrack> apiTracks = mapper
 				.readValue(getList.getBody(), TracksWrapper.class)
 				.tracks();
@@ -46,10 +48,10 @@ public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 					album_id);
 			
 			added += catalogService.addNewTrack(newTrack);
-			
+			added += (albumApiService.addNewAlbums(album_id, false) * 1000000);
 //			List<ApiTrackArtist> artists = track.artists();
 		}
-		
+		added += (albumApiService.addNewAlbums("", true) * 1000000);
 		return added;
 	}
 	

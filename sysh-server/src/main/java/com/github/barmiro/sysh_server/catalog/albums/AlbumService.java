@@ -7,8 +7,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
+import com.github.barmiro.sysh_server.catalog.CatalogService;
+
 @Service
-public class AlbumService {
+public class AlbumService implements CatalogService {
 	private final JdbcClient jdbc;
 	
 	AlbumService(JdbcClient jdbc) {
@@ -32,7 +34,7 @@ public class AlbumService {
 				+ ":id,"
 				+ ":name,"
 				+ ":total_tracks,"
-				+ ":release_date");
+				+ ":release_date)");
 		
 		Integer albumsAdded = 0;
 		
@@ -40,7 +42,7 @@ public class AlbumService {
 			albumsAdded = jdbc.sql(newAlbum)
 					.param("id", album.id(), Types.VARCHAR)
 					.param("name", album.name(), Types.VARCHAR)
-					.param("total_tracks", album.total_tracks(), Types.VARCHAR)
+					.param("total_tracks", album.total_tracks(), Types.INTEGER)
 					.param("release_date", album.release_date(), Types.VARCHAR)
 					.update();
 		} catch (DuplicateKeyException e) {

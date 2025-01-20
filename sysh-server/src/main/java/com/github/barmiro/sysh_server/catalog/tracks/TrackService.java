@@ -25,23 +25,6 @@ public class TrackService implements CatalogService {
 	}
 
 	
-	List<TrackStats> topTracksNew() {
-		
-		String sql = ("SELECT Tracks.*, COUNT(Streams.spotify_track_id) AS stream_count "
-				+ "FROM Tracks "
-				+ "LEFT JOIN Streams ON Tracks.spotify_track_id = Streams.spotify_track_id "
-				+ "GROUP BY "
-				+ "Tracks.spotify_track_id,"
-				+ "Tracks.name,"
-				+ "ORDER BY stream_count DESC;");
-		return jdbc.sql(sql)
-				.query(TrackStats.class)
-				.list();
-
-	}
-	
-
-	
 	public Integer addNewTrack(Track track) {
 		String newTrack = ("INSERT INTO Tracks("
 				+ "spotify_track_id,"
@@ -70,6 +53,22 @@ public class TrackService implements CatalogService {
 		return tracksAdded;
 	}
 	
+	
+	
+	List<TrackStats> topTracksNew() {
+		
+		String sql = ("SELECT Tracks.*, COUNT(Streams.spotify_track_id) AS stream_count "
+				+ "FROM Tracks "
+				+ "LEFT JOIN Streams ON Tracks.spotify_track_id = Streams.spotify_track_id "
+				+ "GROUP BY "
+				+ "Tracks.spotify_track_id,"
+				+ "Tracks.name,"
+				+ "ORDER BY stream_count DESC;");
+		return jdbc.sql(sql)
+				.query(TrackStats.class)
+				.list();
+		
+	}
 //	public Integer addTrack(Stream stream) {
 //		String newTrack = ("INSERT INTO Tracks("
 //				+ "spotify_track_id,"
