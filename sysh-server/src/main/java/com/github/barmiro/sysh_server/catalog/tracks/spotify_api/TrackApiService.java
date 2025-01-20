@@ -1,7 +1,5 @@
 package com.github.barmiro.sysh_server.catalog.tracks.spotify_api;
 
-import java.sql.Types;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -10,85 +8,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.auth.TokenService;
+import com.github.barmiro.sysh_server.catalog.SpotifyApiService;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackService;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.TracksWrapper;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
 
 @Service
-public class TrackApiService {
+public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 
-	private final JdbcClient jdbc;
-	private final RestClient apiClient;
-	private final TokenService tkn;
-	private final TrackService trackService;
-	
-	TrackApiService(JdbcClient jdbc, 
-			RestClient apiClient, 
-			TokenService tkn,
-			TrackService trackService) {
-		this.jdbc = jdbc;
-		this.apiClient = apiClient;
-		this.tkn = tkn;
-		this.trackService = trackService;
+	TrackApiService(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackService catalogService) {
+		super(jdbc, apiClient, tkn, catalogService);
 	}
-	
-	private List<String> newIDs = new ArrayList<>();
-	
-	ObjectMapper mapper = new ObjectMapper()
-			.configure(DeserializationFeature
-					.FAIL_ON_UNKNOWN_PROPERTIES, false);
-	
-	
-	void makeList(String trackID) {
-		if (trackID == "") {
-			return;
-		}
-		int exists = jdbc.sql("SELECT * FROM Tracks "
-				+ "WHERE spotify_track_id = :trackID "
-				+ "LIMIT 1")
-				.param("trackID", trackID, Types.VARCHAR)
-				.query(Track.class)
-				.list()
-				.size();
-		
-		if (exists == 0 && !newIDs.contains(trackID)) {
-			newIDs.add(trackID);
-		} else {
-			System.out.println("Failed: Track " + trackID + "already exists");
-		}
-		
-	}
-	
-	private String stringify(List<String> newIDs) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("tracks?ids=");
-		for (String id:newIDs) {
-			sb.append(id + ",");
-		}
-		sb.deleteCharAt(sb.length() - 1);
-		
-		return sb.toString();
-	}
-	
-	private ResponseEntity<String> getList(List<String> IDlist) throws Exception {
-		
-		if (IDlist.size() == 0 || IDlist.size() > 50) {
-			return null;
-		}
-		ResponseEntity<String> response = apiClient
-				.get()
-				.uri(stringify(IDlist))
-				.header("Authorization", "Bearer " + tkn.getToken())
-				.retrieve()
-				.toEntity(String.class);
-		
-		return response;
-	}
+
 	
 	private Integer addToTracks(ResponseEntity<String> getList) 
 			throws JsonMappingException, JsonProcessingException {
@@ -111,7 +45,7 @@ public class TrackApiService {
 					duration_ms,
 					album_id);
 			
-			added += trackService.addNewTrack(newTrack);
+			added += catalogService.addNewTrack(newTrack);
 			
 //			List<ApiTrackArtist> artists = track.artists();
 		}
@@ -121,7 +55,7 @@ public class TrackApiService {
 	
 	public Integer addNewTracks(String track_id, boolean end) {
 		
-		makeList(track_id);
+		makeList(track_id, "spotify_track_id", Track.class);
 		
 		if (newIDs.size() < 50 && !end) {
 			return 0;
@@ -130,7 +64,7 @@ public class TrackApiService {
 		ResponseEntity<String> response = null;
 		
 		try {
-			response = getList(newIDs);
+			response = getList(newIDs, Track.class, 50);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return 0;

@@ -7,8 +7,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
+import com.github.barmiro.sysh_server.catalog.CatalogService;
+
 @Service
-public class TrackService {
+public class TrackService implements CatalogService {
 
 	private final JdbcClient jdbc;
 	

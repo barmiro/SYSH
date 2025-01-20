@@ -2,7 +2,7 @@ CREATE TABLE Albums (
     id varchar PRIMARY KEY,
     name varchar,
     total_tracks integer,
-    release_date varchar,
+    release_date varchar
     
 );
 
