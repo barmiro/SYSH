@@ -2,6 +2,8 @@ package com.github.barmiro.sysh_server.json;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,20 +35,23 @@ public class JsonController {
 	}
 	
 	@PostMapping("/addJson")
-	String addJson(@RequestBody List<StreamDTO> streamDTOs) {
+	String addJson(@RequestBody List<StreamDTO> streamDTOs
+			) throws InterruptedException, ExecutionException {
+		System.out.println("Adding json file...");
 		long start = System.currentTimeMillis();
 		Integer streamsAdded = 0;
 		Integer tracksAdded = 0;
 		Integer albumsAdded = 0;
-		
-		List<Stream> streams = jsonService.convertStreamDTOs(streamDTOs);
-		streamsAdded = streamService.addAll(streams);
 		
 		List<Track> tracks = new ArrayList<>();
 		List<String> trackIDs = new ArrayList<>();
 		
 		List<Album> albums = new ArrayList<>();
 		List<String> albumIDs = new ArrayList<>();
+		
+		List<Stream> streams = jsonService.convertStreamDTOs(streamDTOs);  // null?
+		
+		Future<Integer> streamsFuture = streamService.addAllAsync(streams); // ASYNC
 		
 		for (Stream stream:streams) {
 			trackIDs.add(stream.spotify_track_id());
@@ -63,11 +68,12 @@ public class JsonController {
 		albums.addAll(albumApiService.addNewAlbums(albumIDs));
 		albumsAdded = albums.size();
 		
+		streamsAdded = streamsFuture.get();
 		
 		long end = System.currentTimeMillis();
 		long time = (end - start) / 1000;
 		System.out.println("Time elapsed: " + time);
-		return (streamsAdded + " streams added.\n" 
+		return (streamsAdded + " streams added.\n"  //this has to wait for streamsAdded - TODO: make a future
 				+ tracksAdded + " tracks added.\n"
 				+ albumsAdded + " albums added.\n");
 	}

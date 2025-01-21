@@ -57,6 +57,7 @@ public class AlbumService implements CatalogService {
 		for (Album album:albums) {
 			added += addAlbum(album);
 		}
+		System.out.println("Added " + added + " new albums.");
 		return added;
 	}
 	

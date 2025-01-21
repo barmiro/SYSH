@@ -2,8 +2,11 @@ package com.github.barmiro.sysh_server.streams;
 
 import java.sql.Types;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,5 +61,19 @@ public class StreamService {
 		}
 		
 		return added;
+	}
+	
+	@Async
+	public Future<Integer> addAllAsync(List<Stream> streams) {
+		System.out.println("Found " + streams.size() + " streams.");
+		Integer added = 0;
+		for (Stream stream:streams) {
+			added += addNew(stream);
+		}
+		
+		CompletableFuture<Integer> result = new CompletableFuture<>();
+		result.complete(added);
+		System.out.println("Added " + added + " streams.");
+		return result;
 	}
 }

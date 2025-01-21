@@ -61,6 +61,8 @@ public class AlbumApiService extends SpotifyApiService<AlbumService, Album>{
 		
 		List<String> newIDs = getNewIDs(album_ids, "id", Album.class);
 		
+		System.out.println("Found " + newIDs.size() + " new albums.");
+		
 		List<String> packets = new ArrayList<>();
 		try {
 			packets = prepIdPackets(newIDs, Album.class, 20);			
@@ -97,7 +99,7 @@ public class AlbumApiService extends SpotifyApiService<AlbumService, Album>{
 		
 		Integer albumsAdded = catalogService.addAlbums(albums);
 		
-		System.out.println(albumsAdded + " new albums added");
+
 		return albums;
 		
 	}

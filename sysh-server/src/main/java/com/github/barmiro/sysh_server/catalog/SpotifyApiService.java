@@ -45,7 +45,6 @@ public abstract class SpotifyApiService<
 		List<String> newIDs = new ArrayList<>();
 		
 		for(String entityID:entityIDs) {
-			
 			if (entityID == "") {
 				continue;
 			}
@@ -62,11 +61,10 @@ public abstract class SpotifyApiService<
 			if (exists == 0 && !newIDs.contains(entityID)) {
 				newIDs.add(entityID);
 			}
-			
 		}
 		return newIDs;
-		
 	}
+	
 	
 	protected String stringify(List<String> newIDs, Class<EntityClass> entCls) {
 		StringBuilder sb = new StringBuilder();
@@ -79,6 +77,7 @@ public abstract class SpotifyApiService<
 		return sb.toString();
 	}
 
+	
 	protected List<String> prepIdPackets(
 			List<String> IDlist,
 			Class<EntityClass> entCls,
@@ -118,63 +117,4 @@ public abstract class SpotifyApiService<
 		return response;
 	}
 }
-//	protected Integer addToTable(ResponseEntity<String> getList Class<WrapperClass> wraCls) 
-//			throws JsonMappingException, JsonProcessingException {
-//
-//		int added = 0;
-//		
-//		List<ApiEntityClass> apiEntities = mapper
-//				.readValue(getList.getBody(), wraCls);
-//				.getList();
-//		
-//		for (ApiTrack track:apiTracks) {
-//			String spotify_track_id = track.id();
-//			String name = track.name();
-//			Integer duration_ms = track.duration_ms();
-//			String album_id = track.album().id();
-//			
-//			Track newTrack = new Track(
-//					spotify_track_id,
-//					name,
-//					duration_ms,
-//					album_id);
-//			
-//			added += catalogService.addNewTrack(newTrack);
-//			
-////			List<ApiTrackArtist> artists = track.artists();
-//		}
-//		
-//		return added;
-//	}
-//	
-//	public Integer addNewTracks(String track_id, boolean end) {
-//		
-//		makeList(track_id);
-//		
-//		if (newIDs.size() < 50 && !end) {
-//			return 0;
-//		}
-//		
-//		ResponseEntity<String> response = null;
-//		
-//		try {
-//			response = getList(newIDs);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return 0;
-//		}
-//		
-//		if (response == null) {
-//			System.out.println("The ID list is either empty or too big.");
-//			return 0;
-//		}
-//		try {
-//			newIDs.clear();
-//			return addToTracks(response);
-//		} catch (JsonProcessingException e) {
-//			e.printStackTrace();
-//			return 0;
-//		}
-//		
-//	}
-//}
+

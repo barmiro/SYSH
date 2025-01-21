@@ -58,6 +58,7 @@ public class TrackService implements CatalogService {
 		for (Track track:tracks) {
 			added += addNewTrack(track);
 		}
+		System.out.println("Added " + added + " new tracks");
 		return added;
 	}
 	
@@ -69,7 +70,7 @@ public class TrackService implements CatalogService {
 				+ "LEFT JOIN Streams ON Tracks.spotify_track_id = Streams.spotify_track_id "
 				+ "GROUP BY "
 				+ "Tracks.spotify_track_id,"
-				+ "Tracks.name,"
+				+ "Tracks.name "
 				+ "ORDER BY stream_count DESC;");
 		return jdbc.sql(sql)
 				.query(TrackStats.class)

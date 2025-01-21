@@ -55,11 +55,12 @@ public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 		return addedTracks;
 	}
 	
+//	TODO: Add disc number and track number in prep for Albums_Tracks
 
 	public List<Track> addNewTracks(List<String> track_ids) {
 		
 		List<String> newIDs = getNewIDs(track_ids, "spotify_track_id", Track.class);
-		
+		System.out.println("Found " + newIDs.size() + " new tracks.");
 		List<String> packets = new ArrayList<>();
 		try {
 			packets = prepIdPackets(newIDs, Track.class, 50);			
@@ -97,7 +98,6 @@ public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 		
 		Integer tracksAdded = catalogService.addTracks(tracks);
 		
-		System.out.println(tracksAdded + " new tracks added");
 		return tracks;
 		
 	}
