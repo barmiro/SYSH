@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.streams;
+package com.github.barmiro.sysh_server.catalog.streams;
 
 import java.sql.Types;
 import java.util.List;

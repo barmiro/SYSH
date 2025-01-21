@@ -1,21 +1,24 @@
 package com.github.barmiro.sysh_server.catalog.albums;
 
-import java.sql.Types;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.jdbc.core.simple.JdbcClient.StatementSpec;
 import org.springframework.stereotype.Service;
 
 import com.github.barmiro.sysh_server.catalog.CatalogService;
+import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
+import com.github.barmiro.sysh_server.common.utils.CompInfo;
+import com.github.barmiro.sysh_server.common.utils.CompListToSql;
 
 @Service
 public class AlbumService implements CatalogService {
 	private final JdbcClient jdbc;
-	
 	AlbumService(JdbcClient jdbc) {
 		this.jdbc = jdbc;
 	}
+	
 	
 	public List<Album> allAlbums() {
 		return jdbc.sql("SELECT * FROM Albums")
@@ -24,40 +27,39 @@ public class AlbumService implements CatalogService {
 	}
 	
 	
-	public Integer addAlbum(Album album) {
-		String newAlbum = ("INSERT INTO Albums("
-				+ "id,"
-				+ "name,"
-				+ "total_tracks,"
-				+ "release_date"
-				+ ") VALUES ("
-				+ ":id,"
-				+ ":name,"
-				+ ":total_tracks,"
-				+ ":release_date)");
+	public Integer addAlbum(Album album
+			) throws IllegalAccessException, InvocationTargetException {
 		
-		Integer albumsAdded = 0;
+		List<RecordCompInfo> recordComps = CompInfo.get(album);
 		
-		try {
-			albumsAdded = jdbc.sql(newAlbum)
-					.param("id", album.id(), Types.VARCHAR)
-					.param("name", album.name(), Types.VARCHAR)
-					.param("total_tracks", album.total_tracks(), Types.INTEGER)
-					.param("release_date", album.release_date(), Types.VARCHAR)
-					.update();
-		} catch (DuplicateKeyException e) {
-			return 100000;
+		String sql = CompListToSql.insert(recordComps, Album.class);
+		StatementSpec jdbcCall = jdbc.sql(sql);
+		
+		for (RecordCompInfo comp:recordComps) {
+			jdbcCall = jdbcCall.param(
+					comp.compName(),
+					comp.compValue(),
+					comp.sqlType());
 		}
 		
-		return albumsAdded;
+		Integer added = 0;
+		added = jdbcCall.update();
+		
+		return added;
 	}
 	
+
 	public Integer addAlbums(List<Album> albums) {
 		Integer added = 0;
 		for (Album album:albums) {
-			added += addAlbum(album);
+			try {
+				added += addAlbum(album);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		System.out.println("Added " + added + " new albums.");
+		System.out.println("Added " + added + " new albums");
 		return added;
 	}
 	

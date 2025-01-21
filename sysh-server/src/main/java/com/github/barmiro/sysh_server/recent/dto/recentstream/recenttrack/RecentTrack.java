@@ -9,7 +9,7 @@ public record RecentTrack(
 		Integer duration_ms,
 		String name,
 		RecentAlbum album,
-		String uri,
+		String id,
 		List<RecentArtist> artists) {
 
 }

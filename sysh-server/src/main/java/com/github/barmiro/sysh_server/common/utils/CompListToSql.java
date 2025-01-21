@@ -2,14 +2,17 @@ package com.github.barmiro.sysh_server.common.utils;
 
 import java.util.List;
 
+import com.github.barmiro.sysh_server.catalog.CatalogEntity;
 import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
 
 public class CompListToSql {
 	
-	public static String insert(List<RecordCompInfo> comps) {
+	public static <T extends CatalogEntity> String insert(
+			List<RecordCompInfo> comps,
+			Class<T> clazz) {
 		
 		StringBuilder sb = new StringBuilder()
-				.append("INSERT INTO Tracks(");
+				.append("INSERT INTO " + clazz.getSimpleName() + "s(");
 		
 		for (RecordCompInfo comp:comps) {
 			sb.append(comp.compName() + ",");
