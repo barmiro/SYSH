@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
-import com.github.barmiro.sysh_server.utils.GetRandom;
+import com.github.barmiro.sysh_server.common.utils.GetRandom;
 
 @SpringBootTest
 class ApiTests {

@@ -14,15 +14,15 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 class TrackServiceTest {
 
-	private ImageFromDockerfile image = new ImageFromDockerfile()
-			.withFileFromPath("schema.sql", Paths.get(System.getenv("TESTCONTAINERS_PATH") + "schema.sql"))
-			.withDockerfile(Paths.get(System.getenv("TESTCONTAINERS_PATH") + "TestDockerfile"));
-	
-	@Container
-	public GenericContainer postgres = new GenericContainer(image)
-			.withExposedPorts(5432);
-	
-	
+//	private ImageFromDockerfile image = new ImageFromDockerfile()
+//			.withFileFromPath("schema.sql", Paths.get(System.getenv("TESTCONTAINERS_PATH") + "schema.sql"))
+//			.withDockerfile(Paths.get(System.getenv("TESTCONTAINERS_PATH") + "TestDockerfile"));
+//	
+//	@Container
+//	public GenericContainer postgres = new GenericContainer(image)
+//			.withExposedPorts(5432);
+//	
+//	
 //	
 //	@BeforeEach
 //	void init() {

@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.utils;
+package com.github.barmiro.sysh_server.common.utils;
 
 import java.util.Random;
 

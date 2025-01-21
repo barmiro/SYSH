@@ -15,7 +15,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.barmiro.sysh_server.utils.GetRandom;
+import com.github.barmiro.sysh_server.common.utils.GetRandom;
 
 @RestController
 public class AuthController {
