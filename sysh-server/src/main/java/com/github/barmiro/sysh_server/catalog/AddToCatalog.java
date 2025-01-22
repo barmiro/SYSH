@@ -12,9 +12,7 @@ import com.github.barmiro.sysh_server.catalog.albums.spotify_api.AlbumApiService
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamService;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
-import com.github.barmiro.sysh_server.catalog.tracks.TrackService;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiService;
-import com.github.barmiro.sysh_server.json.ConvertStreams;
 @Service
 public class AddToCatalog {
 	
@@ -60,6 +58,9 @@ public class AddToCatalog {
 		
 		albums.addAll(albumApiService.addNewAlbums(albumIDs));
 		albumsAdded = albums.size();
+		
+		
+		
 		
 		streamsAdded = streamsFuture.get();
 		

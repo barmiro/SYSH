@@ -6,7 +6,9 @@ public record Track(
 		String spotify_track_id,
 		String name,
 		Integer duration_ms,
-		String album_id
+		String album_id,
+		Integer disc_number,
+		Integer track_number
 		) implements CatalogEntity {
 	
 	@Override

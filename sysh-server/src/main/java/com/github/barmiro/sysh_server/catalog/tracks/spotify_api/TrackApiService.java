@@ -42,12 +42,16 @@ public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 			String name = track.name();
 			Integer duration_ms = track.duration_ms();
 			String album_id = track.album().id();
+			Integer disc_number = track.disc_number();
+			Integer track_number = track.track_number();
 			
 			Track newTrack = new Track(
 					spotify_track_id,
 					name,
 					duration_ms,
-					album_id);
+					album_id,
+					disc_number,
+					track_number);
 			
 			addedTracks.add(newTrack);
 		}
@@ -55,7 +59,6 @@ public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 		return addedTracks;
 	}
 	
-//	TODO: Add disc number and track number in prep for Albums_Tracks
 
 	public List<Track> addNewTracks(List<String> track_ids) {
 		
@@ -96,7 +99,7 @@ public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 		
 		List<Track> tracks = convertApiTracks(apiTracks);
 		
-		Integer tracksAdded = catalogService.addTracks(tracks);
+		catalogService.addTracks(tracks);
 		
 		return tracks;
 		

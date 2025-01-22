@@ -97,7 +97,7 @@ public class AlbumApiService extends SpotifyApiService<AlbumService, Album>{
 		
 		List<Album> albums = convertApiAlbums(apiAlbums);
 		
-		Integer albumsAdded = catalogService.addAlbums(albums);
+		catalogService.addAlbums(albums);
 		
 
 		return albums;

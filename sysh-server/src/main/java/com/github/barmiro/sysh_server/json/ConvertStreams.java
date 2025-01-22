@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
-import com.github.barmiro.sysh_server.catalog.streams.StreamService;
 import com.github.barmiro.sysh_server.recent.dto.ItemsWrapper;
 import com.github.barmiro.sysh_server.recent.dto.recentstream.RecentStream;
 
 public class ConvertStreams {
+	
 	
 	public static List<Stream> json(List<StreamDTO> streamDTOs) {
 		List<Stream> streams = new ArrayList<>();
@@ -61,12 +60,6 @@ public class ConvertStreams {
 				streams.add(stream);
 			}
 		}
-		
 		return streams;
-		
-	}
-	
-	
-//	List<Stream> recent(List<RecentStream> )
-	
+	}	
 }

@@ -10,7 +10,9 @@ public record ApiTrack(
 		String name,
 		ApiTrackAlbum album,
 		List<ApiTrackArtist> artists,
-		Integer duration_ms
+		Integer duration_ms,
+		Integer disc_number,
+		Integer track_number
 		) {
 
 }

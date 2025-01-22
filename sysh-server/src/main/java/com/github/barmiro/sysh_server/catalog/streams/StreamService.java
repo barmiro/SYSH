@@ -20,7 +20,8 @@ public class StreamService {
 	
 	
 	public List<Stream> findAll() {
-		return jdbc.sql("SELECT * FROM Streams")
+		return jdbc.sql("SELECT * FROM Streams"
+				+ "ORDER BY ts DESC")
 				.query(Stream.class)
 				.list();
 	}
