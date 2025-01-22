@@ -8,16 +8,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AlbumController {
 	
-	private final AlbumService albumService;
+	private final AlbumRepository albumRepository;
 	
-	public AlbumController (AlbumService albumService) {
-		this.albumService = albumService;
+	public AlbumController (AlbumRepository albumRepository) {
+		this.albumRepository = albumRepository;
 	}
 	
 	
 	@GetMapping("/getAlbums")
 	List<Album> getAlbums() {
-		return albumService.allAlbums();
+		return albumRepository.allAlbums();
 	}
 
 }

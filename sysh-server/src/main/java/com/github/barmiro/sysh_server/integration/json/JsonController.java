@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.json;
+package com.github.barmiro.sysh_server.integration.json;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;

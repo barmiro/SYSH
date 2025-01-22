@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.recent;
+package com.github.barmiro.sysh_server.integration.recent;
 
 import java.util.List;
 
@@ -10,20 +10,20 @@ import org.springframework.web.client.RestClient;
 import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.AddToCatalog;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
-import com.github.barmiro.sysh_server.catalog.streams.StreamService;
-import com.github.barmiro.sysh_server.json.ConvertStreams;
+import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
+import com.github.barmiro.sysh_server.integration.json.ConvertStreams;
 
 @RestController
 public class RecentController {
 	
 	TokenService tkn;
 	RestClient apiClient;
-	StreamService streamService;
+	StreamRepository streamService;
 	AddToCatalog addToCatalog;
 	
 	public RecentController(TokenService tkn,
 			RestClient apiClient,
-			StreamService streamService,
+			StreamRepository streamService,
 			AddToCatalog addToCatalog) {
 		this.tkn = tkn;
 		this.apiClient = apiClient;

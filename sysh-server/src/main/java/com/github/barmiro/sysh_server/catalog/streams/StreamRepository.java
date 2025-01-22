@@ -7,14 +7,14 @@ import java.util.concurrent.Future;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
-@Service
-public class StreamService {
+@Repository
+public class StreamRepository {
 	
 	private final JdbcClient jdbc;
 	
-	StreamService(JdbcClient jdbc) {
+	StreamRepository(JdbcClient jdbc) {
 		this.jdbc = jdbc;
 	}
 	

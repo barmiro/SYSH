@@ -11,18 +11,18 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.github.barmiro.sysh_server.auth.TokenService;
-import com.github.barmiro.sysh_server.catalog.SpotifyApiService;
+import com.github.barmiro.sysh_server.catalog.SpotifyApiRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
-import com.github.barmiro.sysh_server.catalog.tracks.TrackService;
+import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.TracksWrapper;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
 
 @Service
-public class TrackApiService extends SpotifyApiService<TrackService, Track> {
+public class TrackApiRepository extends SpotifyApiRepository<TrackRepository, Track> {
 
 
-	TrackApiService(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackService catalogService) {
-		super(jdbc, apiClient, tkn, catalogService);
+	TrackApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackRepository catalogRepository) {
+		super(jdbc, apiClient, tkn, catalogRepository);
 	}
 
 	private List<ApiTrack> mapApiTracks(ResponseEntity<String> response
@@ -99,7 +99,7 @@ public class TrackApiService extends SpotifyApiService<TrackService, Track> {
 		
 		List<Track> tracks = convertApiTracks(apiTracks);
 		
-		catalogService.addTracks(tracks);
+		catalogRepository.addTracks(tracks);
 		
 		return tracks;
 		

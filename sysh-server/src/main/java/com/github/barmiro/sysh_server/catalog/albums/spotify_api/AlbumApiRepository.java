@@ -11,17 +11,17 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.github.barmiro.sysh_server.auth.TokenService;
-import com.github.barmiro.sysh_server.catalog.SpotifyApiService;
+import com.github.barmiro.sysh_server.catalog.SpotifyApiRepository;
 import com.github.barmiro.sysh_server.catalog.albums.Album;
-import com.github.barmiro.sysh_server.catalog.albums.AlbumService;
+import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
 import com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto.AlbumsWrapper;
 import com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto.albums.ApiAlbum;
 
 @Service
-public class AlbumApiService extends SpotifyApiService<AlbumService, Album>{
+public class AlbumApiRepository extends SpotifyApiRepository<AlbumRepository, Album>{
 
-	AlbumApiService(JdbcClient jdbc, RestClient apiClient, TokenService tkn, AlbumService catalogService) {
-		super(jdbc, apiClient, tkn, catalogService);
+	AlbumApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, AlbumRepository catalogRepository) {
+		super(jdbc, apiClient, tkn, catalogRepository);
 	}
 
 	private List<ApiAlbum> mapApiAlbums(ResponseEntity<String> response
@@ -97,7 +97,7 @@ public class AlbumApiService extends SpotifyApiService<AlbumService, Album>{
 		
 		List<Album> albums = convertApiAlbums(apiAlbums);
 		
-		catalogService.addAlbums(albums);
+		catalogRepository.addAlbums(albums);
 		
 
 		return albums;

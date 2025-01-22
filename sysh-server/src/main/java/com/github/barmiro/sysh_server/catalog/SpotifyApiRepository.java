@@ -14,23 +14,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.auth.TokenService;
 
 @Service
-public abstract class SpotifyApiService<
-	ServiceClass extends CatalogService,
+public abstract class SpotifyApiRepository<
+	RepositoryClass extends CatalogRepository,
 	EntityClass extends CatalogEntity> {
 
 	protected final JdbcClient jdbc;
 	protected final RestClient apiClient;
 	protected final TokenService tkn;
-	protected final ServiceClass catalogService;
+	protected final RepositoryClass catalogRepository;
 	
-	protected SpotifyApiService(JdbcClient jdbc, 
+	protected SpotifyApiRepository(JdbcClient jdbc, 
 			RestClient apiClient, 
 			TokenService tkn,
-			ServiceClass catalogService) {
+			RepositoryClass catalogRepository) {
 		this.jdbc = jdbc;
 		this.apiClient = apiClient;
 		this.tkn = tkn;
-		this.catalogService = catalogService;
+		this.catalogRepository = catalogRepository;
 	}
 	
 	protected ObjectMapper mapper = new ObjectMapper()

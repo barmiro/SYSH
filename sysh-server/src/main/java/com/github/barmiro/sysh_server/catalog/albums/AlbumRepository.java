@@ -5,17 +5,17 @@ import java.util.List;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.core.simple.JdbcClient.StatementSpec;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
-import com.github.barmiro.sysh_server.catalog.CatalogService;
+import com.github.barmiro.sysh_server.catalog.CatalogRepository;
 import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
 import com.github.barmiro.sysh_server.common.utils.CompInfo;
 import com.github.barmiro.sysh_server.common.utils.CompListToSql;
 
-@Service
-public class AlbumService implements CatalogService {
+@Repository
+public class AlbumRepository implements CatalogRepository {
 	private final JdbcClient jdbc;
-	AlbumService(JdbcClient jdbc) {
+	AlbumRepository(JdbcClient jdbc) {
 		this.jdbc = jdbc;
 	}
 	

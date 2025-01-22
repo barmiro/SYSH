@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.json;
+package com.github.barmiro.sysh_server.integration.json;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +9,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
-import com.github.barmiro.sysh_server.recent.dto.ItemsWrapper;
-import com.github.barmiro.sysh_server.recent.dto.recentstream.RecentStream;
+import com.github.barmiro.sysh_server.integration.recent.dto.ItemsWrapper;
+import com.github.barmiro.sysh_server.integration.recent.dto.recentstream.RecentStream;
 
 public class ConvertStreams {
 	

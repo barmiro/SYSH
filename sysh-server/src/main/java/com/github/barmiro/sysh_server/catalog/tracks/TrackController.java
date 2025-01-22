@@ -8,19 +8,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TrackController {
 
-	private final TrackService trackService;
+	private final TrackRepository trackRepository;
 	
-	TrackController (TrackService trackService) {
-		this.trackService = trackService;
+	TrackController (TrackRepository trackService) {
+		this.trackRepository = trackService;
 	}
 	@GetMapping("/getTracks")
 	List<Track> getTracks() {
-		return trackService.allTracks();
+		return trackRepository.allTracks();
 	}
 	
 	@GetMapping("/topTracksNew")
 	List<TrackStats> topTracksNew() {
-		return trackService.topTracksNew();
+		return trackRepository.topTracksNew();
 	}
 	
 }

@@ -1,5 +1,5 @@
 package com.github.barmiro.sysh_server.catalog;
 
-public interface CatalogService {
+public interface CatalogRepository {
 
 }

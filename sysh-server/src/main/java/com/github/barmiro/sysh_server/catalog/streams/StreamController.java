@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class StreamController {
 	
-	private final StreamService streamService;
+	private final StreamRepository streamRepository;
 
 	
-	StreamController(StreamService streamService) {
-		this.streamService = streamService;
+	StreamController(StreamRepository streamRepository) {
+		this.streamRepository = streamRepository;
 	}
 	
 	
 	@GetMapping("/getStreams")
 	List<Stream> getStreams() {
-		return streamService.findAll();
+		return streamRepository.findAll();
 	}
 	
 }

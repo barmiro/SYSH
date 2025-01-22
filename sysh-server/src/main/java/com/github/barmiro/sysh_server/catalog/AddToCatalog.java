@@ -5,28 +5,29 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import com.github.barmiro.sysh_server.catalog.albums.Album;
-import com.github.barmiro.sysh_server.catalog.albums.spotify_api.AlbumApiService;
+import com.github.barmiro.sysh_server.catalog.albums.spotify_api.AlbumApiRepository;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
-import com.github.barmiro.sysh_server.catalog.streams.StreamService;
+import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
-import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiService;
-@Service
+import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
+
+@Repository
 public class AddToCatalog {
 	
-	TrackApiService trackApiService;
-	AlbumApiService albumApiService;
-	StreamService streamService;
+	TrackApiRepository trackApiRepository;
+	AlbumApiRepository albumApiRepository;
+	StreamRepository streamRepository;
 	
 	public AddToCatalog(
-			TrackApiService trackApiService,
-			AlbumApiService albumApiService,
-			StreamService streamService) {
-		this.trackApiService = trackApiService;
-		this.albumApiService = albumApiService;
-		this.streamService = streamService;
+			TrackApiRepository trackApiRepository,
+			AlbumApiRepository albumApiRepository,
+			StreamRepository streamRepository) {
+		this.trackApiRepository = trackApiRepository;
+		this.albumApiRepository = albumApiRepository;
+		this.streamRepository = streamRepository;
 	}
 
 	public String adder(List<Stream> streams
@@ -42,13 +43,13 @@ public class AddToCatalog {
 		List<Album> albums = new ArrayList<>();
 		List<String> albumIDs = new ArrayList<>();
 		
-		Future<Integer> streamsFuture = streamService.addAllAsync(streams); // ASYNC
+		Future<Integer> streamsFuture = streamRepository.addAllAsync(streams); // ASYNC
 		
 		for (Stream stream:streams) {
 			trackIDs.add(stream.spotify_track_id());
 		}
 		
-		tracks.addAll(trackApiService.addNewTracks(trackIDs));
+		tracks.addAll(trackApiRepository.addNewTracks(trackIDs));
 		tracksAdded = tracks.size();
 		
 		
@@ -56,7 +57,7 @@ public class AddToCatalog {
 			albumIDs.add(track.album_id());
 		}
 		
-		albums.addAll(albumApiService.addNewAlbums(albumIDs));
+		albums.addAll(albumApiRepository.addNewAlbums(albumIDs));
 		albumsAdded = albums.size();
 		
 		
