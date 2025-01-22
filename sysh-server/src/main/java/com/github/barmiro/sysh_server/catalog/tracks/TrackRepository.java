@@ -5,6 +5,8 @@ import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.core.simple.JdbcClient.StatementSpec;
 import org.springframework.stereotype.Repository;
@@ -95,7 +97,25 @@ public class TrackRepository implements CatalogRepository {
 		}
 		
 		Integer added = 0;
-		added = jdbcCall.update();
+		try {
+			added = jdbcCall.update();		
+			
+		} catch (DuplicateKeyException e){
+			System.out.println(
+					track.name() 
+					+ " : "
+					+ track.getId() 
+					+ " already exists.");
+			return 0;
+			
+		} catch(DataIntegrityViolationException e) {
+			System.out.println(
+					track.name() 
+					+ " : "
+					+ track.getId() 
+					+ "contains invalid values.");
+			return 0;
+		}
 		
 		if (duplicate != null) {
 			Integer rows = jdbc.sql(duplicate).update();

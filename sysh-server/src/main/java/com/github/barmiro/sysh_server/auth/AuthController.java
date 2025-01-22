@@ -56,12 +56,22 @@ public class AuthController {
 		return new RedirectView(url);
 	}
 	
-//	TODO: catch exceptions
+	
+	@GetMapping("/error")
+	public String error(@RequestParam(required=false) String message) {
+		return "There was an error. \n" + message;
+	}
+	
+	
 	@GetMapping("/callback")
-	public RedirectView callback(@RequestParam(required=false) String code, @RequestParam(required=true) String state) {
+	public RedirectView callback(@RequestParam(required=false) String code, @RequestParam String state) {
+		
 		if (!state.equals(this.state)) {
-			return null;
+			RedirectView stateMismatch = new RedirectView("/error");
+			stateMismatch.addStaticAttribute("message", "The state returned by Spotify was wrong");
+			return stateMismatch;
 		}
+		
 		MultiValueMap<String, String> newBody = new LinkedMultiValueMap<>();
 		newBody.add("grant_type", "authorization_code");
 		newBody.add("code", code);

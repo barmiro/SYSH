@@ -6,4 +6,4 @@ EXPOSE 8080
 
 FROM postgres:latest AS postgres
 COPY sysh-server/schema.sql /docker-entrypoint-initdb.d/schema.sql
-EXPOSE 5432
+EXPOSE 5432:5432
