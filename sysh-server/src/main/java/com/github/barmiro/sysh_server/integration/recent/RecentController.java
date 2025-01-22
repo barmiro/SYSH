@@ -3,8 +3,10 @@ package com.github.barmiro.sysh_server.integration.recent;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.github.barmiro.sysh_server.auth.TokenService;
@@ -33,7 +35,7 @@ public class RecentController {
 	
 
 	@GetMapping("/recent")
-	public String recent() throws Exception {
+	public String recent() {
 		ResponseEntity<String> response = apiClient
 				.get()
 				.uri("me/player/recently-played")
@@ -44,8 +46,10 @@ public class RecentController {
 		List<Stream> previous = streamService.find(20);
 		List<Stream> streams = ConvertStreams.recent(response, previous);
 
-		String result = addToCatalog.adder(streams);
-		
+		String result;
+
+		result = addToCatalog.adder(streams);
+
 		return result;
 	}
 }

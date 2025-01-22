@@ -30,8 +30,7 @@ public class AddToCatalog {
 		this.streamRepository = streamRepository;
 	}
 
-	public String adder(List<Stream> streams
-			) throws InterruptedException, ExecutionException {
+	public String adder(List<Stream> streams) {
 		
 		int streamsAdded = 0;
 		int tracksAdded = 0;
@@ -63,7 +62,12 @@ public class AddToCatalog {
 		
 		
 		
-		streamsAdded = streamsFuture.get();
+		try {
+			streamsAdded = streamsFuture.get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+			return "Something went wrong with the async method";
+		}
 		
 		return (streamsAdded + " streams added.\n" 
 				+ tracksAdded + " tracks added.\n"
