@@ -1,6 +1,6 @@
 package com.github.barmiro.sysh_server.integration.json;
 
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -16,7 +16,7 @@ public class JsonControllerExceptionHandler {
 				"Please select a valid .json file\n"
 				+ e.getMessage()
 				+ "\n",
-				HttpStatusCode.valueOf(400));
+				HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
@@ -25,7 +25,7 @@ public class JsonControllerExceptionHandler {
 				"Media type not supported. Check your headers.\n"
 				+ e.getMessage()
 				+ "\n",
-				HttpStatusCode.valueOf(415));
+				HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 				
 	}
 }

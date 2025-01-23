@@ -8,14 +8,18 @@ import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.barmiro.sysh_server.catalog.albums.Album;
+import com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto.albums.ApiAlbum;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
+import com.github.barmiro.sysh_server.catalog.tracks.Track;
+import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
 import com.github.barmiro.sysh_server.integration.recent.dto.ItemsWrapper;
 import com.github.barmiro.sysh_server.integration.recent.dto.recentstream.RecentStream;
 
-public class ConvertStreams {
+public class ConvertDTOs {
 	
 	
-	public static List<Stream> json(List<StreamDTO> streamDTOs) {
+	public static List<Stream> streamsJson(List<StreamDTO> streamDTOs) {
 		List<Stream> streams = new ArrayList<>();
 		
 		for (StreamDTO streamDTO:streamDTOs) {
@@ -31,7 +35,7 @@ public class ConvertStreams {
 	}
 	
 	
-	public static List<Stream> recent(
+	public static List<Stream> streamsRecent(
 			ResponseEntity<String> response,
 			List<Stream> previous) {
 		ObjectMapper objectMapper = new ObjectMapper()
@@ -62,4 +66,52 @@ public class ConvertStreams {
 		}
 		return streams;
 	}	
+	
+	public static List<Track> apiTracks(List<ApiTrack> apiTracks) {
+		
+		List<Track> addedTracks = new ArrayList<>();
+		
+		for (ApiTrack track:apiTracks) {
+			String spotify_track_id = track.id();
+			String name = track.name();
+			Integer duration_ms = track.duration_ms();
+			String album_id = track.album().id();
+			Integer disc_number = track.disc_number();
+			Integer track_number = track.track_number();
+			
+			Track newTrack = new Track(
+					spotify_track_id,
+					name,
+					duration_ms,
+					album_id,
+					disc_number,
+					track_number);
+			
+			addedTracks.add(newTrack);
+		}
+		
+		return addedTracks;
+	}
+	
+	public static List<Album> apiAlbums(List<ApiAlbum> apiAlbums) {
+		
+		List<Album> addedAlbums = new ArrayList<>();
+		
+		for (ApiAlbum album:apiAlbums) {
+			String id = album.id();
+			String name = album.name();
+			Integer total_tracks = album.total_tracks();
+			String release_date = album.release_date();
+			
+			Album newAlbum = new Album (
+					id,
+					name,
+					total_tracks,
+					release_date);
+			
+			addedAlbums.add(newAlbum);
+		}
+		
+		return addedAlbums;
+	}
 }

@@ -24,7 +24,7 @@ public class JsonController {
 		System.out.println("Adding json file...");
 		long start = System.currentTimeMillis();
 
-		List<Stream> streams = ConvertStreams.json(streamDTOs);  // null?
+		List<Stream> streams = ConvertDTOs.streamsJson(streamDTOs);  // null?
 		
 		String result = addToCatalog.adder(streams);
 		

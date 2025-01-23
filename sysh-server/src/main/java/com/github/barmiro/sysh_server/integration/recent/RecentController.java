@@ -11,7 +11,7 @@ import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.AddToCatalog;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
-import com.github.barmiro.sysh_server.integration.json.ConvertStreams;
+import com.github.barmiro.sysh_server.integration.json.ConvertDTOs;
 
 @RestController
 public class RecentController {
@@ -42,7 +42,7 @@ public class RecentController {
 				.toEntity(String.class);
 		
 		List<Stream> previous = streamService.find(20);
-		List<Stream> streams = ConvertStreams.recent(response, previous);
+		List<Stream> streams = ConvertDTOs.streamsRecent(response, previous);
 
 		String result;
 

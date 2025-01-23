@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.core.simple.JdbcClient.StatementSpec;
 import org.springframework.stereotype.Repository;
 
-import com.github.barmiro.sysh_server.catalog.CatalogRepository;
+import com.github.barmiro.sysh_server.catalog.interfaces.CatalogRepository;
 import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
 import com.github.barmiro.sysh_server.common.utils.CompInfo;
 import com.github.barmiro.sysh_server.common.utils.CompListToSql;

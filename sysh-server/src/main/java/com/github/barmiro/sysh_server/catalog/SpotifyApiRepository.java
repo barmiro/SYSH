@@ -3,20 +3,29 @@ package com.github.barmiro.sysh_server.catalog;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.auth.TokenService;
+import com.github.barmiro.sysh_server.catalog.interfaces.ApiEntity;
+import com.github.barmiro.sysh_server.catalog.interfaces.CatalogRepository;
+import com.github.barmiro.sysh_server.catalog.tracks.ApiWrapper;
 
 @Service
 public abstract class SpotifyApiRepository<
 	RepositoryClass extends CatalogRepository,
-	EntityClass extends CatalogEntity> {
+	EntityClass extends CatalogEntity,
+	ApiEntityClass extends ApiEntity,
+	WrapperClass extends ApiWrapper<? extends ApiEntity>>
+	{
 
 	protected final JdbcClient jdbc;
 	protected final RestClient apiClient;
@@ -38,6 +47,18 @@ public abstract class SpotifyApiRepository<
 					.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	
 	
+	@SuppressWarnings("unchecked")
+	protected List<ApiEntityClass> mapResponse(
+			ResponseEntity<String> response,
+			Class<WrapperClass> wrapper
+			) throws JsonMappingException, JsonProcessingException {
+		
+//		Keep in mind: unchecked casting
+		return (List<ApiEntityClass>) mapper.readValue(response.getBody(), wrapper).unwrap();
+		
+	}
+	
+	
 	protected List<String> getNewIDs(List<String> entityIDs,
 			String idName, 
 			Class<EntityClass> entCls) {
@@ -45,9 +66,10 @@ public abstract class SpotifyApiRepository<
 		List<String> newIDs = new ArrayList<>();
 		
 		for(String entityID:entityIDs) {
-			if (entityID == "") {
-				continue;
-			}
+			
+			Optional.ofNullable(entityID)
+						.filter(id -> !id.isEmpty())
+						.orElseThrow();
 			
 			int exists = jdbc.sql("SELECT * FROM "
 					+ entCls.getSimpleName() + "s "
@@ -114,7 +136,8 @@ public abstract class SpotifyApiRepository<
 				.retrieve()
 				.toEntity(String.class);
 		
-		return response;
+		
+		return Optional.ofNullable(response).orElseThrow();
 	}
 }
 

@@ -9,51 +9,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.SpotifyApiRepository;
 import com.github.barmiro.sysh_server.catalog.albums.Album;
 import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
 import com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto.AlbumsWrapper;
 import com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto.albums.ApiAlbum;
+import com.github.barmiro.sysh_server.integration.json.ConvertDTOs;
 
 @Service
-public class AlbumApiRepository extends SpotifyApiRepository<AlbumRepository, Album>{
+public class AlbumApiRepository extends SpotifyApiRepository<
+											AlbumRepository,
+											Album,
+											ApiAlbum,
+											AlbumsWrapper> {
 
 	AlbumApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, AlbumRepository catalogRepository) {
 		super(jdbc, apiClient, tkn, catalogRepository);
 	}
 
-	private List<ApiAlbum> mapApiAlbums(ResponseEntity<String> response
-			) throws JsonMappingException, JsonProcessingException {
-		
-		return mapper
-				.readValue(response.getBody(), AlbumsWrapper.class)
-				.albums();
-	}
-	
-	public List<Album> convertApiAlbums(List<ApiAlbum> apiAlbums) {
-		
-		List<Album> addedAlbums = new ArrayList<>();
-		
-		for (ApiAlbum album:apiAlbums) {
-			String id = album.id();
-			String name = album.name();
-			Integer total_tracks = album.total_tracks();
-			String release_date = album.release_date();
-			
-			Album newAlbum = new Album (
-					id,
-					name,
-					total_tracks,
-					release_date);
-			
-			addedAlbums.add(newAlbum);
-		}
-		
-		return addedAlbums;
-	}
-	
 
 	
 	public List<Album> addNewAlbums(List<String> album_ids) {
@@ -75,15 +49,11 @@ public class AlbumApiRepository extends SpotifyApiRepository<AlbumRepository, Al
 		List<ApiAlbum> apiAlbums = new ArrayList<>();
 		for (String packet:packets) {
 			
-			ResponseEntity<String> response = null;
-			response = getResponse(packet);
-			
-			if (response == null) {
-				continue;
-			}
-			
+
+			ResponseEntity<String> response = getResponse(packet);				
+
 			try {
-				apiAlbums.addAll(mapApiAlbums(response));
+				apiAlbums.addAll(mapResponse(response, AlbumsWrapper.class));
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 				System.out.println("Method mapApiAlbums threw an exception");
@@ -95,7 +65,7 @@ public class AlbumApiRepository extends SpotifyApiRepository<AlbumRepository, Al
 			return new ArrayList<Album>();
 		}
 		
-		List<Album> albums = convertApiAlbums(apiAlbums);
+		List<Album> albums = ConvertDTOs.apiAlbums(apiAlbums);
 		
 		catalogRepository.addAlbums(albums);
 		

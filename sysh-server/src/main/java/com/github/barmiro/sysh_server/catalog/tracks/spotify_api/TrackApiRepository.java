@@ -9,54 +9,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.SpotifyApiRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.TracksWrapper;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
+import com.github.barmiro.sysh_server.integration.json.ConvertDTOs;
 
 @Service
-public class TrackApiRepository extends SpotifyApiRepository<TrackRepository, Track> {
+public class TrackApiRepository extends SpotifyApiRepository<
+											TrackRepository,
+											Track,
+											ApiTrack,
+											TracksWrapper> {
 
 
 	TrackApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackRepository catalogRepository) {
 		super(jdbc, apiClient, tkn, catalogRepository);
-	}
-
-	private List<ApiTrack> mapApiTracks(ResponseEntity<String> response
-			) throws JsonMappingException, JsonProcessingException {
-		
-		return mapper
-				.readValue(response.getBody(), TracksWrapper.class)
-				.tracks();
-	}
-	
-	public List<Track> convertApiTracks(List<ApiTrack> apiTracks) {
-		
-		List<Track> addedTracks = new ArrayList<>();
-		
-		for (ApiTrack track:apiTracks) {
-			String spotify_track_id = track.id();
-			String name = track.name();
-			Integer duration_ms = track.duration_ms();
-			String album_id = track.album().id();
-			Integer disc_number = track.disc_number();
-			Integer track_number = track.track_number();
-			
-			Track newTrack = new Track(
-					spotify_track_id,
-					name,
-					duration_ms,
-					album_id,
-					disc_number,
-					track_number);
-			
-			addedTracks.add(newTrack);
-		}
-		
-		return addedTracks;
 	}
 	
 
@@ -85,7 +55,7 @@ public class TrackApiRepository extends SpotifyApiRepository<TrackRepository, Tr
 			}
 			
 			try {
-				apiTracks.addAll(mapApiTracks(response));
+				apiTracks.addAll(mapResponse(response, TracksWrapper.class));
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 				System.out.println("Method mapApiTracks threw an exception");
@@ -97,7 +67,7 @@ public class TrackApiRepository extends SpotifyApiRepository<TrackRepository, Tr
 			return new ArrayList<Track>();
 		}
 		
-		List<Track> tracks = convertApiTracks(apiTracks);
+		List<Track> tracks = ConvertDTOs.apiTracks(apiTracks);
 		
 		catalogRepository.addTracks(tracks);
 		
