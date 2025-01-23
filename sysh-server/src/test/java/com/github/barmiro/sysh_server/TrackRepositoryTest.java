@@ -31,14 +31,14 @@ class TrackServiceTest {
 	@Autowired
 	private TrackRepository tr;
 
-	
 	@Container
 	@ServiceConnection
-	public static JdbcDatabaseContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
-														.withDatabaseName("sysh_db")
-														.withUsername("user")
-														.withPassword("test")
-														.withInitScript("schema.sql");
+	public static JdbcDatabaseContainer<?> postgres 
+						= new PostgreSQLContainer<>("postgres:latest")
+										.withDatabaseName("sysh_db")
+										.withUsername("user")
+										.withPassword("test")
+										.withInitScript("schema.sql");
 
 	
 	List<Track> tracks;
@@ -55,9 +55,9 @@ class TrackServiceTest {
 					"album id " + i,
 					i,
 					i));
-		}
-		
+		}	
 	}
+	
 	
 	@Test void testValidTracks() {
 		assertEquals(rowCount, tracks.size());
@@ -127,7 +127,6 @@ class TrackServiceTest {
 		assertEquals(tableSize, retrieved.size());
 		
 	}
-	
 
 }
 

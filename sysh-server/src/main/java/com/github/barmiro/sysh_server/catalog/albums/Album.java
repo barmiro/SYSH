@@ -13,5 +13,10 @@ public record Album(
 	public String getId() {
 		return id;
 	}
+	
+	@Override
+	public String getName() {
+		return name;
+	}
 
 }

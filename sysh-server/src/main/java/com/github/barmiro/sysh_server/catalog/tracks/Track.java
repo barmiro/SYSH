@@ -16,5 +16,10 @@ public record Track(
 		return spotify_track_id;
 	}
 	
+	@Override
+	public String getName() {
+		return name;
+	}
+	
 
 }

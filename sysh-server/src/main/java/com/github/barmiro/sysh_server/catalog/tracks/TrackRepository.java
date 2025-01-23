@@ -6,22 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.jdbc.core.simple.JdbcClient.StatementSpec;
 import org.springframework.stereotype.Repository;
 
 import com.github.barmiro.sysh_server.catalog.interfaces.CatalogRepository;
-import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
-import com.github.barmiro.sysh_server.common.utils.CompInfo;
-import com.github.barmiro.sysh_server.common.utils.CompListToSql;
 
 @Repository
-public class TrackRepository implements CatalogRepository {
-	private final JdbcClient jdbc;
+public class TrackRepository extends CatalogRepository<Track> {
+
 	TrackRepository(JdbcClient jdbc) {
-		this.jdbc = jdbc;
+		super(jdbc);
 	}
 	
 	
@@ -79,68 +74,84 @@ public class TrackRepository implements CatalogRepository {
 		 
 	}
 
-	public Integer addNewTrack(Track track
-			) throws IllegalAccessException, InvocationTargetException {
-		
-		String duplicate = checkForDuplicates(track);
-		
-		
-		List<RecordCompInfo> recordComps = CompInfo.get(track);
-		
-		String sql = CompListToSql.insert(recordComps, Track.class);
-		StatementSpec jdbcCall = jdbc.sql(sql);
-		
-		for (RecordCompInfo comp:recordComps) {
-			jdbcCall = jdbcCall.param(
-					comp.compName(),
-					comp.compValue(),
-					comp.sqlType());
-		}
-		
-		Integer added = 0;
-		try {
-			added = jdbcCall.update();		
-			
-		} catch (DuplicateKeyException e){
-			System.out.println(
-					track.name() 
-					+ " : "
-					+ track.getId() 
-					+ " already exists.");
-			return 0;
-			
-		} catch(DataIntegrityViolationException e) {
-			System.out.println(
-					track.name() 
-					+ " : "
-					+ track.getId() 
-					+ "contains invalid values.");
-			return 0;
-		}
-		
-		if (duplicate != null) {
-			Integer rows = jdbc.sql(duplicate).update();
-			System.out.println("Duplicate found for "
-					+ track.name()
-					+ ". "
-					+ rows
-					+ " rows affected.");
-		}
-		
-		return added;
-	}
+//	public Integer addTrack(Track track
+//			) throws IllegalAccessException, InvocationTargetException {
+//		
+//		String duplicate = checkForDuplicates(track);
+//		
+//		
+//		List<RecordCompInfo> recordComps = CompInfo.get(track);
+//		
+//		String sql = CompListToSql.insert(recordComps, Track.class);
+//		StatementSpec jdbcCall = jdbc.sql(sql);
+//		
+//		for (RecordCompInfo comp:recordComps) {
+//			jdbcCall = jdbcCall.param(
+//					comp.compName(),
+//					comp.compValue(),
+//					comp.sqlType());
+//		}
+//		
+//		Integer added = 0;
+//		try {
+//			added = jdbcCall.update();		
+//			
+//		} catch (DuplicateKeyException e){
+//			System.out.println(
+//					track.name() 
+//					+ " : "
+//					+ track.getId() 
+//					+ " already exists.");
+//			return 0;
+//			
+//		} catch(DataIntegrityViolationException e) {
+//			System.out.println(
+//					track.name() 
+//					+ " : "
+//					+ track.getId() 
+//					+ "contains invalid values.");
+//			return 0;
+//		}
+//		
+//		if (duplicate != null) {
+//			Integer rows = jdbc.sql(duplicate).update();
+//			System.out.println("Duplicate found for "
+//					+ track.name()
+//					+ ". "
+//					+ rows
+//					+ " rows affected.");
+//		}
+//		
+//		return added;
+//	}
 	
 	
 	public Integer addTracks(List<Track> tracks) {
 		Integer added = 0;
+		
 		for (Track track:tracks) {
+			
+			String duplicate = checkForDuplicates(track);
+			
 			try {
-				added += addNewTrack(track);
+				added += addNew(track, Track.class);
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			if (duplicate != null) {
+				try {
+					int rows = jdbc.sql(duplicate).update();					
+					System.out.println(rows + 
+							"duplicate found for "
+							+ track.name());
+				} catch (DuplicateKeyException e) {
+					System.out.println(e.getMessage()); 
+				}
+			}
 		}
+		
 		System.out.println("Added " + added + " new tracks");
 		return added;
 	}

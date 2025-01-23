@@ -38,6 +38,7 @@ CREATE TABLE Album_Tracklist (
     PRIMARY KEY (album_id, spotify_track_id)
 );
 
+CREATE INDEX tracklist_index ON Album_Tracklist (album_id);
 
 
 CREATE TABLE Artists (

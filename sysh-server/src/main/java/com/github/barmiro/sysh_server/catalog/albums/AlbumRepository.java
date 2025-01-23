@@ -4,19 +4,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.jdbc.core.simple.JdbcClient.StatementSpec;
 import org.springframework.stereotype.Repository;
 
 import com.github.barmiro.sysh_server.catalog.interfaces.CatalogRepository;
-import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
-import com.github.barmiro.sysh_server.common.utils.CompInfo;
-import com.github.barmiro.sysh_server.common.utils.CompListToSql;
 
 @Repository
-public class AlbumRepository implements CatalogRepository {
-	private final JdbcClient jdbc;
+public class AlbumRepository extends CatalogRepository<Album> {
+
 	AlbumRepository(JdbcClient jdbc) {
-		this.jdbc = jdbc;
+		super(jdbc);
 	}
 	
 	
@@ -27,33 +23,51 @@ public class AlbumRepository implements CatalogRepository {
 	}
 	
 	
-	public Integer addAlbum(Album album
-			) throws IllegalAccessException, InvocationTargetException {
-		
-		List<RecordCompInfo> recordComps = CompInfo.get(album);
-		
-		String sql = CompListToSql.insert(recordComps, Album.class);
-		StatementSpec jdbcCall = jdbc.sql(sql);
-		
-		for (RecordCompInfo comp:recordComps) {
-			jdbcCall = jdbcCall.param(
-					comp.compName(),
-					comp.compValue(),
-					comp.sqlType());
-		}
-		
-		Integer added = 0;
-		added = jdbcCall.update();
-		
-		return added;
-	}
+//	public Integer addAlbum(Album album
+//			) throws IllegalAccessException, InvocationTargetException {
+//		
+//		List<RecordCompInfo> recordComps = CompInfo.get(album);
+//		
+//		String sql = CompListToSql.insert(recordComps, Album.class);
+//		StatementSpec jdbcCall = jdbc.sql(sql);
+//		
+//		for (RecordCompInfo comp:recordComps) {
+//			jdbcCall = jdbcCall.param(
+//					comp.compName(),
+//					comp.compValue(),
+//					comp.sqlType());
+//		}
+//		
+//		Integer added = 0;
+//		try {
+//			added = jdbcCall.update();		
+//			
+//		} catch (DuplicateKeyException e){
+//			System.out.println(
+//					album.name() 
+//					+ " : "
+//					+ album.getId() 
+//					+ " already exists.");
+//			return 0;
+//			
+//		} catch(DataIntegrityViolationException e) {
+//			System.out.println(
+//					album.name() 
+//					+ " : "
+//					+ album.getId() 
+//					+ "contains invalid values.");
+//			return 0;
+//		}
+//		
+//		return added;
+//	}
 	
 
 	public Integer addAlbums(List<Album> albums) {
 		Integer added = 0;
 		for (Album album:albums) {
 			try {
-				added += addAlbum(album);
+				added += addNew(album, Album.class);
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

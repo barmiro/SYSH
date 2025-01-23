@@ -22,7 +22,7 @@ import com.github.barmiro.sysh_server.catalog.interfaces.CatalogRepository;
 
 @Repository
 public abstract class SpotifyApiRepository<
-	RepositoryClass extends CatalogRepository,
+	RepositoryClass extends CatalogRepository<EntityClass>,
 	EntityClass extends CatalogEntity,
 	ApiEntityClass extends ApiEntity,
 	WrapperClass extends ApiWrapper<? extends ApiEntity>>
