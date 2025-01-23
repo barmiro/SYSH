@@ -3,7 +3,7 @@ package com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto;
 import java.util.List;
 
 import com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto.albums.ApiAlbum;
-import com.github.barmiro.sysh_server.catalog.tracks.ApiWrapper;
+import com.github.barmiro.sysh_server.catalog.interfaces.ApiWrapper;
 
 public record AlbumsWrapper (
 		List<ApiAlbum> albums

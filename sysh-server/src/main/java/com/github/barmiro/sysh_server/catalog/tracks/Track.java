@@ -1,6 +1,6 @@
 package com.github.barmiro.sysh_server.catalog.tracks;
 
-import com.github.barmiro.sysh_server.catalog.CatalogEntity;
+import com.github.barmiro.sysh_server.catalog.interfaces.CatalogEntity;
 
 public record Track(
 		String spotify_track_id,

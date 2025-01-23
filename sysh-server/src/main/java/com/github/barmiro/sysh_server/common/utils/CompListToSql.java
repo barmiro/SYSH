@@ -2,7 +2,7 @@ package com.github.barmiro.sysh_server.common.utils;
 
 import java.util.List;
 
-import com.github.barmiro.sysh_server.catalog.CatalogEntity;
+import com.github.barmiro.sysh_server.catalog.interfaces.CatalogEntity;
 import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
 
 public class CompListToSql {

@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,10 +16,11 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.interfaces.ApiEntity;
+import com.github.barmiro.sysh_server.catalog.interfaces.ApiWrapper;
+import com.github.barmiro.sysh_server.catalog.interfaces.CatalogEntity;
 import com.github.barmiro.sysh_server.catalog.interfaces.CatalogRepository;
-import com.github.barmiro.sysh_server.catalog.tracks.ApiWrapper;
 
-@Service
+@Repository
 public abstract class SpotifyApiRepository<
 	RepositoryClass extends CatalogRepository,
 	EntityClass extends CatalogEntity,

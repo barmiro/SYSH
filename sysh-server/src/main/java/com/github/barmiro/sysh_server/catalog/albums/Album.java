@@ -1,6 +1,6 @@
 package com.github.barmiro.sysh_server.catalog.albums;
 
-import com.github.barmiro.sysh_server.catalog.CatalogEntity;
+import com.github.barmiro.sysh_server.catalog.interfaces.CatalogEntity;
 
 public record Album(
 		String id,

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,7 +17,7 @@ import com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto.AlbumsWrapp
 import com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto.albums.ApiAlbum;
 import com.github.barmiro.sysh_server.integration.json.ConvertDTOs;
 
-@Service
+@Repository
 public class AlbumApiRepository extends SpotifyApiRepository<
 											AlbumRepository,
 											Album,
