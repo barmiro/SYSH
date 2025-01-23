@@ -2,6 +2,7 @@ package com.github.barmiro.sysh_server.catalog.tracks;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -143,6 +144,27 @@ public class TrackRepository implements CatalogRepository {
 		System.out.println("Added " + added + " new tracks");
 		return added;
 	}
+	
+	public List<Track> getDuplicatesFor(Track track) {
+		List<Track> duplicates = new ArrayList<>();
+		
+		String sql = ("SELECT * FROM Tracks "
+				+ "WHERE spotify_track_id IN ("
+				+ "SELECT secondary_id FROM Track_Duplicates "
+				+ "WHERE primary_id = :trackID) "
+				+ "OR spotify_track_id IN ("
+				+ "SELECT primary_id FROM Track_Duplicates "
+				+ "WHERE secondary_id = :trackID)");
+		
+		duplicates.addAll(jdbc.sql(sql)
+				.param("trackID", track.spotify_track_id(), Types.VARCHAR)
+				.query(Track.class)
+				.list());
+		
+		
+		return duplicates;
+	}
+	
 	
 	
 	

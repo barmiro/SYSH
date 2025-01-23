@@ -32,7 +32,6 @@ class TrackServiceTest {
 	private TrackRepository tr;
 
 	
-
 	@Container
 	@ServiceConnection
 	public static JdbcDatabaseContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
@@ -42,11 +41,13 @@ class TrackServiceTest {
 														.withInitScript("schema.sql");
 
 	
-	List<Track> tracks = new ArrayList<>();
-
+	List<Track> tracks;
+	int rowCount = 5;
+	
 	@BeforeEach
 	void init() {		
-		for (int i = 0; i < 5; i++) {
+		tracks = new ArrayList<>();
+		for (int i = 0; i < rowCount; i++) {
 			tracks.add(new Track(
 					"track id " + i,
 					"track name " + i,
@@ -55,10 +56,11 @@ class TrackServiceTest {
 					i,
 					i));
 		}
+		
 	}
 	
 	@Test void testValidTracks() {
-		assertEquals(5, tracks.size());
+		assertEquals(rowCount, tracks.size());
 		tr.addTracks(tracks);
 		
 		List<Track> retrieved = tr.allTracks();
@@ -68,19 +70,63 @@ class TrackServiceTest {
 		}
 	}
 	
+	
+	@Test void testDuplicates() {
+		
+		List<Track> duplicates = new ArrayList<>();
+		
+		assertEquals(0, tr.getDuplicatesFor(tracks.get(0)).size());
+
+		for (Track track:tracks) {
+			int index = tracks.indexOf(track);
+			
+			 duplicates.add(new Track(
+					"track id duplicate " + index,
+					track.name(),
+					track.duration_ms(),
+					"album id duplicate " + index,
+					index,
+					index));
+		}
+		
+		
+		tr.addTracks(duplicates);
+		List<Track> retrieved = new ArrayList<>();
+		
+		for (Track track:tracks) {
+			retrieved.addAll(tr.getDuplicatesFor(track));
+		}
+		
+		for (Track dupe:retrieved) {
+			assertTrue(duplicates.contains(dupe));
+		}
+		
+		retrieved.clear();
+		
+		for (Track duplicate:duplicates) {
+			retrieved.addAll(tr.getDuplicatesFor(duplicate));			
+		}
+		
+		for (Track track:retrieved) {
+			assertTrue(tracks.contains(track));
+		}
+		
+	}
+	
 	@Test void testEmptyTrack() {
+		int tableSize = rowCount * 2;
+
 		Track empty = new Track(null, null, null, null, null, null);
 		tracks.add(empty);
-		assertEquals(6, tracks.size());
+		assertEquals(rowCount + 1, tracks.size());
 		tr.addTracks(tracks);
 		
 		List<Track> retrieved = tr.allTracks();
 		
 		assertFalse(retrieved.contains(empty));
-		assertEquals(5, retrieved.size());
-
+		assertEquals(tableSize, retrieved.size());
+		
 	}
-	
 	
 
 }
