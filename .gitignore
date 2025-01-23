@@ -3,6 +3,7 @@ dbeaver-workspace.properties
 .metadata
 .env
 sysh-server/.env
+sysh-server/.mvn
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
