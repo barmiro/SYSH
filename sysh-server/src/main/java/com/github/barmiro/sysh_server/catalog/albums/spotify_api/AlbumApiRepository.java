@@ -32,12 +32,11 @@ public class AlbumApiRepository extends SpotifyApiRepository<
 	
 	public List<Album> addNewAlbums(List<String> album_ids) {
 		
-		
 		List<String> newIDs = getNewIDs(album_ids, "id", Album.class);
-		
 		System.out.println("Found " + newIDs.size() + " new albums.");
 		
 		List<String> packets = new ArrayList<>();
+
 		try {
 			packets = prepIdPackets(newIDs, Album.class, 20);			
 		} catch (Exception e) {
@@ -48,8 +47,6 @@ public class AlbumApiRepository extends SpotifyApiRepository<
 		
 		List<ApiAlbum> apiAlbums = new ArrayList<>();
 		for (String packet:packets) {
-			
-
 			ResponseEntity<String> response = getResponse(packet);				
 
 			try {
@@ -69,8 +66,6 @@ public class AlbumApiRepository extends SpotifyApiRepository<
 		
 		catalogRepository.addAlbums(albums);
 		
-
 		return albums;
-		
 	}
 }

@@ -42,9 +42,6 @@ public abstract class SpotifyApiRepository<
 		this.catalogRepository = catalogRepository;
 	}
 	
-	protected ObjectMapper mapper = new ObjectMapper()
-			.configure(DeserializationFeature
-					.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	
 	
 	@SuppressWarnings("unchecked")
@@ -53,9 +50,12 @@ public abstract class SpotifyApiRepository<
 			Class<WrapperClass> wrapper
 			) throws JsonMappingException, JsonProcessingException {
 		
+		ObjectMapper mapper = new ObjectMapper()
+				.configure(DeserializationFeature
+						.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		
 //		Keep in mind: unchecked casting
 		return (List<ApiEntityClass>) mapper.readValue(response.getBody(), wrapper).unwrap();
-		
 	}
 	
 	
@@ -66,7 +66,6 @@ public abstract class SpotifyApiRepository<
 		List<String> newIDs = new ArrayList<>();
 		
 		for(String entityID:entityIDs) {
-			
 			Optional.ofNullable(entityID)
 						.filter(id -> !id.isEmpty())
 						.orElseThrow();
@@ -91,11 +90,12 @@ public abstract class SpotifyApiRepository<
 	protected String stringify(List<String> newIDs, Class<EntityClass> entCls) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(entCls.getSimpleName().toLowerCase() + "s?ids=");
+		
 		for (String id:newIDs) {
 			sb.append(id + ",");
 		}
-		sb.deleteCharAt(sb.length() - 1);
 		
+		sb.deleteCharAt(sb.length() - 1);
 		return sb.toString();
 	}
 
@@ -108,25 +108,19 @@ public abstract class SpotifyApiRepository<
 		
 		int listSize = IDlist.size();
 		
-		if (listSize == 0) {
-			return new ArrayList<>();
-		}
-		
 		List<String> idPackets = new ArrayList<>();
 		
 		for(int i = 0; i < listSize; i += limit) {
-			
 			if (i + limit >= listSize) {
 				limit = listSize - i;
 			}
-			
 			String idPacket = stringify(IDlist.subList(i, i + limit), entCls);
 			idPackets.add(idPacket);
-
 		}
 		
 		return idPackets;
 	}
+	
 	
 	protected ResponseEntity<String> getResponse(String packet) {
 		ResponseEntity<String> response = apiClient
