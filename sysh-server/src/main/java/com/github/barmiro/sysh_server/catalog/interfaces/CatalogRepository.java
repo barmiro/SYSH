@@ -37,7 +37,7 @@ public abstract class CatalogRepository<EntityClass extends CatalogEntity> {
 					comp.sqlType());
 		}
 		
-		Integer added = 0;
+		int added = 0;
 		
 		try {
 			added = jdbcCall.update();		

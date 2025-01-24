@@ -16,55 +16,16 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	}
 	
 	
+	
 	public List<Album> allAlbums() {
 		return jdbc.sql("SELECT * FROM Albums")
 				.query(Album.class)
 				.list();
 	}
 	
-	
-//	public Integer addAlbum(Album album
-//			) throws IllegalAccessException, InvocationTargetException {
-//		
-//		List<RecordCompInfo> recordComps = CompInfo.get(album);
-//		
-//		String sql = CompListToSql.insert(recordComps, Album.class);
-//		StatementSpec jdbcCall = jdbc.sql(sql);
-//		
-//		for (RecordCompInfo comp:recordComps) {
-//			jdbcCall = jdbcCall.param(
-//					comp.compName(),
-//					comp.compValue(),
-//					comp.sqlType());
-//		}
-//		
-//		Integer added = 0;
-//		try {
-//			added = jdbcCall.update();		
-//			
-//		} catch (DuplicateKeyException e){
-//			System.out.println(
-//					album.name() 
-//					+ " : "
-//					+ album.getId() 
-//					+ " already exists.");
-//			return 0;
-//			
-//		} catch(DataIntegrityViolationException e) {
-//			System.out.println(
-//					album.name() 
-//					+ " : "
-//					+ album.getId() 
-//					+ "contains invalid values.");
-//			return 0;
-//		}
-//		
-//		return added;
-//	}
-	
 
-	public Integer addAlbums(List<Album> albums) {
-		Integer added = 0;
+	public int addAlbums(List<Album> albums) {
+		int added = 0;
 		for (Album album:albums) {
 			try {
 				added += addNew(album, Album.class);

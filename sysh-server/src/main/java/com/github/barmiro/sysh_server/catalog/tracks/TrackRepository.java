@@ -74,60 +74,10 @@ public class TrackRepository extends CatalogRepository<Track> {
 		 
 	}
 
-//	public Integer addTrack(Track track
-//			) throws IllegalAccessException, InvocationTargetException {
-//		
-//		String duplicate = checkForDuplicates(track);
-//		
-//		
-//		List<RecordCompInfo> recordComps = CompInfo.get(track);
-//		
-//		String sql = CompListToSql.insert(recordComps, Track.class);
-//		StatementSpec jdbcCall = jdbc.sql(sql);
-//		
-//		for (RecordCompInfo comp:recordComps) {
-//			jdbcCall = jdbcCall.param(
-//					comp.compName(),
-//					comp.compValue(),
-//					comp.sqlType());
-//		}
-//		
-//		Integer added = 0;
-//		try {
-//			added = jdbcCall.update();		
-//			
-//		} catch (DuplicateKeyException e){
-//			System.out.println(
-//					track.name() 
-//					+ " : "
-//					+ track.getId() 
-//					+ " already exists.");
-//			return 0;
-//			
-//		} catch(DataIntegrityViolationException e) {
-//			System.out.println(
-//					track.name() 
-//					+ " : "
-//					+ track.getId() 
-//					+ "contains invalid values.");
-//			return 0;
-//		}
-//		
-//		if (duplicate != null) {
-//			Integer rows = jdbc.sql(duplicate).update();
-//			System.out.println("Duplicate found for "
-//					+ track.name()
-//					+ ". "
-//					+ rows
-//					+ " rows affected.");
-//		}
-//		
-//		return added;
-//	}
+
 	
-	
-	public Integer addTracks(List<Track> tracks) {
-		Integer added = 0;
+	public int addTracks(List<Track> tracks) {
+		int added = 0;
 		
 		for (Track track:tracks) {
 			
@@ -136,7 +86,6 @@ public class TrackRepository extends CatalogRepository<Track> {
 			try {
 				added += addNew(track, Track.class);
 			} catch (IllegalAccessException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -144,7 +93,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 				try {
 					int rows = jdbc.sql(duplicate).update();					
 					System.out.println(rows + 
-							"duplicate found for "
+							" duplicate found for "
 							+ track.name());
 				} catch (DuplicateKeyException e) {
 					System.out.println(e.getMessage()); 
