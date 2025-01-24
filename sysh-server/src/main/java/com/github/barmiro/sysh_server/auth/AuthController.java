@@ -20,12 +20,9 @@ import com.github.barmiro.sysh_server.common.utils.GetRandom;
 @RestController
 public class AuthController {
 	
-	private RestClient tokenClient;
 	private TokenService tkn;
 	
-	public AuthController(RestClient tokenClient, TokenService tkn) {
-		this.tokenClient = tokenClient;
-
+	public AuthController(TokenService tkn) {
 		this.tkn = tkn;
 	}
 	
@@ -76,6 +73,10 @@ public class AuthController {
 		newBody.add("grant_type", "authorization_code");
 		newBody.add("code", code);
 		newBody.add("redirect_uri", "http://localhost:8080/callback");
+		
+		RestClient tokenClient = RestClient.builder()
+				.baseUrl("https://accounts.spotify.com/api/token")
+				.build();
 		
 		ResponseEntity<String> newEntity = tokenClient
 				.post()
