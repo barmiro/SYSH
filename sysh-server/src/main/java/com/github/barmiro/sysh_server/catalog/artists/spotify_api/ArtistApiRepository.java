@@ -10,12 +10,12 @@ import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.barmiro.sysh_server.auth.TokenService;
-import com.github.barmiro.sysh_server.catalog.SpotifyApiRepository;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
 import com.github.barmiro.sysh_server.catalog.artists.ArtistRepository;
 import com.github.barmiro.sysh_server.catalog.artists.spotify_api.dto.ArtistsWrapper;
 import com.github.barmiro.sysh_server.catalog.artists.spotify_api.dto.artists.ApiArtist;
-import com.github.barmiro.sysh_server.integration.json.ConvertDTOs;
+import com.github.barmiro.sysh_server.catalog.interfaces.SpotifyApiRepository;
+import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
 
 @Repository
 public class ArtistApiRepository extends SpotifyApiRepository<
