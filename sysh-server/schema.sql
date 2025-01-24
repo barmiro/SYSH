@@ -42,7 +42,8 @@ CREATE INDEX tracklist_index ON Album_Tracklist (album_id);
 
 
 CREATE TABLE Artists (
-    id varchar PRIMARY KEY
+    id varchar PRIMARY KEY,
+    name varchar
 );
 
 CREATE TABLE Artist_Discography (

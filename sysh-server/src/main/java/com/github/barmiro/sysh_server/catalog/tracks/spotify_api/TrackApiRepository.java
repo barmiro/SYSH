@@ -30,7 +30,7 @@ public class TrackApiRepository extends SpotifyApiRepository<
 	}
 	
 
-	public List<Track> addNewTracks(List<String> track_ids) {
+	public List<ApiTrack> getApiTracks(List<String> track_ids) {
 		
 		List<String> newIDs = getNewIDs(track_ids, "spotify_track_id");
 		System.out.println("Found " + newIDs.size() + " new tracks.");
@@ -40,7 +40,7 @@ public class TrackApiRepository extends SpotifyApiRepository<
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Method prepIdPackets threw an exception.");
-			return new ArrayList<Track>();
+			return new ArrayList<ApiTrack>();
 		}
 		
 		List<ApiTrack> apiTracks = new ArrayList<>();
@@ -64,8 +64,13 @@ public class TrackApiRepository extends SpotifyApiRepository<
 		
 		if (apiTracks.size() == 0) {
 			System.out.println("No tracks to add.");
-			return new ArrayList<Track>();
+			return new ArrayList<ApiTrack>();
 		}
+		
+		return apiTracks;
+	}
+		
+	public List<Track> addNewTracks (List<ApiTrack> apiTracks) {
 		
 		List<Track> tracks = ConvertDTOs.apiTracks(apiTracks);
 		

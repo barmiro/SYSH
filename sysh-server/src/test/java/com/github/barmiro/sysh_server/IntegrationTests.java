@@ -74,9 +74,14 @@ class IntegrationTests {
 					SampleResponseBodies.albums(),
 					MediaType.APPLICATION_JSON));
 		
+		server.expect(requestTo("https://api.spotify.com/v1/artists?ids=6kBDZFXuLrZgHnvmPu9NsG,6nB0iY1cjSY1KyhYyuIIKH,7guDJrEfX3qb6FEbdPA5qi"))
+		.andRespond(withSuccess(
+				SampleResponseBodies.artists(),
+				MediaType.APPLICATION_JSON));
+		
 		
 		String result = rc.recent();
-		assertEquals("5 5 3", result);
+		assertEquals("5 5 3 3", result);
 	}
 	
 

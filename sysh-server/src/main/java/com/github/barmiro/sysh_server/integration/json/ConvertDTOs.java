@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.catalog.albums.Album;
 import com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto.albums.ApiAlbum;
+import com.github.barmiro.sysh_server.catalog.artists.Artist;
+import com.github.barmiro.sysh_server.catalog.artists.spotify_api.dto.artists.ApiArtist;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
@@ -113,5 +115,23 @@ public class ConvertDTOs {
 		}
 		
 		return addedAlbums;
+	}
+	
+	public static List<Artist> apiArtists(List<ApiArtist> apiArtists) {
+		
+		List<Artist> addedArtists = new ArrayList<>();
+		
+		for (ApiArtist artist:apiArtists) {
+			String id = artist.id();
+			String name = artist.name();
+
+			Artist newArtist = new Artist (
+					id,
+					name);
+					
+			addedArtists.add(newArtist);
+		}
+		
+		return addedArtists;
 	}
 }
