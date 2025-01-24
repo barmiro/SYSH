@@ -69,9 +69,10 @@ public class AddToCatalog {
 			return "Something went wrong with the async method";
 		}
 		
-		return (streamsAdded + " streams added.\n" 
-				+ tracksAdded + " tracks added.\n"
-				+ albumsAdded + " albums added.\n");
+		return (streamsAdded + " " + tracksAdded + " " + albumsAdded);
+//		return (streamsAdded + " streams added.\n" 
+//				+ tracksAdded + " tracks added.\n"
+//				+ albumsAdded + " albums added.\n");
 	}
 	
 }

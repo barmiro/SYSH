@@ -15,7 +15,7 @@ public class TrackController {
 	}
 	@GetMapping("/getTracks")
 	List<Track> getTracks() {
-		return trackRepository.allTracks();
+		return trackRepository.findAll();
 	}
 	
 	@GetMapping("/topTracksNew")

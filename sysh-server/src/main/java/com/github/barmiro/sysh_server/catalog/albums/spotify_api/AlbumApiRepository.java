@@ -32,13 +32,13 @@ public class AlbumApiRepository extends SpotifyApiRepository<
 	
 	public List<Album> addNewAlbums(List<String> album_ids) {
 		
-		List<String> newIDs = getNewIDs(album_ids, "id", Album.class);
+		List<String> newIDs = getNewIDs(album_ids, "id");
 		System.out.println("Found " + newIDs.size() + " new albums.");
 		
 		List<String> packets = new ArrayList<>();
 
 		try {
-			packets = prepIdPackets(newIDs, Album.class, 20);			
+			packets = prepIdPackets(newIDs, 20);			
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Method prepIdPackets threw an exception.");
@@ -50,7 +50,7 @@ public class AlbumApiRepository extends SpotifyApiRepository<
 			ResponseEntity<String> response = getResponse(packet);				
 
 			try {
-				apiAlbums.addAll(mapResponse(response, AlbumsWrapper.class));
+				apiAlbums.addAll(mapResponse(response));
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 				System.out.println("Method mapApiAlbums threw an exception");

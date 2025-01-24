@@ -17,7 +17,7 @@ public class AlbumController {
 	
 	@GetMapping("/getAlbums")
 	List<Album> getAlbums() {
-		return albumRepository.allAlbums();
+		return albumRepository.findAll();
 	}
 
 }

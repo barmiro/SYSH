@@ -1,6 +1,7 @@
 package com.github.barmiro.sysh_server.catalog.interfaces;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,7 +22,23 @@ public abstract class CatalogRepository<EntityClass extends CatalogEntity> {
 		this.jdbc = jdbc;
 	}
 	
-	public Integer addNew(EntityClass entity, Class<EntityClass> entCls
+	@SuppressWarnings("unchecked")
+	Class<EntityClass> getEntityClass() throws ClassCastException {
+		ParameterizedType superClass = (ParameterizedType) getClass()
+										.getGenericSuperclass();
+		return (Class<EntityClass>) superClass.getActualTypeArguments()[0];
+	}
+	
+	
+	public List<EntityClass> findAll() {
+		Class<EntityClass> clazz = getEntityClass();
+		return jdbc.sql("SELECT * FROM "
+				+ clazz.getSimpleName() + 's')
+				.query(clazz)
+				.list();
+	}
+	
+	public int addNew(EntityClass entity, Class<EntityClass> entCls
 			) throws IllegalAccessException, InvocationTargetException {
 		
 

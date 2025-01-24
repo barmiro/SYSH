@@ -1,5 +1,6 @@
 package com.github.barmiro.sysh_server.catalog;
 
+import java.lang.reflect.ParameterizedType;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,27 +44,40 @@ public abstract class SpotifyApiRepository<
 		this.catalogRepository = catalogRepository;
 	}
 	
+	@SuppressWarnings("unchecked")
+	Class<EntityClass> getEntityClass() throws ClassCastException {
+		ParameterizedType superClass = (ParameterizedType) getClass()
+				.getGenericSuperclass();
+		return (Class<EntityClass>) superClass.getActualTypeArguments()[1];
+	}
+	
+	@SuppressWarnings("unchecked")
+	Class<WrapperClass> getWrapperClass() throws ClassCastException {
+		ParameterizedType superClass = (ParameterizedType) getClass()
+										.getGenericSuperclass();
+		return (Class<WrapperClass>) superClass.getActualTypeArguments()[3];
+	}
 	
 	
 	@SuppressWarnings("unchecked")
 	protected List<ApiEntityClass> mapResponse(
-			ResponseEntity<String> response,
-			Class<WrapperClass> wrapper
-			) throws JsonMappingException, JsonProcessingException {
+			ResponseEntity<String> response
+			) throws JsonMappingException, JsonProcessingException, ClassCastException {
+		
+		Class<WrapperClass> wrapper = getWrapperClass();
 		
 		ObjectMapper mapper = new ObjectMapper()
 				.configure(DeserializationFeature
 						.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		
-//		Keep in mind: unchecked casting
 		return (List<ApiEntityClass>) mapper.readValue(response.getBody(), wrapper).unwrap();
 	}
 	
 	
 	protected List<String> getNewIDs(List<String> entityIDs,
-			String idName, 
-			Class<EntityClass> entCls) {
+			String idName) {
 		
+		Class<EntityClass> entCls = getEntityClass();
 		List<String> newIDs = new ArrayList<>();
 		
 		for(String entityID:entityIDs) {
@@ -88,7 +102,9 @@ public abstract class SpotifyApiRepository<
 	}
 	
 	
-	protected String stringify(List<String> newIDs, Class<EntityClass> entCls) {
+	protected String stringify(List<String> newIDs) {
+		Class<EntityClass> entCls = getEntityClass();
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append(entCls.getSimpleName().toLowerCase() + "s?ids=");
 		
@@ -103,10 +119,10 @@ public abstract class SpotifyApiRepository<
 	
 	protected List<String> prepIdPackets(
 			List<String> IDlist,
-			Class<EntityClass> entCls,
 			int limit
 			) throws Exception {
 		
+
 		int listSize = IDlist.size();
 		
 		List<String> idPackets = new ArrayList<>();
@@ -115,7 +131,7 @@ public abstract class SpotifyApiRepository<
 			if (i + limit >= listSize) {
 				limit = listSize - i;
 			}
-			String idPacket = stringify(IDlist.subList(i, i + limit), entCls);
+			String idPacket = stringify(IDlist.subList(i, i + limit));
 			idPackets.add(idPacket);
 		}
 		
@@ -130,7 +146,6 @@ public abstract class SpotifyApiRepository<
 				.header("Authorization", "Bearer " + tkn.getToken())
 				.retrieve()
 				.toEntity(String.class);
-		
 		
 		return Optional.ofNullable(response).orElseThrow();
 	}

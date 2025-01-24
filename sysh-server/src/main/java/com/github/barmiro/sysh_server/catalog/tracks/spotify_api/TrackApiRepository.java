@@ -32,11 +32,11 @@ public class TrackApiRepository extends SpotifyApiRepository<
 
 	public List<Track> addNewTracks(List<String> track_ids) {
 		
-		List<String> newIDs = getNewIDs(track_ids, "spotify_track_id", Track.class);
+		List<String> newIDs = getNewIDs(track_ids, "spotify_track_id");
 		System.out.println("Found " + newIDs.size() + " new tracks.");
 		List<String> packets = new ArrayList<>();
 		try {
-			packets = prepIdPackets(newIDs, Track.class, 50);			
+			packets = prepIdPackets(newIDs, 50);			
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Method prepIdPackets threw an exception.");
@@ -55,7 +55,7 @@ public class TrackApiRepository extends SpotifyApiRepository<
 			}
 			
 			try {
-				apiTracks.addAll(mapResponse(response, TracksWrapper.class));
+				apiTracks.addAll(mapResponse(response));
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 				System.out.println("Method mapApiTracks threw an exception");

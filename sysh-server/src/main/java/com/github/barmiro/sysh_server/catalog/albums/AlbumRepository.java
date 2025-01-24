@@ -17,12 +17,6 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	
 	
 	
-	public List<Album> allAlbums() {
-		return jdbc.sql("SELECT * FROM Albums")
-				.query(Album.class)
-				.list();
-	}
-	
 
 	public int addAlbums(List<Album> albums) {
 		int added = 0;

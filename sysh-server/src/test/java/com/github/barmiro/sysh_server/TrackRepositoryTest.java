@@ -63,7 +63,7 @@ class TrackServiceTest {
 		assertEquals(rowCount, tracks.size());
 		tr.addTracks(tracks);
 		
-		List<Track> retrieved = tr.allTracks();
+		List<Track> retrieved = tr.findAll();
 		
 		for (Track track:tracks) {
 			assertTrue(retrieved.contains(track));
@@ -121,7 +121,7 @@ class TrackServiceTest {
 		assertEquals(rowCount + 1, tracks.size());
 		tr.addTracks(tracks);
 		
-		List<Track> retrieved = tr.allTracks();
+		List<Track> retrieved = tr.findAll();
 		
 		assertFalse(retrieved.contains(empty));
 		assertEquals(tableSize, retrieved.size());

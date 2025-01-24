@@ -20,13 +20,6 @@ public class TrackRepository extends CatalogRepository<Track> {
 	}
 	
 	
-	public List<Track> allTracks() {
-		return jdbc.sql("SELECT * FROM Tracks")
-				.query(Track.class)
-				.list();
-	}
-	
-	
 	private String checkForDuplicates(Track track) {
 		String getDupe = ("SELECT spotify_track_id "
 				+ "FROM Tracks "

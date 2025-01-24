@@ -57,7 +57,7 @@ class AlbumRepositoryTest {
 		assertEquals(rowCount, albums.size());
 		ar.addAlbums(albums);
 		
-		List<Album> rearieved = ar.allAlbums();
+		List<Album> rearieved = ar.findAll();
 		
 		for (Album album:albums) {
 			assertTrue(rearieved.contains(album));
@@ -72,7 +72,7 @@ class AlbumRepositoryTest {
 		assertEquals(rowCount + 1, albums.size());
 		ar.addAlbums(albums);
 		
-		List<Album> rearieved = ar.allAlbums();
+		List<Album> rearieved = ar.findAll();
 		
 		assertFalse(rearieved.contains(empty));
 		assertEquals(rowCount, rearieved.size());
