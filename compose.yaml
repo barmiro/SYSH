@@ -4,7 +4,6 @@ services:
       context: .
       dockerfile: Dockerfile
       target: app
-    command: ["sh", "-c","mkdir -p /images"]
     env_file:
       - .env
     environment:

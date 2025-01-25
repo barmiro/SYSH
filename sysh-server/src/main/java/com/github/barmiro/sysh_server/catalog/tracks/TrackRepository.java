@@ -1,7 +1,9 @@
 package com.github.barmiro.sysh_server.catalog.tracks;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -122,11 +124,38 @@ public class TrackRepository extends CatalogRepository<Track> {
 	
 	
 //	TODO: change
-	List<TrackStats> topTracksNew() {
+	List<TrackStats> topTracksNew(Optional<String> startDateOpt, Optional<String> endDateOpt) {
+		
+		Timestamp startDate = Timestamp.valueOf(startDateOpt
+				.orElse("2000-01-01T00:00:00")
+				.replace("T", " "));
+		Timestamp endDate = Timestamp.valueOf(endDateOpt
+				.orElse(LocalDateTime.now().toString())
+				.replace("T", " "));
 		
 		String sql = ("SELECT Tracks.*, COUNT(Streams.spotify_track_id) AS stream_count "
 				+ "FROM Tracks "
 				+ "LEFT JOIN Streams ON Tracks.spotify_track_id = Streams.spotify_track_id "
+				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
+				+ "AND Streams.ms_played >= 30000 "
+				+ "GROUP BY "
+				+ "Tracks.spotify_track_id,"
+				+ "Tracks.name "
+				+ "ORDER BY stream_count DESC;");
+		return jdbc.sql(sql)
+				.param("startDate", startDate, Types.TIMESTAMP)
+				.param("endDate", endDate, Types.TIMESTAMP)
+				.query(TrackStats.class)
+				.list();
+		
+	}
+	
+	List<TrackStats> topTracksTime() {
+		
+		String sql = ("SELECT Tracks.*, SUM(Streams.ms_played) / 60000 AS stream_count "
+				+ "FROM Tracks "
+				+ "LEFT JOIN Streams ON Tracks.spotify_track_id = Streams.spotify_track_id "
+				+ "WHERE Streams.ts BETWEEN '2024-01-01 01:00:00' AND '2025-01-01 01:00:00' "
 				+ "GROUP BY "
 				+ "Tracks.spotify_track_id,"
 				+ "Tracks.name "

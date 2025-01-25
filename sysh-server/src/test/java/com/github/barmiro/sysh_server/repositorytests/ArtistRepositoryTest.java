@@ -27,6 +27,7 @@ class ArtistRepositoryTest {
 	@Autowired
 	private ArtistRepository ar;
 	
+	@SuppressWarnings("resource")
 	@Container
 	@ServiceConnection
 	public static JdbcDatabaseContainer<?> postgres 

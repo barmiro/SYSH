@@ -27,6 +27,7 @@ class AlbumRepositoryTest {
 	@Autowired
 	private AlbumRepository ar;
 	
+	@SuppressWarnings("resource")
 	@Container
 	@ServiceConnection
 	public static JdbcDatabaseContainer<?> postgres 
@@ -49,7 +50,8 @@ class AlbumRepositoryTest {
 					"album name " + i,
 					i,
 					"2024-01-" + (10 + i),
-					"randomurl"));
+					"randomurl",
+					"anotherrandomurl"));
 		}
 	}
 	
@@ -68,7 +70,7 @@ class AlbumRepositoryTest {
 	
 	@Test void testEmptyAlbum() {
 
-		Album empty = new Album(null, null, null, null, null);
+		Album empty = new Album(null, null, null, null, null, null);
 		albums.add(empty);
 		assertEquals(rowCount + 1, albums.size());
 		ar.addAlbums(albums);

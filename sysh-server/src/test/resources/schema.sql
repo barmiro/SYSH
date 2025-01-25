@@ -28,7 +28,8 @@ CREATE TABLE Albums (
     name varchar,
     total_tracks integer,
     release_date varchar,
-    image_url varchar
+    image_url varchar,
+    thumbnail_url varchar
 );
 
 CREATE TABLE Album_Tracklist (

@@ -31,6 +31,7 @@ class TrackServiceTest {
 	@Autowired
 	private TrackRepository tr;
 
+	@SuppressWarnings("resource")
 	@Container
 	@ServiceConnection
 	public static JdbcDatabaseContainer<?> postgres 

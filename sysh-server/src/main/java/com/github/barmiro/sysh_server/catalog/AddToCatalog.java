@@ -93,7 +93,7 @@ public class AddToCatalog {
 		return (streamsAdded + " streams added.\n" 
 				+ tracksAdded + " tracks added.\n"
 				+ albumsAdded + " albums added.\n"
-				+ artistsAdded + " artists added.");
+				+ artistsAdded + " artists added.\n");
 	}
 	
 }

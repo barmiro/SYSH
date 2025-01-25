@@ -42,6 +42,7 @@ class IntegrationTest {
 	@Autowired
 	private RecentController rc;
 	
+	@SuppressWarnings("resource")
 	@Container
 	@ServiceConnection
 	public static JdbcDatabaseContainer<?> postgres 
@@ -84,7 +85,7 @@ class IntegrationTest {
 		
 		
 		String result = rc.recent();
-		assertEquals("5 streams added.\n5 tracks added.\n3 albums added.\n3 artists added.", result);
+		assertEquals("5 streams added.\n5 tracks added.\n3 albums added.\n3 artists added.\n", result);
 	}
 	
 

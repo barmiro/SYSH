@@ -107,6 +107,10 @@ public class ConvertDTOs {
 			String release_date = album.release_date();
 			String image_url = album
 					.images()
+					.get(0)
+					.url();
+			String thumbnail_url = album
+					.images()
 					.get(album.images().size() - 1)
 					.url();
 			
@@ -115,7 +119,8 @@ public class ConvertDTOs {
 					name,
 					total_tracks,
 					release_date,
-					image_url);
+					image_url,
+					thumbnail_url);
 			
 			addedAlbums.add(newAlbum);
 		}
