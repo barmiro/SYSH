@@ -27,7 +27,8 @@ CREATE TABLE Albums (
     id varchar PRIMARY KEY,
     name varchar,
     total_tracks integer,
-    release_date varchar
+    release_date varchar,
+    image_url varchar
 );
 
 CREATE TABLE Album_Tracklist (
@@ -45,11 +46,6 @@ CREATE TABLE Artists (
     id varchar PRIMARY KEY,
     name varchar
 );
-
-CREATE TABLE Artist_Discography (
-    
-);
-
 
 
 CREATE TABLE Albums_Tracks (

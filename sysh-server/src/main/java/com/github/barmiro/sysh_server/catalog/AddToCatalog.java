@@ -65,6 +65,7 @@ public class AddToCatalog {
 		tracksAdded = tracks.size();
 		
 		
+		
 		for (Track track:tracks) {
 			albumIDs.add(track.album_id());
 		}

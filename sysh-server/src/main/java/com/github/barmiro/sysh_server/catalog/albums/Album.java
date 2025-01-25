@@ -6,7 +6,8 @@ public record Album(
 		String id,
 		String name,
 		Integer total_tracks,
-		String release_date
+		String release_date,
+		String image_url
 		) implements CatalogEntity {
 	
 	@Override

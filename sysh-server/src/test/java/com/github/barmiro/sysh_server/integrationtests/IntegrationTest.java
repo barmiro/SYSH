@@ -57,8 +57,7 @@ class IntegrationTest {
 			"DELETE FROM Track_Duplicates",
 			"DELETE FROM Albums",
 			"DELETE FROM Album_Tracklist",
-			"DELETE FROM Artists",
-			"DELETE FROM Artist_Discography"})
+			"DELETE FROM Artists"})
 	@Test
 	void test() {
 		ts.setToken("abcde");
