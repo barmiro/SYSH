@@ -29,7 +29,27 @@ public class AlbumRepository extends CatalogRepository<Album> {
 			}
 		}
 		System.out.println("Added " + added + " new albums");
+		
+		
 		return added;
+	}
+	
+	
+	public List<AlbumStats> topAlbumsCount() {
+		
+		String sql = ("SELECT Albums.*, COUNT(Streams.spotify_track_id) as sort_param "
+				+ "FROM Albums "
+				+ "LEFT JOIN Albums_Tracks ON Albums.id = Albums_Tracks.album_id "
+				+ "LEFT JOIN Streams ON Albums_Tracks.spotify_track_id = Streams.spotify_track_id "
+				+ "GROUP By "
+				+ "Albums.id,"
+				+ "Albums.name "
+				+ "ORDER BY sort_param DESC;");
+		
+		return jdbc.sql(sql)
+				.query(AlbumStats.class)
+				.list();
+				
 	}
 	
 }

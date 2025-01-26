@@ -72,7 +72,7 @@ public abstract class CatalogRepository<EntityClass extends CatalogEntity> {
 					entity.getName() 
 					+ " : "
 					+ entity.getId() 
-					+ "contains invalid values.");
+					+ " contains invalid values.");
 			return 0;
 		}
 		

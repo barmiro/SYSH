@@ -22,21 +22,6 @@ public class TrackController {
 		return trackRepository.findAll();
 	}
 	
-//	@GetMapping("/topTracksNew")
-//	List<TrackStats> topTracksNew(
-//			@RequestParam(required = false)
-//			Optional<String> startDate,
-//			@RequestParam(required = false)
-//			Optional<String> endDate) {
-//		
-//		return trackRepository.topTracksCount(startDate, endDate);
-//	}
-//	
-//	@GetMapping("/topTracksTime")
-//	List<TrackStats> topTracksTime() {
-//		return trackRepository.topTracksTime();
-//	}
-	
 	@GetMapping("/topTracks")
 	List<TrackStats> topTracks(
 			@RequestParam
@@ -58,6 +43,7 @@ public class TrackController {
 		} else if (sort.equals("count")) {
 			return trackRepository.topTracksTime(startDate, endDate);
 		} else {
+//			not catching this one, if it's thrown, something has gone really wrong
 			throw new InvalidSortParameterException();
 		}
 		

@@ -6,11 +6,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.github.barmiro.sysh_server.catalog.albums.Album;
 import com.github.barmiro.sysh_server.catalog.albums.spotify_api.AlbumApiRepository;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
 import com.github.barmiro.sysh_server.catalog.artists.spotify_api.ArtistApiRepository;
+import com.github.barmiro.sysh_server.catalog.jointables.AlbumsTracks;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
@@ -25,16 +27,19 @@ public class AddToCatalog {
 	AlbumApiRepository albumApiRepository;
 	ArtistApiRepository artistApiRepository;
 	StreamRepository streamRepository;
+	AlbumsTracks albumsTracks;
 	
 	public AddToCatalog(
 			TrackApiRepository trackApiRepository,
 			AlbumApiRepository albumApiRepository,
 			ArtistApiRepository artistApiRepository,
-			StreamRepository streamRepository) {
+			StreamRepository streamRepository,
+			AlbumsTracks albumsTracks) {
 		this.trackApiRepository = trackApiRepository;
 		this.albumApiRepository = albumApiRepository;
 		this.artistApiRepository = artistApiRepository;
 		this.streamRepository = streamRepository;
+		this.albumsTracks = albumsTracks;
 	}
 
 	public String adder(List<Stream> streams) {
@@ -72,6 +77,8 @@ public class AddToCatalog {
 		
 		albums.addAll(albumApiRepository.addNewAlbums(albumIDs));
 		albumsAdded = albums.size();
+		albumsTracks.join(tracks);
+		
 		
 		for (ApiTrack apiTrack:apiTracks) {
 			for (ApiTrackArtist artist:apiTrack.artists()) {

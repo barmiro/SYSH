@@ -19,5 +19,10 @@ public class AlbumController {
 	List<Album> getAlbums() {
 		return albumRepository.findAll();
 	}
+	
+	@GetMapping("/topAlbums")
+	List<AlbumStats> topAlbums() {
+		return albumRepository.topAlbumsCount();
+	}
 
 }

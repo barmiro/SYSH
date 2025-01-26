@@ -57,6 +57,8 @@ CREATE TABLE Albums_Tracks (
     PRIMARY KEY (album_id, spotify_track_id)
 );
 
+CREATE INDEX album_join ON Albums_Tracks (album_id);
+
 CREATE TABLE Tracks_Artists (
     spotify_track_id varchar REFERENCES Tracks(spotify_track_id),
     artist_id varchar REFERENCES Artists(id),
