@@ -41,9 +41,9 @@ public class ArtistController {
 				.replace("T", " "));
 		String sortBy = sort.orElse("");
 		if (sortBy.equals("time")) {
-			return artistRepository.topArtistsCount(startDate, endDate);
-		} else {
 			return artistRepository.topArtistsTime(startDate, endDate);
+		} else {
+			return artistRepository.topArtistsCount(startDate, endDate);
 		} 
 		
 	}

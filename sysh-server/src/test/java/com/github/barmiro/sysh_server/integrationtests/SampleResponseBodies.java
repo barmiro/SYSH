@@ -48,11 +48,11 @@ public class SampleResponseBodies {
 	static List<ArtistStats> artistStats() {
 		List<ArtistStats> artistStats = new ArrayList<>();
 		
-		artistStats.add(new ArtistStats("7guDJrEfX3qb6FEbdPA5qi", "Stevie Wonder", 10));
+		artistStats.add(new ArtistStats("6nB0iY1cjSY1KyhYyuIIKH", "FKA twigs", 2));
 		
-		artistStats.add(new ArtistStats("6nB0iY1cjSY1KyhYyuIIKH", "FKA twigs", 8));
+		artistStats.add(new ArtistStats("7guDJrEfX3qb6FEbdPA5qi", "Stevie Wonder", 2));
 		
-		artistStats.add(new ArtistStats("6kBDZFXuLrZgHnvmPu9NsG", "Aphex Twin", 4));
+		artistStats.add(new ArtistStats("6kBDZFXuLrZgHnvmPu9NsG", "Aphex Twin", 1));
 		
 		return artistStats;
 		

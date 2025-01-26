@@ -38,7 +38,7 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 	
 public List<ArtistStats> topArtistsCount(Timestamp startDate, Timestamp endDate) {
 		
-		String sql = ("SELECT Artists.*, COUNT(Streams.spotify_track_id) as sort_param "
+		String sql = ("SELECT Artists.*, COUNT(Streams.ts) as sort_param "
 				+ "FROM Artists "
 				+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
 				+ "LEFT JOIN Streams ON Tracks_Artists.spotify_track_id = Streams.spotify_track_id "
