@@ -1,8 +1,8 @@
-package com.github.barmiro.sysh_server.catalog.artists.spotify_api.dto;
+package com.github.barmiro.sysh_server.catalog.artists.spotifyapi.dto;
 
 import java.util.List;
 
-import com.github.barmiro.sysh_server.catalog.artists.spotify_api.dto.artists.ApiArtist;
+import com.github.barmiro.sysh_server.catalog.artists.spotifyapi.dto.artists.ApiArtist;
 import com.github.barmiro.sysh_server.catalog.interfaces.ApiWrapper;
 
 public record ArtistsWrapper(

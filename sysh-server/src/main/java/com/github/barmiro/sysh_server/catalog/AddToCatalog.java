@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.github.barmiro.sysh_server.catalog.albums.Album;
 import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
-import com.github.barmiro.sysh_server.catalog.artists.spotify_api.ArtistApiRepository;
+import com.github.barmiro.sysh_server.catalog.artists.spotifyapi.ArtistApiRepository;
 import com.github.barmiro.sysh_server.catalog.jointables.AlbumsTracks;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
@@ -55,7 +55,6 @@ public class AddToCatalog {
 		List<String> trackIDs = new ArrayList<>();
 		
 		List<Album> albums = new ArrayList<>();
-//		List<String> albumIDs = new ArrayList<>();
 		
 		List<Artist> artists = new ArrayList<>();
 		List<String> artistIDs = new ArrayList<>();
@@ -76,9 +75,7 @@ public class AddToCatalog {
 		
 		
 		
-//		for (Track track:tracks) {
-//			albumIDs.add(track.album_id());
-//		}
+
 		
 		List <ApiTrackAlbum> apiTrackAlbums = new ArrayList<>();
 		for (ApiTrack apiTrack:apiTracks) {
@@ -89,10 +86,7 @@ public class AddToCatalog {
 		albums.addAll(ConvertDTOs.apiTrackAlbums(apiTrackAlbums));
 		albumsAdded = albumRepository.addAlbums(albums);
 		
-		
-//		albums.addAll(albumApiRepository.addNewAlbums(albumIDs));
-//		albumsAdded = albums.size();
-		albumsTracks.join(tracks);
+				albumsTracks.join(tracks);
 		
 		
 		for (ApiTrack apiTrack:apiTracks) {

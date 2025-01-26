@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.catalog.artists.spotify_api;
+package com.github.barmiro.sysh_server.catalog.artists.spotifyapi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +12,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
 import com.github.barmiro.sysh_server.catalog.artists.ArtistRepository;
-import com.github.barmiro.sysh_server.catalog.artists.spotify_api.dto.ArtistsWrapper;
-import com.github.barmiro.sysh_server.catalog.artists.spotify_api.dto.artists.ApiArtist;
+import com.github.barmiro.sysh_server.catalog.artists.spotifyapi.dto.ArtistsWrapper;
+import com.github.barmiro.sysh_server.catalog.artists.spotifyapi.dto.artists.ApiArtist;
 import com.github.barmiro.sysh_server.catalog.interfaces.SpotifyApiRepository;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
 
@@ -38,7 +38,7 @@ public class ArtistApiRepository extends SpotifyApiRepository<
 		List<String> packets = new ArrayList<>();
 
 		try {
-			packets = prepIdPackets(newIDs, 20);			
+			packets = prepIdPackets(newIDs, 50);			
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("Method prepIdPackets threw an exception.");

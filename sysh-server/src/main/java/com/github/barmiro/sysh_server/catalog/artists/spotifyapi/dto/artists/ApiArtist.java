@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.catalog.artists.spotify_api.dto.artists;
+package com.github.barmiro.sysh_server.catalog.artists.spotifyapi.dto.artists;
 
 import com.github.barmiro.sysh_server.catalog.interfaces.ApiEntity;
 

@@ -1,8 +1,8 @@
-package com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto;
+package com.github.barmiro.sysh_server.catalog.albums.spotifyapideprecated.dto;
 
 import java.util.List;
 
-import com.github.barmiro.sysh_server.catalog.albums.spotify_api.dto.albums.ApiAlbum;
+import com.github.barmiro.sysh_server.catalog.albums.spotifyapideprecated.dto.albums.ApiAlbum;
 import com.github.barmiro.sysh_server.catalog.interfaces.ApiWrapper;
 
 public record AlbumsWrapper (
