@@ -1,5 +1,10 @@
 package com.github.barmiro.sysh_server.integrationtests;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.github.barmiro.sysh_server.catalog.albums.AlbumStats;
+
 public class SampleResponseBodies {
 
 	static String recent() {
@@ -16,5 +21,26 @@ public class SampleResponseBodies {
 	
 	static String artists() {
 		return "{\"artists\":[{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/6kBDZFXuLrZgHnvmPu9NsG\"},\"followers\":{\"href\":null,\"total\":1580544},\"genres\":[\"idm\",\"ambient\",\"electronica\"],\"href\":\"https://api.spotify.com/v1/artists/6kBDZFXuLrZgHnvmPu9NsG\",\"id\":\"6kBDZFXuLrZgHnvmPu9NsG\",\"images\":[{\"url\":\"https://i.scdn.co/image/ab6761610000e5ebaa3c91d792eb520a5d58daa5\",\"height\":640,\"width\":640},{\"url\":\"https://i.scdn.co/image/ab67616100005174aa3c91d792eb520a5d58daa5\",\"height\":320,\"width\":320},{\"url\":\"https://i.scdn.co/image/ab6761610000f178aa3c91d792eb520a5d58daa5\",\"height\":160,\"width\":160}],\"name\":\"Aphex Twin\",\"popularity\":65,\"type\":\"artist\",\"uri\":\"spotify:artist:6kBDZFXuLrZgHnvmPu9NsG\"},{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/6nB0iY1cjSY1KyhYyuIIKH\"},\"followers\":{\"href\":null,\"total\":1323322},\"genres\":[\"art pop\",\"alternative r&b\"],\"href\":\"https://api.spotify.com/v1/artists/6nB0iY1cjSY1KyhYyuIIKH\",\"id\":\"6nB0iY1cjSY1KyhYyuIIKH\",\"images\":[{\"url\":\"https://i.scdn.co/image/ab6761610000e5eb1a8242e65195789d352c97bd\",\"height\":640,\"width\":640},{\"url\":\"https://i.scdn.co/image/ab676161000051741a8242e65195789d352c97bd\",\"height\":320,\"width\":320},{\"url\":\"https://i.scdn.co/image/ab6761610000f1781a8242e65195789d352c97bd\",\"height\":160,\"width\":160}],\"name\":\"FKA twigs\",\"popularity\":64,\"type\":\"artist\",\"uri\":\"spotify:artist:6nB0iY1cjSY1KyhYyuIIKH\"},{\"external_urls\":{\"spotify\":\"https://open.spotify.com/artist/7guDJrEfX3qb6FEbdPA5qi\"},\"followers\":{\"href\":null,\"total\":6765356},\"genres\":[\"motown\",\"soul\"],\"href\":\"https://api.spotify.com/v1/artists/7guDJrEfX3qb6FEbdPA5qi\",\"id\":\"7guDJrEfX3qb6FEbdPA5qi\",\"images\":[{\"url\":\"https://i.scdn.co/image/c59faacbed7aa770266bad048660810eca204108\",\"height\":1008,\"width\":1000},{\"url\":\"https://i.scdn.co/image/37c7875911b1d8195b05d40061a86bd01908a0d9\",\"height\":645,\"width\":640},{\"url\":\"https://i.scdn.co/image/3b24b51bf11404089c4d66acd0c612539c77e7e7\",\"height\":202,\"width\":200},{\"url\":\"https://i.scdn.co/image/05489744160e3f6f94f707fa1e2a6d4bbd14a298\",\"height\":64,\"width\":64}],\"name\":\"Stevie Wonder\",\"popularity\":76,\"type\":\"artist\",\"uri\":\"spotify:artist:7guDJrEfX3qb6FEbdPA5qi\"}]}";
+	}
+	
+	static List<AlbumStats> albumStats() {
+		List<AlbumStats> albumStats = new ArrayList<>();
+		
+		albumStats.add(new AlbumStats(
+				"3o1TOhMkU5FFMSJMDhXfdF",
+				"EUSEXUA",
+				2));
+		
+		albumStats.add(new AlbumStats(
+				"6YUCc2RiXcEKS9ibuZxjt0",
+				"Songs In The Key Of Life",
+				2));
+		
+		albumStats.add(new AlbumStats(
+				"7aNclGRxTysfh6z0d8671k",
+				"Selected Ambient Works 85-92",
+				1));
+		
+		return albumStats;
 	}
 }

@@ -4,7 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,11 +25,14 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.github.barmiro.sysh_server.auth.TokenService;
+import com.github.barmiro.sysh_server.catalog.albums.AlbumController;
+import com.github.barmiro.sysh_server.catalog.albums.AlbumStats;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
 
 @Testcontainers
 @SpringBootTest
 @AutoConfigureMockRestServiceServer
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class IntegrationTest {
 
 	@Test
@@ -36,11 +45,15 @@ class IntegrationTest {
 	@Autowired
 	MockRestServiceServer server;
 	
+	
 	@Autowired
 	RestClient apiClient;
 	
 	@Autowired
 	private RecentController rc;
+	
+	@Autowired
+	private AlbumController ac;
 	
 	@SuppressWarnings("resource")
 	@Container
@@ -53,6 +66,7 @@ class IntegrationTest {
 										.withInitScript("schema.sql");
 
 	
+	
 	@Sql(statements = {"DELETE FROM Streams",
 			"DELETE FROM Tracks",
 			"DELETE FROM Track_Duplicates",
@@ -60,7 +74,8 @@ class IntegrationTest {
 			"DELETE FROM Album_Tracklist",
 			"DELETE FROM Artists"})
 	@Test
-	void test() {
+	@Order(1)
+	void recentTest() {
 		ts.setToken("abcde");
 		
 		server.expect(requestTo("https://api.spotify.com/v1/me/player/recently-played"))
@@ -88,5 +103,18 @@ class IntegrationTest {
 		assertEquals("5 streams added.\n5 tracks added.\n3 albums added.\n3 artists added.\n", result);
 	}
 	
+	@Test
+	@Order(2)
+	void getEndpointsTest() {
+		List<AlbumStats> albumStats = SampleResponseBodies.albumStats();
+		
+		List<AlbumStats> response = ac.topAlbums(Optional.empty(), Optional.empty(), Optional.empty());
+
+				
+		assertEquals(albumStats, response);
+		
+
+		
+	}
 
 }

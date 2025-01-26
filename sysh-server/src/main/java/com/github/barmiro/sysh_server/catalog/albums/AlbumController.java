@@ -25,7 +25,7 @@ public class AlbumController {
 	}
 	
 	@GetMapping("/topAlbums")
-	List<AlbumStats> topAlbums(
+	public List<AlbumStats> topAlbums(
 			@RequestParam(required = false)
 			Optional<String> sort,
 			@RequestParam(required = false)
