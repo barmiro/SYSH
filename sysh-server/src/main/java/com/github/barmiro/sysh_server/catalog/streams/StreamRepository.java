@@ -20,7 +20,7 @@ public class StreamRepository {
 	
 	
 	public List<Stream> findAll() {
-		return jdbc.sql("SELECT * FROM Streams"
+		return jdbc.sql("SELECT * FROM Streams "
 				+ "ORDER BY ts DESC")
 				.query(Stream.class)
 				.list();
@@ -56,11 +56,12 @@ public class StreamRepository {
 	}
 	
 	public int addAll(List<Stream> streams) {
+		System.out.println("Found " + streams.size() + " streams.");
 		int added = 0;
 		for (Stream stream:streams) {
 			added += addNew(stream);
 		}
-		
+		System.out.println("Added " + added + " streams.");
 		return added;
 	}
 	

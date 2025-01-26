@@ -2,8 +2,6 @@ package com.github.barmiro.sysh_server.catalog;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +40,7 @@ public class AddToCatalog {
 		this.albumsTracks = albumsTracks;
 	}
 
+	@Transactional
 	public String adder(List<Stream> streams) {
 		
 		int streamsAdded = 0;
@@ -59,7 +58,10 @@ public class AddToCatalog {
 		List<Artist> artists = new ArrayList<>();
 		List<String> artistIDs = new ArrayList<>();
 		
-		Future<Integer> streamsFuture = streamRepository.addAllAsync(streams); // ASYNC
+
+//		this used to performed asynchronously
+//		but async methods perform separate transactions :(
+		streamsAdded = streamRepository.addAll(streams);
 		
 		for (Stream stream:streams) {
 			trackIDs.add(stream.spotify_track_id());
@@ -89,14 +91,7 @@ public class AddToCatalog {
 		artists.addAll(artistApiRepository.addNewArtists(artistIDs));
 		artistsAdded = artists.size();
 		
-		try {
-			streamsAdded = streamsFuture.get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			return "Something went wrong with the async method";
-		}
-		
-//		return (streamsAdded + " " + tracksAdded + " " + albumsAdded + " " + artistsAdded);
+
 		return (streamsAdded + " streams added.\n" 
 				+ tracksAdded + " tracks added.\n"
 				+ albumsAdded + " albums added.\n"
