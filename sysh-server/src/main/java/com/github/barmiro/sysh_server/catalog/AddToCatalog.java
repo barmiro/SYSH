@@ -11,6 +11,7 @@ import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
 import com.github.barmiro.sysh_server.catalog.artists.spotifyapi.ArtistApiRepository;
 import com.github.barmiro.sysh_server.catalog.jointables.AlbumsTracks;
+import com.github.barmiro.sysh_server.catalog.jointables.TracksArtists;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
@@ -28,18 +29,21 @@ public class AddToCatalog {
 	ArtistApiRepository artistApiRepository;
 	StreamRepository streamRepository;
 	AlbumsTracks albumsTracks;
+	TracksArtists tracksArtists;
 	
 	public AddToCatalog(
 			TrackApiRepository trackApiRepository,
 			AlbumRepository albumRepository,
 			ArtistApiRepository artistApiRepository,
 			StreamRepository streamRepository,
-			AlbumsTracks albumsTracks) {
+			AlbumsTracks albumsTracks,
+			TracksArtists tracksArtists) {
 		this.trackApiRepository = trackApiRepository;
 		this.albumRepository = albumRepository;
 		this.artistApiRepository = artistApiRepository;
 		this.streamRepository = streamRepository;
 		this.albumsTracks = albumsTracks;
+		this.tracksArtists = tracksArtists;
 	}
 
 	@Transactional
@@ -86,8 +90,7 @@ public class AddToCatalog {
 		albums.addAll(ConvertDTOs.apiTrackAlbums(apiTrackAlbums));
 		albumsAdded = albumRepository.addAlbums(albums);
 		
-				albumsTracks.join(tracks);
-		
+		albumsTracks.join(tracks);
 		
 		for (ApiTrack apiTrack:apiTracks) {
 			for (ApiTrackArtist artist:apiTrack.artists()) {
@@ -98,6 +101,7 @@ public class AddToCatalog {
 		artists.addAll(artistApiRepository.addNewArtists(artistIDs));
 		artistsAdded = artists.size();
 		
+		tracksArtists.join(apiTracks);
 
 		return (streamsAdded + " streams added.\n" 
 				+ tracksAdded + " tracks added.\n"

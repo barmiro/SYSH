@@ -1,6 +1,8 @@
 package com.github.barmiro.sysh_server.catalog.artists;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.List;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -30,6 +32,46 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 		}
 		System.out.println("Added " + added + " new artists");
 		return added;
+	}
+	
+	
+	
+public List<ArtistStats> topArtistsCount(Timestamp startDate, Timestamp endDate) {
+		
+		String sql = ("SELECT Artists.*, COUNT(Streams.spotify_track_id) as sort_param "
+				+ "FROM Artists "
+				+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
+				+ "LEFT JOIN Streams ON Tracks_Artists.spotify_track_id = Streams.spotify_track_id "
+				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
+				+ "AND Streams.ms_played >= 30000 "
+				+ "GROUP By "
+				+ "Artists.id,"
+				+ "Artists.name "
+				+ "ORDER BY sort_param DESC;");
+		
+		return jdbc.sql(sql)
+				.param("startDate", startDate, Types.TIMESTAMP)
+				.param("endDate", endDate, Types.TIMESTAMP)
+				.query(ArtistStats.class)
+				.list();
+	}
+	
+	public List<ArtistStats> topArtistsTime(Timestamp startDate, Timestamp endDate) {
+		String sql = ("SELECT Artists.*, SUM(Streams.ms_played) / 60000 as sort_param "
+				+ "FROM Artists "
+				+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
+				+ "LEFT JOIN Streams ON Tracks_Artists.spotify_track_id = Streams.spotify_track_id "
+				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
+				+ "GROUP By "
+				+ "Artists.id,"
+				+ "Artists.name "
+				+ "ORDER BY sort_param DESC;");
+		
+		return jdbc.sql(sql)
+				.param("startDate", startDate, Types.TIMESTAMP)
+				.param("endDate", endDate, Types.TIMESTAMP)
+				.query(ArtistStats.class)
+				.list();
 	}
 
 }

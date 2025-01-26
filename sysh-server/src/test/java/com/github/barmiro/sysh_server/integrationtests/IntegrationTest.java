@@ -27,6 +27,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.albums.AlbumController;
 import com.github.barmiro.sysh_server.catalog.albums.AlbumStats;
+import com.github.barmiro.sysh_server.catalog.artists.ArtistController;
+import com.github.barmiro.sysh_server.catalog.artists.ArtistStats;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
 
 @Testcontainers
@@ -53,7 +55,10 @@ class IntegrationTest {
 	private RecentController rc;
 	
 	@Autowired
-	private AlbumController ac;
+	private AlbumController albc;
+	
+	@Autowired
+	private ArtistController artc;
 	
 	@SuppressWarnings("resource")
 	@Container
@@ -105,15 +110,25 @@ class IntegrationTest {
 	
 	@Test
 	@Order(2)
-	void getEndpointsTest() {
+	void topAlbumsTest() {
 		List<AlbumStats> albumStats = SampleResponseBodies.albumStats();
 		
-		List<AlbumStats> response = ac.topAlbums(Optional.empty(), Optional.empty(), Optional.empty());
+		List<AlbumStats> response = albc.topAlbums(Optional.empty(), Optional.empty(), Optional.empty());
 
 				
 		assertEquals(albumStats, response);
 		
-
+	}
+	
+	@Test
+	@Order(3)
+	void topArtistsTest() {
+		List<ArtistStats> artistStats = SampleResponseBodies.artistStats();
+		
+		List<ArtistStats> response = artc.topArtists(Optional.empty(), Optional.empty(), Optional.empty());
+		
+		
+		assertEquals(artistStats, response);
 		
 	}
 

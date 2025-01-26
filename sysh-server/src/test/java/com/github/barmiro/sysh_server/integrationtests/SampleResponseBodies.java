@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.barmiro.sysh_server.catalog.albums.AlbumStats;
+import com.github.barmiro.sysh_server.catalog.artists.ArtistStats;
 
 public class SampleResponseBodies {
 
@@ -42,5 +43,18 @@ public class SampleResponseBodies {
 				1));
 		
 		return albumStats;
+	}
+	
+	static List<ArtistStats> artistStats() {
+		List<ArtistStats> artistStats = new ArrayList<>();
+		
+		artistStats.add(new ArtistStats("7guDJrEfX3qb6FEbdPA5qi", "Stevie Wonder", 10));
+		
+		artistStats.add(new ArtistStats("6nB0iY1cjSY1KyhYyuIIKH", "FKA twigs", 8));
+		
+		artistStats.add(new ArtistStats("6kBDZFXuLrZgHnvmPu9NsG", "Aphex Twin", 4));
+		
+		return artistStats;
+		
 	}
 }

@@ -23,7 +23,7 @@ public class TrackController {
 	}
 	
 	@GetMapping("/topTracks")
-	List<TrackStats> topTracks(
+	public List<TrackStats> topTracks(
 			@RequestParam
 			Optional<String> sort,
 			@RequestParam(required = false)
