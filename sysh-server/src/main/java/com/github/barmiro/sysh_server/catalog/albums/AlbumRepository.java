@@ -1,6 +1,8 @@
 package com.github.barmiro.sysh_server.catalog.albums;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.List;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -35,7 +37,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	}
 	
 	
-	public List<AlbumStats> topAlbumsCount() {
+	public List<AlbumStats> topAlbumsCount(Timestamp startDate, Timestamp endDate) {
 		
 		String sql = ("SELECT Albums.*, COUNT(Streams.spotify_track_id) as sort_param "
 				+ "FROM Albums "
@@ -47,9 +49,27 @@ public class AlbumRepository extends CatalogRepository<Album> {
 				+ "ORDER BY sort_param DESC;");
 		
 		return jdbc.sql(sql)
+				.param("startDate", startDate, Types.TIMESTAMP)
+				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(AlbumStats.class)
 				.list();
-				
+	}
+	
+	public List<AlbumStats> topAlbumsTime(Timestamp startDate, Timestamp endDate) {
+		String sql = ("SELECT Albums.*, SUM(Streams.ms_played) / 60000 as sort_param "
+				+ "FROM Albums "
+				+ "LEFT JOIN Albums_Tracks ON Albums.id = Albums_Tracks.album_id "
+				+ "LEFT JOIN Streams ON Albums_Tracks.spotify_track_id = Streams.spotify_track_id "
+				+ "GROUP By "
+				+ "Albums.id,"
+				+ "Albums.name "
+				+ "ORDER BY sort_param DESC;");
+		
+		return jdbc.sql(sql)
+				.param("startDate", startDate, Types.TIMESTAMP)
+				.param("endDate", endDate, Types.TIMESTAMP)
+				.query(AlbumStats.class)
+				.list();
 	}
 	
 }

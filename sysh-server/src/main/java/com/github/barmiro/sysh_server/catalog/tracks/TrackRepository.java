@@ -148,12 +148,14 @@ public class TrackRepository extends CatalogRepository<Track> {
 		String sql = ("SELECT Tracks.*, SUM(Streams.ms_played) / 60000 AS sort_param "
 				+ "FROM Tracks "
 				+ "LEFT JOIN Streams ON Tracks.spotify_track_id = Streams.spotify_track_id "
-				+ "WHERE Streams.ts BETWEEN '2024-01-01 01:00:00' AND '2025-01-01 01:00:00' "
+				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
 				+ "GROUP BY "
 				+ "Tracks.spotify_track_id,"
 				+ "Tracks.name "
 				+ "ORDER BY sort_param DESC;");
 		return jdbc.sql(sql)
+				.param("startDate", startDate, Types.TIMESTAMP)
+				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(TrackStats.class)
 				.list();
 		

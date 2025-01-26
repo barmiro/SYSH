@@ -25,27 +25,24 @@ public class TrackController {
 	@GetMapping("/topTracks")
 	List<TrackStats> topTracks(
 			@RequestParam
-			String sort,
+			Optional<String> sort,
 			@RequestParam(required = false)
-			Optional<String> startDateOpt,
+			Optional<String> start,
 			@RequestParam(required = false)
-			Optional<String> endDateOpt) {
+			Optional<String> end) {
 		
-		Timestamp startDate = Timestamp.valueOf(startDateOpt
+		Timestamp startDate = Timestamp.valueOf(start
 				.orElse("2000-01-01T00:00:00")
 				.replace("T", " "));
-		Timestamp endDate = Timestamp.valueOf(endDateOpt
+		Timestamp endDate = Timestamp.valueOf(end
 				.orElse(LocalDateTime.now().toString())
 				.replace("T", " "));
-		
-		if (sort.equals("time")) {
+		String sortBy = sort.orElse("");
+		if (sortBy.equals("time")) {
 			return trackRepository.topTracksCount(startDate, endDate);
-		} else if (sort.equals("count")) {
-			return trackRepository.topTracksTime(startDate, endDate);
 		} else {
-//			not catching this one, if it's thrown, something has gone really wrong
-			throw new InvalidSortParameterException();
-		}
+			return trackRepository.topTracksTime(startDate, endDate);
+		} 
 		
 	}
 	
