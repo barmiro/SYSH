@@ -73,10 +73,10 @@ class IntegrationTest {
 				SampleResponseBodies.tracks(),
 				MediaType.APPLICATION_JSON));
 		
-		server.expect(requestTo("https://api.spotify.com/v1/albums?ids=7aNclGRxTysfh6z0d8671k,3o1TOhMkU5FFMSJMDhXfdF,6YUCc2RiXcEKS9ibuZxjt0"))
-			.andRespond(withSuccess(
-					SampleResponseBodies.albums(),
-					MediaType.APPLICATION_JSON));
+//		server.expect(requestTo("https://api.spotify.com/v1/albums?ids=7aNclGRxTysfh6z0d8671k,3o1TOhMkU5FFMSJMDhXfdF,6YUCc2RiXcEKS9ibuZxjt0"))
+//			.andRespond(withSuccess(
+//					SampleResponseBodies.albums(),
+//					MediaType.APPLICATION_JSON));
 		
 		server.expect(requestTo("https://api.spotify.com/v1/artists?ids=6kBDZFXuLrZgHnvmPu9NsG,6nB0iY1cjSY1KyhYyuIIKH,7guDJrEfX3qb6FEbdPA5qi"))
 		.andRespond(withSuccess(

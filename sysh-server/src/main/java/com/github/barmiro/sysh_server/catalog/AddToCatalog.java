@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.github.barmiro.sysh_server.catalog.albums.Album;
-import com.github.barmiro.sysh_server.catalog.albums.spotify_api.AlbumApiRepository;
+import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
 import com.github.barmiro.sysh_server.catalog.artists.spotify_api.ArtistApiRepository;
 import com.github.barmiro.sysh_server.catalog.jointables.AlbumsTracks;
@@ -16,25 +16,27 @@ import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
+import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.album.ApiTrackAlbum;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.artists.ApiTrackArtist;
+import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
 
 @Repository
 public class AddToCatalog {
 	
 	TrackApiRepository trackApiRepository;
-	AlbumApiRepository albumApiRepository;
+	AlbumRepository albumRepository;
 	ArtistApiRepository artistApiRepository;
 	StreamRepository streamRepository;
 	AlbumsTracks albumsTracks;
 	
 	public AddToCatalog(
 			TrackApiRepository trackApiRepository,
-			AlbumApiRepository albumApiRepository,
+			AlbumRepository albumRepository,
 			ArtistApiRepository artistApiRepository,
 			StreamRepository streamRepository,
 			AlbumsTracks albumsTracks) {
 		this.trackApiRepository = trackApiRepository;
-		this.albumApiRepository = albumApiRepository;
+		this.albumRepository = albumRepository;
 		this.artistApiRepository = artistApiRepository;
 		this.streamRepository = streamRepository;
 		this.albumsTracks = albumsTracks;
@@ -53,7 +55,7 @@ public class AddToCatalog {
 		List<String> trackIDs = new ArrayList<>();
 		
 		List<Album> albums = new ArrayList<>();
-		List<String> albumIDs = new ArrayList<>();
+//		List<String> albumIDs = new ArrayList<>();
 		
 		List<Artist> artists = new ArrayList<>();
 		List<String> artistIDs = new ArrayList<>();
@@ -73,12 +75,23 @@ public class AddToCatalog {
 		
 		
 		
-		for (Track track:tracks) {
-			albumIDs.add(track.album_id());
-		}
 		
-		albums.addAll(albumApiRepository.addNewAlbums(albumIDs));
-		albumsAdded = albums.size();
+//		for (Track track:tracks) {
+//			albumIDs.add(track.album_id());
+//		}
+		
+		List <ApiTrackAlbum> apiTrackAlbums = new ArrayList<>();
+		for (ApiTrack apiTrack:apiTracks) {
+			if (!apiTrackAlbums.contains(apiTrack.album())) {
+				apiTrackAlbums.add(apiTrack.album());				
+			}
+		}
+		albums.addAll(ConvertDTOs.apiTrackAlbums(apiTrackAlbums));
+		albumsAdded = albumRepository.addAlbums(albums);
+		
+		
+//		albums.addAll(albumApiRepository.addNewAlbums(albumIDs));
+//		albumsAdded = albums.size();
 		albumsTracks.join(tracks);
 		
 		

@@ -15,6 +15,7 @@ import com.github.barmiro.sysh_server.catalog.artists.spotify_api.dto.artists.Ap
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
+import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.album.ApiTrackAlbum;
 import com.github.barmiro.sysh_server.dataintake.json.StreamDTO;
 import com.github.barmiro.sysh_server.dataintake.recent.dto.ItemsWrapper;
 import com.github.barmiro.sysh_server.dataintake.recent.dto.recentstream.RecentStream;
@@ -127,6 +128,39 @@ public class ConvertDTOs {
 		
 		return addedAlbums;
 	}
+	
+public static List<Album> apiTrackAlbums(List<ApiTrackAlbum> apiTrackAlbums) {
+		
+		List<Album> addedAlbums = new ArrayList<>();
+		
+		for (ApiTrackAlbum album:apiTrackAlbums) {
+			String id = album.id();
+			String name = album.name();
+			Integer total_tracks = album.total_tracks();
+			String release_date = album.release_date();
+			String image_url = album
+					.images()
+					.get(0)
+					.url();
+			String thumbnail_url = album
+					.images()
+					.get(album.images().size() - 1)
+					.url();
+			
+			Album newAlbum = new Album (
+					id,
+					name,
+					total_tracks,
+					release_date,
+					image_url,
+					thumbnail_url);
+			
+			addedAlbums.add(newAlbum);
+		}
+		
+		return addedAlbums;
+	}
+	
 	
 	public static List<Artist> apiArtists(List<ApiArtist> apiArtists) {
 		
