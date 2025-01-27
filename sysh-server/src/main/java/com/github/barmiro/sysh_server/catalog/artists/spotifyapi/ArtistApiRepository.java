@@ -24,7 +24,7 @@ public class ArtistApiRepository extends SpotifyApiRepository<
 											ApiArtist,
 											ArtistsWrapper> {
 
-	ArtistApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, ArtistRepository catalogRepository) {
+	public ArtistApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, ArtistRepository catalogRepository) {
 		super(jdbc, apiClient, tkn, catalogRepository);
 	}
 

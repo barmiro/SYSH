@@ -25,7 +25,7 @@ public class TrackApiRepository extends SpotifyApiRepository<
 											TracksWrapper> {
 
 
-	TrackApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackRepository catalogRepository) {
+	public TrackApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackRepository catalogRepository) {
 		super(jdbc, apiClient, tkn, catalogRepository);
 	}
 	

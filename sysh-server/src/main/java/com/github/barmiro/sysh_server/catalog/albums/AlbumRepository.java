@@ -3,6 +3,7 @@ package com.github.barmiro.sysh_server.catalog.albums;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -18,11 +19,30 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	}
 	
 	
-	
+	protected List<Album> getNewAlbums(List<Album> albums) {
+		
+		List<Album> newAlbums = new ArrayList<>();
+		
+		for(Album album:albums) {
+			
+			int exists = jdbc.sql("SELECT * FROM Albums "
+					+ "WHERE id = :albumID "
+					+ "LIMIT 1")
+					.param("albumID", album.id(), Types.VARCHAR)
+					.query(Album.class)
+					.list()
+					.size();
+			
+			if (exists == 0 && !newAlbums.contains(album)) {
+				newAlbums.add(album);
+			}
+		}
+		return newAlbums;
+	}
 
 	public int addAlbums(List<Album> albums) {
 		int added = 0;
-		for (Album album:albums) {
+		for (Album album:getNewAlbums(albums)) {
 			try {
 				added += addNew(album, Album.class);
 			} catch (IllegalAccessException | InvocationTargetException e) {

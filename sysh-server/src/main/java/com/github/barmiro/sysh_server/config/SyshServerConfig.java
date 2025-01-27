@@ -11,6 +11,15 @@ public class SyshServerConfig {
 	
 	@Bean
 	RestClient apiClient(RestClient.Builder builder) {
-		return builder.baseUrl("https://api.spotify.com/v1/").build();
+		return builder
+				.baseUrl("https://api.spotify.com/v1/")
+				.build();
+	}
+	
+	@Bean
+	RestClient tokenClient(RestClient.Builder builder) {
+		return builder
+				.baseUrl("https://accounts.spotify.com/api/token")
+				.build();
 	}
 }

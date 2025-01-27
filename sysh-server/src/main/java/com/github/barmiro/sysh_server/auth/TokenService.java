@@ -26,6 +26,11 @@ public class TokenService {
 	private final String clientSecret = System.getenv("SPOTIFY_CLIENT_SECRET");
 	private final String base64 = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
 
+	private RestClient tokenClient;
+	
+	public TokenService(RestClient tokenClient) {
+		this.tokenClient = tokenClient;
+	}
 	
 	ObjectMapper objectMapper = new ObjectMapper();
 	
@@ -72,9 +77,9 @@ public class TokenService {
 		newBody.add("code", code);
 		newBody.add("redirect_uri", "http://localhost:8080/callback");
 		
-		RestClient tokenClient = RestClient.builder()
-				.baseUrl("https://accounts.spotify.com/api/token")
-				.build();
+//		RestClient tokenClient = RestClient.builder()
+//				.baseUrl("https://accounts.spotify.com/api/token")
+//				.build();
 		
 		ResponseEntity<String> newEntity = tokenClient
 				.post()
@@ -93,11 +98,12 @@ public class TokenService {
 			return;
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
+			throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
+			throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
 		}
 		
-		throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
 	}
 	
 	public void refresh() {
@@ -113,9 +119,7 @@ public class TokenService {
 		newBody.add("grant_type", "refresh_token");
 		newBody.add("refresh-token", refreshToken);
 		
-		RestClient tokenClient = RestClient.builder()
-				.baseUrl("https://accounts.spotify.com/api/token")
-				.build();
+		
 		
 		ResponseEntity<String> newEntity = tokenClient
 				.post()
