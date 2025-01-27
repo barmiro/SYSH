@@ -27,7 +27,7 @@ public class AuthController {
 	}
 	
 	ObjectMapper objectMapper = new ObjectMapper();
-	private AuthResponseBody responseBody;
+	private AuthResponseDTO responseBody;
 	
 	private final String clientId = System.getenv("SPOTIFY_CLIENT_ID");
 	private final String clientSecret = System.getenv("SPOTIFY_CLIENT_SECRET");
@@ -88,7 +88,7 @@ public class AuthController {
 		
 		
 		try {
-			responseBody = objectMapper.readValue(newEntity.getBody(), AuthResponseBody.class);
+			responseBody = objectMapper.readValue(newEntity.getBody(), AuthResponseDTO.class);
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {

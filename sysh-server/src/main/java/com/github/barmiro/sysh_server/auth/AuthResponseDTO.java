@@ -1,6 +1,6 @@
 package com.github.barmiro.sysh_server.auth;
 
-public record AuthResponseBody(
+public record AuthResponseDTO(
 		String access_token,
 		String token_type,
 		String scope,

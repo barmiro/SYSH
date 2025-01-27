@@ -41,9 +41,8 @@ public class TracksArtists {
 						.param("artist_id", artists.get(i).id(), Types.VARCHAR)
 						.param("artist_order", i, Types.INTEGER)
 						.update();
-				System.out.println(artists.get(i).id());
 			}
-			System.out.println(artists);
+			
 		}
 		
 		System.out.println("Tracks_Artists join table updated, new entries: " + added);
