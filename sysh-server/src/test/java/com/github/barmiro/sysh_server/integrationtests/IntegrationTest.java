@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,7 +43,7 @@ class IntegrationTest {
 	}
 	
 	@Autowired
-	TokenService ts;
+	TokenService tkn;
 	
 	@Autowired
 	MockRestServiceServer server;
@@ -59,6 +60,10 @@ class IntegrationTest {
 	
 	@Autowired
 	private ArtistController artc;
+	
+	private final String clientId = System.getenv("SPOTIFY_CLIENT_ID");
+	private final String clientSecret = System.getenv("SPOTIFY_CLIENT_SECRET");
+	private final String base64 = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
 	
 	@SuppressWarnings("resource")
 	@Container
@@ -78,10 +83,25 @@ class IntegrationTest {
 			"DELETE FROM Albums",
 			"DELETE FROM Album_Tracklist",
 			"DELETE FROM Artists"})
+	
+//	@Test
+//	@Order(0)
+//	void tokenTest() {
+//		
+//		server.expect(requestTo("https://accounts.spotify.com/api/token"))
+//		.andExpect(content().formData(SampleResponseBodies.tokenRequest()))
+//		.andExpect(header("Authorization", "Basic " + base64))
+//		.andRespond(withSuccess(SampleResponseBodies.tokenResponse(), MediaType.APPLICATION_JSON));
+//		
+//		tkn.getNewToken("randomcode");
+//		
+//	}
+	
 	@Test
 	@Order(1)
 	void recentTest() {
-		ts.setToken("abcde");
+		tkn.setToken("abcde");
+		tkn.expTimeFromExpiresIn(3600);
 		
 		server.expect(requestTo("https://api.spotify.com/v1/me/player/recently-played"))
 			.andRespond(withSuccess(

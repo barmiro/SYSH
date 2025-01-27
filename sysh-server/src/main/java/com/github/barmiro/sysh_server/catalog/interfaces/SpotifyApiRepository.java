@@ -136,6 +136,8 @@ public abstract class SpotifyApiRepository<
 	
 	
 	protected ResponseEntity<String> getResponse(String packet) {
+		
+		
 		ResponseEntity<String> response = apiClient
 				.get()
 				.uri(packet)

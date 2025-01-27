@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.albums.Album;
 import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
@@ -30,6 +31,8 @@ public class AddToCatalog {
 	StreamRepository streamRepository;
 	AlbumsTracks albumsTracks;
 	TracksArtists tracksArtists;
+	TokenService tkn;
+	
 	
 	public AddToCatalog(
 			TrackApiRepository trackApiRepository,
@@ -37,17 +40,22 @@ public class AddToCatalog {
 			ArtistApiRepository artistApiRepository,
 			StreamRepository streamRepository,
 			AlbumsTracks albumsTracks,
-			TracksArtists tracksArtists) {
+			TracksArtists tracksArtists,
+			TokenService tkn) {
 		this.trackApiRepository = trackApiRepository;
 		this.albumRepository = albumRepository;
 		this.artistApiRepository = artistApiRepository;
 		this.streamRepository = streamRepository;
 		this.albumsTracks = albumsTracks;
 		this.tracksArtists = tracksArtists;
+		this.tkn = tkn;
 	}
 
 	@Transactional
 	public String adder(List<Stream> streams) {
+		
+		
+		tkn.refresh();
 		
 		int streamsAdded = 0;
 		int tracksAdded = 0;
@@ -76,10 +84,6 @@ public class AddToCatalog {
 		tracks.addAll(trackApiRepository.addNewTracks(apiTracks));
 		tracksAdded = tracks.size();
 		
-		
-		
-		
-
 		
 		List <ApiTrackAlbum> apiTrackAlbums = new ArrayList<>();
 		for (ApiTrack apiTrack:apiTracks) {

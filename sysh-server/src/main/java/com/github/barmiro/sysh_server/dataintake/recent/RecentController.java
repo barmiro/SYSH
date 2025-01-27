@@ -34,6 +34,9 @@ public class RecentController {
 
 	@GetMapping("/recent")
 	public String recent() {
+		
+		tkn.refresh();
+		
 		ResponseEntity<String> response = apiClient
 				.get()
 				.uri("me/player/recently-played")
