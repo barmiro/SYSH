@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
@@ -17,7 +19,7 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 		super(jdbc);
 	}
 	
-	
+	private static final Logger log = LoggerFactory.getLogger(ArtistRepository.class);
 	
 
 	public int addArtists(List<Artist> artists) {
@@ -30,7 +32,7 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Added " + added + " new artists");
+		log.info("Added " + added + " new artists");
 		return added;
 	}
 	

@@ -3,6 +3,8 @@ package com.github.barmiro.sysh_server.catalog.tracks.spotify_api;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -29,17 +31,17 @@ public class TrackApiRepository extends SpotifyApiRepository<
 		super(jdbc, apiClient, tkn, catalogRepository);
 	}
 	
+	private static final Logger log = LoggerFactory.getLogger(TrackApiRepository.class);
 
 	public List<ApiTrack> getApiTracks(List<String> track_ids) {
 		
 		List<String> newIDs = getNewIDs(track_ids, "spotify_track_id");
-		System.out.println("Found " + newIDs.size() + " new tracks.");
+		log.info("Found " + newIDs.size() + " new tracks.");
 		List<String> packets = new ArrayList<>();
 		try {
 			packets = prepIdPackets(newIDs, 50);			
 		} catch (Exception e) {
-			e.printStackTrace();
-			System.out.println("Method prepIdPackets threw an exception.");
+			log.error("Method prepIdPackets threw an exception: " + e.getMessage());
 			return new ArrayList<ApiTrack>();
 		}
 		
@@ -50,20 +52,19 @@ public class TrackApiRepository extends SpotifyApiRepository<
 			response = getResponse(packet);
 			
 			if (response == null) {
-				System.out.println("Response for " + packet + " is null.");
+				log.error("Response for " + packet + " is null.");
 				continue;
 			}
 			
 			try {
 				apiTracks.addAll(mapResponse(response));
 			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-				System.out.println("Method mapApiTracks threw an exception");
+				log.info("Method mapApiTracks threw an exception: " + e.getMessage());
 			}
 		}
 		
 		if (apiTracks.size() == 0) {
-			System.out.println("No tracks to add.");
+			log.info("No tracks to add.");
 			return new ArrayList<ApiTrack>();
 		}
 		

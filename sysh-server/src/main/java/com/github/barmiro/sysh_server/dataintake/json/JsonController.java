@@ -2,6 +2,8 @@ package com.github.barmiro.sysh_server.dataintake.json;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,10 +21,12 @@ public class JsonController {
 		this.addToCatalog = addToCatalog;
 	}
 	
+	private static final Logger log = LoggerFactory.getLogger(JsonController.class);
+	
 	@PostMapping("/addJson")
 	String addJson(@RequestBody List<StreamDTO> streamDTOs) {
 		
-		System.out.println("Adding json file...");
+		log.info("Adding json file...");
 		long start = System.currentTimeMillis();
 
 		List<Stream> streams = ConvertDTOs.streamsJson(streamDTOs);  // null?
@@ -31,9 +35,9 @@ public class JsonController {
 		
 		long end = System.currentTimeMillis();
 		long time = (end - start) / 1000;
-		System.out.println("Time elapsed: " + time);
+		log.info("Time elapsed: " + time);
 		
 		return result;
 	}
-}
+	}
  

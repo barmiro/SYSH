@@ -6,6 +6,8 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +20,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		super(jdbc);
 	}
 	
-	
+	private static final Logger log = LoggerFactory.getLogger(AlbumRepository.class);
 	protected List<Album> getNewAlbums(List<Album> albums) {
 		
 		List<Album> newAlbums = new ArrayList<>();
@@ -50,7 +52,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Added " + added + " new albums");
+		log.info("Added " + added + " new albums");
 		
 		
 		return added;

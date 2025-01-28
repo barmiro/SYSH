@@ -3,6 +3,8 @@ package com.github.barmiro.sysh_server.auth;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,7 @@ public class TokenService {
 	}
 	
 	ObjectMapper objectMapper = new ObjectMapper();
+	private static final Logger log = LoggerFactory.getLogger(TokenService.class);
 	
 	public void setToken(String token) {
 		this.token = token;
@@ -108,10 +111,11 @@ public class TokenService {
 	public boolean refresh() {
 		
 		if (LocalDateTime.now().plusMinutes(5).isBefore(expirationTime)) {
-			System.out.println("Token valid until: " + expirationTime + ". Proceeding...");
+			
+			log.info("Token valid until: " + expirationTime + ". Proceeding...");
 			return false;
 		}
-		System.out.println("Token expires: " + expirationTime + ", getting new token...");
+		log.info("Token expires: " + expirationTime + ". Getting new token...");
 		AuthResponseDTO responseBody;
 		MultiValueMap<String, String> newBody = new LinkedMultiValueMap<>();
 		

@@ -7,11 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import com.github.barmiro.sysh_server.catalog.interfaces.CatalogRepository;
+
+
 
 @Repository
 public class TrackRepository extends CatalogRepository<Track> {
@@ -19,7 +23,8 @@ public class TrackRepository extends CatalogRepository<Track> {
 	TrackRepository(JdbcClient jdbc) {
 		super(jdbc);
 	}
-	
+
+	private static final Logger log = LoggerFactory.getLogger(TrackRepository.class);
 	
 	private String checkForDuplicates(Track track) {
 		String getDupe = ("SELECT spotify_track_id "
@@ -72,7 +77,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 	
 	public int addTracks(List<Track> tracks) {
 		int added = 0;
-		
+		int duplicates = 0;
 		for (Track track:tracks) {
 			
 			String duplicate = checkForDuplicates(track);
@@ -85,17 +90,19 @@ public class TrackRepository extends CatalogRepository<Track> {
 			
 			if (duplicate != null) {
 				try {
-					int rows = jdbc.sql(duplicate).update();					
-					System.out.println(rows + 
-							" duplicate found for "
-							+ track.name());
+					duplicates += jdbc.sql(duplicate).update();					
 				} catch (DuplicateKeyException e) {
-					System.out.println(e.getMessage()); 
+					log.error(e.getMessage());
 				}
 			}
 		}
 		
-		System.out.println("Added " + added + " new tracks");
+		log.info("Added " + added + " new tracks.");
+		
+		if (duplicates > 0) {
+			log.info(duplicates + " tracks appear on multiple albums.");			
+		}
+		
 		return added;
 	}
 	

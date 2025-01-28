@@ -3,6 +3,8 @@ package com.github.barmiro.sysh_server.catalog.jointables;
 import java.sql.Types;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
@@ -18,8 +20,10 @@ public class TracksArtists {
 		this.jdbc = jdbc;
 	}
 	
+	private static final Logger log = LoggerFactory.getLogger(TracksArtists.class);
+	
 	public void join(List<ApiTrack> apiTracks) {
-		System.out.println("Updating the Tracks_Artists join table...");
+		log.info("Updating the Tracks_Artists join table...");
 		String sql = ("INSERT INTO Tracks_Artists ("
 				+ "spotify_track_id,"
 				+ "artist_id,"
@@ -45,6 +49,6 @@ public class TracksArtists {
 			
 		}
 		
-		System.out.println("Tracks_Artists join table updated, new entries: " + added);
+		log.info("Tracks_Artists join table updated, new entries: " + added);
 	}
 }

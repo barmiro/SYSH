@@ -158,7 +158,6 @@ class IntegrationTest {
 		
 		List<ArtistStats> response = artc.topArtists(Optional.empty(), Optional.empty(), Optional.empty());
 		
-		System.out.println(response);
 		assertEquals(artistStats, response);
 		
 	}

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
@@ -13,11 +15,11 @@ import org.springframework.stereotype.Repository;
 public class StreamRepository {
 	
 	private final JdbcClient jdbc;
-	
 	StreamRepository(JdbcClient jdbc) {
 		this.jdbc = jdbc;
 	}
 	
+	private static final Logger log = LoggerFactory.getLogger(StreamRepository.class);
 	
 	public List<Stream> findAll() {
 		return jdbc.sql("SELECT * FROM Streams "
@@ -56,18 +58,18 @@ public class StreamRepository {
 	}
 	
 	public int addAll(List<Stream> streams) {
-		System.out.println("Found " + streams.size() + " streams.");
+		log.info("Found " + streams.size() + " streams.");
 		int added = 0;
 		for (Stream stream:streams) {
 			added += addNew(stream);
 		}
-		System.out.println("Added " + added + " streams.");
+		log.info("Added " + added + " streams.");
 		return added;
 	}
 	
 	@Async
 	public Future<Integer> addAllAsync(List<Stream> streams) {
-		System.out.println("Found " + streams.size() + " streams.");
+		log.info("Found " + streams.size() + " streams.");
 		int added = 0;
 		for (Stream stream:streams) {
 			added += addNew(stream);
@@ -75,7 +77,7 @@ public class StreamRepository {
 		
 		CompletableFuture<Integer> result = new CompletableFuture<>();
 		result.complete(added);
-		System.out.println("Added " + added + " streams.");
+		log.info("Added " + added + " streams.");
 		return result;
 	}
 }

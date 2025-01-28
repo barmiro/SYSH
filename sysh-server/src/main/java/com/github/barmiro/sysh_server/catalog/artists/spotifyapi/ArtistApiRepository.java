@@ -3,6 +3,8 @@ package com.github.barmiro.sysh_server.catalog.artists.spotifyapi;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -28,12 +30,12 @@ public class ArtistApiRepository extends SpotifyApiRepository<
 		super(jdbc, apiClient, tkn, catalogRepository);
 	}
 
-
+	private static final Logger log = LoggerFactory.getLogger(ArtistApiRepository.class);
 	
 	public List<Artist> addNewArtists(List<String> artist_ids) {
 		
 		List<String> newIDs = getNewIDs(artist_ids, "id");
-		System.out.println("Found " + newIDs.size() + " new artists.");
+		log.info("Found " + newIDs.size() + " new artists.");
 		
 		List<String> packets = new ArrayList<>();
 
@@ -41,7 +43,7 @@ public class ArtistApiRepository extends SpotifyApiRepository<
 			packets = prepIdPackets(newIDs, 50);			
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Method prepIdPackets threw an exception.");
+			log.error("Method prepIdPackets threw an exception.");
 			return new ArrayList<Artist>();
 		}
 		
@@ -53,12 +55,12 @@ public class ArtistApiRepository extends SpotifyApiRepository<
 				apiArtists.addAll(mapResponse(response));
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
-				System.out.println("Method mapApiArtists threw an exception");
+				log.error("Method mapApiArtists threw an exception");
 			}
 		}
 		
 		if (apiArtists.size() == 0) {
-			System.out.println("No artists to add.");
+			log.info("No artists to add.");
 			return new ArrayList<Artist>();
 		}
 		
