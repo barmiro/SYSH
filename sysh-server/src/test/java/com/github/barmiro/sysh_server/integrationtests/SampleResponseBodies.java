@@ -12,7 +12,7 @@ import com.github.barmiro.sysh_server.catalog.artists.ArtistStats;
 public class SampleResponseBodies {
 
 	static String tokenResponse() {
-		return "{ \"access_token\" : \"randomtoken\", \"token_type\": \"Bearer\", \"expires_in\": \"3600\", \"refresh_token\": \"randomrefreshtoken\", \"scope\": \"user-read-email\" }";
+		return "{ \"access_token\" : \"randomtoken\", \"token_type\": \"Bearer\", \"expires_in\": \"300\", \"refresh_token\": \"randomrefreshtoken\", \"scope\": \"user-read-email\" }";
 	}
 	
 	static MultiValueMap<String, String> tokenRequest() {
@@ -24,6 +24,20 @@ public class SampleResponseBodies {
 		body.add("redirect_uri", "http://localhost:8080/callback");
 		
 		return body;
+	}
+	
+	static MultiValueMap<String, String> refreshRequest() {
+		
+		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+		
+		body.add("grant_type", "refresh_token");
+		body.add("refresh_token", "randomrefreshtoken");
+		
+		return body;
+	}
+	
+	static String refreshResponse() {
+		return "{ \"access_token\" : \"newrandomtoken\", \"token_type\": \"Bearer\", \"expires_in\": \"3600\", \"refresh_token\": \"newrandomrefreshtoken\", \"scope\": \"user-read-email\" }";
 	}
 	
 	

@@ -69,7 +69,6 @@ public class TokenService {
 	
 	
 	public void getNewToken(String code) {
-		System.out.println("getNewToken called");
 		AuthResponseDTO responseBody;
 		MultiValueMap<String, String> newBody = new LinkedMultiValueMap<>();
 		
@@ -106,18 +105,18 @@ public class TokenService {
 		
 	}
 	
-	public void refresh() {
+	public boolean refresh() {
 		
 		if (LocalDateTime.now().plusMinutes(5).isBefore(expirationTime)) {
 			System.out.println("Token valid until: " + expirationTime + ". Proceeding...");
-			return;
+			return false;
 		}
 		System.out.println("Token expires: " + expirationTime + ", getting new token...");
 		AuthResponseDTO responseBody;
 		MultiValueMap<String, String> newBody = new LinkedMultiValueMap<>();
 		
 		newBody.add("grant_type", "refresh_token");
-		newBody.add("refresh-token", refreshToken);
+		newBody.add("refresh_token", refreshToken);
 		
 		
 		
@@ -135,7 +134,7 @@ public class TokenService {
 			setToken(responseBody.access_token());
 			expTimeFromExpiresIn(responseBody.expires_in());
 			setRefreshToken(responseBody.refresh_token());
-			return;
+			return true;
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {

@@ -1,5 +1,7 @@
 package com.github.barmiro.sysh_server.integrationtests;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -39,7 +41,18 @@ class AuthTests {
 		.andExpect(header("Authorization", "Basic " + base64))
 		.andRespond(withSuccess(SampleResponseBodies.tokenResponse(), MediaType.APPLICATION_JSON));
 		
+		
+		customizer.getServer().expect(requestTo("https://accounts.spotify.com/api/token"))
+		.andExpect(content().formData(SampleResponseBodies.refreshRequest()))
+		.andExpect(header("Authorization", "Basic " + base64))
+		.andRespond(withSuccess(SampleResponseBodies.refreshResponse(), MediaType.APPLICATION_JSON));
+		
+		
 		tkn.getNewToken("randomcode");
+		assertTrue(tkn.refresh());
+		assertFalse(tkn.refresh());
+		
+		
 		
 	}
 
