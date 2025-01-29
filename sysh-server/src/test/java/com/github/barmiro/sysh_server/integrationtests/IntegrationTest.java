@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +40,7 @@ import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
 import com.github.barmiro.sysh_server.common.StatsRepository;
-import com.github.barmiro.sysh_server.common.records.StatsDTO;
+import com.github.barmiro.sysh_server.common.records.stats.FullStats;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
 
 @Testcontainers
@@ -170,8 +171,8 @@ class IntegrationTest {
 	@Test
 	@Order(4)
 	void statsRepositoryTest() {
-		StatsDTO expectedStats = new StatsDTO(23, 5, 5, 3, 3);
-		assertEquals(expectedStats, stats.streamStats());
+		FullStats expectedStats = new FullStats(23, 5, 5, 3, 3);
+		assertEquals(expectedStats, stats.streamStats(Timestamp.valueOf("2000-01-01 00:00:00"), Timestamp.valueOf("2025-02-01 00:00:00")));
 	}
 
 }

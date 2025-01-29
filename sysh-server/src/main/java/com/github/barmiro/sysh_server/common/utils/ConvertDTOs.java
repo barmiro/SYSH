@@ -27,7 +27,7 @@ public class ConvertDTOs {
 		List<Stream> streams = new ArrayList<>();
 		
 		for (StreamDTO streamDTO:streamDTOs) {
-			if (streamDTO.spotify_track_uri() != null) {
+			if (streamDTO.spotify_track_uri() != null && streamDTO.ms_played() > 0) {
 				Stream stream = new Stream(streamDTO.ts(),
 						streamDTO.ms_played(),
 						streamDTO.spotify_track_uri().replace("spotify:track:", ""));

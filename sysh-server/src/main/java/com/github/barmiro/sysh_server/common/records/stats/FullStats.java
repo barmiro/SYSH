@@ -1,6 +1,6 @@
-package com.github.barmiro.sysh_server.common.records;
+package com.github.barmiro.sysh_server.common.records.stats;
 
-public record StatsDTO(
+public record FullStats(
 		Integer minutes_streamed,
 		Integer stream_count,
 		Integer track_count,

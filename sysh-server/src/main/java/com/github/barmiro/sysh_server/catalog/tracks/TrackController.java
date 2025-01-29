@@ -41,9 +41,9 @@ public class TrackController {
 				.replace("T", " "));
 		String sortBy = sort.orElse("");
 		if (sortBy.equals("time")) {
-			return trackRepository.topTracksCount(startDate, endDate);
-		} else {
 			return trackRepository.topTracksTime(startDate, endDate);
+		} else {
+			return trackRepository.topTracksCount(startDate, endDate);
 		} 
 		
 	}
