@@ -19,6 +19,8 @@ public class StatsRepository {
 	}
 	
 	public FullStats streamStats(Timestamp startDate, Timestamp endDate) {
+		
+//		I will figure out how to do all of this in a single query one day.
 		String sql = ("SELECT "
 				+ "COUNT(Streams.*) "
 				+ "AS stream_count,"
@@ -33,6 +35,8 @@ public class StatsRepository {
 				+ "WHERE Streams.ms_played > 30000 "
 				+ "AND Streams.ts BETWEEN :startDate AND :endDate;");
 		
+//		This is a separate query because I believe even streams below 30s
+//		should count towards streaming time
 		String minutes = ("SELECT "
 				+ "SUM(ms_played) / 60000 AS minutes_streamed "
 				+ "FROM Streams "

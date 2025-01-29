@@ -141,15 +141,20 @@ public static List<Album> apiTrackAlbums(List<ApiTrackAlbum> apiTrackAlbums) {
 			String name = album.name();
 			Integer total_tracks = album.total_tracks();
 			String release_date = album.release_date();
-			String image_url = album
-					.images()
-					.get(0)
-					.url();
-			String thumbnail_url = album
-					.images()
-					.get(album.images().size() - 1)
-					.url();
 			
+//			TODO: handle albums with no images
+			String image_url = "";
+			String thumbnail_url = "";
+			if (album.images().size() > 0) {
+				image_url = album
+						.images()
+						.get(0)
+						.url();
+				thumbnail_url = album
+						.images()
+						.get(album.images().size() - 1)
+						.url();				
+			}
 			Album newAlbum = new Album (
 					id,
 					name,
