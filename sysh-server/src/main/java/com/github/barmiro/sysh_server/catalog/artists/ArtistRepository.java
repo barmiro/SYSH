@@ -28,8 +28,7 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 			try {
 				added += addNew(artist, Artist.class);
 			} catch (IllegalAccessException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error(e.getMessage());
 			}
 		}
 		log.info("Added " + added + " new artists");

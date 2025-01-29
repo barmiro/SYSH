@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequestMapping("/top")
 @RestController
 public class AlbumController {
 	
@@ -24,7 +26,7 @@ public class AlbumController {
 		return albumRepository.findAll();
 	}
 	
-	@GetMapping("/topAlbums")
+	@GetMapping("/albums")
 	public List<AlbumStats> topAlbums(
 			@RequestParam(required = false)
 			Optional<String> sort,

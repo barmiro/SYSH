@@ -38,6 +38,8 @@ import com.github.barmiro.sysh_server.catalog.jointables.TracksArtists;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
+import com.github.barmiro.sysh_server.common.StatsRepository;
+import com.github.barmiro.sysh_server.common.records.StatsDTO;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
 
 @Testcontainers
@@ -79,6 +81,9 @@ class IntegrationTest {
 	
 	@Autowired
 	private TracksArtists traArt;
+	
+	@Autowired
+	private StatsRepository stats;
 
 	@SuppressWarnings("resource")
 	@Container
@@ -160,6 +165,13 @@ class IntegrationTest {
 		
 		assertEquals(artistStats, response);
 		
+	}
+	
+	@Test
+	@Order(4)
+	void statsRepositoryTest() {
+		StatsDTO expectedStats = new StatsDTO(23, 5, 5, 3, 3);
+		assertEquals(expectedStats, stats.streamStats());
 	}
 
 }
