@@ -20,9 +20,7 @@ public class StatsRepository {
 	
 	public FullStats streamStats(Timestamp startDate, Timestamp endDate) {
 		String sql = ("SELECT "
-				+ "SUM(Streams.ms_played) / 60000 "
-				+ "AS minutes_streamed,"
-				+ "COUNT(CASE WHEN Streams.ms_played > 30000 THEN 1 END) "
+				+ "COUNT(Streams.*) "
 				+ "AS stream_count,"
 				+ "COUNT(DISTINCT CASE WHEN NOT EXISTS ("
 				+ "SELECT 1 FROM Track_Duplicates WHERE Tracks.spotify_track_id = Track_Duplicates.secondary_id"
@@ -32,15 +30,21 @@ public class StatsRepository {
 				+ "AS album_count "
 				+ "FROM Streams "
 				+ "JOIN Tracks ON Streams.spotify_track_id = Tracks.spotify_track_id "
+				+ "WHERE Streams.ms_played > 30000 "
+				+ "AND Streams.ts BETWEEN :startDate AND :endDate;");
+		
+		String minutes = ("SELECT "
+				+ "SUM(ms_played) / 60000 AS minutes_streamed "
+				+ "FROM Streams "
 				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate;");
 		
-
 		String artists = ("SELECT "
 				+ "COUNT(DISTINCT Tracks_Artists.artist_id) "
 				+ "FROM Tracks_Artists "
 				+ "JOIN Streams ON "
 				+ "Streams.spotify_track_id = Tracks_Artists.spotify_track_id "
-				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate;");
+				+ "WHERE Streams.ms_played > 30000 "
+				+ "AND Streams.ts BETWEEN :startDate AND :endDate;");
 		
 		
 		StatsDTO statsDTO =  jdbc.sql(sql)
@@ -49,13 +53,19 @@ public class StatsRepository {
 				.query(StatsDTO.class)
 				.single();
 		
+		Integer minutesStreamed = jdbc.sql(minutes)
+				.param("startDate", startDate, Types.TIMESTAMP)
+				.param("endDate", endDate, Types.TIMESTAMP)
+				.query(Integer.class)
+				.single();
+		
 		Integer artistCount = jdbc.sql(artists)
 				.param("startDate", startDate, Types.TIMESTAMP)
 				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(Integer.class)
 				.single();
 		
-		return new FullStats(statsDTO.minutes_streamed(),
+		return new FullStats(minutesStreamed,
 				statsDTO.stream_count(),
 				statsDTO.track_count(),
 				statsDTO.album_count(),
