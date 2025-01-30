@@ -10,15 +10,20 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import java.util.Base64;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.MockServerRestClientCustomizer;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.web.client.RestClient;
 
 import com.github.barmiro.sysh_server.auth.TokenService;
 
 @SpringBootTest
 class AuthTests {
+	
+	@Autowired
+	JdbcClient jdbc;
 
 	
 	private final String clientId = System.getenv("SPOTIFY_CLIENT_ID");
@@ -34,7 +39,7 @@ class AuthTests {
 		.baseUrl("https://accounts.spotify.com/api/token");
 		
 		customizer.customize(builder);
-		TokenService tkn = new TokenService(builder.build());
+		TokenService tkn = new TokenService(builder.build(), jdbc);
 		
 		customizer.getServer().expect(requestTo("https://accounts.spotify.com/api/token"))
 		.andExpect(content().formData(SampleResponseBodies.tokenRequest()))

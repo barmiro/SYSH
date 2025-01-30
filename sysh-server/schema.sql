@@ -73,6 +73,7 @@ CREATE TABLE Artists_Albums (
     PRIMARY KEY (artist_id, album_id)
 );
 
+CREATE TABLE Refresh (token varchar);
 
 
 
