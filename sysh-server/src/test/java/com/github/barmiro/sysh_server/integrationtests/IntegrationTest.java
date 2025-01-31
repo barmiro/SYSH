@@ -124,7 +124,7 @@ class IntegrationTest {
 		RecentController rc = new RecentController(tkn, builder.build(), sr, add);
 		
 		
-		customizer.getServer().expect(requestTo("https://api.spotify.com/v1/me/player/recently-played"))
+		customizer.getServer().expect(requestTo("https://api.spotify.com/v1/me/player/recently-played?limit=50"))
 			.andRespond(withSuccess(
 					SampleResponseBodies.recent(),
 					MediaType.APPLICATION_JSON));

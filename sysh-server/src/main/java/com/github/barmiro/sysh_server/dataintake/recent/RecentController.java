@@ -39,14 +39,14 @@ public class RecentController {
 		
 		ResponseEntity<String> response = apiClient
 				.get()
-				.uri("me/player/recently-played")
+				.uri("me/player/recently-played?limit=50")
 				.header("Authorization", "Bearer " + tkn.getToken())
 				.retrieve()
 				.toEntity(String.class);
 		
 
 		
-		List<Stream> previous = streamService.find(20);
+		List<Stream> previous = streamService.find(50);
 		List<Stream> streams = ConvertDTOs.streamsRecent(response, previous);
 
 		String result;

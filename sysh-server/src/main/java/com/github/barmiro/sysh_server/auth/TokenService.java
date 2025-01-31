@@ -31,6 +31,7 @@ public class TokenService {
 	private String token;
 	private LocalDateTime expirationTime;
 	private String refreshToken;
+	private boolean authenticated = false;
 	
 	private final String clientId = System.getenv("SPOTIFY_CLIENT_ID");
 	private final String clientSecret = System.getenv("SPOTIFY_CLIENT_SECRET");
@@ -81,6 +82,10 @@ public class TokenService {
 		}
 	}
 	
+	public boolean isAuthenticated() {
+		return authenticated;
+	}
+	
 	
 	
 	public void getNewToken(String code) {
@@ -109,6 +114,7 @@ public class TokenService {
 			setToken(responseBody.access_token());
 			expTimeFromExpiresIn(responseBody.expires_in());
 			setRefreshToken(responseBody.refresh_token());
+			authenticated = true;
 			return;
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
@@ -123,8 +129,8 @@ public class TokenService {
 	public boolean refresh() {
 		
 		if (expirationTime == null) {
-			if (refreshToken == null) {
-				log.info("Not authorized with Spotify yet");
+			if (!authenticated) {
+				log.info("Not authenticated with Spotify yet");
 				throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
 			}
 			log.info("The server has been restarted. Refreshing token...");
@@ -188,6 +194,7 @@ public class TokenService {
 			return;
 		}
 		refreshToken = tokenList.get(0);
+		authenticated = true;
 		jdbc.sql("DELETE FROM Refresh").update();
 	}
 	
