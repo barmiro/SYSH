@@ -165,11 +165,14 @@ public class TokenService {
 		throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
 	}
 	
+//	I don't like this approach, but it was quick
 	@Value("${test.env:false}")
 	private boolean isTestEnv;
 
 	@PostConstruct
 	public void initToken() {
+		
+		
 		if (isTestEnv) {
 			return;
 		}
