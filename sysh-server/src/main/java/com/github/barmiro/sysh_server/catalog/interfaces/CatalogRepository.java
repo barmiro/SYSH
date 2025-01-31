@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -21,6 +23,7 @@ public abstract class CatalogRepository<EntityClass extends CatalogEntity> {
 	protected CatalogRepository(JdbcClient jdbc) {
 		this.jdbc = jdbc;
 	}
+	private static final Logger log = LoggerFactory.getLogger(CatalogRepository.class);
 	
 	@SuppressWarnings("unchecked")
 	Class<EntityClass> getEntityClass() throws ClassCastException {
@@ -60,7 +63,7 @@ public abstract class CatalogRepository<EntityClass extends CatalogEntity> {
 			added = jdbcCall.update();		
 			
 		} catch (DuplicateKeyException e){
-			System.out.println(
+			log.error(
 					entity.getName() 
 					+ " : "
 					+ entity.getId() 
@@ -68,7 +71,7 @@ public abstract class CatalogRepository<EntityClass extends CatalogEntity> {
 			return 0;
 			
 		} catch(DataIntegrityViolationException e) {
-			System.out.println(
+			log.error(
 					entity.getName() 
 					+ " : "
 					+ entity.getId() 
