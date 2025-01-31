@@ -2,7 +2,8 @@ CREATE TABLE Streams (
     id SERIAL PRIMARY KEY,
     ts timestamp NOT NULL,
     ms_played integer NOT NULL,
-    spotify_track_id varchar NOT NULL
+    spotify_track_id varchar NOT NULL,
+    CONSTRAINT no_duplicates UNIQUE (ts, spotify_track_id)
 );
 
 

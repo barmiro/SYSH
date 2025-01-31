@@ -48,7 +48,13 @@ public class StreamRepository {
 				+ ") VALUES ("
 				+ ":ts,"
 				+ ":ms_played,"
-				+ ":spotify_track_id)");
+				+ ":spotify_track_id) "
+				//this filters out duplicates, and accurately adds quick double-plays
+				//(ignoring the first, extremely-short-but-technically-there plays)
+				//in practice, it's only ~0.1% of streaming time, but might matter for a song's stats
+				+ "ON CONFLICT (ts, spotify_track_id) DO "
+				+ "UPDATE SET ms_played = EXCLUDED.ms_played "
+				+ "WHERE Streams.ms_played < EXCLUDED.ms_played");
 		
 		return this.jdbc.sql(sql)
 				.param("ts", stream.ts(), Types.TIMESTAMP)
@@ -63,7 +69,7 @@ public class StreamRepository {
 		for (Stream stream:streams) {
 			added += addNew(stream);
 		}
-		log.info("Added " + added + " streams.");
+		log.info("Added " + added + " new streams.");
 		return added;
 	}
 	
