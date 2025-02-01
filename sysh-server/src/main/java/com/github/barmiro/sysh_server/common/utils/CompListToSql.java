@@ -2,12 +2,11 @@ package com.github.barmiro.sysh_server.common.utils;
 
 import java.util.List;
 
-import com.github.barmiro.sysh_server.catalog.interfaces.CatalogEntity;
 import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
 
 public class CompListToSql {
 	
-	public static <T extends CatalogEntity> String insert(
+	public static <T> String insert(
 			List<RecordCompInfo> comps,
 			Class<T> clazz) {
 		

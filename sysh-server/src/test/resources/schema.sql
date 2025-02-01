@@ -74,6 +74,16 @@ CREATE TABLE Artists_Albums (
     PRIMARY KEY (artist_id, album_id)
 );
 
+CREATE TABLE Stats_Cache (
+    start_date TIMESTAMP NOT NULL, 
+    end_date TIMESTAMP NOT NULL, 
+    minutes_streamed INTEGER, 
+    stream_count INTEGER, 
+    track_count INTEGER, 
+    album_count INTEGER, 
+    artist_count INTEGER
+);
+
 CREATE TABLE Refresh (token varchar);
 
 

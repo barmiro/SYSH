@@ -1,7 +1,6 @@
 package com.github.barmiro.sysh_server.common;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,12 +26,19 @@ public class StatsController {
 			@RequestParam(required = false)
 			Optional<String> end) {
 		
+//		6 years before Spotify was founded, safe minimum
 		Timestamp startDate = Timestamp.valueOf(start
 				.orElse("2000-01-01T00:00:00")
 				.replace("T", " "));
+		
+//		This will be the placeholder for the upper limit for now;
+//		considered 2100, but I'm erring on the side of caution
+//		in terms of 32-bit epoch integer overflow
 		Timestamp endDate = Timestamp.valueOf(end
-				.orElse(LocalDateTime.now().toString())
+				.orElse("2038-01-01T00:00:00")
 				.replace("T", " "));
+		
+		
 		
 		return statsRepo.streamStats(startDate, endDate);
 	}

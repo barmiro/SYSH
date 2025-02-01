@@ -171,8 +171,10 @@ class IntegrationTest {
 	@Test
 	@Order(4)
 	void statsRepositoryTest() {
-		FullStats expectedStats = new FullStats(23, 5, 5, 3, 3);
-		assertEquals(expectedStats, stats.streamStats(Timestamp.valueOf("2000-01-01 00:00:00"), Timestamp.valueOf("2025-02-01 00:00:00")));
+		Timestamp startDate = Timestamp.valueOf("2000-01-01 00:00:00");
+		Timestamp endDate = Timestamp.valueOf("2025-02-01 00:00:00");
+		FullStats expectedStats = new FullStats(startDate, endDate, 23, 5, 5, 3, 3);
+		assertEquals(expectedStats, stats.streamStats(startDate, endDate));
 	}
 
 }
