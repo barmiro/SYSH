@@ -82,7 +82,7 @@ CREATE TABLE Stats_Cache (
     track_count INTEGER, 
     album_count INTEGER, 
     artist_count INTEGER,
-    CONSTRAINT no_duplicates UNIQUE (start_date, end_date)
+    CONSTRAINT no_duplicate_stats UNIQUE (start_date, end_date)
 );
 
 CREATE TABLE Refresh (token varchar);

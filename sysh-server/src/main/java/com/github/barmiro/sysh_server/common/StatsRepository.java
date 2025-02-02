@@ -110,6 +110,7 @@ public class StatsRepository {
 				.optional();
 	}
 	
+	
 	public int addCachedStats(Timestamp startDate, Timestamp endDate
 			) throws IllegalAccessException, InvocationTargetException {
 			
@@ -117,19 +118,7 @@ public class StatsRepository {
 
 		List<RecordCompInfo> recordComps = CompInfo.get(stats);
 		
-		StringBuilder sqlBuilder = new StringBuilder(
-				CompListToSql.insert(recordComps, FullStats.class));
-		
-		String sql = sqlBuilder.append(
-				" ON CONFLICT (start_date, end_date) "
-				+ "DO UPDATE SET "
-				+ "minutes_streamed = EXCLUDED.minutes_streamed,"
-				+ "stream_count = EXCLUDED.stream_count,"
-				+ "track_count = EXCLUDED.track_count,"
-				+ "album_count = EXCLUDED.album_count,"
-				+ "artist_count = EXCLUDED.artist_count")
-				.toString();
-
+		String sql = CompListToSql.insertCache(recordComps);
 		
 		StatementSpec jdbcCall = jdbc.sql(sql);
 		

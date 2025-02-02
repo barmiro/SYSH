@@ -1,5 +1,6 @@
 package com.github.barmiro.sysh_server.common;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.Optional;
 
@@ -38,8 +39,13 @@ public class StatsController {
 				.orElse("2038-01-01T00:00:00")
 				.replace("T", " "));
 		
-		
-		
+
+		try {
+			System.out.println(statsRepo.addCachedStats(startDate, endDate));
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return statsRepo.streamStats(startDate, endDate);
 	}
 
