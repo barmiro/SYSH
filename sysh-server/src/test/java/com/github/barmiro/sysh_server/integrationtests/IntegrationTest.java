@@ -39,6 +39,7 @@ import com.github.barmiro.sysh_server.catalog.jointables.TracksArtists;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
+import com.github.barmiro.sysh_server.common.StatsCache;
 import com.github.barmiro.sysh_server.common.StatsRepository;
 import com.github.barmiro.sysh_server.common.records.stats.FullStats;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
@@ -85,6 +86,9 @@ class IntegrationTest {
 	
 	@Autowired
 	private StatsRepository stats;
+	
+	@Autowired
+	private StatsCache statsCache;
 
 	@SuppressWarnings("resource")
 	@Container
@@ -120,7 +124,7 @@ class IntegrationTest {
 
 		TrackApiRepository trApi = new TrackApiRepository(jdbc, builder.build(), tkn, trackRepo);
 		ArtistApiRepository arApi = new ArtistApiRepository(jdbc, builder.build(), tkn, artistRepo);
-		AddToCatalog add = new AddToCatalog(trApi, albumRepo, arApi, sr, albTra, traArt, tkn);
+		AddToCatalog add = new AddToCatalog(trApi, albumRepo, arApi, sr, albTra, traArt, tkn, statsCache);
 		RecentController rc = new RecentController(tkn, builder.build(), sr, add);
 		
 		

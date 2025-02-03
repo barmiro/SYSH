@@ -20,11 +20,13 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiReposit
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.album.ApiTrackAlbum;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.artists.ApiTrackArtist;
+import com.github.barmiro.sysh_server.common.StatsCache;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
 
 @Repository
 public class AddToCatalog {
 	
+//	this list is getting pretty long, I don't want this to become a god object
 	TrackApiRepository trackApiRepository;
 	AlbumRepository albumRepository;
 	ArtistApiRepository artistApiRepository;
@@ -32,7 +34,7 @@ public class AddToCatalog {
 	AlbumsTracks albumsTracks;
 	TracksArtists tracksArtists;
 	TokenService tkn;
-	
+	StatsCache statsCache;
 	
 	public AddToCatalog(
 			TrackApiRepository trackApiRepository,
@@ -41,7 +43,8 @@ public class AddToCatalog {
 			StreamRepository streamRepository,
 			AlbumsTracks albumsTracks,
 			TracksArtists tracksArtists,
-			TokenService tkn) {
+			TokenService tkn,
+			StatsCache statsCache) {
 		this.trackApiRepository = trackApiRepository;
 		this.albumRepository = albumRepository;
 		this.artistApiRepository = artistApiRepository;
@@ -49,6 +52,7 @@ public class AddToCatalog {
 		this.albumsTracks = albumsTracks;
 		this.tracksArtists = tracksArtists;
 		this.tkn = tkn;
+		this.statsCache = statsCache;
 	}
 
 	@Transactional
@@ -106,6 +110,12 @@ public class AddToCatalog {
 		artistsAdded = artists.size();
 		
 		tracksArtists.join(apiTracks);
+		
+//		the <= 50 condition limits this cache update to recent streams,
+//		easier than returning all necessary values and handling it in recent logic
+		if (streams.size() > 0 && streams.size() <= 50) {
+			statsCache.updateCache(streams, tracksAdded, albumsAdded, artistsAdded);
+		}
 
 		return (streamsAdded + " streams added.\n" 
 				+ tracksAdded + " tracks added.\n"

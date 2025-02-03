@@ -29,7 +29,7 @@ public class StreamRepository {
 	}
 	
 	public List<Stream> find(int limit) {
-		return jdbc.sql("SELECT * FROM Streams LIMIT :limit")
+		return jdbc.sql("SELECT * FROM Streams ORDER BY ts DESC LIMIT :limit")
 				.param("limit", limit, Types.INTEGER)
 				.query(Stream.class)
 				.list();
