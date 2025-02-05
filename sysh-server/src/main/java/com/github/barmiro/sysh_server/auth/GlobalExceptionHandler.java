@@ -8,13 +8,19 @@ import org.springframework.web.client.HttpClientErrorException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+	
+	TokenService tkn;
+	
+	GlobalExceptionHandler(TokenService tkn) {
+		this.tkn = tkn;
+	}
 
 	@ExceptionHandler(HttpClientErrorException.class)
 	public ResponseEntity<String> handleHttpClientError(HttpClientErrorException e) throws InterruptedException {
 		if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 			for (int i = 0; i < 5; i++) {
 				try {
-					//refresh logic
+					tkn.refresh();
 				} catch (HttpClientErrorException ex) {
 					if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 						Thread.sleep(2000 * i);
