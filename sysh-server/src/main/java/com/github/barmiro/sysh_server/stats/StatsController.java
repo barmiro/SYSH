@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.common;
+package com.github.barmiro.sysh_server.stats;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
@@ -7,8 +7,6 @@ import java.util.Optional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.github.barmiro.sysh_server.common.records.stats.FullStats;
 
 @RestController
 public class StatsController {

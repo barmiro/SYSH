@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.common;
+package com.github.barmiro.sysh_server.stats;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;

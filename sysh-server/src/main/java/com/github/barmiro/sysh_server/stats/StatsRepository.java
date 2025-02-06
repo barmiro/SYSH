@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.common;
+package com.github.barmiro.sysh_server.stats;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
@@ -14,8 +14,6 @@ import org.springframework.jdbc.core.simple.JdbcClient.StatementSpec;
 import org.springframework.stereotype.Repository;
 
 import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
-import com.github.barmiro.sysh_server.common.records.stats.FullStats;
-import com.github.barmiro.sysh_server.common.records.stats.StatsDTO;
 import com.github.barmiro.sysh_server.common.utils.CompInfo;
 import com.github.barmiro.sysh_server.common.utils.CompListToSql;
 

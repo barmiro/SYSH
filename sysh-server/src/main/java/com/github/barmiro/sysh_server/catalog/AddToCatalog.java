@@ -20,8 +20,8 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiReposit
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.album.ApiTrackAlbum;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.artists.ApiTrackArtist;
-import com.github.barmiro.sysh_server.common.StatsCache;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
+import com.github.barmiro.sysh_server.stats.StatsCache;
 
 @Repository
 public class AddToCatalog {

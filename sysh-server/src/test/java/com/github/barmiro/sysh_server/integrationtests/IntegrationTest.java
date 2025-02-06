@@ -39,10 +39,10 @@ import com.github.barmiro.sysh_server.catalog.jointables.TracksArtists;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
-import com.github.barmiro.sysh_server.common.StatsCache;
-import com.github.barmiro.sysh_server.common.StatsRepository;
-import com.github.barmiro.sysh_server.common.records.stats.FullStats;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
+import com.github.barmiro.sysh_server.stats.FullStats;
+import com.github.barmiro.sysh_server.stats.StatsCache;
+import com.github.barmiro.sysh_server.stats.StatsRepository;
 
 @Testcontainers
 @SpringBootTest

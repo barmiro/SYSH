@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.common.records.stats;
+package com.github.barmiro.sysh_server.stats;
 
 import java.sql.Timestamp;
 
