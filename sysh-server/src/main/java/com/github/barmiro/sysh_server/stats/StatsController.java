@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.Optional;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,6 +45,13 @@ public class StatsController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return statsRepo.streamStats(startDate, endDate);
+	}
+	
+	@GetMapping("/stats/year/{year}")
+	FullStats yearStats(@PathVariable Integer year) {
+		Timestamp startDate = Timestamp.valueOf(year + "-01-01 00:00:00");
+		Timestamp endDate = Timestamp.valueOf(year + "-12-31 23:59:59");
 		return statsRepo.streamStats(startDate, endDate);
 	}
 
