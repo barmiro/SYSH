@@ -24,7 +24,7 @@ public class ScheduledApiCalls {
 	
 //	called every 25 minutes, the mathematical minimum time required
 //	to reach Spotify's limit of 50 streams per call
-	@Scheduled(fixedRate = 60000)
+	@Scheduled(fixedRate = 1500000)
 	public void scheduledGetRecent() {
 		if (tkn.isAuthenticated()) {
 			recentController.recent();
