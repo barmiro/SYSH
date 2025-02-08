@@ -149,7 +149,9 @@ public class TokenService {
 			responseBody = objectMapper.readValue(newEntity.getBody(), AuthResponseDTO.class);
 			setToken(responseBody.access_token());
 			expTimeFromExpiresIn(responseBody.expires_in());
-			setRefreshToken(responseBody.refresh_token());
+			if (responseBody.refresh_token() != null) {
+				setRefreshToken(responseBody.refresh_token());				
+			}
 			return true;
 		} catch (JsonMappingException e) {
 			e.printStackTrace();

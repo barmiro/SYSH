@@ -28,10 +28,9 @@ public class TokenInit {
 
 	@PostConstruct
 	void initToken() {
-		System.out.println("Init token started");
+
 		
 		if (isTestEnv) {
-			System.out.println("Test env true");
 			return;
 		}
 		
@@ -43,18 +42,15 @@ public class TokenInit {
 		}
 		
 		if (tokenList.size() == 0 || tokenList.get(0) == null || tokenList.get(0).isEmpty()) {
-			System.out.println("No token found");
 			return;
 		}
 		tkn.setRefreshToken(tokenList.get(0));
 		jdbc.sql("DELETE FROM Refresh").update();
-		System.out.println("Token loaded");
 	}
 	
 	
 	@PreDestroy
 	public void saveToken() {
-		System.out.println("save token started");
 		if (isTestEnv) {
 			return;
 		}
@@ -62,12 +58,11 @@ public class TokenInit {
 		try {
 			jdbc.sql("DELETE FROM Refresh").update();
 			if (tkn.getRefreshToken() == null) {
-				System.out.println("Refresh token is null");
 				return;
 			}
-			System.out.println("Token insert: " + jdbc.sql("INSERT INTO Refresh (token) VALUES (:refreshToken)")
+			jdbc.sql("INSERT INTO Refresh (token) VALUES (:refreshToken)")
 			.param("refreshToken", tkn.getRefreshToken(), Types.VARCHAR)
-			.update());
+			.update();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

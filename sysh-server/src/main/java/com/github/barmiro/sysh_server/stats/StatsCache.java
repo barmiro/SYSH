@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.github.barmiro.sysh_server.catalog.streams.Stream;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 
 @Service
 public class StatsCache {
@@ -137,10 +136,6 @@ public class StatsCache {
 		log.info(updatedCaches + " caches have been updated.");
 	}
 	
-	@PreDestroy
-	void destroyTest() {
-		System.out.println("PreDestroy works here");
-	}
 }
 
 
