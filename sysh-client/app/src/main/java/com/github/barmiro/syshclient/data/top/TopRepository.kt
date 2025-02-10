@@ -1,6 +1,5 @@
 package com.github.barmiro.syshclient.data.top
 
-import com.github.barmiro.syshclient.data.top.dto.TrackDTO
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
@@ -19,9 +18,9 @@ class TopRepository {
     val topApi = retrofit.create(TopApi::class.java)
 
     suspend fun getTracks() {
-        println("Top track: " + topApi.getTopTracks("2024-01-01T00:00:00", "2024-12-31T23:59:59", "time").body().orEmpty()[0])
-        println("Top album: " + topApi.getTopAlbums("2024-01-01T00:00:00", "2024-12-31T23:59:59", "time").body().orEmpty()[0])
-        println("Top artist: " + topApi.getTopArtists("2024-01-01T00:00:00", "2024-12-31T23:59:59", "time").body().orEmpty()[0])
+        println("Top track: " + topApi.fetchTopTracks("2024-01-01T00:00:00", "2024-12-31T23:59:59", "time").body().orEmpty()[0])
+        println("Top album: " + topApi.fetchTopAlbums("2024-01-01T00:00:00", "2024-12-31T23:59:59", "time").body().orEmpty()[0])
+        println("Top artist: " + topApi.fetchTopArtists("2024-01-01T00:00:00", "2024-12-31T23:59:59", "time").body().orEmpty()[0])
     }
 
 

@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
+import com.github.barmiro.syshclient.data.stats.StatsRepository
 import com.github.barmiro.syshclient.data.top.TopRepository
 import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
 import kotlinx.coroutines.launch
@@ -33,6 +34,8 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             val topRepo = TopRepository()
             topRepo.getTracks()
+            val statsRepo = StatsRepository()
+            statsRepo.getStats()
         }
 
     }
