@@ -1,7 +1,7 @@
 package com.github.barmiro.syshclient.data.top.dto
 
-data class TrackDTO(
-    val spotify_track_id: String,
+data class ArtistDTO(
+    val id: String,
     val name: String,
     val sort_param: Int
 )
