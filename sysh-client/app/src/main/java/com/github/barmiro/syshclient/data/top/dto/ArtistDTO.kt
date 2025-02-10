@@ -1,5 +1,8 @@
 package com.github.barmiro.syshclient.data.top.dto
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ArtistDTO(
     val id: String,
     val name: String,

@@ -4,27 +4,25 @@ import com.github.barmiro.syshclient.data.top.dto.AlbumDTO
 import com.github.barmiro.syshclient.data.top.dto.ArtistDTO
 import com.github.barmiro.syshclient.data.top.dto.TrackDTO
 import com.github.barmiro.syshclient.util.Resource
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okio.IOException
 import retrofit2.HttpException
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TopRepository @Inject constructor() {
 
-    val moshi = Moshi.Builder()
-        .add(KotlinJsonAdapterFactory())
-        .build()
-
     val retrofit = Retrofit.Builder()
         .baseUrl("http://10.0.2.2:8080/top/")
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .addConverterFactory(
+            Json.asConverterFactory(
+                "application/json; charset=UTF8".toMediaType()))
         .build()
 
     val topApi = retrofit.create(TopApi::class.java)

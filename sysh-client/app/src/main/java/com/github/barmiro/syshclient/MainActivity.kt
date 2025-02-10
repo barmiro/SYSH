@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         lifecycleScope.launch {
-            topRepo.getTracks()
+            topRepo.test()
             statsRepo.getStats()
         }
 
