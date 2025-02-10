@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlinAndroidKsp)
+    alias(libs.plugins.hiltAndroid)
 }
 
 android {
@@ -60,4 +62,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit2.converter.moshi)
     implementation(libs.moshi)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 }

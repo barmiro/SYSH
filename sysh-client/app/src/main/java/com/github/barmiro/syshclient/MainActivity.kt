@@ -15,9 +15,14 @@ import androidx.lifecycle.lifecycleScope
 import com.github.barmiro.syshclient.data.stats.StatsRepository
 import com.github.barmiro.syshclient.data.top.TopRepository
 import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject lateinit var statsRepo: StatsRepository
+    @Inject lateinit var topRepo: TopRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -32,9 +37,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         lifecycleScope.launch {
-            val topRepo = TopRepository()
             topRepo.getTracks()
-            val statsRepo = StatsRepository()
             statsRepo.getStats()
         }
 
