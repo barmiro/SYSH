@@ -37,8 +37,7 @@ class TopRepository @Inject constructor() {
 
 //    I know this is bad, but refactoring will be made later on,
 //    when I know exactly which DTO contains what fields
-    suspend fun getTopTracks(
-        fetchFromRemote: Boolean,
+    fun getTopTracks(
         start: String? = null,
         end: String? = null,
         sort: String? = null
@@ -52,11 +51,11 @@ class TopRepository @Inject constructor() {
             } catch (e:IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered IOException: " + e.message))
-                ArrayList()
+                emptyList()
             } catch (e: HttpException) {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered HttpException: " + e.code()))
-                ArrayList()
+                emptyList()
             }
             val isFetchSuccessful = topTracks.isNotEmpty()
             if (isFetchSuccessful) {
@@ -67,8 +66,7 @@ class TopRepository @Inject constructor() {
             emit(Resource.Loading(false))
         }
     }
-    suspend fun getTopAlbums(
-        fetchFromRemote: Boolean,
+    fun getTopAlbums(
         start: String? = null,
         end: String? = null,
         sort: String? = null
@@ -82,11 +80,11 @@ class TopRepository @Inject constructor() {
             } catch (e:IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered IOException: " + e.message))
-                ArrayList()
+                emptyList()
             } catch (e: HttpException) {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered HttpException: " + e.code()))
-                ArrayList()
+                emptyList()
             }
             val isFetchSuccessful = topAlbums.isNotEmpty()
             if (isFetchSuccessful) {
@@ -98,8 +96,7 @@ class TopRepository @Inject constructor() {
         }
     }
 
-    suspend fun getTopArtists(
-        fetchFromRemote: Boolean,
+    fun getTopArtists(
         start: String? = null,
         end: String? = null,
         sort: String? = null
@@ -113,11 +110,11 @@ class TopRepository @Inject constructor() {
             } catch (e:IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered IOException: " + e.message))
-                ArrayList()
+                emptyList()
             } catch (e: HttpException) {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered HttpException: " + e.code()))
-                ArrayList()
+                emptyList()
             }
             val isFetchSuccessful = topArtists.isNotEmpty()
             if (isFetchSuccessful) {
