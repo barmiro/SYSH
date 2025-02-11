@@ -39,6 +39,7 @@ fun TopTracksScreen(
             items(state.tracks.size) { i ->
                 val track = state.tracks[i]
                 TrackItem(
+                    index = i + 1,
                     track = track,
                     modifier = Modifier
                         .fillMaxWidth()

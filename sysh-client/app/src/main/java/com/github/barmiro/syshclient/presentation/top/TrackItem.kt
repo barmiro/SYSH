@@ -21,6 +21,7 @@ import com.github.barmiro.syshclient.data.top.dto.TrackDTO
 
 @Composable
 fun TrackItem(
+    index: Int,
     track: TrackDTO,
     modifier: Modifier = Modifier
 ) {
@@ -35,7 +36,7 @@ fun TrackItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = track.name,
+                    text = index.toString() + ". " + track.name,
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground,
