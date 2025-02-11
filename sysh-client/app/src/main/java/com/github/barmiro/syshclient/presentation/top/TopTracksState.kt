@@ -6,7 +6,7 @@ data class TopTracksState(
     val tracks: List<TrackDTO> = emptyList(),
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
-    val sort: String = "",
-    val start: String = "",
-    val end: String = ""
+    val sort: String? = null,
+    val start: String? = null,
+    val end: String? = null
 )

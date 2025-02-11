@@ -4,36 +4,66 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.github.barmiro.syshclient.data.stats.StatsRepository
 import com.github.barmiro.syshclient.data.top.TopRepository
+import com.github.barmiro.syshclient.presentation.top.TopTracksScreen
+import com.github.barmiro.syshclient.presentation.top.TopTracksViewModel
 import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @Inject lateinit var statsRepo: StatsRepository
     @Inject lateinit var topRepo: TopRepository
+    private val topTracksVM: TopTracksViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             SyshClientTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+                NavHost(
+                    navController =  navController,
+                    startDestination = MainScreen
+                ) {
+                     composable<MainScreen> {
+                         Column(
+                             modifier = Modifier.fillMaxSize(),
+                             verticalArrangement = Arrangement.Center,
+                             horizontalAlignment = Alignment.CenterHorizontally
+                         ) {
+                             Button(onClick = {
+                                 navController.navigate(TopTracks)
+                             }) {
+                                 Text(text = "Let's go!")
+                             }
+                         }
+                     }
+                    composable<TopTracks> {
+                        TopTracksScreen(topTracksVM)
+                    }
                 }
+//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+//                    Greeting(
+//                        name = "Android",
+//                        modifier = Modifier.padding(innerPadding)
+//                    )
+//                }
             }
         }
         lifecycleScope.launch {
@@ -44,18 +74,25 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+@Serializable
+object MainScreen
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SyshClientTheme {
-        Greeting("Android")
-    }
-}
+@Serializable
+object TopTracks
+
+
+//@Composable
+//fun Greeting(name: String, modifier: Modifier = Modifier) {
+//    Text(
+//        text = "Hello $name!",
+//        modifier = modifier
+//    )
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun GreetingPreview() {
+//    SyshClientTheme {
+//        Greeting("Android")
+//    }
+//}

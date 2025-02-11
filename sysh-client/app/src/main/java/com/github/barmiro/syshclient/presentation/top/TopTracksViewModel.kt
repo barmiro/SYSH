@@ -37,9 +37,9 @@ class TopTracksViewModel @Inject constructor(
     }
 
     private fun getTopTracks(
-        start: String = state.start,
-        end: String = state.end,
-        sort: String = state.sort
+        start: String? = state.start,
+        end: String? = state.end,
+        sort: String? = state.sort
     ) {
         viewModelScope.launch {
             topRepository.getTopTracks(start, end, sort)
