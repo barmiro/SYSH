@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.barmiro.syshclient.data.top.dto.TrackDTO
@@ -37,17 +39,19 @@ fun TrackItem(
                     fontWeight = FontWeight.Normal,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground,
+                    overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(9f)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = track.sort_param.toString(),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
