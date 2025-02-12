@@ -11,16 +11,20 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @Composable
 fun TopTracksScreen(
     viewModel: TopTracksViewModel
 ) {
-
     val state = viewModel.state
+    viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -31,7 +35,7 @@ fun TopTracksScreen(
                 viewModel.onEvent(TopTracksEvent.Refresh)
             }
         ) {
-            Text(text = "Load")
+            Text(text = "Refresh")
         }
         LazyColumn(
             modifier = Modifier.fillMaxSize()
@@ -55,6 +59,16 @@ fun TopTracksScreen(
                         ))
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun <T: LifecycleObserver> T.observeLifecycle(lifecycle: Lifecycle) {
+    DisposableEffect(lifecycle) {
+        lifecycle.addObserver(this@observeLifecycle)
+        onDispose {
+            lifecycle.removeObserver(this@observeLifecycle)
         }
     }
 }

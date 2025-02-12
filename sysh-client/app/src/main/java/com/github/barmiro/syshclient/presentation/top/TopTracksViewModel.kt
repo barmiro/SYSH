@@ -3,6 +3,8 @@ package com.github.barmiro.syshclient.presentation.top
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.top.TopRepository
@@ -14,10 +16,12 @@ import javax.inject.Inject
 @HiltViewModel
 class TopTracksViewModel @Inject constructor(
     private val topRepository: TopRepository
-): ViewModel() {
+): ViewModel(), DefaultLifecycleObserver {
 
+    override fun onCreate(owner: LifecycleOwner) {
+        getTopTracks()
+    }
     var state by mutableStateOf(TopTracksState())
-
     fun onEvent(event: TopTracksEvent) {
         when(event) {
             is TopTracksEvent.Refresh -> {
