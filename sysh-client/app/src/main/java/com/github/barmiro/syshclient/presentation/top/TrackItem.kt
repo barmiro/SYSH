@@ -42,7 +42,7 @@ fun TrackItem(
                     color = MaterialTheme.colorScheme.onBackground,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
-                    modifier = Modifier.weight(9f)
+                    modifier = Modifier.weight(5f)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(

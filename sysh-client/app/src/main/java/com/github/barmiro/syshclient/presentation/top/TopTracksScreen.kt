@@ -32,10 +32,10 @@ fun TopTracksScreen(
     ) {
         Button(
             onClick = {
-                viewModel.onEvent(TopTracksEvent.Refresh)
+                viewModel.onEvent(TopTracksEvent.OnSearchParameterChange("time"))
             }
         ) {
-            Text(text = "Refresh")
+            Text(text = "Sort by time")
         }
         LazyColumn(
             modifier = Modifier.fillMaxSize()
