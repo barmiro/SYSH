@@ -83,7 +83,7 @@ fun TopTracksScreen(
     ) {
         Button(
             onClick = {
-                viewModel.onEvent(TopTracksEvent.OnSearchParameterChange("time"))
+                viewModel.onEvent(TopTracksEvent.OnSearchParameterChange("time", state.start, state.end))
             }
         ) {
             Text(text = "Sort by time")
@@ -171,7 +171,7 @@ fun DateRangePickerModal(
                     text = "Select date range"
                 )
             },
-            showModeToggle = false,
+            showModeToggle = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(500.dp)
