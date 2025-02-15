@@ -66,6 +66,10 @@ fun TopTracksScreen(
         DateRangePickerModal(
             onDateRangeSelected = {
                 dateRange = it
+                val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                val start = formatter.format(it.first)
+                val end = formatter.format(it.second)
+                viewModel.onEvent((TopTracksEvent.OnSearchParameterChange(state.sort, start, end)))
             },
             onDismiss = {
                 isDateRangePickerVisible = false
