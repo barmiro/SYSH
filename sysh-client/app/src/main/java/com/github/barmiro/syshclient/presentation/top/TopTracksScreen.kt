@@ -41,24 +41,7 @@ fun TopTracksScreen(
 
     var dateRange by remember { mutableStateOf<Pair<Long?, Long?>?>(null) }
 
-    if(dateRange != null) {
-        val start = Date(dateRange!!.first!!)
-        val end = Date(dateRange!!.second!!)
 
-        val formattedStart = SimpleDateFormat(
-            "MMM dd, yyyy",
-            Locale.getDefault())
-            .format(start)
-
-        val formattedEnd = SimpleDateFormat(
-            "MMM dd, yyyy",
-            Locale.getDefault())
-            .format(end)
-
-        Text("Selected range: $formattedStart - $formattedEnd")
-    } else {
-        Text("No date range selected")
-    }
 
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
 
@@ -81,12 +64,22 @@ fun TopTracksScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Button(
-            onClick = {
-                viewModel.onEvent(TopTracksEvent.OnSearchParameterChange("time", state.start, state.end))
+        if (state.sort == "time") {
+            Button(
+                onClick = {
+                    viewModel.onEvent(TopTracksEvent.OnSearchParameterChange(null, state.start, state.end))
+                }
+            ) {
+                Text(text = "Sort by count")
             }
-        ) {
-            Text(text = "Sort by time")
+        } else {
+            Button(
+                onClick = {
+                    viewModel.onEvent(TopTracksEvent.OnSearchParameterChange("time", state.start, state.end))
+                }
+            ) {
+                Text(text = "Sort by time")
+            }
         }
         Button(
             onClick = {
@@ -94,6 +87,24 @@ fun TopTracksScreen(
             }
         ) {
             Text(text = "Select date range")
+        }
+        if(dateRange != null) {
+            val start = Date(dateRange!!.first!!)
+            val end = Date(dateRange!!.second!!)
+
+            val formattedStart = SimpleDateFormat(
+                "MMM dd, yyyy",
+                Locale.getDefault())
+                .format(start)
+
+            val formattedEnd = SimpleDateFormat(
+                "MMM dd, yyyy",
+                Locale.getDefault())
+                .format(end)
+
+            Text("Selected range: $formattedStart - $formattedEnd")
+        } else {
+            Text("No date range selected")
         }
         LazyColumn(
             modifier = Modifier.fillMaxSize()
