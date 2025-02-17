@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class TrackDTO(
     val spotify_track_id: String,
     val name: String,
-    val sort_param: Int
+    val minutes_played: Int,
+    val stream_count: Int
 )

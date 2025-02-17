@@ -41,9 +41,9 @@ public class TrackController {
 				.replace("T", " "));
 		String sortBy = sort.orElse("");
 		if (sortBy.equals("time")) {
-			return trackRepository.topTracksTime(startDate, endDate);
+			return trackRepository.topTracks("minutes_played", startDate, endDate);
 		} else {
-			return trackRepository.topTracksCount(startDate, endDate);
+			return trackRepository.topTracks("stream_count", startDate, endDate);
 		} 
 		
 	}

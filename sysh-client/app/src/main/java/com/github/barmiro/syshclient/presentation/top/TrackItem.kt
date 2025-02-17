@@ -3,9 +3,7 @@ package com.github.barmiro.syshclient.presentation.top
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -48,29 +46,29 @@ fun TrackItem(
                 Text(
                     text = index.toString(),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
+                    fontSize = 17.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center
                 )
             }
         }
         Column(
-            modifier = Modifier.weight(8f)
+            modifier = Modifier.weight(7f)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = track.name,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                     modifier = Modifier.weight(5f)
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+//            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = track.spotify_track_id,
                 fontStyle = FontStyle.Italic,
@@ -79,25 +77,25 @@ fun TrackItem(
             )
         }
         Column(
-            Modifier.weight(3f),
+            Modifier.weight(2f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.End
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
                 Text(
-                    text = track.sort_param.toString(),
+                    text = track.stream_count.toString(),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
-                    textAlign = TextAlign.End
+                    textAlign = TextAlign.End,
+                    lineHeight = 18.sp
                 )
             }
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(0.dp),
                 horizontalArrangement = Arrangement.End
             ) {
                 Text(
@@ -105,19 +103,21 @@ fun TrackItem(
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
-                    textAlign = TextAlign.End
+                    textAlign = TextAlign.End,
+                    lineHeight = 12.sp
                 )
             }
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(0.dp),
                 horizontalArrangement = Arrangement.End
             ) {
                 Text(
-                    text = (track.sort_param * 3).toString() + " minutes",
+                    text = track.minutes_played.toString() + " minutes",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
-                    textAlign = TextAlign.End
+                    textAlign = TextAlign.End,
+                    lineHeight = 12.sp
                 )
             }
         }

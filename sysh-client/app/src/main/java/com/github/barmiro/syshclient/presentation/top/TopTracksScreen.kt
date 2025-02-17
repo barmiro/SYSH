@@ -119,7 +119,7 @@ fun TopTracksScreen(
                         .clickable {
                             //TODO
                         }
-                        .padding(16.dp)
+                        .padding(12.dp)
                 )
                 if (i < state.tracks.size) {
                     HorizontalDivider(
