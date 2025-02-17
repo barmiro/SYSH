@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class StatsRepository @Inject constructor() {
 
     val retrofit = Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:8080/stats/")
+        .baseUrl("http://fedora.local:8080/stats/")
         .addConverterFactory(
             Json.asConverterFactory(
                 "application/json; charset=UTF8".toMediaType()))

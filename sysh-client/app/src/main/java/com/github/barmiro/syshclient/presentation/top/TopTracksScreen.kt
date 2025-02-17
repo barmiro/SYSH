@@ -59,74 +59,84 @@ fun TopTracksScreen(
             }
         )
     }
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (state.sort == "time") {
+    if (state.isLoading) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "Loading...")
+        }
+    } else {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (state.sort == "time") {
+                Button(
+                    onClick = {
+                        viewModel.onEvent(TopTracksEvent.OnSearchParameterChange(null, state.start, state.end))
+                    }
+                ) {
+                    Text(text = "Sort by count")
+                }
+            } else {
+                Button(
+                    onClick = {
+                        viewModel.onEvent(TopTracksEvent.OnSearchParameterChange("time", state.start, state.end))
+                    }
+                ) {
+                    Text(text = "Sort by time")
+                }
+            }
             Button(
                 onClick = {
-                    viewModel.onEvent(TopTracksEvent.OnSearchParameterChange(null, state.start, state.end))
+                    isDateRangePickerVisible = true
                 }
             ) {
-                Text(text = "Sort by count")
+                Text(text = "Select date range")
             }
-        } else {
-            Button(
-                onClick = {
-                    viewModel.onEvent(TopTracksEvent.OnSearchParameterChange("time", state.start, state.end))
-                }
+            if(dateRange != null) {
+                val start = Date(dateRange!!.first!!)
+                val end = Date(dateRange!!.second!!)
+
+                val formattedStart = SimpleDateFormat(
+                    "MMM dd, yyyy",
+                    Locale.getDefault())
+                    .format(start)
+
+                val formattedEnd = SimpleDateFormat(
+                    "MMM dd, yyyy",
+                    Locale.getDefault())
+                    .format(end)
+
+                Text("Selected range: $formattedStart - $formattedEnd")
+            } else {
+                Text("No date range selected")
+            }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
             ) {
-                Text(text = "Sort by time")
-            }
-        }
-        Button(
-            onClick = {
-                isDateRangePickerVisible = true
-            }
-        ) {
-            Text(text = "Select date range")
-        }
-        if(dateRange != null) {
-            val start = Date(dateRange!!.first!!)
-            val end = Date(dateRange!!.second!!)
-
-            val formattedStart = SimpleDateFormat(
-                "MMM dd, yyyy",
-                Locale.getDefault())
-                .format(start)
-
-            val formattedEnd = SimpleDateFormat(
-                "MMM dd, yyyy",
-                Locale.getDefault())
-                .format(end)
-
-            Text("Selected range: $formattedStart - $formattedEnd")
-        } else {
-            Text("No date range selected")
-        }
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(state.tracks.size) { i ->
-                val track = state.tracks[i]
-                TrackItem(
-                    index = i + 1,
-                    track = track,
-                    sort = state.sort,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            //TODO
-                        }
-                        .padding(12.dp)
-                )
-                if (i < state.tracks.size) {
-                    HorizontalDivider(
-                        modifier = Modifier.padding(
-                            horizontal = 16.dp
-                        ))
+                items(state.tracks.size) { i ->
+                    val track = state.tracks[i]
+                    TrackItem(
+                        index = i + 1,
+                        track = track,
+                        sort = state.sort,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                //TODO
+                            }
+                            .padding(12.dp)
+                    )
+                    if (i < state.tracks.size) {
+                        HorizontalDivider(
+                            modifier = Modifier.padding(
+                                horizontal = 16.dp
+                            ))
+                    }
                 }
             }
         }
