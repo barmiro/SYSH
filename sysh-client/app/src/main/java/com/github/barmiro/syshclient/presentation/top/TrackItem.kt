@@ -22,6 +22,7 @@ import com.github.barmiro.syshclient.data.top.dto.TrackDTO
 fun TrackItem(
     index: Int,
     track: TrackDTO,
+    sort: String?,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -76,6 +77,21 @@ fun TrackItem(
                 fontSize = 14.sp
             )
         }
+        val sortParam: String
+        val sortParamName: String
+        val otherParam: String
+        val otherParamName: String
+        if (sort == "time") {
+            sortParam = track.minutes_played.toString()
+            sortParamName = "minutes"
+            otherParam = track.stream_count.toString()
+            otherParamName = "streams"
+        } else {
+            sortParam = track.stream_count.toString()
+            sortParamName = "streams"
+            otherParam = track.minutes_played.toString()
+            otherParamName = "minutes"
+        }
         Column(
             Modifier.weight(2f),
             verticalArrangement = Arrangement.Center,
@@ -85,7 +101,7 @@ fun TrackItem(
                 horizontalArrangement = Arrangement.End
             ) {
                 Text(
-                    text = track.stream_count.toString(),
+                    text = sortParam,
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onBackground,
@@ -99,7 +115,7 @@ fun TrackItem(
                 horizontalArrangement = Arrangement.End
             ) {
                 Text(
-                    text = "streams",
+                    text = sortParamName,
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
@@ -112,7 +128,7 @@ fun TrackItem(
                 horizontalArrangement = Arrangement.End
             ) {
                 Text(
-                    text = track.minutes_played.toString() + " minutes",
+                    text = "$otherParam $otherParamName",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,

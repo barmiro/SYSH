@@ -114,6 +114,7 @@ fun TopTracksScreen(
                 TrackItem(
                     index = i + 1,
                     track = track,
+                    sort = state.sort,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {

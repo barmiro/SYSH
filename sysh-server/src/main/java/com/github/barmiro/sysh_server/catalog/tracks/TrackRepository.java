@@ -130,12 +130,13 @@ public class TrackRepository extends CatalogRepository<Track> {
 List<TrackStats> topTracks(String sort, Timestamp startDate, Timestamp endDate) {
 		
 		String sql = ("SELECT Tracks.*,"
-				+ "COUNT(Streams.spotify_track_id) AS stream_count,"
+				+ "COUNT(CASE WHEN "
+				+ "Streams.ms_played >= 30000 "
+				+ "THEN Streams.spotify_track_id END) AS stream_count,"
 				+ "SUM(Streams.ms_played) / 60000 AS minutes_played "
 				+ "FROM Tracks "
 				+ "LEFT JOIN Streams ON Tracks.spotify_track_id = Streams.spotify_track_id "
 				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
-				+ "AND Streams.ms_played >= 30000 "
 				+ "GROUP BY "
 				+ "Tracks.spotify_track_id,"
 				+ "Tracks.name "
