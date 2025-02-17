@@ -8,7 +8,7 @@ data class TrackDTO(
     val name: String,
     val album_name: String,
     val thumbnail_url: String,
-    val artist_names: String,
+    val primary_artist_name: String,
     val minutes_played: Int,
     val stream_count: Int
 )

@@ -5,7 +5,7 @@ public record TrackStats(
 		String name,
 		String album_name,
 		String thumbnail_url,
-		String artist_names,
+		String primary_artist_name,
 		Integer stream_count,
 		Integer minutes_played) {
 }

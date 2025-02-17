@@ -81,7 +81,7 @@ fun TrackItem(
             }
 //            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = track.artist_names,
+                text = track.primary_artist_name,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 12.sp,
                 lineHeight = 12.sp,

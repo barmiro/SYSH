@@ -127,29 +127,31 @@ public class TrackRepository extends CatalogRepository<Track> {
 	}
 	
 	
-List<TrackStats> topTracks(String sort, Timestamp startDate, Timestamp endDate) {
+	List<TrackStats> topTracks(String sort, Timestamp startDate, Timestamp endDate) {
 		
-		String sql = ("SELECT Tracks.*,"
+		String sql = ("SELECT t2.spotify_track_id, t2.name,"
 				+ "COUNT("
 				+ "CASE WHEN Streams.ms_played >= 30000 THEN Streams.spotify_track_id END"
 				+ ") AS stream_count,"
 				+ "SUM(Streams.ms_played) / 60000 AS minutes_played,"
 				+ "Albums.name AS album_name,"
 				+ "Albums.thumbnail_url,"
-				+ "Artists.name AS artist_names "
-				+ "FROM Tracks "
-				+ "LEFT JOIN Streams ON Tracks.spotify_track_id = Streams.spotify_track_id "
-				+ "LEFT JOIN Albums ON Tracks.album_id = Albums.id "
-				+ "LEFT JOIN Tracks_Artists ON Tracks.spotify_track_id = Tracks_Artists.spotify_track_id "
+				+ "Artists.name AS primary_artist_name "
+				+ "FROM Tracks t "
+				+ "LEFT JOIN Track_Duplicates ON Track_Duplicates.secondary_id = t.spotify_track_id "
+				+ "LEFT JOIN Tracks t2 ON t2.spotify_track_id = COALESCE(Track_Duplicates.primary_id, t.spotify_track_id) "
+				+ "LEFT JOIN Streams ON t.spotify_track_id = Streams.spotify_track_id "
+				+ "LEFT JOIN Albums ON t2.album_id = Albums.id "
+				+ "LEFT JOIN Tracks_Artists ON t2.spotify_track_id = Tracks_Artists.spotify_track_id "
 				+ "LEFT JOIN Artists ON Tracks_Artists.artist_id = Artists.id "
 				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
 				+ "AND Tracks_Artists.artist_order = 0 "
 				+ "GROUP BY "
-				+ "Tracks.spotify_track_id,"
-				+ "Tracks.name,"
+				+ "t2.spotify_track_id,"
+				+ "t2.name,"
 				+ "album_name,"
 				+ "Albums.thumbnail_url,"
-				+ "artist_names "
+				+ "primary_artist_name "
 				+ "ORDER BY "
 				+ sort
 				+ " DESC;");
@@ -158,7 +160,6 @@ List<TrackStats> topTracks(String sort, Timestamp startDate, Timestamp endDate) 
 				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(TrackStats.class)
 				.list();
-		
 	}
 	
 	List<TrackStats> topTracksCount(Timestamp startDate, Timestamp endDate) {
