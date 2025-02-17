@@ -12,7 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
@@ -65,7 +65,8 @@ fun TopTracksScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Loading...")
+            Text(text = "Loading...",
+                color = MaterialTheme.colorScheme.onBackground )
         }
     } else {
         Column(
@@ -131,12 +132,6 @@ fun TopTracksScreen(
                             }
                             .padding(12.dp)
                     )
-                    if (i < state.tracks.size) {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(
-                                horizontal = 16.dp
-                            ))
-                    }
                 }
             }
         }

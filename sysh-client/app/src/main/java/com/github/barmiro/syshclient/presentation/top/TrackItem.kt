@@ -61,6 +61,7 @@ fun TrackItem(
                 model = track.thumbnail_url,
                 contentDescription = "thumbnail for track " + track.name,
                 modifier = Modifier.height(50.dp).width(50.dp)
+//                    .clip(RoundedCornerShape(2.dp))
             )
         }
         Column(
