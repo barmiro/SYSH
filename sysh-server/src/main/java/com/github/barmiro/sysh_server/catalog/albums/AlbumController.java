@@ -44,9 +44,9 @@ public class AlbumController {
 		
 		String sortBy = sort.orElse("count");
 		if (sortBy.equals("time")) {
-			return albumRepository.topAlbumsTime(startDate, endDate);
+			return albumRepository.topAlbums("total_ms_played", startDate, endDate);
 		} else {
-			return albumRepository.topAlbumsCount(startDate, endDate);
+			return albumRepository.topAlbums("stream_count", startDate, endDate);
 		}
 	}
 

@@ -7,5 +7,5 @@ public record TrackStats(
 		String thumbnail_url,
 		String primary_artist_name,
 		Integer stream_count,
-		Integer minutes_played) {
+		Integer total_ms_played) {
 }

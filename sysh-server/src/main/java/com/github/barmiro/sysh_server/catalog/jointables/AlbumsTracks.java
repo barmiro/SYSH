@@ -21,7 +21,7 @@ public class AlbumsTracks {
 	
 	private static final Logger log = LoggerFactory.getLogger(AlbumsTracks.class);
 	
-	public void join(List<Track> tracks) {
+	public void updateJoinTable(List<Track> tracks) {
 		log.info("Updating the Albums_Tracks join table...");
 		String sql = ("INSERT INTO Albums_Tracks ("
 				+ "album_id,"

@@ -58,6 +58,41 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		return added;
 	}
 	
+	List<AlbumStats> topAlbums(String sort, Timestamp startDate, Timestamp endDate) {
+		
+		String sql = ("SELECT Albums.*,"
+				+ "COUNT("
+				+ "CASE WHEN Streams.ms_played >= 30000 THEN Streams.spotify_track_id END"
+				+ ") AS stream_count,"
+				+ "SUM(Streams.ms_played) AS total_ms_played,"
+				+ "(SELECT Artists.name "
+				+ "FROM Artists "
+				+ "JOIN Tracks_Artists ON Tracks_Artists.artist_id = Artists.id "
+				+ "WHERE Tracks_Artists.spotify_track_id = Albums_Tracks.spotify_track_id "
+				+ "AND Tracks_Artists.artist_order = 0 "
+				+ "LIMIT 1) AS primary_artist_name "
+				+ "FROM Albums "
+				+ "LEFT JOIN Albums_Tracks ON Albums.id = Albums_Tracks.album_id "
+				+ "LEFT JOIN Streams ON Albums_Tracks.spotify_track_id = Streams.spotify_track_id "
+				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
+				+ "GROUP BY "
+				+ "Albums.id,"
+				+ "Albums.name,"
+				+ "Albums.thumbnail_url,"
+				+ "primary_artist_name "
+				+ "ORDER BY "
+				+ sort
+				+ " DESC;");
+		return jdbc.sql(sql)
+				.param("startDate", startDate, Types.TIMESTAMP)
+				.param("endDate", endDate, Types.TIMESTAMP)
+				.query(AlbumStats.class)
+				.list();
+	}
+	
+	
+	
+	
 	
 	public List<AlbumStats> topAlbumsCount(Timestamp startDate, Timestamp endDate) {
 		

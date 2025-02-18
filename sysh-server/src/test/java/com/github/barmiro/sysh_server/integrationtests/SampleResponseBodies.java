@@ -63,16 +63,25 @@ public class SampleResponseBodies {
 		albumStats.add(new AlbumStats(
 				"3o1TOhMkU5FFMSJMDhXfdF",
 				"EUSEXUA",
+				"https://i.scdn.co/image/ab67616d00004851bd5d937814595eeb925ab03f",
+				"FKA twigs",
+				1,
 				2));
 		
 		albumStats.add(new AlbumStats(
 				"6YUCc2RiXcEKS9ibuZxjt0",
 				"Songs In The Key Of Life",
+				"https://i.scdn.co/image/ab67616d000048512fee61bfec596bb6f5447c50",
+				"Stevie Wonder",
+				1,
 				2));
 		
 		albumStats.add(new AlbumStats(
 				"7aNclGRxTysfh6z0d8671k",
 				"Selected Ambient Works 85-92",
+				"https://i.scdn.co/image/ab67616d0000485138906032688bb13b135ce19a",
+				"Aphex Twin",
+				1,
 				1));
 		
 		return albumStats;

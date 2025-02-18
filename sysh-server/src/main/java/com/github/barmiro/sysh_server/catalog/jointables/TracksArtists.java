@@ -22,7 +22,7 @@ public class TracksArtists {
 	
 	private static final Logger log = LoggerFactory.getLogger(TracksArtists.class);
 	
-	public void join(List<ApiTrack> apiTracks) {
+	public void updateJoinTable(List<ApiTrack> apiTracks) {
 		log.info("Updating the Tracks_Artists join table...");
 		String sql = ("INSERT INTO Tracks_Artists ("
 				+ "spotify_track_id,"

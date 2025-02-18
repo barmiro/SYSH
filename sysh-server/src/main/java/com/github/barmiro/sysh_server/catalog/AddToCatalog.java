@@ -98,7 +98,7 @@ public class AddToCatalog {
 		albums.addAll(ConvertDTOs.apiTrackAlbums(apiTrackAlbums));
 		albumsAdded = albumRepository.addAlbums(albums);
 		
-		albumsTracks.join(tracks);
+		albumsTracks.updateJoinTable(tracks);
 		
 		for (ApiTrack apiTrack:apiTracks) {
 			for (ApiTrackArtist artist:apiTrack.artists()) {
@@ -109,7 +109,7 @@ public class AddToCatalog {
 		artists.addAll(artistApiRepository.addNewArtists(artistIDs));
 		artistsAdded = artists.size();
 		
-		tracksArtists.join(apiTracks);
+		tracksArtists.updateJoinTable(apiTracks);
 		
 //		the <= 50 condition limits this cache update to recent streams,
 //		easier than returning all necessary values and handling it in recent logic

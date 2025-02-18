@@ -20,12 +20,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.github.barmiro.syshclient.data.top.dto.TrackDTO
+import com.github.barmiro.syshclient.domain.top.TopTrack
 
 @Composable
 fun TrackItem(
     index: Int,
-    track: TrackDTO,
+    track: TopTrack,
     sort: String?,
     modifier: Modifier = Modifier
 ) {
@@ -60,7 +60,7 @@ fun TrackItem(
         Column(
         ) {
             AsyncImage(
-                model = track.thumbnail_url,
+                model = track.thumbnailUrl,
                 contentDescription = "thumbnail for track " + track.name,
                 modifier = Modifier.height(50.dp).width(50.dp)
                     .clip(RoundedCornerShape(2.dp))
@@ -84,7 +84,7 @@ fun TrackItem(
             }
 //            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = track.primary_artist_name,
+                text = track.primaryArtistName,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
@@ -93,7 +93,7 @@ fun TrackItem(
                 maxLines = 1
             )
             Text(
-                text = track.album_name,
+                text = track.albumName,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 12.sp,
                 lineHeight = 12.sp,
@@ -106,14 +106,14 @@ fun TrackItem(
         val otherParam: String
         val otherParamName: String
         if (sort == "time") {
-            sortParam = track.minutes_played.toString()
+            sortParam = track.minutesPlayed.toString()
             sortParamName = "minutes"
-            otherParam = track.stream_count.toString()
+            otherParam = track.streamCount.toString()
             otherParamName = "streams"
         } else {
-            sortParam = track.stream_count.toString()
+            sortParam = track.streamCount.toString()
             sortParamName = "streams"
-            otherParam = track.minutes_played.toString()
+            otherParam = track.minutesPlayed.toString()
             otherParamName = "minutes"
         }
         Column(
