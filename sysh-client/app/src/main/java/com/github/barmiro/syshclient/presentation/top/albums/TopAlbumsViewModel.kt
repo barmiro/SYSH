@@ -19,10 +19,12 @@ class TopAlbumsViewModel @Inject constructor(
     private val topRepository: TopRepository
 ): ViewModel(), DefaultLifecycleObserver {
 
-    override fun onCreate(owner: LifecycleOwner) {
-        getTopAlbums()
-    }
     var state by mutableStateOf(TopAlbumsState())
+    override fun onCreate(owner: LifecycleOwner) {
+        if (state.albumList.isEmpty()) {
+            getTopAlbums()
+        }
+    }
     fun onEvent(event: TopScreenEvent) {
         when(event) {
             is TopScreenEvent.Refresh -> {

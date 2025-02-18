@@ -6,10 +6,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -25,10 +30,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -44,6 +53,7 @@ import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @AndroidEntryPoint
@@ -69,7 +79,7 @@ class MainActivity : ComponentActivity() {
                         title = "Top",
                         selectedIcon = Icons.Filled.Star,
                         unselectedIcon = Icons.Outlined.Star,
-                        navigateTo = TopTracks
+                        navigateTo = Top
                     ),
                     BottomNavigationItem(
                         title = "Stats",
@@ -149,9 +159,45 @@ class MainActivity : ComponentActivity() {
                                                 color = MaterialTheme.colorScheme.onBackground)
                                         }
                                         Button(onClick = {
-                                            navController.navigate(TopTracks)
+                                            navController.navigate(Top)
                                         }) {
                                             Text(text = "Let's go!")
+                                        }
+                                    }
+                                }
+                                composable<Top> {
+                                    val pagerState = rememberPagerState(pageCount = { 2 })
+//                                    not using lifecycleScope because the animations need a MonotonicFrameClock
+                                    val coroutineScope = rememberCoroutineScope()
+                                    val topNavItems = listOf("Tracks", "Albums")
+                                    Row(modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.Center) {
+                                        SingleChoiceSegmentedButtonRow {
+                                            topNavItems.forEachIndexed { index, label ->
+                                                SegmentedButton(
+                                                    shape = SegmentedButtonDefaults.itemShape(index = index, count = topNavItems.size),
+                                                    onClick = {
+                                                        coroutineScope.launch {
+                                                            pagerState.animateScrollToPage(index)
+                                                        }
+                                                    },
+                                                    selected = index == pagerState.currentPage,
+                                                    modifier = Modifier.height(30.dp)
+                                                ) {
+                                                    Text(text = label,
+                                                        fontSize = 14.sp,
+                                                        lineHeight = 14.sp)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    Column(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
+                                        HorizontalPager(state = pagerState) { page ->
+                                            when (page) {
+                                                0 -> TopTracksScreen(topTracksVM)
+                                                1 -> TopAlbumsScreen(topAlbumsVM)
+                                                else -> Text("Something went wrong with the pager")
+                                            }
                                         }
                                     }
                                 }
@@ -198,6 +244,9 @@ object TopTracks
 
 @Serializable
 object TopAlbums
+
+@Serializable
+object Top
 
 
 //@Composable

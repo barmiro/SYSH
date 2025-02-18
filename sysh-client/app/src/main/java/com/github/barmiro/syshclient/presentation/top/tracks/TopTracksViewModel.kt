@@ -19,10 +19,12 @@ class TopTracksViewModel @Inject constructor(
     private val topRepository: TopRepository
 ): ViewModel(), DefaultLifecycleObserver {
 
-    override fun onCreate(owner: LifecycleOwner) {
-        getTopTracks()
-    }
     var state by mutableStateOf(TopTracksState())
+    override fun onCreate(owner: LifecycleOwner) {
+        if (state.trackList.isEmpty()) {
+            getTopTracks()
+        }
+    }
     fun onEvent(event: TopScreenEvent) {
         when(event) {
             is TopScreenEvent.Refresh -> {
