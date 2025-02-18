@@ -3,6 +3,7 @@ package com.github.barmiro.syshclient.presentation.top
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -74,48 +75,55 @@ fun TopTracksScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if (state.sort == "time") {
-                Button(
-                    onClick = {
-                        viewModel.onEvent(TopTracksEvent.OnSearchParameterChange(null, state.start, state.end))
+            Row() {
+                Column {
+                    if (state.sort == "time") {
+                        Button(
+                            onClick = {
+                                viewModel.onEvent(TopTracksEvent.OnSearchParameterChange(null, state.start, state.end))
+                            }
+                        ) {
+                            Text(text = "Sort by count")
+                        }
+                    } else {
+                        Button(
+                            onClick = {
+                                viewModel.onEvent(TopTracksEvent.OnSearchParameterChange("time", state.start, state.end))
+                            }
+                        ) {
+                            Text(text = "Sort by time")
+                        }
                     }
-                ) {
-                    Text(text = "Sort by count")
                 }
-            } else {
-                Button(
-                    onClick = {
-                        viewModel.onEvent(TopTracksEvent.OnSearchParameterChange("time", state.start, state.end))
+                Column {
+                    Button(
+                        onClick = {
+                            isDateRangePickerVisible = true
+                        }
+                    ) {
+                        Text(text = "Select date range")
                     }
-                ) {
-                    Text(text = "Sort by time")
+                    if(dateRange != null) {
+                        val start = Date(dateRange!!.first!!)
+                        val end = Date(dateRange!!.second!!)
+
+                        val formattedStart = SimpleDateFormat(
+                            "MMM dd, yyyy",
+                            Locale.getDefault())
+                            .format(start)
+
+                        val formattedEnd = SimpleDateFormat(
+                            "MMM dd, yyyy",
+                            Locale.getDefault())
+                            .format(end)
+
+                        Text("Selected range: $formattedStart - $formattedEnd")
+                    } else {
+                        Text("No date range selected")
+                    }
                 }
             }
-            Button(
-                onClick = {
-                    isDateRangePickerVisible = true
-                }
-            ) {
-                Text(text = "Select date range")
-            }
-            if(dateRange != null) {
-                val start = Date(dateRange!!.first!!)
-                val end = Date(dateRange!!.second!!)
 
-                val formattedStart = SimpleDateFormat(
-                    "MMM dd, yyyy",
-                    Locale.getDefault())
-                    .format(start)
-
-                val formattedEnd = SimpleDateFormat(
-                    "MMM dd, yyyy",
-                    Locale.getDefault())
-                    .format(end)
-
-                Text("Selected range: $formattedStart - $formattedEnd")
-            } else {
-                Text("No date range selected")
-            }
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
