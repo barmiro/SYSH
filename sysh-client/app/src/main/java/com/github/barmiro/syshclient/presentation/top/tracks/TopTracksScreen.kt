@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.presentation.top
+package com.github.barmiro.syshclient.presentation.top.tracks
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -53,7 +54,7 @@ fun TopTracksScreen(
                 val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 val start = formatter.format(it.first)
                 val end = formatter.format(it.second)
-                viewModel.onEvent((TopTracksEvent.OnSearchParameterChange(state.sort, start, end)))
+                viewModel.onEvent((TopScreenEvent.OnSearchParameterChange(state.sort, start, end)))
             },
             onDismiss = {
                 isDateRangePickerVisible = false
@@ -80,7 +81,13 @@ fun TopTracksScreen(
                     if (state.sort == "time") {
                         Button(
                             onClick = {
-                                viewModel.onEvent(TopTracksEvent.OnSearchParameterChange(null, state.start, state.end))
+                                viewModel.onEvent(
+                                    TopScreenEvent.OnSearchParameterChange(
+                                        null,
+                                        state.start,
+                                        state.end
+                                    )
+                                )
                             }
                         ) {
                             Text(text = "Sort by count")
@@ -88,7 +95,13 @@ fun TopTracksScreen(
                     } else {
                         Button(
                             onClick = {
-                                viewModel.onEvent(TopTracksEvent.OnSearchParameterChange("time", state.start, state.end))
+                                viewModel.onEvent(
+                                    TopScreenEvent.OnSearchParameterChange(
+                                        "time",
+                                        state.start,
+                                        state.end
+                                    )
+                                )
                             }
                         ) {
                             Text(text = "Sort by time")
@@ -127,8 +140,8 @@ fun TopTracksScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(state.tracks.size) { i ->
-                    val track = state.tracks[i]
+                items(state.trackList.size) { i ->
+                    val track = state.trackList[i]
                     TrackItem(
                         index = i + 1,
                         track = track,

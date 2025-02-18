@@ -38,8 +38,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.barmiro.syshclient.presentation.top.TopTracksScreen
-import com.github.barmiro.syshclient.presentation.top.TopTracksViewModel
+import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
+import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
+import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
+import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.Serializable
@@ -49,6 +51,7 @@ class MainActivity : ComponentActivity() {
 //    @Inject lateinit var statsRepo: StatsRepository
 //    @Inject lateinit var topRepo: TopRepository
     private val topTracksVM: TopTracksViewModel by viewModels()
+    private val topAlbumsVM: TopAlbumsViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -72,7 +75,7 @@ class MainActivity : ComponentActivity() {
                         title = "Stats",
                         selectedIcon = Icons.Filled.Info,
                         unselectedIcon = Icons.Outlined.Info,
-                        navigateTo = MainScreen
+                        navigateTo = TopAlbums
                     ),
                     BottomNavigationItem(
                         title = "Settings",
@@ -155,6 +158,9 @@ class MainActivity : ComponentActivity() {
                                 composable<TopTracks> {
                                     TopTracksScreen(topTracksVM)
                                 }
+                                composable<TopAlbums> {
+                                    TopAlbumsScreen(topAlbumsVM)
+                                }
                             }
                         }
 
@@ -189,6 +195,9 @@ object MainScreen
 
 @Serializable
 object TopTracks
+
+@Serializable
+object TopAlbums
 
 
 //@Composable

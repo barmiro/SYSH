@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.presentation.top
+package com.github.barmiro.syshclient.presentation.top.albums
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,51 +8,52 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.top.TopRepository
+import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TopTracksViewModel @Inject constructor(
+class TopAlbumsViewModel @Inject constructor(
     private val topRepository: TopRepository
 ): ViewModel(), DefaultLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
-        getTopTracks()
+        getTopAlbums()
     }
-    var state by mutableStateOf(TopTracksState())
-    fun onEvent(event: TopTracksEvent) {
+    var state by mutableStateOf(TopAlbumsState())
+    fun onEvent(event: TopScreenEvent) {
         when(event) {
-            is TopTracksEvent.Refresh -> {
-                getTopTracks()
+            is TopScreenEvent.Refresh -> {
+                getTopAlbums()
             }
-            is TopTracksEvent.OnSearchParameterChange -> {
+            is TopScreenEvent.OnSearchParameterChange -> {
                 state = state.copy(
                     start = event.start,
                     end = event.end,
                     sort = event.sort
                 )
                 viewModelScope.launch {
-                    getTopTracks()
+                    getTopAlbums()
                 }
             }
         }
     }
 
-    private fun getTopTracks(
+    private fun getTopAlbums(
         start: String? = state.start,
         end: String? = state.end,
         sort: String? = state.sort
     ) {
         viewModelScope.launch {
-            topRepository.getTopTracks(start, end, sort)
+            topRepository.getTopAlbums(start, end, sort)
                 .collect { result ->
                     when(result) {
                         is Resource.Success -> {
-                            result.data?.let { topTracks ->
+                            result.data?.let { topAlbums ->
                                 state = state.copy(
-                                    tracks = topTracks
+                                    albumList = topAlbums
                                 )
                             }
                         }

@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.presentation.top
+package com.github.barmiro.syshclient.presentation.top.tracks
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
