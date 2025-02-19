@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -31,8 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
@@ -42,7 +40,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -189,24 +186,44 @@ class MainActivity : ComponentActivity() {
                                             Row(modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.Center,
                                                 verticalAlignment = Alignment.Bottom) {
-                                                SingleChoiceSegmentedButtonRow {
-                                                    topNavItems.forEachIndexed { index, label ->
-                                                        SegmentedButton(
-                                                            shape = RectangleShape,
-                                                            onClick = {
-                                                                coroutineScope.launch {
-                                                                    pagerState.animateScrollToPage(index)
-                                                                }
-                                                            },
-                                                            selected = index == pagerState.currentPage,
-                                                            modifier = Modifier.height(30.dp)
-                                                        ) {
-                                                            Text(text = label,
-                                                                fontSize = 14.sp,
-                                                                lineHeight = 14.sp)
+                                                NavigationBarItem(
+                                                    selected = pagerState.currentPage == 0,
+                                                    onClick = {
+                                                        coroutineScope.launch {
+                                                            pagerState.animateScrollToPage(0)
                                                         }
-                                                    }
-                                                }
+                                                    },
+                                                    icon = { Text("Tracks") },
+                                                    modifier = Modifier.offset(y = 20.dp)
+                                                )
+                                                NavigationBarItem(
+                                                    selected = pagerState.currentPage == 1,
+                                                    onClick = {
+                                                        coroutineScope.launch {
+                                                            pagerState.animateScrollToPage(1)
+                                                        }
+                                                    },
+                                                    icon = { Text("Albums") },
+                                                    modifier = Modifier.offset(y = 20.dp)
+                                                )
+//                                                SingleChoiceSegmentedButtonRow {
+//                                                    topNavItems.forEachIndexed { index, label ->
+//                                                        SegmentedButton(
+//                                                            shape = SegmentedButtonDefaults.itemShape(index = index, count = topNavItems.size),
+//                                                            onClick = {
+//                                                                coroutineScope.launch {
+//                                                                    pagerState.animateScrollToPage(index)
+//                                                                }
+//                                                            },
+//                                                            selected = index == pagerState.currentPage,
+//                                                            modifier = Modifier.height(30.dp)
+//                                                        ) {
+//                                                            Text(text = label,
+//                                                                fontSize = 14.sp,
+//                                                                lineHeight = 14.sp)
+//                                                        }
+//                                                    }
+//                                                }
                                             }
                                         }
                                     }
