@@ -28,9 +28,18 @@ class TopScreenStateManager @Inject constructor() {
         _state.value = _state.value.copy(
             isLoading = isLoading ?: _state.value.isLoading,
             isRefreshing = isRefreshing ?: _state.value.isRefreshing,
-            sort = sort ?: _state.value.sort,
-            start = start ?: _state.value.start,
-            end = end ?: _state.value.end
+            sort = handleNullOrEmptyString(sort, _state.value.sort),
+            start = handleNullOrEmptyString(start, _state.value.start),
+            end = handleNullOrEmptyString(end, _state.value.end)
         )
+    }
+}
+
+
+private fun handleNullOrEmptyString(newValue: String?, currentValue: String?): String? {
+    return when {
+        newValue == null -> currentValue
+        newValue.isEmpty() -> null
+        else -> newValue
     }
 }

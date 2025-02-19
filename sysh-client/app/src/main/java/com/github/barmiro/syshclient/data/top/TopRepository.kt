@@ -27,11 +27,6 @@ class TopRepository @Inject constructor() {
 
     val topApi = retrofit.create(TopApi::class.java)
 
-    suspend fun test() {
-        println("Top track: " + topApi.fetchTopTracks("2024-01-01T00:00:00", "2024-12-31T23:59:59", "time").body().orEmpty()[0])
-        println("Top album: " + topApi.fetchTopAlbums("2024-01-01T00:00:00", "2024-12-31T23:59:59", "time").body().orEmpty()[0])
-        println("Top artist: " + topApi.fetchTopArtists("2024-01-01T00:00:00", "2024-12-31T23:59:59", "time").body().orEmpty()[0])
-    }
 
 //    I know this is bad, but refactoring will be made later on,
 //    when I know exactly which DTO contains what fields

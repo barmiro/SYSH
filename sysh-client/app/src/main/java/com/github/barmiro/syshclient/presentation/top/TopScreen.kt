@@ -74,7 +74,7 @@ fun TopScreen(
         )
     }
 
-    Row(modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp)) {
+    Row(modifier = Modifier.fillMaxWidth().padding(bottom = 96.dp)) {
         HorizontalPager(state = pagerState) { page ->
             when (page) {
                 0 -> TopTracksScreen(topTracksVM)
@@ -85,43 +85,43 @@ fun TopScreen(
         }
     }
     Box (modifier = Modifier.fillMaxSize()) {
-        Column {
-            if (state.sort == "time") {
-                Button(
-                    onClick = {
-                        viewModel.onEvent(
-                            TopScreenEvent.OnSearchParameterChange(
-                                "count",
-                                state.start,
-                                state.end
+        Column(
+            modifier = Modifier.fillMaxSize().padding(bottom = 48.dp),
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                if (state.sort == "time") {
+                    Button(
+                        onClick = {
+                            viewModel.onEvent(
+                                TopScreenEvent.OnSearchParameterChange(
+                                    "count",
+                                    state.start,
+                                    state.end
+                                )
                             )
-                        )
+                        }
+                    ) {
+                        Text(text = "Sort by count")
                     }
-                ) {
-                    Text(text = "Sort by count")
-                }
-            } else {
-                Button(
-                    onClick = {
-                        viewModel.onEvent(
-                            TopScreenEvent.OnSearchParameterChange(
-                                "time",
-                                state.start,
-                                state.end
+                } else {
+                    Button(
+                        onClick = {
+                            viewModel.onEvent(
+                                TopScreenEvent.OnSearchParameterChange(
+                                    "time",
+                                    state.start,
+                                    state.end
+                                )
                             )
-                        )
+                        }
+                    ) {
+                        Text(text = "Sort by time")
                     }
-                ) {
-                    Text(text = "Sort by time")
-                }
-            }
-            Column {
-                Button(
-                    onClick = {
-                        isDateRangePickerVisible = true
-                    }
-                ) {
-                    Text(text = "Select date range")
                 }
                 if (dateRange != null) {
                     val start = Date(dateRange!!.first!!)
@@ -139,74 +139,70 @@ fun TopScreen(
                     )
                         .format(end)
 
-                    Text("Selected range: $formattedStart - $formattedEnd")
+                    Button(
+                        onClick = {
+                            viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
+                            dateRange = null
+                        }
+                    ) {
+                        Text(text = "$formattedStart - $formattedEnd")
+                    }
                 } else {
-                    Text("No date range selected")
-                }
-            }
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Bottom
-            ) {
+                    Button(
+                        onClick = {
+                            isDateRangePickerVisible = true
+                        }
+                    ) {
+                        Text(text = "Select date range")
+                    }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    NavigationBarItem(
-                        selected = pagerState.currentPage == 0,
-                        onClick = {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(0)
-                            }
-                        },
-                        icon = { Text("Tracks") },
-                        modifier = Modifier.offset(y = 20.dp)
-                    )
-                    NavigationBarItem(
-                        selected = pagerState.currentPage == 1,
-                        onClick = {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(1)
-                            }
-                        },
-                        icon = { Text("Albums") },
-                        modifier = Modifier.offset(y = 20.dp)
-                    )
-                    NavigationBarItem(
-                        selected = pagerState.currentPage == 2,
-                        onClick = {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(2)
-                            }
-                        },
-                        icon = { Text("Artists") },
-                        modifier = Modifier.offset(y = 20.dp)
-                    )
-//                                                SingleChoiceSegmentedButtonRow {
-//                                                    topNavItems.forEachIndexed { index, label ->
-//                                                        SegmentedButton(
-//                                                            shape = SegmentedButtonDefaults.itemShape(index = index, count = topNavItems.size),
-//                                                            onClick = {
-//                                                                coroutineScope.launch {
-//                                                                    pagerState.animateScrollToPage(index)
-//                                                                }
-//                                                            },
-//                                                            selected = index == pagerState.currentPage,
-//                                                            modifier = Modifier.height(30.dp)
-//                                                        ) {
-//                                                            Text(text = label,
-//                                                                fontSize = 14.sp,
-//                                                                lineHeight = 14.sp)
-//                                                        }
-//                                                    }
-//                                                }
                 }
             }
         }
     }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            NavigationBarItem(
+                selected = pagerState.currentPage == 0,
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(0)
+                    }
+                },
+                icon = { Text("Tracks") },
+                modifier = Modifier.offset(y = 20.dp)
+            )
+            NavigationBarItem(
+                selected = pagerState.currentPage == 1,
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(1)
+                    }
+                },
+                icon = { Text("Albums") },
+                modifier = Modifier.offset(y = 20.dp)
+            )
+            NavigationBarItem(
+                selected = pagerState.currentPage == 2,
+                onClick = {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(2)
+                    }
+                },
+                icon = { Text("Artists") },
+                modifier = Modifier.offset(y = 20.dp)
+            )
+        }
+    }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
