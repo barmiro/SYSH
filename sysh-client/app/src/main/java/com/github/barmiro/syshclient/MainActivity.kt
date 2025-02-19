@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +32,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,7 +40,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -170,28 +172,8 @@ class MainActivity : ComponentActivity() {
 //                                    not using lifecycleScope because the animations need a MonotonicFrameClock
                                     val coroutineScope = rememberCoroutineScope()
                                     val topNavItems = listOf("Tracks", "Albums")
-                                    Row(modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.Center) {
-                                        SingleChoiceSegmentedButtonRow {
-                                            topNavItems.forEachIndexed { index, label ->
-                                                SegmentedButton(
-                                                    shape = SegmentedButtonDefaults.itemShape(index = index, count = topNavItems.size),
-                                                    onClick = {
-                                                        coroutineScope.launch {
-                                                            pagerState.animateScrollToPage(index)
-                                                        }
-                                                    },
-                                                    selected = index == pagerState.currentPage,
-                                                    modifier = Modifier.height(30.dp)
-                                                ) {
-                                                    Text(text = label,
-                                                        fontSize = 14.sp,
-                                                        lineHeight = 14.sp)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    Column(modifier = Modifier.fillMaxWidth().padding(top = 40.dp)) {
+
+                                    Row(modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp)) {
                                         HorizontalPager(state = pagerState) { page ->
                                             when (page) {
                                                 0 -> TopTracksScreen(topTracksVM)
@@ -200,6 +182,35 @@ class MainActivity : ComponentActivity() {
                                             }
                                         }
                                     }
+                                    Box (modifier = Modifier.fillMaxSize()) {
+                                        Column(modifier = Modifier.fillMaxSize(),
+                                            verticalArrangement = Arrangement.Bottom) {
+
+                                            Row(modifier = Modifier.fillMaxWidth(),
+                                                horizontalArrangement = Arrangement.Center,
+                                                verticalAlignment = Alignment.Bottom) {
+                                                SingleChoiceSegmentedButtonRow {
+                                                    topNavItems.forEachIndexed { index, label ->
+                                                        SegmentedButton(
+                                                            shape = RectangleShape,
+                                                            onClick = {
+                                                                coroutineScope.launch {
+                                                                    pagerState.animateScrollToPage(index)
+                                                                }
+                                                            },
+                                                            selected = index == pagerState.currentPage,
+                                                            modifier = Modifier.height(30.dp)
+                                                        ) {
+                                                            Text(text = label,
+                                                                fontSize = 14.sp,
+                                                                lineHeight = 14.sp)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
                                 }
                                 composable<TopTracks> {
                                     TopTracksScreen(topTracksVM)
