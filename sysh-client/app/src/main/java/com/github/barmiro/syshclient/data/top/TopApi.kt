@@ -5,6 +5,7 @@ import com.github.barmiro.syshclient.data.top.dto.ArtistDTO
 import com.github.barmiro.syshclient.data.top.dto.TrackDTO
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface TopApi {
@@ -29,4 +30,12 @@ interface TopApi {
         @Query("end") end: String? = null,
         @Query("sort") sort: String? = null
     ): Response<List<ArtistDTO>>
+
+    @GET("{entity}")
+    suspend fun<T> fetchTopItems(
+        @Path("entity") entity: String,
+        @Query("start") start: String? = null,
+        @Query("end") end: String? = null,
+        @Query("sort") sort: String? = null
+    ): Response<List<T>>
 }

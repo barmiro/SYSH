@@ -21,11 +21,10 @@ import javax.inject.Inject
 @HiltViewModel
 class TopAlbumsViewModel @Inject constructor(
     private val topRepository: TopRepository,
-    val stateManager: TopScreenStateManager
+    private val stateManager: TopScreenStateManager
 ): ViewModel(), DefaultLifecycleObserver {
 
     val state: StateFlow<TopScreenState> = stateManager.state
-
     var albumList by mutableStateOf<List<TopAlbum>>(emptyList())
     private var isDataLoaded = false
 

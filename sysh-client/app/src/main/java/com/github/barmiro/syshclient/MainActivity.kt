@@ -39,6 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.barmiro.syshclient.presentation.top.TopScreen
+import com.github.barmiro.syshclient.presentation.top.TopScreenViewModel
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
@@ -52,6 +53,7 @@ import kotlinx.serialization.Serializable
 class MainActivity : ComponentActivity() {
 //    @Inject lateinit var statsRepo: StatsRepository
 //    @Inject lateinit var topRepo: TopRepository
+    private val topScreenVM: TopScreenViewModel by viewModels()
     private val topTracksVM: TopTracksViewModel by viewModels()
     private val topAlbumsVM: TopAlbumsViewModel by viewModels()
     private val topArtistsVM: TopArtistsViewModel by viewModels()
@@ -159,7 +161,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                                 composable<Top> {
-                                    TopScreen(topTracksVM, topAlbumsVM, topArtistsVM)
+                                    TopScreen(topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM)
                                 }
                                 composable<TopTracks> {
                                     TopTracksScreen(topTracksVM)
