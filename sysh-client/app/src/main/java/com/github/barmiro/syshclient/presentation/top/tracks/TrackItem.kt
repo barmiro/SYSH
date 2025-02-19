@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -76,6 +77,7 @@ fun TrackItem(
                     text = track.name,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
+                    lineHeight = 18.sp,
                     color = MaterialTheme.colorScheme.onBackground,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
@@ -88,17 +90,19 @@ fun TrackItem(
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                lineHeight = 12.sp,
+                lineHeight = 14.sp,
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 1
+                maxLines = 1,
+                modifier = Modifier.alpha(0.5F)
             )
             Text(
                 text = track.albumName,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 12.sp,
-                lineHeight = 12.sp,
+                lineHeight = 14.sp,
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 1
+                maxLines = 1,
+                modifier = Modifier.alpha(0.5F)
             )
         }
         val sortParam: String
@@ -141,6 +145,7 @@ fun TrackItem(
                 Text(
                     text = sortParamName,
                     fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                     textAlign = TextAlign.End,
@@ -157,7 +162,8 @@ fun TrackItem(
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                     textAlign = TextAlign.End,
-                    lineHeight = 12.sp
+                    lineHeight = 12.sp,
+                    modifier = Modifier.alpha(0.5F)
                 )
             }
         }

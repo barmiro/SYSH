@@ -6,16 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -35,10 +29,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -46,15 +38,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.github.barmiro.syshclient.presentation.top.TopScreen
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
-import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsScreen
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 @AndroidEntryPoint
@@ -168,79 +159,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                                 composable<Top> {
-                                    val pagerState = rememberPagerState(pageCount = { 3 })
-//                                    not using lifecycleScope because the animations need a MonotonicFrameClock
-                                    val coroutineScope = rememberCoroutineScope()
-
-                                    Row(modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp)) {
-                                        HorizontalPager(state = pagerState) { page ->
-                                            when (page) {
-                                                0 -> TopTracksScreen(topTracksVM)
-                                                1 -> TopAlbumsScreen(topAlbumsVM)
-                                                2 -> TopArtistsScreen(topArtistsVM)
-                                                else -> Text("Something went wrong with the pager")
-                                            }
-                                        }
-                                    }
-                                    Box (modifier = Modifier.fillMaxSize()) {
-                                        Column(modifier = Modifier.fillMaxSize(),
-                                            verticalArrangement = Arrangement.Bottom) {
-
-                                            Row(modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.Center,
-                                                verticalAlignment = Alignment.Bottom) {
-                                                NavigationBarItem(
-                                                    selected = pagerState.currentPage == 0,
-                                                    onClick = {
-                                                        coroutineScope.launch {
-                                                            pagerState.animateScrollToPage(0)
-                                                        }
-                                                    },
-                                                    icon = { Text("Tracks") },
-                                                    modifier = Modifier.offset(y = 20.dp)
-                                                )
-                                                NavigationBarItem(
-                                                    selected = pagerState.currentPage == 1,
-                                                    onClick = {
-                                                        coroutineScope.launch {
-                                                            pagerState.animateScrollToPage(1)
-                                                        }
-                                                    },
-                                                    icon = { Text("Albums") },
-                                                    modifier = Modifier.offset(y = 20.dp)
-                                                )
-                                                NavigationBarItem(
-                                                    selected = pagerState.currentPage == 2,
-                                                    onClick = {
-                                                        coroutineScope.launch {
-                                                            pagerState.animateScrollToPage(2)
-                                                        }
-                                                    },
-                                                    icon = { Text("Artists") },
-                                                    modifier = Modifier.offset(y = 20.dp)
-                                                )
-//                                                SingleChoiceSegmentedButtonRow {
-//                                                    topNavItems.forEachIndexed { index, label ->
-//                                                        SegmentedButton(
-//                                                            shape = SegmentedButtonDefaults.itemShape(index = index, count = topNavItems.size),
-//                                                            onClick = {
-//                                                                coroutineScope.launch {
-//                                                                    pagerState.animateScrollToPage(index)
-//                                                                }
-//                                                            },
-//                                                            selected = index == pagerState.currentPage,
-//                                                            modifier = Modifier.height(30.dp)
-//                                                        ) {
-//                                                            Text(text = label,
-//                                                                fontSize = 14.sp,
-//                                                                lineHeight = 14.sp)
-//                                                        }
-//                                                    }
-//                                                }
-                                            }
-                                        }
-                                    }
-
+                                    TopScreen(topTracksVM, topAlbumsVM, topArtistsVM)
                                 }
                                 composable<TopTracks> {
                                     TopTracksScreen(topTracksVM)
@@ -252,21 +171,9 @@ class MainActivity : ComponentActivity() {
                         }
 
                     }
-
-                    //                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    //                    Greeting(
-                    //                        name = "Android",
-                    //                        modifier = Modifier.padding(innerPadding)
-                    //                    )
-                    //                }
                 }
             }
         }
-//        lifecycleScope.launch {
-//            topRepo.test()
-//            statsRepo.getStats()
-//        }
-
     }
 }
 

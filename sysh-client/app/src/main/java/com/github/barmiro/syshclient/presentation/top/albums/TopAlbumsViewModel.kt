@@ -8,20 +8,29 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.top.TopRepository
+import com.github.barmiro.syshclient.domain.top.TopAlbum
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
+import com.github.barmiro.syshclient.presentation.top.TopScreenState
+import com.github.barmiro.syshclient.presentation.top.TopScreenStateManager
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TopAlbumsViewModel @Inject constructor(
-    private val topRepository: TopRepository
+    private val topRepository: TopRepository,
+    val stateManager: TopScreenStateManager
 ): ViewModel(), DefaultLifecycleObserver {
 
-    var state by mutableStateOf(TopAlbumsState())
+    val state: StateFlow<TopScreenState> = stateManager.state
+
+    var albumList by mutableStateOf<List<TopAlbum>>(emptyList())
+    private var isDataLoaded = false
+
     override fun onCreate(owner: LifecycleOwner) {
-        if (state.albumList.isEmpty()) {
+        if (albumList.isEmpty() && !isDataLoaded) {
             getTopAlbums()
         }
     }
@@ -31,11 +40,12 @@ class TopAlbumsViewModel @Inject constructor(
                 getTopAlbums()
             }
             is TopScreenEvent.OnSearchParameterChange -> {
-                state = state.copy(
+                stateManager.updateState(
                     start = event.start,
                     end = event.end,
                     sort = event.sort
                 )
+
                 viewModelScope.launch {
                     getTopAlbums()
                 }
@@ -44,9 +54,9 @@ class TopAlbumsViewModel @Inject constructor(
     }
 
     private fun getTopAlbums(
-        start: String? = state.start,
-        end: String? = state.end,
-        sort: String? = state.sort
+        start: String? = state.value.start,
+        end: String? = state.value.end,
+        sort: String? = state.value.sort
     ) {
         viewModelScope.launch {
             topRepository.getTopAlbums(start, end, sort)
@@ -54,17 +64,19 @@ class TopAlbumsViewModel @Inject constructor(
                     when(result) {
                         is Resource.Success -> {
                             result.data?.let { topAlbums ->
-                                state = state.copy(
-                                    albumList = topAlbums
-                                )
+                                albumList = topAlbums
+                                isDataLoaded = true
                             }
                         }
                         is Resource.Error -> {
 
                         }
                         is Resource.Loading -> {
-                            state = state.copy(isLoading = result.isLoading)
+                            stateManager.updateState(
+                                isLoading = result.isLoading)
+
                         }
+
                     }
                 }
         }

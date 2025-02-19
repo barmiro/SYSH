@@ -8,20 +8,28 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.top.TopRepository
+import com.github.barmiro.syshclient.domain.top.TopArtist
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
+import com.github.barmiro.syshclient.presentation.top.TopScreenState
+import com.github.barmiro.syshclient.presentation.top.TopScreenStateManager
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class TopArtistsViewModel @Inject constructor(
-    private val topRepository: TopRepository
+    private val topRepository: TopRepository,
+    private val stateManager: TopScreenStateManager
 ): ViewModel(), DefaultLifecycleObserver {
 
-    var state by mutableStateOf(TopArtistsState())
+    val state: StateFlow<TopScreenState> = stateManager.state
+    var artistList by mutableStateOf<List<TopArtist>>(emptyList())
+    private var isDataLoaded = false
+
     override fun onCreate(owner: LifecycleOwner) {
-        if (state.artistList.isEmpty()) {
+        if (artistList.isEmpty() && !isDataLoaded) {
             getTopArtists()
         }
     }
@@ -31,7 +39,7 @@ class TopArtistsViewModel @Inject constructor(
                 getTopArtists()
             }
             is TopScreenEvent.OnSearchParameterChange -> {
-                state = state.copy(
+                stateManager.updateState(
                     start = event.start,
                     end = event.end,
                     sort = event.sort
@@ -44,9 +52,9 @@ class TopArtistsViewModel @Inject constructor(
     }
 
     private fun getTopArtists(
-        start: String? = state.start,
-        end: String? = state.end,
-        sort: String? = state.sort
+        start: String? = state.value.start,
+        end: String? = state.value.end,
+        sort: String? = state.value.sort
     ) {
         viewModelScope.launch {
             topRepository.getTopArtists(start, end, sort)
@@ -54,16 +62,16 @@ class TopArtistsViewModel @Inject constructor(
                     when(result) {
                         is Resource.Success -> {
                             result.data?.let { topArtists ->
-                                state = state.copy(
-                                    artistList = topArtists
-                                )
+                                artistList = topArtists
+                                isDataLoaded = true
                             }
                         }
                         is Resource.Error -> {
 
                         }
                         is Resource.Loading -> {
-                            state = state.copy(isLoading = result.isLoading)
+                            stateManager.updateState(
+                                isLoading = result.isLoading)
                         }
                     }
                 }

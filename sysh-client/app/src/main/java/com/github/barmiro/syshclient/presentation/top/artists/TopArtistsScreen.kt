@@ -19,6 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,8 +31,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
-import com.github.barmiro.syshclient.presentation.top.artists.ArtistItem
-import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -40,12 +39,10 @@ import java.util.Locale
 fun TopArtistsScreen(
     viewModel: TopArtistsViewModel
 ) {
-    val state = viewModel.state
+    val state by viewModel.state.collectAsState()
     viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
 
     var dateRange by remember { mutableStateOf<Pair<Long?, Long?>?>(null) }
-
-
 
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
 
@@ -142,8 +139,8 @@ fun TopArtistsScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(state.artistList.size) { i ->
-                    val artist = state.artistList[i]
+                items(viewModel.artistList.size) { i ->
+                    val artist = viewModel.artistList[i]
                     ArtistItem(
                         index = i + 1,
                         artist = artist,

@@ -19,6 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +39,7 @@ import java.util.Locale
 fun TopAlbumsScreen(
     viewModel: TopAlbumsViewModel
 ) {
-    val state = viewModel.state
+    val state by viewModel.state.collectAsState()
     viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
 
     var dateRange by remember { mutableStateOf<Pair<Long?, Long?>?>(null) }
@@ -83,7 +84,7 @@ fun TopAlbumsScreen(
                             onClick = {
                                 viewModel.onEvent(
                                     TopScreenEvent.OnSearchParameterChange(
-                                        null,
+                                        "count",
                                         state.start,
                                         state.end
                                     )
@@ -140,8 +141,8 @@ fun TopAlbumsScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(state.albumList.size) { i ->
-                    val album = state.albumList[i]
+                items(viewModel.albumList.size) { i ->
+                    val album = viewModel.albumList[i]
                     AlbumItem(
                         index = i + 1,
                         album = album,

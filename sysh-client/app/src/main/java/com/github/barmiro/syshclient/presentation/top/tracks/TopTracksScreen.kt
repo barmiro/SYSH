@@ -19,6 +19,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,12 +39,10 @@ import java.util.Locale
 fun TopTracksScreen(
     viewModel: TopTracksViewModel
 ) {
-    val state = viewModel.state
+    val state by viewModel.state.collectAsState()
     viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
 
     var dateRange by remember { mutableStateOf<Pair<Long?, Long?>?>(null) }
-
-
 
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
 
@@ -140,8 +139,8 @@ fun TopTracksScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(state.trackList.size) { i ->
-                    val track = state.trackList[i]
+                items(viewModel.trackList.size) { i ->
+                    val track = viewModel.trackList[i]
                     TrackItem(
                         index = i + 1,
                         track = track,
