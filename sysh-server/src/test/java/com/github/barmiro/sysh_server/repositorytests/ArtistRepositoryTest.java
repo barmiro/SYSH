@@ -47,7 +47,9 @@ class ArtistRepositoryTest {
 		for (int i = 0; i < rowCount; i++) {
 			artists.add(new Artist (
 					"artist id " + i,
-					"artist name " + i));
+					"artist name " + i,
+					"image_url " + i,
+					"thumbnail_url " + i));
 		}
 	}
 	
@@ -66,7 +68,7 @@ class ArtistRepositoryTest {
 	
 	@Test void testEmptyArtist() {
 
-		Artist empty = new Artist(null, null);
+		Artist empty = new Artist(null, null, null, null);
 		artists.add(empty);
 		assertEquals(rowCount + 1, artists.size());
 		ar.addArtists(artists);

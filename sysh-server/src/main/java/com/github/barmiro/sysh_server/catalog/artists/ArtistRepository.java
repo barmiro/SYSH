@@ -37,18 +37,24 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 	
 	
 	
-public List<ArtistStats> topArtistsCount(Timestamp startDate, Timestamp endDate) {
+public List<ArtistStats> topArtists(String sort, Timestamp startDate, Timestamp endDate) {
 		
-		String sql = ("SELECT Artists.*, COUNT(Streams.ts) as sort_param "
+		String sql = ("SELECT Artists.*,"
+				+ "COUNT("
+				+ "CASE WHEN Streams.ms_played >= 30000 THEN Streams.spotify_track_id END"
+				+ ") AS stream_count,"
+				+ "SUM(Streams.ms_played) AS total_ms_played "
 				+ "FROM Artists "
 				+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
 				+ "LEFT JOIN Streams ON Tracks_Artists.spotify_track_id = Streams.spotify_track_id "
 				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
-				+ "AND Streams.ms_played >= 30000 "
 				+ "GROUP By "
 				+ "Artists.id,"
-				+ "Artists.name "
-				+ "ORDER BY sort_param DESC;");
+				+ "Artists.name,"
+				+ "Artists.thumbnail_url "
+				+ "ORDER BY "
+				+ sort
+				+ " DESC;");
 		
 		return jdbc.sql(sql)
 				.param("startDate", startDate, Types.TIMESTAMP)

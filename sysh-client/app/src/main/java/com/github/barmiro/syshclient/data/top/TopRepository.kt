@@ -1,7 +1,7 @@
 package com.github.barmiro.syshclient.data.top
 
-import com.github.barmiro.syshclient.data.top.dto.ArtistDTO
 import com.github.barmiro.syshclient.domain.top.TopAlbum
+import com.github.barmiro.syshclient.domain.top.TopArtist
 import com.github.barmiro.syshclient.domain.top.TopTrack
 import com.github.barmiro.syshclient.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -102,7 +102,7 @@ class TopRepository @Inject constructor() {
         start: String? = null,
         end: String? = null,
         sort: String? = null
-    ): Flow<Resource<List<ArtistDTO>>> {
+    ): Flow<Resource<List<TopArtist>>> {
         return flow {
             emit(Resource.Loading(true))
             val topArtists = try{
@@ -120,7 +120,9 @@ class TopRepository @Inject constructor() {
             }
             val isFetchSuccessful = topArtists.isNotEmpty()
             if (isFetchSuccessful) {
-                emit(Resource.Success(topArtists))
+                emit(Resource.Success(
+                    data = topArtists.map { it.toTopArtist() }
+                ))
             } else {
                 emit(Resource.Error("Received list is empty"))
             }

@@ -46,7 +46,9 @@ CREATE INDEX tracklist_index ON Album_Tracklist (album_id);
 
 CREATE TABLE Artists (
     id varchar PRIMARY KEY,
-    name varchar
+    name varchar,
+    image_url varchar,
+    thumbnail_url varchar
 );
 
 

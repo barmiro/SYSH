@@ -143,16 +143,17 @@ public static List<Album> apiTrackAlbums(List<ApiTrackAlbum> apiTrackAlbums) {
 			String release_date = album.release_date();
 			
 //			TODO: handle albums with no images
+			int imageListSize = album.images().size();
 			String image_url = "";
 			String thumbnail_url = "";
-			if (album.images().size() > 0) {
+			if (imageListSize > 0) {
 				image_url = album
 						.images()
 						.get(0)
 						.url();
 				thumbnail_url = album
 						.images()
-						.get(album.images().size() - 1)
+						.get(imageListSize - 1)
 						.url();				
 			}
 			Album newAlbum = new Album (
@@ -174,13 +175,30 @@ public static List<Album> apiTrackAlbums(List<ApiTrackAlbum> apiTrackAlbums) {
 		
 		List<Artist> addedArtists = new ArrayList<>();
 		
+		
 		for (ApiArtist artist:apiArtists) {
 			String id = artist.id();
 			String name = artist.name();
+			
+			int imageListSize = artist.images().size();
+			String image_url = "";
+			String thumbnail_url = "";
+			if (imageListSize > 0) {
+				image_url = artist
+						.images()
+						.get(0)
+						.url();
+				thumbnail_url = artist
+						.images()
+						.get(imageListSize - 1)
+						.url();	
+			}
 
 			Artist newArtist = new Artist (
 					id,
-					name);
+					name,
+					image_url,
+					thumbnail_url);
 					
 			addedArtists.add(newArtist);
 		}

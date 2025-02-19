@@ -1,8 +1,10 @@
 package com.github.barmiro.syshclient.data.top
 
 import com.github.barmiro.syshclient.data.top.dto.AlbumDTO
+import com.github.barmiro.syshclient.data.top.dto.ArtistDTO
 import com.github.barmiro.syshclient.data.top.dto.TrackDTO
 import com.github.barmiro.syshclient.domain.top.TopAlbum
+import com.github.barmiro.syshclient.domain.top.TopArtist
 import com.github.barmiro.syshclient.domain.top.TopTrack
 
 fun TrackDTO.toTopTrack(): TopTrack {
@@ -23,6 +25,16 @@ fun AlbumDTO.toTopAlbum(): TopAlbum {
         name = name,
         thumbnailUrl = thumbnail_url,
         primaryArtistName = primary_artist_name,
+        minutesPlayed = total_ms_played / 60000,
+        streamCount = stream_count
+    )
+}
+
+fun ArtistDTO.toTopArtist(): TopArtist {
+    return TopArtist(
+        id = id,
+        name = name,
+        thumbnailUrl = thumbnail_url,
         minutesPlayed = total_ms_played / 60000,
         streamCount = stream_count
     )

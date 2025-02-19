@@ -65,7 +65,7 @@ public class SampleResponseBodies {
 				"EUSEXUA",
 				"https://i.scdn.co/image/ab67616d00004851bd5d937814595eeb925ab03f",
 				"FKA twigs",
-				1,
+				500586,
 				2));
 		
 		albumStats.add(new AlbumStats(
@@ -73,7 +73,7 @@ public class SampleResponseBodies {
 				"Songs In The Key Of Life",
 				"https://i.scdn.co/image/ab67616d000048512fee61bfec596bb6f5447c50",
 				"Stevie Wonder",
-				1,
+				637266,
 				2));
 		
 		albumStats.add(new AlbumStats(
@@ -81,7 +81,7 @@ public class SampleResponseBodies {
 				"Selected Ambient Works 85-92",
 				"https://i.scdn.co/image/ab67616d0000485138906032688bb13b135ce19a",
 				"Aphex Twin",
-				1,
+				293751,
 				1));
 		
 		return albumStats;
@@ -90,11 +90,11 @@ public class SampleResponseBodies {
 	static List<ArtistStats> artistStats() {
 		List<ArtistStats> artistStats = new ArrayList<>();
 		
-		artistStats.add(new ArtistStats("6nB0iY1cjSY1KyhYyuIIKH", "FKA twigs", 2));
+		artistStats.add(new ArtistStats("6nB0iY1cjSY1KyhYyuIIKH", "FKA twigs", "https://i.scdn.co/image/ab6761610000f1781a8242e65195789d352c97bd", 500586, 2));
 		
-		artistStats.add(new ArtistStats("7guDJrEfX3qb6FEbdPA5qi", "Stevie Wonder", 2));
+		artistStats.add(new ArtistStats("7guDJrEfX3qb6FEbdPA5qi", "Stevie Wonder", "https://i.scdn.co/image/05489744160e3f6f94f707fa1e2a6d4bbd14a298", 637266, 2));
 		
-		artistStats.add(new ArtistStats("6kBDZFXuLrZgHnvmPu9NsG", "Aphex Twin", 1));
+		artistStats.add(new ArtistStats("6kBDZFXuLrZgHnvmPu9NsG", "Aphex Twin", "https://i.scdn.co/image/ab6761610000f178aa3c91d792eb520a5d58daa5", 293751, 1));
 		
 		return artistStats;
 		

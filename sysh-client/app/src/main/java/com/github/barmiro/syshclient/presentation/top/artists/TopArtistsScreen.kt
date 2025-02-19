@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.presentation.top.albums
+package com.github.barmiro.syshclient.presentation.top.artists
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,13 +30,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
+import com.github.barmiro.syshclient.presentation.top.artists.ArtistItem
+import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
-fun TopAlbumsScreen(
-    viewModel: TopAlbumsViewModel
+fun TopArtistsScreen(
+    viewModel: TopArtistsViewModel
 ) {
     val state = viewModel.state
     viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
@@ -76,7 +78,7 @@ fun TopAlbumsScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row {
+            Row() {
                 Column {
                     if (state.sort == "time") {
                         Button(
@@ -140,11 +142,11 @@ fun TopAlbumsScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(state.albumList.size) { i ->
-                    val album = state.albumList[i]
-                    AlbumItem(
+                items(state.artistList.size) { i ->
+                    val artist = state.artistList[i]
+                    ArtistItem(
                         index = i + 1,
-                        album = album,
+                        artist = artist,
                         sort = state.sort,
                         modifier = Modifier
                             .fillMaxWidth()

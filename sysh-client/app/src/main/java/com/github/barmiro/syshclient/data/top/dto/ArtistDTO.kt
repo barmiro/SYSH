@@ -6,5 +6,7 @@ import kotlinx.serialization.Serializable
 data class ArtistDTO(
     val id: String,
     val name: String,
-    val sort_param: Int
+    val thumbnail_url: String,
+    val total_ms_played: Int,
+    val stream_count: Int
 )

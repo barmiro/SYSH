@@ -48,6 +48,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
+import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsScreen
+import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
@@ -61,6 +63,7 @@ class MainActivity : ComponentActivity() {
 //    @Inject lateinit var topRepo: TopRepository
     private val topTracksVM: TopTracksViewModel by viewModels()
     private val topAlbumsVM: TopAlbumsViewModel by viewModels()
+    private val topArtistsVM: TopArtistsViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -165,16 +168,16 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                                 composable<Top> {
-                                    val pagerState = rememberPagerState(pageCount = { 2 })
+                                    val pagerState = rememberPagerState(pageCount = { 3 })
 //                                    not using lifecycleScope because the animations need a MonotonicFrameClock
                                     val coroutineScope = rememberCoroutineScope()
-                                    val topNavItems = listOf("Tracks", "Albums")
 
                                     Row(modifier = Modifier.fillMaxWidth().padding(bottom = 40.dp)) {
                                         HorizontalPager(state = pagerState) { page ->
                                             when (page) {
                                                 0 -> TopTracksScreen(topTracksVM)
                                                 1 -> TopAlbumsScreen(topAlbumsVM)
+                                                2 -> TopArtistsScreen(topArtistsVM)
                                                 else -> Text("Something went wrong with the pager")
                                             }
                                         }
@@ -204,6 +207,16 @@ class MainActivity : ComponentActivity() {
                                                         }
                                                     },
                                                     icon = { Text("Albums") },
+                                                    modifier = Modifier.offset(y = 20.dp)
+                                                )
+                                                NavigationBarItem(
+                                                    selected = pagerState.currentPage == 2,
+                                                    onClick = {
+                                                        coroutineScope.launch {
+                                                            pagerState.animateScrollToPage(2)
+                                                        }
+                                                    },
+                                                    icon = { Text("Artists") },
                                                     modifier = Modifier.offset(y = 20.dp)
                                                 )
 //                                                SingleChoiceSegmentedButtonRow {

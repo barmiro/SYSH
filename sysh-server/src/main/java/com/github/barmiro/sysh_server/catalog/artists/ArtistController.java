@@ -43,9 +43,9 @@ public class ArtistController {
 				.replace("T", " "));
 		String sortBy = sort.orElse("");
 		if (sortBy.equals("time")) {
-			return artistRepository.topArtistsTime(startDate, endDate);
+			return artistRepository.topArtists("total_ms_played", startDate, endDate);
 		} else {
-			return artistRepository.topArtistsCount(startDate, endDate);
+			return artistRepository.topArtists("stream_count", startDate, endDate);
 		} 
 		
 	}

@@ -4,7 +4,9 @@ import com.github.barmiro.sysh_server.catalog.interfaces.CatalogEntity;
 
 public record Artist(
 		String id,
-		String name) implements CatalogEntity {
+		String name,
+		String image_url,
+		String thumbnail_url) implements CatalogEntity {
 	
 	@Override
 	public String getId() {
