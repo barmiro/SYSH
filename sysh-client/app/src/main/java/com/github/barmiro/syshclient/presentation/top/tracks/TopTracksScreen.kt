@@ -16,6 +16,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -31,11 +32,12 @@ fun TopTracksScreen(
     val state by viewModel.state.collectAsState()
     viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
 
-    val previousValues by remember {mutableStateOf(listOf(state.sort, state.start, state.end))}
+    var previousValues by remember {mutableStateOf(listOf(state.sort, state.start, state.end))}
     LaunchedEffect(state.sort, state.start, state.end) {
         if (listOf(state.sort, state.start, state.end) != previousValues) {
             viewModel.onEvent(TopScreenEvent.Refresh)
         }
+        previousValues = listOf(state.sort, state.start, state.end)
     }
     if (state.isLoading) {
         Column(
