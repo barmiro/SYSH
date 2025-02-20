@@ -15,6 +15,10 @@ class TopScreenViewModel @Inject constructor(
 
     val state: StateFlow<TopScreenState> = stateManager.state
 
+    fun sortParam(): String? {
+        return state.value.sort
+    }
+
     fun onEvent(event: TopScreenEvent) {
         when(event) {
             is TopScreenEvent.Refresh -> {

@@ -39,8 +39,7 @@ fun TopAlbumsScreen(
         }
         previousValues = listOf(state.sort, state.start, state.end)
     }
-
-    if (state.isLoading) {
+    if (viewModel.isLoading.collectAsState().value) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -55,7 +54,6 @@ fun TopAlbumsScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {

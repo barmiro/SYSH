@@ -130,7 +130,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     ) { innerPadding ->
-                        Column(modifier = Modifier.padding(innerPadding)){
+                        Column(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding(), top = 0.dp)){
                             NavHost(
                                 navController = navController,
                                 startDestination = MainScreen

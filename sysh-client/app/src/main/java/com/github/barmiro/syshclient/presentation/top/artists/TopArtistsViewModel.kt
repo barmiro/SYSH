@@ -14,6 +14,7 @@ import com.github.barmiro.syshclient.presentation.top.TopScreenState
 import com.github.barmiro.syshclient.presentation.top.TopScreenStateManager
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,6 +29,8 @@ class TopArtistsViewModel @Inject constructor(
     var artistList by mutableStateOf<List<TopArtist>>(emptyList())
     private var isDataLoaded = false
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
     override fun onCreate(owner: LifecycleOwner) {
         if (artistList.isEmpty() && !isDataLoaded) {
             getTopArtists()
@@ -70,8 +73,7 @@ class TopArtistsViewModel @Inject constructor(
 
                         }
                         is Resource.Loading -> {
-                            stateManager.updateState(
-                                isLoading = result.isLoading)
+                            _isLoading.value = result.isLoading
                         }
                     }
                 }

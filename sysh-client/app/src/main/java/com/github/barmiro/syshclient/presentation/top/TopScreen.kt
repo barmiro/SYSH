@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,17 +19,24 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -42,10 +50,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsScreen
@@ -56,7 +66,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.absoluteValue
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,7 +105,7 @@ fun TopScreen(
 
     LaunchedEffect(tabIndex) {
         pagerState.animateScrollToPage(page = tabIndex,
-            animationSpec = spring(stiffness = 300f)
+            animationSpec = spring(stiffness = 500f)
         )
     }
 
@@ -106,18 +115,85 @@ fun TopScreen(
         }
     }
 
-    Row(modifier = Modifier.fillMaxWidth().padding(bottom = 48.dp)) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = "Top",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold)
-            }
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                ),
+                title = {
+                    Text(text = "Top",
+                        fontWeight = FontWeight.Bold)
+                },
+                navigationIcon = {
+                    Button(onClick = { /* do something */ },
+                        ) {
+                        Icon(
+                            imageVector = Icons.Filled.DateRange,
+                            contentDescription = "Localized description"
+                        )
+                        Text(text = "Date range", modifier = Modifier.padding(start = 4.dp))
+                    }
+                },
+                actions = {
+                    if (state.sort == "time") {
+                        Button(
+                            onClick = {
+                                viewModel.onEvent(
+                                    TopScreenEvent.OnSearchParameterChange(
+                                        "count",
+                                        state.start,
+                                        state.end
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(text = "Count")
+                            Spacer(Modifier.width(4.dp))
+                            Icon(
+                                painter = painterResource(id = R.drawable.sort_24px),
+                                tint = ButtonDefaults.buttonColors().contentColor,
+                                contentDescription = "Sort icon"
+                            )
+                        }
+                    } else {
+                        Button(
+                            onClick = {
+                                viewModel.onEvent(
+                                    TopScreenEvent.OnSearchParameterChange(
+                                        "time",
+                                        state.start,
+                                        state.end
+                                    )
+                                )
+                            }
+                        ) {
+                            Text(text = "Time")
+                            Spacer(Modifier.width(4.dp))
+                            Icon(
+                                painter = painterResource(id = R.drawable.sort_24px),
+                                tint = ButtonDefaults.buttonColors().contentColor,
+                                contentDescription = "Sort icon"
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Row(modifier = Modifier.fillMaxWidth().padding(top = innerPadding.calculateTopPadding(), bottom = 48.dp)) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+//                Row(modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(bottom = 4.dp),
+//                    horizontalArrangement = Arrangement.Center,
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Text(text = "Top",
+//                        fontSize = 20.sp,
+//                        fontWeight = FontWeight.Bold)
+//                }
 //            HorizontalDivider(modifier = Modifier
 //                .fillMaxWidth()
 //                .alpha(0.2f)
@@ -125,124 +201,126 @@ fun TopScreen(
 //                color = MaterialTheme.colorScheme.onBackground,
 //                thickness = 2.dp)
 
-            TabRow(selectedTabIndex = tabIndex,
+                TabRow(selectedTabIndex = tabIndex,
 //                divider = {
 //                    HorizontalDivider(modifier = Modifier.alpha(0.5f), thickness = 2.dp)
 //                },
-                indicator = { tabPositions ->
-                    TopIndicator(
-                        tabPositions,
-                        pagerState.getOffsetDistanceInPages(0))
-                }) {
-                tabs.forEachIndexed { index, title ->
-                    CompositionLocalProvider(LocalRippleConfiguration provides null) {
-                        Tab(text = { Text(
-                            text = title,
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.alpha(
-                                (1 - pagerState.getOffsetDistanceInPages(index).absoluteValue / 2).coerceAtLeast(0.5f)
+                    indicator = { tabPositions ->
+                        TopIndicator(
+                            tabPositions,
+                            pagerState.getOffsetDistanceInPages(0))
+                    }) {
+                    tabs.forEachIndexed { index, title ->
+                        CompositionLocalProvider(LocalRippleConfiguration provides null) {
+                            Tab(text = { Text(
+                                text = title,
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.alpha(
+                                    (1 - pagerState.getOffsetDistanceInPages(index).absoluteValue / 2).coerceAtLeast(0.5f)
+                                )
+                            ) },
+                                selected = tabIndex == index,
+                                onClick = { tabIndex = index }
                             )
-                        ) },
-                            selected = tabIndex == index,
-                            onClick = { tabIndex = index }
-                        )
 
+                        }
+                    }
+                }
+
+                HorizontalPager(state = pagerState, modifier = Modifier.fillMaxWidth().weight(1f)) { page ->
+                    Box(Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        when (page) {
+                            0 -> TopTracksScreen(topTracksVM)
+                            1 -> TopAlbumsScreen(topAlbumsVM)
+                            2 -> TopArtistsScreen(topArtistsVM)
+                            else -> Text("Something went wrong with the pager")
+                        }
                     }
                 }
             }
 
-            HorizontalPager(state = pagerState, modifier = Modifier.fillMaxWidth().weight(1f)) { page ->
-                Box(Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    when (page) {
-                        0 -> TopTracksScreen(topTracksVM)
-                        1 -> TopAlbumsScreen(topAlbumsVM)
-                        2 -> TopArtistsScreen(topArtistsVM)
-                        else -> Text("Something went wrong with the pager")
-                    }
-                }
-            }
         }
 
-    }
-
-    Box (modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.Bottom
+        Box (modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Bottom
             ) {
-                if (state.sort == "time") {
-                    Button(
-                        onClick = {
-                            viewModel.onEvent(
-                                TopScreenEvent.OnSearchParameterChange(
-                                    "count",
-                                    state.start,
-                                    state.end
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    if (state.sort == "time") {
+                        Button(
+                            onClick = {
+                                viewModel.onEvent(
+                                    TopScreenEvent.OnSearchParameterChange(
+                                        "count",
+                                        state.start,
+                                        state.end
+                                    )
                                 )
-                            )
+                            }
+                        ) {
+                            Text(text = "Sort by count")
                         }
-                    ) {
-                        Text(text = "Sort by count")
-                    }
-                } else {
-                    Button(
-                        onClick = {
-                            viewModel.onEvent(
-                                TopScreenEvent.OnSearchParameterChange(
-                                    "time",
-                                    state.start,
-                                    state.end
+                    } else {
+                        Button(
+                            onClick = {
+                                viewModel.onEvent(
+                                    TopScreenEvent.OnSearchParameterChange(
+                                        "time",
+                                        state.start,
+                                        state.end
+                                    )
                                 )
-                            )
+                            }
+                        ) {
+                            Text(text = "Sort by time")
                         }
-                    ) {
-                        Text(text = "Sort by time")
                     }
-                }
-                if (dateRange != null) {
-                    val start = Date(dateRange!!.first!!)
-                    val end = Date(dateRange!!.second!!)
+                    if (dateRange != null) {
+                        val start = Date(dateRange!!.first!!)
+                        val end = Date(dateRange!!.second!!)
 
-                    val formattedStart = SimpleDateFormat(
-                        "MMM dd, yyyy",
-                        Locale.getDefault()
-                    )
-                        .format(start)
+                        val formattedStart = SimpleDateFormat(
+                            "MMM dd, yyyy",
+                            Locale.getDefault()
+                        )
+                            .format(start)
 
-                    val formattedEnd = SimpleDateFormat(
-                        "MMM dd, yyyy",
-                        Locale.getDefault()
-                    )
-                        .format(end)
+                        val formattedEnd = SimpleDateFormat(
+                            "MMM dd, yyyy",
+                            Locale.getDefault()
+                        )
+                            .format(end)
 
-                    Button(
-                        onClick = {
-                            viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
-                            dateRange = null
+                        Button(
+                            onClick = {
+                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
+                                dateRange = null
+                            }
+                        ) {
+                            Text(text = "$formattedStart - $formattedEnd")
                         }
-                    ) {
-                        Text(text = "$formattedStart - $formattedEnd")
-                    }
-                } else {
-                    Button(
-                        onClick = {
-                            isDateRangePickerVisible = true
+                    } else {
+                        Button(
+                            onClick = {
+                                isDateRangePickerVisible = true
+                            }
+                        ) {
+                            Text(text = "Select date range")
                         }
-                    ) {
-                        Text(text = "Select date range")
                     }
                 }
             }
         }
     }
+
 }
 
 
@@ -302,7 +380,7 @@ fun TopIndicator(tabPositions: List<TabPosition>, animationOffset: Float) {
     val leftIndicatorEdge by transition.animateDp(
         transitionSpec = {
             if (initialState < targetState) {
-                spring(dampingRatio = 1f, stiffness = 100f)
+                spring(dampingRatio = 1f, stiffness = 200f)
             } else {
                 spring(dampingRatio = 1f, stiffness = 2000f)
             }
@@ -316,7 +394,7 @@ fun TopIndicator(tabPositions: List<TabPosition>, animationOffset: Float) {
             if (initialState < targetState) {
                 spring(dampingRatio = 1f, stiffness = 2000f)
             } else {
-                spring(dampingRatio = 1f, stiffness = 100f)
+                spring(dampingRatio = 1f, stiffness = 200f)
             }
         }
     ) {

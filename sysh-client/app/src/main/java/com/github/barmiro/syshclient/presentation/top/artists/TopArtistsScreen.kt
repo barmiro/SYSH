@@ -40,7 +40,7 @@ fun TopArtistsScreen(
         previousValues = listOf(state.sort, state.start, state.end)
     }
 
-    if (state.isLoading) {
+    if (viewModel.isLoading.collectAsState().value) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
