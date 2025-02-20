@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
@@ -38,8 +39,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsScreen
@@ -99,14 +102,37 @@ fun TopScreen(
 
     Row(modifier = Modifier.fillMaxWidth().padding(bottom = 48.dp)) {
         Column(modifier = Modifier.fillMaxWidth()) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Top",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold)
+            }
+//            HorizontalDivider(modifier = Modifier
+//                .fillMaxWidth()
+//                .alpha(0.2f)
+//                .padding(top = 4.dp),
+//                color = MaterialTheme.colorScheme.onBackground,
+//                thickness = 2.dp)
+
             TabRow(selectedTabIndex = tabIndex,
+//                divider = {
+//                    HorizontalDivider(modifier = Modifier.alpha(0.5f), thickness = 2.dp)
+//                },
                 indicator = { tabPositions ->
                     TopIndicator(
                         tabPositions,
                         pagerState.getOffsetDistanceInPages(0))
                 }) {
                 tabs.forEachIndexed { index, title ->
-                    Tab(text = { Text(title) },
+                    Tab(text = { Text(
+                        text = title,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer) },
                         selected = tabIndex == index,
                         onClick = { tabIndex = index }
                     )
@@ -263,35 +289,37 @@ fun TopIndicator(tabPositions: List<TabPosition>, animationOffset: Float) {
     val leftIndicatorEdge by transition.animateDp(
         transitionSpec = {
             if (initialState < targetState) {
-                spring(dampingRatio = 1f, stiffness = 60f)
+                spring(dampingRatio = 1f, stiffness = 100f)
             } else {
-                spring(dampingRatio = 1f, stiffness = 1000f)
+                spring(dampingRatio = 1f, stiffness = 2000f)
             }
         }
     ) {
-        tabPositions[0].right * it
+        tabPositions[0].right * (it + 0.125f)
     }
 
     val rightIndicatorEdge by transition.animateDp(
         transitionSpec = {
             if (initialState < targetState) {
-                spring(dampingRatio = 1f, stiffness = 1000f)
+                spring(dampingRatio = 1f, stiffness = 2000f)
             } else {
-                spring(dampingRatio = 1f, stiffness = 60f)
+                spring(dampingRatio = 1f, stiffness = 100f)
             }
         }
     ) {
-        tabPositions[0].right * (it + 1)
+        tabPositions[0].right * (it + 0.875f)
     }
+
 
     Box(
         modifier = Modifier
             .wrapContentSize(align = Alignment.BottomStart)
             .offset(x = leftIndicatorEdge)
             .width(rightIndicatorEdge - leftIndicatorEdge)
-            .padding(bottom = 0.dp)
+            .padding(8.dp)
             .fillMaxWidth()
-            .height(2.dp)
-            .background(MaterialTheme.colorScheme.secondary, RectangleShape)
+            .height(64.dp)
+            .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(32.dp))
+            .zIndex(-1f)
     )
 }
