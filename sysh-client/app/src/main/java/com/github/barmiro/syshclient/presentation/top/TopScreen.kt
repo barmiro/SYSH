@@ -4,9 +4,9 @@ import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +21,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -28,6 +29,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -127,13 +129,29 @@ fun TopScreen(
                         fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
-                    Button(onClick = { /* do something */ },
+                    if (dateRange != null) {
+                        IconButton(
+                            onClick = {
+                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
+                                dateRange = null
+                            }
                         ) {
-                        Icon(
-                            imageVector = Icons.Filled.DateRange,
-                            contentDescription = "Localized description"
-                        )
-                        Text(text = "Date range", modifier = Modifier.padding(start = 4.dp))
+                            Icon(
+                                imageVector = Icons.Filled.DateRange,
+                                contentDescription = "Localized description"
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = {
+                                isDateRangePickerVisible = true
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.DateRange,
+                                contentDescription = "Localized description"
+                            )
+                        }
                     }
                 },
                 actions = {
@@ -147,7 +165,8 @@ fun TopScreen(
                                         state.end
                                     )
                                 )
-                            }
+                            },
+                            contentPadding = PaddingValues(horizontal = 12.dp)
                         ) {
                             Text(text = "Count")
                             Spacer(Modifier.width(4.dp))
@@ -167,7 +186,8 @@ fun TopScreen(
                                         state.end
                                     )
                                 )
-                            }
+                            },
+                            contentPadding = PaddingValues(horizontal = 12.dp)
                         ) {
                             Text(text = "Time")
                             Spacer(Modifier.width(4.dp))
@@ -180,31 +200,34 @@ fun TopScreen(
                     }
                 }
             )
+//            TODO: this is a terrible hack
+            Box(
+                modifier = Modifier.fillMaxWidth().height(92.dp), contentAlignment = Alignment.BottomCenter
+            ) {
+                var rangeText = "All time"
+                if (dateRange != null) {
+                    val start = Date(dateRange!!.first!!)
+                    val end = Date(dateRange!!.second!!)
+
+                    val formattedStart = SimpleDateFormat(
+                        "MMM dd, yyyy",
+                        Locale.getDefault()
+                    ).format(start)
+
+                    val formattedEnd = SimpleDateFormat(
+                        "MMM dd, yyyy",
+                        Locale.getDefault()
+                    ).format(end)
+
+                    rangeText = "$formattedStart - $formattedEnd"
+                }
+                Text(text = rangeText, fontSize = 12.sp, modifier = Modifier.alpha(0.5f))
+            }
         }
     ) { innerPadding ->
-        Row(modifier = Modifier.fillMaxWidth().padding(top = innerPadding.calculateTopPadding(), bottom = 48.dp)) {
+        Row(modifier = Modifier.fillMaxWidth().padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp)) {
             Column(modifier = Modifier.fillMaxWidth()) {
-//                Row(modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(bottom = 4.dp),
-//                    horizontalArrangement = Arrangement.Center,
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    Text(text = "Top",
-//                        fontSize = 20.sp,
-//                        fontWeight = FontWeight.Bold)
-//                }
-//            HorizontalDivider(modifier = Modifier
-//                .fillMaxWidth()
-//                .alpha(0.2f)
-//                .padding(top = 4.dp),
-//                color = MaterialTheme.colorScheme.onBackground,
-//                thickness = 2.dp)
-
                 TabRow(selectedTabIndex = tabIndex,
-//                divider = {
-//                    HorizontalDivider(modifier = Modifier.alpha(0.5f), thickness = 2.dp)
-//                },
                     indicator = { tabPositions ->
                         TopIndicator(
                             tabPositions,
@@ -244,81 +267,81 @@ fun TopScreen(
 
         }
 
-        Box (modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    if (state.sort == "time") {
-                        Button(
-                            onClick = {
-                                viewModel.onEvent(
-                                    TopScreenEvent.OnSearchParameterChange(
-                                        "count",
-                                        state.start,
-                                        state.end
-                                    )
-                                )
-                            }
-                        ) {
-                            Text(text = "Sort by count")
-                        }
-                    } else {
-                        Button(
-                            onClick = {
-                                viewModel.onEvent(
-                                    TopScreenEvent.OnSearchParameterChange(
-                                        "time",
-                                        state.start,
-                                        state.end
-                                    )
-                                )
-                            }
-                        ) {
-                            Text(text = "Sort by time")
-                        }
-                    }
-                    if (dateRange != null) {
-                        val start = Date(dateRange!!.first!!)
-                        val end = Date(dateRange!!.second!!)
-
-                        val formattedStart = SimpleDateFormat(
-                            "MMM dd, yyyy",
-                            Locale.getDefault()
-                        )
-                            .format(start)
-
-                        val formattedEnd = SimpleDateFormat(
-                            "MMM dd, yyyy",
-                            Locale.getDefault()
-                        )
-                            .format(end)
-
-                        Button(
-                            onClick = {
-                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
-                                dateRange = null
-                            }
-                        ) {
-                            Text(text = "$formattedStart - $formattedEnd")
-                        }
-                    } else {
-                        Button(
-                            onClick = {
-                                isDateRangePickerVisible = true
-                            }
-                        ) {
-                            Text(text = "Select date range")
-                        }
-                    }
-                }
-            }
-        }
+//        Box (modifier = Modifier.fillMaxSize()) {
+//            Column(
+//                modifier = Modifier.fillMaxSize(),
+//                verticalArrangement = Arrangement.Bottom
+//            ) {
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.SpaceEvenly,
+//                    verticalAlignment = Alignment.Bottom
+//                ) {
+//                    if (state.sort == "time") {
+//                        Button(
+//                            onClick = {
+//                                viewModel.onEvent(
+//                                    TopScreenEvent.OnSearchParameterChange(
+//                                        "count",
+//                                        state.start,
+//                                        state.end
+//                                    )
+//                                )
+//                            }
+//                        ) {
+//                            Text(text = "Sort by count")
+//                        }
+//                    } else {
+//                        Button(
+//                            onClick = {
+//                                viewModel.onEvent(
+//                                    TopScreenEvent.OnSearchParameterChange(
+//                                        "time",
+//                                        state.start,
+//                                        state.end
+//                                    )
+//                                )
+//                            }
+//                        ) {
+//                            Text(text = "Sort by time")
+//                        }
+//                    }
+//                    if (dateRange != null) {
+//                        val start = Date(dateRange!!.first!!)
+//                        val end = Date(dateRange!!.second!!)
+//
+//                        val formattedStart = SimpleDateFormat(
+//                            "MMM dd, yyyy",
+//                            Locale.getDefault()
+//                        )
+//                            .format(start)
+//
+//                        val formattedEnd = SimpleDateFormat(
+//                            "MMM dd, yyyy",
+//                            Locale.getDefault()
+//                        )
+//                            .format(end)
+//
+//                        Button(
+//                            onClick = {
+//                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
+//                                dateRange = null
+//                            }
+//                        ) {
+//                            Text(text = "$formattedStart - $formattedEnd")
+//                        }
+//                    } else {
+//                        Button(
+//                            onClick = {
+//                                isDateRangePickerVisible = true
+//                            }
+//                        ) {
+//                            Text(text = "Select date range")
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 
 }
