@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient.presentation.top
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
@@ -62,6 +63,7 @@ import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsScreen
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -194,7 +196,7 @@ fun TopScreen(
             )
 //            TODO: this is a terrible hack
             Box(
-                modifier = Modifier.fillMaxWidth().height(86.dp), contentAlignment = Alignment.BottomCenter
+                modifier = Modifier.fillMaxWidth().height(88.dp), contentAlignment = Alignment.BottomCenter
             ) {
                 var rangeText = "All time"
                 if (dateRange != null) {
@@ -213,19 +215,12 @@ fun TopScreen(
 
                     rangeText = "$formattedStart - $formattedEnd"
                 }
-                var sortText = "stream count"
+                var sortText = "by stream count"
                 if (state.sort == "time") {
-                    sortText = "listening time"
+                    sortText = "by listening time"
                 }
-                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
-                    Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                        Text(text = rangeText, fontSize = 14.sp, lineHeight = 14.sp, modifier = Modifier.padding(0.dp))
-                        Text(text = " • ", fontSize = 14.sp, lineHeight = 14.sp, modifier = Modifier.padding(0.dp))
-                        Text(text = "by $sortText", fontSize = 14.sp, lineHeight = 14.sp, modifier = Modifier.alpha(0.5f).padding(0.dp))
-                    }
-//                    Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-//                    }
-
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
+                    TopText(rangeText, sortText)
                 }
             }
         }
@@ -282,68 +277,9 @@ fun TopScreen(
 //                    horizontalArrangement = Arrangement.SpaceEvenly,
 //                    verticalAlignment = Alignment.Bottom
 //                ) {
-//                    if (state.sort == "time") {
-//                        Button(
-//                            onClick = {
-//                                viewModel.onEvent(
-//                                    TopScreenEvent.OnSearchParameterChange(
-//                                        "count",
-//                                        state.start,
-//                                        state.end
-//                                    )
-//                                )
-//                            }
-//                        ) {
-//                            Text(text = "Sort by count")
-//                        }
-//                    } else {
-//                        Button(
-//                            onClick = {
-//                                viewModel.onEvent(
-//                                    TopScreenEvent.OnSearchParameterChange(
-//                                        "time",
-//                                        state.start,
-//                                        state.end
-//                                    )
-//                                )
-//                            }
-//                        ) {
-//                            Text(text = "Sort by time")
-//                        }
-//                    }
-//                    if (dateRange != null) {
-//                        val start = Date(dateRange!!.first!!)
-//                        val end = Date(dateRange!!.second!!)
 //
-//                        val formattedStart = SimpleDateFormat(
-//                            "MMM dd, yyyy",
-//                            Locale.getDefault()
-//                        )
-//                            .format(start)
-//
-//                        val formattedEnd = SimpleDateFormat(
-//                            "MMM dd, yyyy",
-//                            Locale.getDefault()
-//                        )
-//                            .format(end)
-//
-//                        Button(
-//                            onClick = {
-//                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
-//                                dateRange = null
-//                            }
-//                        ) {
-//                            Text(text = "$formattedStart - $formattedEnd")
-//                        }
-//                    } else {
-//                        Button(
-//                            onClick = {
-//                                isDateRangePickerVisible = true
-//                            }
-//                        ) {
-//                            Text(text = "Select date range")
-//                        }
-//                    }
+
+
 //                }
 //            }
 //        }
@@ -441,4 +377,50 @@ fun TopIndicator(tabPositions: List<TabPosition>, animationOffset: Float) {
             .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(32.dp))
             .zIndex(-1f)
     )
+}
+
+@Composable
+fun TopText(rangeText: String, sortText: String) {
+    var oldRangeText by remember { mutableStateOf("") }
+    var oldSortText by remember { mutableStateOf("") }
+    var targetRangeText by remember { mutableStateOf("") }
+    var targetSortText by remember { mutableStateOf("") }
+    val delayBase = 150L
+
+    LaunchedEffect(rangeText) {
+        targetRangeText = oldRangeText
+        for(i in 1..targetRangeText.length) {
+            targetRangeText = targetRangeText.dropLast(1)
+            delay(delayBase / oldRangeText.length)
+        }
+        delay(delayBase)
+        for(i in 1..rangeText.length) {
+            targetRangeText += rangeText[i - 1]
+            delay(delayBase / rangeText.length)
+        }
+        oldRangeText = rangeText
+    }
+
+    LaunchedEffect(sortText) {
+        targetSortText = oldSortText
+        for(i in 1..targetSortText.length) {
+            targetSortText = targetSortText.dropLast(1)
+            delay(delayBase / oldSortText.length)
+        }
+        delay(delayBase)
+        for(i in 1..sortText.length) {
+            targetSortText += sortText[i - 1]
+            delay(delayBase / sortText.length)
+        }
+        oldSortText = sortText
+    }
+
+    Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        Text(text = targetRangeText, fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.padding(0.dp)
+            .animateContentSize(spring(1f, 3000f)))
+        Text(text = " • ", fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.padding(0.dp))
+        Text(text = targetSortText, fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.alpha(0.5f).padding(0.dp)
+            .animateContentSize(spring(1f, 3000f)))
+
+    }
 }
