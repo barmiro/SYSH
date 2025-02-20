@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -21,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.github.barmiro.syshclient.domain.top.TopAlbum
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun AlbumItem(
@@ -90,26 +93,28 @@ fun AlbumItem(
                 fontWeight = FontWeight.Bold,
                 lineHeight = 12.sp,
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 1
+                maxLines = 1,
+                modifier = Modifier.alpha(0.5F)
             )
         }
         val sortParam: String
         val sortParamName: String
         val otherParam: String
         val otherParamName: String
+        val format = NumberFormat.getInstance(Locale.US)
         if (sort == "time") {
-            sortParam = album.minutesPlayed.toString()
+            sortParam = format.format(album.minutesPlayed)
             sortParamName = "minutes"
-            otherParam = album.streamCount.toString()
+            otherParam = format.format(album.streamCount)
             otherParamName = "streams"
         } else {
-            sortParam = album.streamCount.toString()
+            sortParam = format.format(album.streamCount)
             sortParamName = "streams"
-            otherParam = album.minutesPlayed.toString()
+            otherParam = format.format(album.minutesPlayed)
             otherParamName = "minutes"
         }
         Column(
-            Modifier.weight(2f),
+            Modifier.weight(2.2f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.End
         ) {
@@ -133,6 +138,7 @@ fun AlbumItem(
                 Text(
                     text = sortParamName,
                     fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                     textAlign = TextAlign.End,
@@ -149,7 +155,8 @@ fun AlbumItem(
                     color = MaterialTheme.colorScheme.onBackground,
                     maxLines = 1,
                     textAlign = TextAlign.End,
-                    lineHeight = 12.sp
+                    lineHeight = 12.sp,
+                    modifier = Modifier.alpha(0.5F)
                 )
             }
         }

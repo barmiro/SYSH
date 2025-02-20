@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.github.barmiro.syshclient.domain.top.TopTrack
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun TrackItem(
@@ -109,19 +111,20 @@ fun TrackItem(
         val sortParamName: String
         val otherParam: String
         val otherParamName: String
+        val format = NumberFormat.getInstance(Locale.US)
         if (sort == "time") {
-            sortParam = track.minutesPlayed.toString()
+            sortParam = format.format(track.minutesPlayed)
             sortParamName = "minutes"
-            otherParam = track.streamCount.toString()
+            otherParam = format.format(track.streamCount)
             otherParamName = "streams"
         } else {
-            sortParam = track.streamCount.toString()
+            sortParam = format.format(track.streamCount)
             sortParamName = "streams"
-            otherParam = track.minutesPlayed.toString()
+            otherParam = format.format(track.minutesPlayed)
             otherParamName = "minutes"
         }
         Column(
-            Modifier.weight(2f),
+            Modifier.weight(2.2f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.End
         ) {

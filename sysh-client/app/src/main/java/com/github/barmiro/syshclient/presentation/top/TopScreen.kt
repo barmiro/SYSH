@@ -4,11 +4,10 @@ import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,14 +21,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -156,7 +154,7 @@ fun TopScreen(
                 },
                 actions = {
                     if (state.sort == "time") {
-                        Button(
+                        IconButton(
                             onClick = {
                                 viewModel.onEvent(
                                     TopScreenEvent.OnSearchParameterChange(
@@ -165,19 +163,16 @@ fun TopScreen(
                                         state.end
                                     )
                                 )
-                            },
-                            contentPadding = PaddingValues(horizontal = 12.dp)
+                            }
                         ) {
-                            Text(text = "Count")
-                            Spacer(Modifier.width(4.dp))
                             Icon(
                                 painter = painterResource(id = R.drawable.sort_24px),
-                                tint = ButtonDefaults.buttonColors().contentColor,
+                                tint = IconButtonDefaults.iconButtonColors().contentColor,
                                 contentDescription = "Sort icon"
                             )
                         }
                     } else {
-                        Button(
+                        IconButton(
                             onClick = {
                                 viewModel.onEvent(
                                     TopScreenEvent.OnSearchParameterChange(
@@ -186,14 +181,11 @@ fun TopScreen(
                                         state.end
                                     )
                                 )
-                            },
-                            contentPadding = PaddingValues(horizontal = 12.dp)
+                            }
                         ) {
-                            Text(text = "Time")
-                            Spacer(Modifier.width(4.dp))
                             Icon(
                                 painter = painterResource(id = R.drawable.sort_24px),
-                                tint = ButtonDefaults.buttonColors().contentColor,
+                                tint = IconButtonDefaults.iconButtonColors().contentColor,
                                 contentDescription = "Sort icon"
                             )
                         }
@@ -202,7 +194,7 @@ fun TopScreen(
             )
 //            TODO: this is a terrible hack
             Box(
-                modifier = Modifier.fillMaxWidth().height(92.dp), contentAlignment = Alignment.BottomCenter
+                modifier = Modifier.fillMaxWidth().height(86.dp), contentAlignment = Alignment.BottomCenter
             ) {
                 var rangeText = "All time"
                 if (dateRange != null) {
@@ -221,7 +213,20 @@ fun TopScreen(
 
                     rangeText = "$formattedStart - $formattedEnd"
                 }
-                Text(text = rangeText, fontSize = 12.sp, modifier = Modifier.alpha(0.5f))
+                var sortText = "stream count"
+                if (state.sort == "time") {
+                    sortText = "listening time"
+                }
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+                    Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        Text(text = rangeText, fontSize = 14.sp, lineHeight = 14.sp, modifier = Modifier.padding(0.dp))
+                        Text(text = " • ", fontSize = 14.sp, lineHeight = 14.sp, modifier = Modifier.padding(0.dp))
+                        Text(text = "by $sortText", fontSize = 14.sp, lineHeight = 14.sp, modifier = Modifier.alpha(0.5f).padding(0.dp))
+                    }
+//                    Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+//                    }
+
+                }
             }
         }
     ) { innerPadding ->
