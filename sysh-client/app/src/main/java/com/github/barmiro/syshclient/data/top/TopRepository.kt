@@ -53,7 +53,7 @@ class TopRepository @Inject constructor() {
             val isFetchSuccessful = topTracks.isNotEmpty()
             if (isFetchSuccessful) {
                 emit(Resource.Success(
-                    data= topTracks.map { it.toTopTrack() }
+                    data = topTracks.map { it.toTopTrack() }
                 ))
             } else {
                 emit(Resource.Error("Received list is empty"))

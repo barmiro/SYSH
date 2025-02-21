@@ -21,17 +21,20 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
@@ -63,8 +66,11 @@ import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsScreen
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
+import com.github.barmiro.syshclient.util.setToEndOfDay
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlin.math.absoluteValue
@@ -88,12 +94,17 @@ fun TopScreen(
     if (isDateRangePickerVisible) {
         DateRangePickerModal(
             onDateRangeSelected = {
-                dateRange = it
-                val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-                val start = formatter.format(it.first)
-                val end = formatter.format(it.second)
+                if (it.first != null) {
+                    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                    dateRange = when {
+                        it.second == null -> Pair(it.first, System.currentTimeMillis())
+                        else -> it
+                    }
 
-                viewModel.onEvent((TopScreenEvent.OnSearchParameterChange(null, start, end)))
+                    val start = formatter.format(dateRange!!.first)
+                    val end = formatter.format(setToEndOfDay(Date(dateRange!!.second!!)))
+                    viewModel.onEvent((TopScreenEvent.OnSearchParameterChange(null, start, end)))
+                }
             },
             onDismiss = {
                 isDateRangePickerVisible = false
@@ -116,7 +127,7 @@ fun TopScreen(
             tabIndex = pagerState.currentPage
         }
     }
-
+    var expanded by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -129,30 +140,65 @@ fun TopScreen(
                         fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
-                    if (dateRange != null) {
-                        IconButton(
+                    IconButton(onClick = { expanded = !expanded }) {
+                        Icon(Icons.Default.DateRange, contentDescription = "More options")
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("All time") },
                             onClick = {
                                 viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
                                 dateRange = null
+                                expanded = false
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.DateRange,
-                                contentDescription = "Localized description"
-                            )
-                        }
-                    } else {
-                        IconButton(
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Yearly") },
+                            onClick = {
+                                val year: Int = LocalDate.now().year
+                                val startDate = Calendar.getInstance().set(year, 0, 1)
+                                val endDate:String =""
+                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "${LocalDate.now().year}-01-01T00:00:00" , end = "${LocalDate.now().year}-12-31T23:59:59"))
+
+                                expanded = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Custom range") },
                             onClick = {
                                 isDateRangePickerVisible = true
+                                expanded = false
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.DateRange,
-                                contentDescription = "Localized description"
-                            )
-                        }
+                        )
                     }
+
+//                    if (dateRange != null) {
+//                        IconButton(
+//                            onClick = {
+//                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
+//                                dateRange = null
+//                            }
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Filled.DateRange,
+//                                contentDescription = "Localized description"
+//                            )
+//                        }
+//                    } else {
+//                        IconButton(
+//                            onClick = {
+//                                isDateRangePickerVisible = true
+//                            }
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Outlined.DateRange,
+//                                contentDescription = "Localized description"
+//                            )
+//                        }
+//                    }
                 },
                 actions = {
                     if (state.sort == "time") {
@@ -213,7 +259,7 @@ fun TopScreen(
                         Locale.getDefault()
                     ).format(end)
 
-                    rangeText = "$formattedStart - $formattedEnd"
+                    rangeText = "$start - $end"
                 }
                 var sortText = "by stream count"
                 if (state.sort == "time") {
@@ -267,22 +313,24 @@ fun TopScreen(
 
         }
 
-//        Box (modifier = Modifier.fillMaxSize()) {
-//            Column(
-//                modifier = Modifier.fillMaxSize(),
-//                verticalArrangement = Arrangement.Bottom
-//            ) {
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceEvenly,
-//                    verticalAlignment = Alignment.Bottom
-//                ) {
-//
+        Box (modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                Surface(modifier = Modifier.fillMaxWidth().height(48.dp).background(MaterialTheme.colorScheme.background)) {
+                    HorizontalDivider(thickness = 2.dp, modifier = Modifier.alpha(0.5f))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.Bottom
+                    ) {
 
+                    }
 
-//                }
-//            }
-//        }
+                }
+            }
+        }
     }
 
 }
