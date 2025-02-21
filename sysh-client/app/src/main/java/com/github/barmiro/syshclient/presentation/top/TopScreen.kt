@@ -1,8 +1,6 @@
 package com.github.barmiro.syshclient.presentation.top
 
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,18 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -46,15 +36,13 @@ import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsScreen
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
 import com.github.barmiro.syshclient.presentation.top.components.DateRangePickerModal
+import com.github.barmiro.syshclient.presentation.top.components.TopScreenBottomBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopIndicator
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopText
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import com.github.barmiro.syshclient.util.setToEndOfDay
-import com.github.barmiro.syshclient.util.yearToDateRange
-import com.github.barmiro.syshclient.util.yearToEnd
-import com.github.barmiro.syshclient.util.yearToStart
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -128,6 +116,7 @@ fun TopScreen(
         topBar = {
             TopScreenTopBar(
                 state = state,
+                dateRangeMode = dateRangeMode,
                 onDateRangeSelect = { dateRange = it },
                 onDateRangeModeChange = { dateRangeMode = it },
                 onDateRangePickerVisibilityChange = { isDateRangePickerVisible = it },
@@ -183,102 +172,11 @@ fun TopScreen(
                 }
             }
         }
-
-
-        var bottomBarPageCount by remember { mutableIntStateOf(15)}
-        var bottomBarPagerState = rememberPagerState(pageCount = { bottomBarPageCount }, initialPage = bottomBarPageCount - 1)
-        var bottomBarTargetPage by remember { mutableIntStateOf(bottomBarPagerState.currentPage) }
-
-        LaunchedEffect(bottomBarTargetPage) {
-            bottomBarPagerState.animateScrollToPage(bottomBarTargetPage)
-        }
-
-        LaunchedEffect(bottomBarPagerState.currentPage) {
-            if (dateRangeMode == "yearly") {
-                val year = LocalDateTime.now().year - (bottomBarPageCount - bottomBarPagerState.currentPage - 1)
-                dateRange = yearToDateRange(year)
-                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = yearToStart(year) , end = yearToEnd(year)))
-            }
-        }
-
-        if (dateRangeMode.isNotEmpty()) {
-            Box (modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    Surface(modifier = Modifier.fillMaxWidth().height(48.dp).background(MaterialTheme.colorScheme.background)) {
-                        HorizontalDivider(thickness = 2.dp, modifier = Modifier.alpha(0.5f))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.fillMaxWidth().weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        if (bottomBarPagerState.currentPage > 0) {
-                                            bottomBarTargetPage = bottomBarPagerState.currentPage - 1
-                                        }
-                                    },
-                                    enabled = when {
-                                        bottomBarPagerState.currentPage == 0 -> false
-                                        else -> true
-                                    }
-                                ) {
-                                    Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                        tint = IconButtonDefaults.iconButtonColors().contentColor,
-                                        contentDescription = "Left arrow"
-                                    )
-                                }
-                            }
-                            Column(modifier = Modifier.fillMaxWidth().weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                HorizontalPager(
-                                    state = bottomBarPagerState,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) { page ->
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceEvenly,
-                                        verticalAlignment = Alignment.Bottom
-                                    ) {
-                                        Text((LocalDateTime.now().year - (bottomBarPageCount - page - 1)).toString())
-
-                                    }
-                                }
-                            }
-                            Column(modifier = Modifier.fillMaxWidth().weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        if (bottomBarPagerState.currentPage < bottomBarPageCount - 1) {
-                                            bottomBarTargetPage = bottomBarPagerState.currentPage + 1
-                                        }
-                                    },
-                                    enabled = when {
-                                        bottomBarPagerState.currentPage == bottomBarPageCount - 1 -> false
-                                        else -> true
-                                    }
-                                ) {
-                                    Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                        tint = IconButtonDefaults.iconButtonColors().contentColor,
-                                        contentDescription = "Right arrow"
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        TopScreenBottomBar(
+            dateRangeMode = dateRangeMode,
+            onDateRangeChange = { dateRange = it },
+            onVMSearchParameterChange = { viewModel.onEvent(it)}
+        )
     }
 }
 

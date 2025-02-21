@@ -1,0 +1,208 @@
+package com.github.barmiro.syshclient.presentation.top.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.unit.dp
+import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
+import com.github.barmiro.syshclient.util.monthToDateRange
+import com.github.barmiro.syshclient.util.monthToEnd
+import com.github.barmiro.syshclient.util.monthToStart
+import com.github.barmiro.syshclient.util.yearToDateRange
+import com.github.barmiro.syshclient.util.yearToEnd
+import com.github.barmiro.syshclient.util.yearToStart
+import java.time.LocalDate
+import java.time.YearMonth
+
+@Composable
+fun TopScreenBottomBar(
+    dateRangeMode: String,
+    onDateRangeChange: (Pair<Long?, Long?>?) -> Unit,
+    onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit
+    ) {
+
+    var pageCount by remember { mutableIntStateOf(100) }
+    var pagerState = rememberPagerState(pageCount = { pageCount }, initialPage = pageCount - 1)
+    var targetPage by remember { mutableIntStateOf(pagerState.currentPage) }
+    var pageTextGenerator by remember { mutableStateOf<((Int) -> String)>({ "Page $it" }) }
+
+
+
+    LaunchedEffect(targetPage) {
+        pagerState.animateScrollToPage(targetPage)
+    }
+
+    LaunchedEffect(dateRangeMode) {
+        targetPage = pageCount - 1
+    }
+
+    LaunchedEffect(pagerState.currentPage, dateRangeMode) {
+        if (dateRangeMode == "yearly") {
+
+            val year = pageNumberToYear(
+                page = pagerState.currentPage,
+                pageCount = pageCount
+            )
+
+            pageTextGenerator = { page ->
+                pageNumberToYear(
+                    page = page,
+                    pageCount = pageCount)
+                    .toString()
+            }
+
+            onDateRangeChange(yearToDateRange(year))
+            onVMSearchParameterChange(
+                TopScreenEvent.OnSearchParameterChange(
+                    start = yearToStart(year),
+                    end = yearToEnd(year)))
+        }
+
+        if (dateRangeMode == "monthly") {
+
+            val month = pageNumberToMonth(
+                page = pagerState.currentPage,
+                pageCount = pageCount
+            )
+
+            pageTextGenerator = { page ->
+                val monthYear = pageNumberToMonth(
+                    page = page,
+                    pageCount = pageCount)
+                val monthName = monthYear.month.name
+                    .lowercase()
+                    .replaceFirstChar { it.uppercaseChar() }
+                val year = monthYear.year
+                "$monthName $year"
+            }
+
+            onDateRangeChange(monthToDateRange(month))
+            onVMSearchParameterChange(
+                TopScreenEvent.OnSearchParameterChange(
+                    start = monthToStart(month),
+                    end = monthToEnd(month)
+                )
+            )
+        }
+    }
+
+
+
+    if (dateRangeMode == "yearly" || dateRangeMode == "monthly") {
+        Box (modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                Surface(modifier = Modifier.fillMaxWidth().height(48.dp).background(MaterialTheme.colorScheme.background)) {
+                    HorizontalDivider(thickness = 2.dp, modifier = Modifier.alpha(0.5f))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.fillMaxWidth().weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    if (pagerState.currentPage > 0) {
+                                        targetPage = pagerState.currentPage - 1
+                                    }
+                                },
+                                enabled = when {
+                                    pagerState.currentPage == 0 -> false
+                                    else -> true
+                                }
+                            ) {
+                                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                    tint = IconButtonDefaults.iconButtonColors().contentColor,
+                                    contentDescription = "Left arrow"
+                                )
+                            }
+                        }
+                        Column(modifier = Modifier.fillMaxWidth().weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            HorizontalPager(
+                                state = pagerState,
+                                modifier = Modifier.fillMaxWidth()
+                            ) { page ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.Bottom
+                                ) {
+                                    Text(pageTextGenerator(page))
+
+                                }
+                            }
+                        }
+                        Column(modifier = Modifier.fillMaxWidth().weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    if (pagerState.currentPage < pageCount - 1) {
+                                        targetPage = pagerState.currentPage + 1
+                                    }
+                                },
+                                enabled = when {
+                                    pagerState.currentPage == pageCount - 1 -> false
+                                    else -> true
+                                }
+                            ) {
+                                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                    tint = IconButtonDefaults.iconButtonColors().contentColor,
+                                    contentDescription = "Right arrow"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+//TODO: i in 0 UNTIL
+
+fun pageNumberToYear(page: Int, pageCount: Int): Int {
+    return LocalDate.now().year - (pageCount - page - 1)
+}
+
+fun pageNumberToMonth(page: Int, pageCount: Int): YearMonth {
+    return YearMonth
+        .now()
+        .minusMonths(pageCount - page - 1L)
+
+}

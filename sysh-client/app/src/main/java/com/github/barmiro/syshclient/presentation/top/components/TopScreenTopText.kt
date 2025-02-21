@@ -36,6 +36,7 @@ fun TopScreenTopText(
     val rangeText = when (dateRangeMode) {
         "" -> "All time"
         "yearly" -> "Yearly"
+        "monthly" -> "Monthly"
         "custom" -> "Custom date range"
         else -> "Invalid date range mode"
     }

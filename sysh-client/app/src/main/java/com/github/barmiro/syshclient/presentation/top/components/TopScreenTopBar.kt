@@ -22,15 +22,20 @@ import androidx.compose.ui.text.font.FontWeight
 import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.TopScreenState
+import com.github.barmiro.syshclient.util.monthToDateRange
+import com.github.barmiro.syshclient.util.monthToEnd
+import com.github.barmiro.syshclient.util.monthToStart
 import com.github.barmiro.syshclient.util.yearToDateRange
 import com.github.barmiro.syshclient.util.yearToEnd
 import com.github.barmiro.syshclient.util.yearToStart
 import java.time.LocalDate
+import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopScreenTopBar(
     state: TopScreenState,
+    dateRangeMode: String,
     onDateRangeSelect: (Pair<Long?, Long?>?) -> Unit,
     onDateRangeModeChange: (String) -> Unit,
     onDateRangePickerVisibilityChange: (Boolean) -> Unit,
@@ -48,7 +53,7 @@ fun TopScreenTopBar(
         },
         navigationIcon = {
             IconButton(onClick = { expanded = !expanded }) {
-                Icon(Icons.Default.DateRange, contentDescription = "More options")
+                Icon(Icons.Default.DateRange, contentDescription = "Date range options")
             }
             DropdownMenu(
                 expanded = expanded,
@@ -60,7 +65,10 @@ fun TopScreenTopBar(
                         onDateRangeSelect(null)
                         onDateRangeModeChange("")
                         onVMSearchParameterChange(
-                            TopScreenEvent.OnSearchParameterChange(start = "", end = "")
+                            TopScreenEvent.OnSearchParameterChange(
+                                start = "",
+                                end = ""
+                            )
                         )
                         expanded = false
                     }
@@ -68,10 +76,34 @@ fun TopScreenTopBar(
                 DropdownMenuItem(
                     text = { Text("Yearly") },
                     onClick = {
-                        val year: Int = LocalDate.now().year
-                        onDateRangeSelect(yearToDateRange(year))
-                        onDateRangeModeChange("yearly")
-                        onVMSearchParameterChange(TopScreenEvent.OnSearchParameterChange(start = yearToStart(year) , end = yearToEnd(year)))
+                        if (dateRangeMode != "yearly") {
+                            val year: Int = LocalDate.now().year
+                            onDateRangeSelect(yearToDateRange(year))
+                            onDateRangeModeChange("yearly")
+                            onVMSearchParameterChange(
+                                TopScreenEvent.OnSearchParameterChange(
+                                    start = yearToStart(year),
+                                    end = yearToEnd(year)
+                                )
+                            )
+                        }
+
+                        expanded = false
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text("Monthly") },
+                    onClick = {
+                        if (dateRangeMode != "monthly") {
+                            val month: YearMonth = YearMonth.now()
+                            onDateRangeSelect(monthToDateRange(month))
+                            onDateRangeModeChange("monthly")
+                            onVMSearchParameterChange(
+                                TopScreenEvent.OnSearchParameterChange(
+                                    start = monthToStart(month) , end = monthToEnd(month)
+                                )
+                            )
+                        }
 
                         expanded = false
                     }
