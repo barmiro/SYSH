@@ -31,11 +31,17 @@ class TopArtistsViewModel @Inject constructor(
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> get() = _isLoading
+
+    var previousValues by mutableStateOf(listOf(state.value.sort, state.value.start, state.value.end))
+
     override fun onCreate(owner: LifecycleOwner) {
-        if (artistList.isEmpty() && !isDataLoaded) {
+        if ((artistList.isEmpty() && !isDataLoaded)
+            || listOf(state.value.sort, state.value.start, state.value.end) != previousValues) {
             getTopArtists()
+            previousValues = listOf(state.value.sort, state.value.start, state.value.end)
         }
     }
+
     fun onEvent(event: TopScreenEvent) {
         when(event) {
             is TopScreenEvent.Refresh -> {

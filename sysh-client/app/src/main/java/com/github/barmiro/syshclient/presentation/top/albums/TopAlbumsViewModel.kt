@@ -31,11 +31,17 @@ class TopAlbumsViewModel @Inject constructor(
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> get() = _isLoading
+
+    var previousValues by mutableStateOf(listOf(state.value.sort, state.value.start, state.value.end))
+
     override fun onCreate(owner: LifecycleOwner) {
-        if (albumList.isEmpty() && !isDataLoaded) {
+        if ((albumList.isEmpty() && !isDataLoaded)
+            || listOf(state.value.sort, state.value.start, state.value.end) != previousValues) {
             getTopAlbums()
+            previousValues = listOf(state.value.sort, state.value.start, state.value.end)
         }
     }
+
     fun onEvent(event: TopScreenEvent) {
         when(event) {
             is TopScreenEvent.Refresh -> {

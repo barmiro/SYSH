@@ -31,11 +31,17 @@ class TopTracksViewModel @Inject constructor(
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> get() = _isLoading
+
+    var previousValues by mutableStateOf(listOf(state.value.sort, state.value.start, state.value.end))
+
     override fun onCreate(owner: LifecycleOwner) {
-        if (trackList.isEmpty() && !isDataLoaded) {
+        if ((trackList.isEmpty() && !isDataLoaded)
+            || listOf(state.value.sort, state.value.start, state.value.end) != previousValues) {
             getTopTracks()
+            previousValues = listOf(state.value.sort, state.value.start, state.value.end)
         }
     }
+
     fun onEvent(event: TopScreenEvent) {
         when(event) {
             is TopScreenEvent.Refresh -> {
