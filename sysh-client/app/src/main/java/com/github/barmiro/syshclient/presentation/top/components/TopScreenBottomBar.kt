@@ -30,7 +30,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.util.monthToDateRange
 import com.github.barmiro.syshclient.util.monthToEnd
@@ -40,6 +42,7 @@ import com.github.barmiro.syshclient.util.yearToEnd
 import com.github.barmiro.syshclient.util.yearToStart
 import java.time.LocalDate
 import java.time.YearMonth
+import kotlin.math.absoluteValue
 
 @Composable
 fun TopScreenBottomBar(
@@ -63,53 +66,55 @@ fun TopScreenBottomBar(
         targetPage = pageCount - 1
     }
 
-    LaunchedEffect(pagerState.currentPage, dateRangeMode) {
-        if (dateRangeMode == "yearly") {
+    LaunchedEffect(pagerState.targetPage, pagerState.currentPage, dateRangeMode) {
+        if((pagerState.getOffsetDistanceInPages(pagerState.targetPage)).absoluteValue <= 0.5) {
 
-            val year = pageNumberToYear(
-                page = pagerState.currentPage,
-                pageCount = pageCount
-            )
-
-            pageTextGenerator = { page ->
-                pageNumberToYear(
-                    page = page,
-                    pageCount = pageCount)
-                    .toString()
-            }
-
-            onDateRangeChange(yearToDateRange(year))
-            onVMSearchParameterChange(
-                TopScreenEvent.OnSearchParameterChange(
-                    start = yearToStart(year),
-                    end = yearToEnd(year)))
-        }
-
-        if (dateRangeMode == "monthly") {
-
-            val month = pageNumberToMonth(
-                page = pagerState.currentPage,
-                pageCount = pageCount
-            )
-
-            pageTextGenerator = { page ->
-                val monthYear = pageNumberToMonth(
-                    page = page,
-                    pageCount = pageCount)
-                val monthName = monthYear.month.name
-                    .lowercase()
-                    .replaceFirstChar { it.uppercaseChar() }
-                val year = monthYear.year
-                "$monthName $year"
-            }
-
-            onDateRangeChange(monthToDateRange(month))
-            onVMSearchParameterChange(
-                TopScreenEvent.OnSearchParameterChange(
-                    start = monthToStart(month),
-                    end = monthToEnd(month)
+            if (dateRangeMode == "yearly") {
+                val year = pageNumberToYear(
+                    page = pagerState.currentPage,
+                    pageCount = pageCount
                 )
-            )
+
+                pageTextGenerator = { page ->
+                    pageNumberToYear(
+                        page = page,
+                        pageCount = pageCount)
+                        .toString()
+                }
+
+                onDateRangeChange(yearToDateRange(year))
+                onVMSearchParameterChange(
+                    TopScreenEvent.OnSearchParameterChange(
+                        start = yearToStart(year),
+                        end = yearToEnd(year)))
+            }
+
+            if (dateRangeMode == "monthly") {
+
+                val month = pageNumberToMonth(
+                    page = pagerState.currentPage,
+                    pageCount = pageCount
+                )
+
+                pageTextGenerator = { page ->
+                    val monthYear = pageNumberToMonth(
+                        page = page,
+                        pageCount = pageCount)
+                    val monthName = monthYear.month.name
+                        .lowercase()
+                        .replaceFirstChar { it.uppercaseChar() }
+                    val year = monthYear.year
+                    "$monthName $year"
+                }
+
+                onDateRangeChange(monthToDateRange(month))
+                onVMSearchParameterChange(
+                    TopScreenEvent.OnSearchParameterChange(
+                        start = monthToStart(month),
+                        end = monthToEnd(month)
+                    )
+                )
+            }
         }
     }
 
@@ -123,6 +128,7 @@ fun TopScreenBottomBar(
             ) {
                 Surface(modifier = Modifier.fillMaxWidth().height(48.dp).background(MaterialTheme.colorScheme.background)) {
                     HorizontalDivider(thickness = 2.dp, modifier = Modifier.alpha(0.5f))
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -132,24 +138,26 @@ fun TopScreenBottomBar(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            IconButton(
-                                onClick = {
-                                    if (pagerState.currentPage > 0) {
-                                        targetPage = pagerState.currentPage - 1
-                                    }
-                                },
-                                enabled = when {
-                                    pagerState.currentPage == 0 -> false
-                                    else -> true
-                                }
-                            ) {
-                                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                    tint = IconButtonDefaults.iconButtonColors().contentColor,
-                                    contentDescription = "Left arrow"
+                            if (dateRangeMode == "monthly") {
+                                LeftBottomBarArrow(
+                                    currentPage = pagerState.currentPage,
+                                    onTargetPageChange = { targetPage = it},
+                                    jump = 12
                                 )
                             }
                         }
-                        Column(modifier = Modifier.fillMaxWidth().weight(1f),
+
+                        Column(modifier = Modifier.fillMaxWidth().weight(2f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            LeftBottomBarArrow(
+                                currentPage = pagerState.currentPage,
+                                onTargetPageChange = { targetPage = it}
+                            )
+                        }
+
+                        Column(modifier = Modifier.fillMaxWidth().weight(4f),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
@@ -167,24 +175,28 @@ fun TopScreenBottomBar(
                                 }
                             }
                         }
+
+                        Column(modifier = Modifier.fillMaxWidth().weight(2f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            RightBottomBarArrow(
+                                currentPage = pagerState.currentPage,
+                                onTargetPageChange = { targetPage = it },
+                                pageCount = pageCount
+                            )
+                        }
+
                         Column(modifier = Modifier.fillMaxWidth().weight(1f),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center
                         ) {
-                            IconButton(
-                                onClick = {
-                                    if (pagerState.currentPage < pageCount - 1) {
-                                        targetPage = pagerState.currentPage + 1
-                                    }
-                                },
-                                enabled = when {
-                                    pagerState.currentPage == pageCount - 1 -> false
-                                    else -> true
-                                }
-                            ) {
-                                Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                    tint = IconButtonDefaults.iconButtonColors().contentColor,
-                                    contentDescription = "Right arrow"
+                            if (dateRangeMode == "monthly") {
+                                RightBottomBarArrow(
+                                    currentPage = pagerState.currentPage,
+                                    onTargetPageChange = { targetPage = it},
+                                    pageCount = pageCount,
+                                    jump = 12
                                 )
                             }
                         }
@@ -205,4 +217,75 @@ fun pageNumberToMonth(page: Int, pageCount: Int): YearMonth {
         .now()
         .minusMonths(pageCount - page - 1L)
 
+}
+
+@Composable
+fun LeftBottomBarArrow(currentPage: Int,
+                       onTargetPageChange: (Int) -> Unit,
+                       jump: Int = 1
+) {
+    IconButton(
+        onClick = {
+            var adjustedJump = jump
+            if (currentPage < jump) {
+                adjustedJump = currentPage
+            }
+            onTargetPageChange(currentPage - adjustedJump)
+        },
+        enabled = when {
+            currentPage == 0 -> false
+            else -> true
+        }
+    ) {
+        if (jump > 1) {
+            Icon(
+                painter = painterResource(id = R.drawable.keyboard_double_arrow_left_24dp),
+                tint = IconButtonDefaults.iconButtonColors().contentColor,
+                contentDescription = "Sort icon"
+            )
+        } else {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                tint = IconButtonDefaults.iconButtonColors().contentColor,
+                contentDescription = "Left arrow"
+            )
+        }
+    }
+}
+
+@Composable
+fun RightBottomBarArrow(currentPage: Int,
+                        onTargetPageChange: (Int) -> Unit,
+                        pageCount: Int,
+                        jump: Int = 1
+) {
+
+    val lastPage = pageCount - 1
+    IconButton(
+        onClick = {
+            var adjustedJump = jump
+            if (currentPage + jump > lastPage) {
+                adjustedJump = lastPage - currentPage
+            }
+            onTargetPageChange(currentPage + adjustedJump)
+        },
+        enabled = when {
+            currentPage == lastPage -> false
+            else -> true
+        }
+    ) {
+        if (jump > 1) {
+            Icon(
+                painter = painterResource(id = R.drawable.keyboard_double_arrow_right_24dp),
+                tint = IconButtonDefaults.iconButtonColors().contentColor,
+                contentDescription = "Sort icon"
+            )
+        } else {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                tint = IconButtonDefaults.iconButtonColors().contentColor,
+                contentDescription = "Left arrow"
+            )
+        }
+    }
 }

@@ -76,7 +76,10 @@ fun TrackItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = track.name,
+                    text = when{
+                        track.name.isEmpty() -> "[ Deleted track ]"
+                        else -> track.name
+                    },
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     lineHeight = 18.sp,
