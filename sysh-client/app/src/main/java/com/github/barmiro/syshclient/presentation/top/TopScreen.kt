@@ -20,6 +20,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DatePickerDialog
@@ -67,12 +69,14 @@ import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewMode
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import com.github.barmiro.syshclient.util.setToEndOfDay
+import com.github.barmiro.syshclient.util.yearToDateRange
+import com.github.barmiro.syshclient.util.yearToEnd
+import com.github.barmiro.syshclient.util.yearToStart
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import kotlin.math.absoluteValue
 
 
@@ -88,8 +92,14 @@ fun TopScreen(
     val state by viewModel.state.collectAsState()
 
     var dateRange by remember { mutableStateOf<Pair<Long?, Long?>?>(null) }
-
+    var dateRangeMode by remember { mutableStateOf("") }
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
+
+    var tabIndex by remember { mutableIntStateOf(0) }
+    val tabs = listOf("Tracks", "Albums", "Artists")
+    val tabPagerState = rememberPagerState(pageCount = { 3 })
+
+
 
     if (isDateRangePickerVisible) {
         DateRangePickerModal(
@@ -97,13 +107,22 @@ fun TopScreen(
                 if (it.first != null) {
                     val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                     dateRange = when {
-                        it.second == null -> Pair(it.first, System.currentTimeMillis())
+                        it.second == null -> Pair(
+                            it.first,
+//                            this mess is here for compatibility with Material 3's date range picker
+//                            the server deals with converting the timezone
+//                            I'll change it at some point because it will cause issues when moving between timezones
+                            LocalDateTime.now()
+                                .atOffset(ZoneOffset.UTC)
+                                .toInstant()
+                                .toEpochMilli())
                         else -> it
                     }
 
                     val start = formatter.format(dateRange!!.first)
-                    val end = formatter.format(setToEndOfDay(Date(dateRange!!.second!!)))
+                    val end = formatter.format(setToEndOfDay(dateRange!!.second!!))
                     viewModel.onEvent((TopScreenEvent.OnSearchParameterChange(null, start, end)))
+                    dateRangeMode = "custom"
                 }
             },
             onDismiss = {
@@ -112,19 +131,15 @@ fun TopScreen(
         )
     }
 
-    var tabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("Tracks", "Albums", "Artists")
-    val pagerState = rememberPagerState(pageCount = { 3 })
-
     LaunchedEffect(tabIndex) {
-        pagerState.animateScrollToPage(page = tabIndex,
+        tabPagerState.animateScrollToPage(page = tabIndex,
             animationSpec = spring(stiffness = 500f)
         )
     }
 
-    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
-        if (!pagerState.isScrollInProgress) {
-            tabIndex = pagerState.currentPage
+    LaunchedEffect(tabPagerState.currentPage, tabPagerState.isScrollInProgress) {
+        if (!tabPagerState.isScrollInProgress) {
+            tabIndex = tabPagerState.currentPage
         }
     }
     var expanded by remember { mutableStateOf(false) }
@@ -150,8 +165,9 @@ fun TopScreen(
                         DropdownMenuItem(
                             text = { Text("All time") },
                             onClick = {
-                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
                                 dateRange = null
+                                dateRangeMode = ""
+                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
                                 expanded = false
                             }
                         )
@@ -159,9 +175,9 @@ fun TopScreen(
                             text = { Text("Yearly") },
                             onClick = {
                                 val year: Int = LocalDate.now().year
-                                val startDate = Calendar.getInstance().set(year, 0, 1)
-                                val endDate:String =""
-                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "${LocalDate.now().year}-01-01T00:00:00" , end = "${LocalDate.now().year}-12-31T23:59:59"))
+                                dateRange = yearToDateRange(year)
+                                dateRangeMode = "yearly"
+                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = yearToStart(year) , end = yearToEnd(year)))
 
                                 expanded = false
                             }
@@ -174,31 +190,6 @@ fun TopScreen(
                             }
                         )
                     }
-
-//                    if (dateRange != null) {
-//                        IconButton(
-//                            onClick = {
-//                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = "", end = ""))
-//                                dateRange = null
-//                            }
-//                        ) {
-//                            Icon(
-//                                imageVector = Icons.Filled.DateRange,
-//                                contentDescription = "Localized description"
-//                            )
-//                        }
-//                    } else {
-//                        IconButton(
-//                            onClick = {
-//                                isDateRangePickerVisible = true
-//                            }
-//                        ) {
-//                            Icon(
-//                                imageVector = Icons.Outlined.DateRange,
-//                                contentDescription = "Localized description"
-//                            )
-//                        }
-//                    }
                 },
                 actions = {
                     if (state.sort == "time") {
@@ -244,23 +235,25 @@ fun TopScreen(
             Box(
                 modifier = Modifier.fillMaxWidth().height(88.dp), contentAlignment = Alignment.BottomCenter
             ) {
-                var rangeText = "All time"
-                if (dateRange != null) {
-                    val start = Date(dateRange!!.first!!)
-                    val end = Date(dateRange!!.second!!)
-
-                    val formattedStart = SimpleDateFormat(
-                        "MMM dd, yyyy",
-                        Locale.getDefault()
-                    ).format(start)
-
-                    val formattedEnd = SimpleDateFormat(
-                        "MMM dd, yyyy",
-                        Locale.getDefault()
-                    ).format(end)
-
-                    rangeText = "$start - $end"
+                val rangeText = when {
+                    dateRangeMode == "" -> "All time"
+                    dateRangeMode == "yearly" -> "Yearly"
+                    dateRangeMode == "custom" -> "Custom date range"
+                    else -> "Invalid date range mode"
                 }
+//                if (dateRange != null) {
+//                    val formattedStart = SimpleDateFormat(
+//                        "MMM dd, yyyy",
+//                        Locale.getDefault()
+//                    ).format(dateRange!!.first)
+//
+//                    val formattedEnd = SimpleDateFormat(
+//                        "MMM dd, yyyy",
+//                        Locale.getDefault()
+//                    ).format(dateRange!!.second)
+//
+//                    rangeText = "$formattedStart - $formattedEnd"
+//                }
                 var sortText = "by stream count"
                 if (state.sort == "time") {
                     sortText = "by listening time"
@@ -277,7 +270,7 @@ fun TopScreen(
                     indicator = { tabPositions ->
                         TopIndicator(
                             tabPositions,
-                            pagerState.getOffsetDistanceInPages(0))
+                            tabPagerState.getOffsetDistanceInPages(0))
                     }) {
                     tabs.forEachIndexed { index, title ->
                         CompositionLocalProvider(LocalRippleConfiguration provides null) {
@@ -286,7 +279,7 @@ fun TopScreen(
                                 fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.alpha(
-                                    (1 - pagerState.getOffsetDistanceInPages(index).absoluteValue / 2).coerceAtLeast(0.5f)
+                                    (1 - tabPagerState.getOffsetDistanceInPages(index).absoluteValue / 2).coerceAtLeast(0.5f)
                                 )
                             ) },
                                 selected = tabIndex == index,
@@ -297,7 +290,10 @@ fun TopScreen(
                     }
                 }
 
-                HorizontalPager(state = pagerState, modifier = Modifier.fillMaxWidth().weight(1f)) { page ->
+                HorizontalPager(
+                    state = tabPagerState,
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                ) { page ->
                     Box(Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
@@ -313,27 +309,106 @@ fun TopScreen(
 
         }
 
-        Box (modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                Surface(modifier = Modifier.fillMaxWidth().height(48.dp).background(MaterialTheme.colorScheme.background)) {
-                    HorizontalDivider(thickness = 2.dp, modifier = Modifier.alpha(0.5f))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.Bottom
-                    ) {
+
+        var bottomBarPageCount by remember { mutableIntStateOf(15)}
+        var bottomBarPagerState = rememberPagerState(pageCount = { bottomBarPageCount }, initialPage = bottomBarPageCount - 1)
+        var bottomBarTargetPage by remember { mutableIntStateOf(bottomBarPagerState.currentPage) }
+
+        LaunchedEffect(bottomBarTargetPage) {
+            bottomBarPagerState.animateScrollToPage(bottomBarTargetPage)
+        }
+
+        LaunchedEffect(bottomBarPagerState.currentPage) {
+            val year = LocalDateTime.now().year - (bottomBarPageCount - bottomBarPagerState.currentPage - 1)
+            dateRange = yearToDateRange(year)
+            viewModel.onEvent(TopScreenEvent.OnSearchParameterChange(start = yearToStart(year) , end = yearToEnd(year)))
+        }
+
+        if (dateRangeMode.isNotEmpty()) {
+            Box (modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    Surface(modifier = Modifier.fillMaxWidth().height(48.dp).background(MaterialTheme.colorScheme.background)) {
+                        HorizontalDivider(thickness = 2.dp, modifier = Modifier.alpha(0.5f))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.fillMaxWidth().weight(1f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        if (bottomBarPagerState.currentPage > 0) {
+                                            bottomBarTargetPage = bottomBarPagerState.currentPage - 1
+                                        }
+                                    },
+                                    enabled = when {
+                                        bottomBarPagerState.currentPage == 0 -> false
+                                        else -> true
+                                    }
+                                ) {
+                                    Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                        tint = IconButtonDefaults.iconButtonColors().contentColor,
+                                        contentDescription = "Left arrow"
+                                    )
+                                }
+                            }
+                            Column(modifier = Modifier.fillMaxWidth().weight(1f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                HorizontalPager(
+                                    state = bottomBarPagerState,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) { page ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceEvenly,
+                                        verticalAlignment = Alignment.Bottom
+                                    ) {
+                                        Text((LocalDateTime.now().year - (bottomBarPageCount - page - 1)).toString())
+
+                                    }
+                                }
+                            }
+                            Column(modifier = Modifier.fillMaxWidth().weight(1f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        if (bottomBarPagerState.currentPage < bottomBarPageCount - 1) {
+                                            bottomBarTargetPage = bottomBarPagerState.currentPage + 1
+                                        }
+                                    },
+                                    enabled = when {
+                                        bottomBarPagerState.currentPage == bottomBarPageCount - 1 -> false
+                                        else -> true
+                                    }
+                                ) {
+                                    Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                        tint = IconButtonDefaults.iconButtonColors().contentColor,
+                                        contentDescription = "Right arrow"
+                                    )
+                                }
+                            }
+
+                        }
 
                     }
-
                 }
             }
-        }
-    }
 
+        }
+
+    }
 }
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
