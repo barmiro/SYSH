@@ -32,6 +32,9 @@ class TopArtistsViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> get() = _isLoading
 
+    private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
+    val errorMessage: StateFlow<String?> get() = _errorMessage
+
     var previousValues by mutableStateOf(listOf(state.value.sort, state.value.start, state.value.end))
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -71,12 +74,13 @@ class TopArtistsViewModel @Inject constructor(
                     when(result) {
                         is Resource.Success -> {
                             result.data?.let { topArtists ->
+                                _errorMessage.value = null
                                 artistList = topArtists
                                 isDataLoaded = true
                             }
                         }
                         is Resource.Error -> {
-
+                            _errorMessage.value = result.message
                         }
                         is Resource.Loading -> {
                             _isLoading.value = result.isLoading

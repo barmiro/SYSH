@@ -64,7 +64,11 @@ fun TopScreenBottomBar(
 
 
     LaunchedEffect(targetPage) {
-        pagerState.animateScrollToPage(targetPage)
+        if (targetPage - pagerState.currentPage > 12) {
+            pagerState.scrollToPage(targetPage)
+        } else {
+            pagerState.animateScrollToPage(targetPage)
+        }
     }
 
     LaunchedEffect(dateRangeMode) {
@@ -79,6 +83,7 @@ fun TopScreenBottomBar(
     }
 
     LaunchedEffect(pagerState.targetPage, pagerState.currentPage, dateRangeMode) {
+//        to start loading data before the page settles
         if((pagerState.getOffsetDistanceInPages(pagerState.targetPage)).absoluteValue <= 0.5) {
 
             if (dateRangeMode == "yearly") {

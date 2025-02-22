@@ -12,6 +12,7 @@ import okio.IOException
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import java.net.ConnectException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -37,27 +38,32 @@ class TopRepository @Inject constructor() {
     ): Flow<Resource<List<TopTrack>>> {
         return flow {
             emit(Resource.Loading(true))
-            val topTracks = try{
-                topApi.fetchTopTracks(start, end, sort)
+            try {
+                val topTracks = topApi.fetchTopTracks(start, end, sort)
                     .body()
                     .orEmpty()
+                val isFetchSuccessful = topTracks.isNotEmpty()
+                if (isFetchSuccessful) {
+                    emit(Resource.Success(
+                        data = topTracks.map { it.toTopTrack() }
+                    ))
+                } else {
+                    emit(Resource.Error("No results found"))
+                }
             } catch (e:IOException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered IOException: " + e.message))
-                emptyList()
+                emit(Resource.Error("IOException:\n" + e.message))
             } catch (e: HttpException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered HttpException: " + e.code()))
-                emptyList()
+                emit(Resource.Error("HttpException:\n" + e.code()))
+            } catch (e: ConnectException) {
+                e.printStackTrace()
+                emit(Resource.Error("ConnectException:\n" + e.message))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("Exception:\n" + e.message))
             }
-            val isFetchSuccessful = topTracks.isNotEmpty()
-            if (isFetchSuccessful) {
-                emit(Resource.Success(
-                    data = topTracks.map { it.toTopTrack() }
-                ))
-            } else {
-                emit(Resource.Error("Received list is empty"))
-            }
+
             emit(Resource.Loading(false))
         }
     }
@@ -68,27 +74,32 @@ class TopRepository @Inject constructor() {
     ): Flow<Resource<List<TopAlbum>>> {
         return flow {
             emit(Resource.Loading(true))
-            val topAlbums = try{
-                topApi.fetchTopAlbums(start, end, sort)
+            try {
+                val topAlbums = topApi.fetchTopAlbums(start, end, sort)
                     .body()
                     .orEmpty()
+                val isFetchSuccessful = topAlbums.isNotEmpty()
+                if (isFetchSuccessful) {
+                    emit(Resource.Success(
+                        data = topAlbums.map { it.toTopAlbum() }
+                    ))
+                } else {
+                    emit(Resource.Error("No results found"))
+                }
             } catch (e:IOException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered IOException: " + e.message))
-                emptyList()
+                emit(Resource.Error("IOException:\n" + e.message))
             } catch (e: HttpException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered HttpException: " + e.code()))
-                emptyList()
+                emit(Resource.Error("HttpException:\n" + e.code()))
+            } catch (e: ConnectException) {
+                e.printStackTrace()
+                emit(Resource.Error("ConnectException:\n" + e.message))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("Exception:\n" + e.message))
             }
-            val isFetchSuccessful = topAlbums.isNotEmpty()
-            if (isFetchSuccessful) {
-                emit(Resource.Success(
-                    data = topAlbums.map { it.toTopAlbum() }
-                ))
-            } else {
-                emit(Resource.Error("Received list is empty"))
-            }
+
             emit(Resource.Loading(false))
         }
     }
@@ -100,27 +111,32 @@ class TopRepository @Inject constructor() {
     ): Flow<Resource<List<TopArtist>>> {
         return flow {
             emit(Resource.Loading(true))
-            val topArtists = try{
-                topApi.fetchTopArtists(start, end, sort)
+            try {
+                val topArtists = topApi.fetchTopArtists(start, end, sort)
                     .body()
                     .orEmpty()
+                val isFetchSuccessful = topArtists.isNotEmpty()
+                if (isFetchSuccessful) {
+                    emit(Resource.Success(
+                        data = topArtists.map { it.toTopArtist() }
+                    ))
+                } else {
+                    emit(Resource.Error("No results found"))
+                }
             } catch (e:IOException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered IOException: " + e.message))
-                emptyList()
+                emit(Resource.Error("IOException:\n" + e.message))
             } catch (e: HttpException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered HttpException: " + e.code()))
-                emptyList()
+                emit(Resource.Error("HttpException:\n" + e.code()))
+            } catch (e: ConnectException) {
+                e.printStackTrace()
+                emit(Resource.Error("ConnectException:\n" + e.message))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("Exception:\n" + e.message))
             }
-            val isFetchSuccessful = topArtists.isNotEmpty()
-            if (isFetchSuccessful) {
-                emit(Resource.Success(
-                    data = topArtists.map { it.toTopArtist() }
-                ))
-            } else {
-                emit(Resource.Error("Received list is empty"))
-            }
+
             emit(Resource.Loading(false))
         }
     }
