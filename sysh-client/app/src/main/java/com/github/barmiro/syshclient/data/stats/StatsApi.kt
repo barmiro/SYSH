@@ -20,4 +20,7 @@ interface StatsApi {
     suspend fun fetchStatsYear(
         @Path("year") year: Int
     ): Response<StatsDTO>
+
+    @GET("startup")
+    suspend fun fetchStartupData(): Response<String>
 }

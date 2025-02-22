@@ -143,5 +143,12 @@ public class StatsRepository {
 		}
 		
 		return added;
-	}	
+	}
+	
+	public Timestamp getFirstStreamDate() {
+		return jdbc.sql(
+				"SELECT ts FROM streams ORDER BY ts ASC LIMIT 1")
+				.query(Timestamp.class)
+				.single();
+	}
 }

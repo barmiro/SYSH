@@ -40,13 +40,18 @@ import com.github.barmiro.syshclient.util.monthToStart
 import com.github.barmiro.syshclient.util.yearToDateRange
 import com.github.barmiro.syshclient.util.yearToEnd
 import com.github.barmiro.syshclient.util.yearToStart
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
+import java.util.Locale
 import kotlin.math.absoluteValue
 
 @Composable
 fun TopScreenBottomBar(
+    oldestStreamDate: LocalDate,
     dateRangeMode: String,
+    dateRange: Pair<Long?, Long?>?,
     onDateRangeChange: (Pair<Long?, Long?>?) -> Unit,
     onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit
     ) {
@@ -63,6 +68,13 @@ fun TopScreenBottomBar(
     }
 
     LaunchedEffect(dateRangeMode) {
+        pageCount = when (dateRangeMode) {
+            "yearly" -> LocalDate.now().year - oldestStreamDate.year + 1
+            "monthly" -> YearMonth.from(oldestStreamDate)
+                .until(YearMonth.from(LocalDate.now()), ChronoUnit.MONTHS)
+                .toInt() + 1
+            else -> 1
+        }
         targetPage = pageCount - 1
     }
 
@@ -120,7 +132,7 @@ fun TopScreenBottomBar(
 
 
 
-    if (dateRangeMode == "yearly" || dateRangeMode == "monthly") {
+    if (dateRangeMode.isNotEmpty()) {
         Box (modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -134,70 +146,74 @@ fun TopScreenBottomBar(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Column(modifier = Modifier.fillMaxWidth().weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            if (dateRangeMode == "monthly") {
-                                LeftBottomBarArrow(
-                                    currentPage = pagerState.currentPage,
-                                    onTargetPageChange = { targetPage = it},
-                                    jump = 12
-                                )
-                            }
-                        }
-
-                        Column(modifier = Modifier.fillMaxWidth().weight(2f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            LeftBottomBarArrow(
-                                currentPage = pagerState.currentPage,
-                                onTargetPageChange = { targetPage = it}
-                            )
-                        }
-
-                        Column(modifier = Modifier.fillMaxWidth().weight(4f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            HorizontalPager(
-                                state = pagerState,
-                                modifier = Modifier.fillMaxWidth()
-                            ) { page ->
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.Bottom
-                                ) {
-                                    Text(pageTextGenerator(page))
-
+                        if (dateRangeMode == "custom") {
+                            BottomBarCustomRangeText(dateRange)
+                        } else {
+                            Column(modifier = Modifier.fillMaxWidth().weight(1f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                if (dateRangeMode == "monthly") {
+                                    LeftBottomBarArrow(
+                                        currentPage = pagerState.currentPage,
+                                        onTargetPageChange = { targetPage = it},
+                                        jump = 12
+                                    )
                                 }
                             }
-                        }
 
-                        Column(modifier = Modifier.fillMaxWidth().weight(2f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            RightBottomBarArrow(
-                                currentPage = pagerState.currentPage,
-                                onTargetPageChange = { targetPage = it },
-                                pageCount = pageCount
-                            )
-                        }
+                            Column(modifier = Modifier.fillMaxWidth().weight(2f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                LeftBottomBarArrow(
+                                    currentPage = pagerState.currentPage,
+                                    onTargetPageChange = { targetPage = it}
+                                )
+                            }
 
-                        Column(modifier = Modifier.fillMaxWidth().weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            if (dateRangeMode == "monthly") {
+                            Column(modifier = Modifier.fillMaxWidth().weight(4f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                HorizontalPager(
+                                    state = pagerState,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) { page ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceEvenly,
+                                        verticalAlignment = Alignment.Bottom
+                                    ) {
+                                        Text(pageTextGenerator(page))
+
+                                    }
+                                }
+                            }
+
+                            Column(modifier = Modifier.fillMaxWidth().weight(2f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
                                 RightBottomBarArrow(
                                     currentPage = pagerState.currentPage,
-                                    onTargetPageChange = { targetPage = it},
-                                    pageCount = pageCount,
-                                    jump = 12
+                                    onTargetPageChange = { targetPage = it },
+                                    pageCount = pageCount
                                 )
+                            }
+
+                            Column(modifier = Modifier.fillMaxWidth().weight(1f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                if (dateRangeMode == "monthly") {
+                                    RightBottomBarArrow(
+                                        currentPage = pagerState.currentPage,
+                                        onTargetPageChange = { targetPage = it},
+                                        pageCount = pageCount,
+                                        jump = 12
+                                    )
+                                }
                             }
                         }
                     }
@@ -217,6 +233,23 @@ fun pageNumberToMonth(page: Int, pageCount: Int): YearMonth {
         .now()
         .minusMonths(pageCount - page - 1L)
 
+}
+
+@Composable
+fun BottomBarCustomRangeText(dateRange: Pair<Long?, Long?>?) {
+    if (dateRange != null) {
+        val formattedStart = SimpleDateFormat(
+            "MMM dd, yyyy",
+            Locale.getDefault()
+        ).format(dateRange.first)
+
+        val formattedEnd = SimpleDateFormat(
+            "MMM dd, yyyy",
+            Locale.getDefault()
+        ).format(dateRange.second)
+
+        Text("$formattedStart - $formattedEnd")
+    }
 }
 
 @Composable

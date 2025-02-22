@@ -173,24 +173,11 @@ fun TopScreen(
             }
         }
         TopScreenBottomBar(
+            oldestStreamDate = state.oldestStreamDate!!,
             dateRangeMode = dateRangeMode,
+            dateRange = dateRange,
             onDateRangeChange = { dateRange = it },
             onVMSearchParameterChange = { viewModel.onEvent(it)}
         )
     }
 }
-
-
-//                if (dateRange != null) {
-//                    val formattedStart = SimpleDateFormat(
-//                        "MMM dd, yyyy",
-//                        Locale.getDefault()
-//                    ).format(dateRange!!.first)
-//
-//                    val formattedEnd = SimpleDateFormat(
-//                        "MMM dd, yyyy",
-//                        Locale.getDefault()
-//                    ).format(dateRange!!.second)
-//
-//                    rangeText = "$formattedStart - $formattedEnd"
-//                }

@@ -59,5 +59,10 @@ public class StatsController {
 		Timestamp endDate = Timestamp.valueOf(year + "-12-31 23:59:59");
 		return statsRepo.streamStats(startDate, endDate);
 	}
+	
+	@GetMapping("/startup")
+	Timestamp startup() {
+		return statsRepo.getFirstStreamDate();
+	}
 
 }

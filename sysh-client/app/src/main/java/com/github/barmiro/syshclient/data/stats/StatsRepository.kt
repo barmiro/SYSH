@@ -1,9 +1,16 @@
 package com.github.barmiro.syshclient.data.stats
 
+import com.github.barmiro.syshclient.util.Resource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import java.io.IOException
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,10 +26,35 @@ class StatsRepository @Inject constructor() {
 
     val statsApi = retrofit.create(StatsApi::class.java)
 
-    suspend fun getStats() {
-        println("Stats all: " + statsApi.fetchStatsAll().body())
-        println("Stats range: " + statsApi.fetchStatsRange("2024-01-01T00:00:00", "2024-12-31T23:59:59").body())
-        println("Stats year: " + statsApi.fetchStatsYear(2024).body())
+//TODO: move to a common repo
+    fun getOldestStreamDate(): Flow<Resource<LocalDate>> {
+        return flow {
+            emit(Resource.Loading(true))
+            val oldestStreamDate = try{
+                statsApi.fetchStartupData()
+                    .body()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                emit(Resource.Error("Encountered IOException: " + e.message))
+                ""
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                emit(Resource.Error("Encountered HttpException: " + e.code()))
+                ""
+            }
+            val isFetchSuccessful = !oldestStreamDate.isNullOrEmpty()
+            if (isFetchSuccessful) {
+                val dateFromTimestamp = oldestStreamDate!!.substringBefore('T')
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                emit(
+                    Resource.Success(
+                    data = LocalDate.parse(dateFromTimestamp, formatter)
+                ))
+            } else {
+                emit(Resource.Error("Received list is empty"))
+            }
+            emit(Resource.Loading(false))
+        }
     }
 
 

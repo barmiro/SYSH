@@ -59,6 +59,7 @@ class MainActivity : ComponentActivity() {
     private val topArtistsVM: TopArtistsViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        topScreenVM.getOldestStreamDate()
         enableEdgeToEdge()
         setContent {
             SyshClientTheme {
