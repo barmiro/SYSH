@@ -41,13 +41,13 @@ public List<ArtistStats> topArtists(String sort, Timestamp startDate, Timestamp 
 		
 		String sql = ("SELECT Artists.*,"
 				+ "COUNT("
-				+ "CASE WHEN Streams.ms_played >= 30000 THEN Streams.spotify_track_id END"
+				+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
 				+ ") AS stream_count,"
-				+ "SUM(Streams.ms_played) AS total_ms_played "
+				+ "SUM(SongStreams.ms_played) AS total_ms_played "
 				+ "FROM Artists "
 				+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
-				+ "LEFT JOIN Streams ON Tracks_Artists.spotify_track_id = Streams.spotify_track_id "
-				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
+				+ "LEFT JOIN SongStreams ON Tracks_Artists.spotify_track_id = SongStreams.spotify_track_id "
+				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate "
 				+ "GROUP By "
 				+ "Artists.id,"
 				+ "Artists.name,"
@@ -64,11 +64,11 @@ public List<ArtistStats> topArtists(String sort, Timestamp startDate, Timestamp 
 	}
 	
 	public List<ArtistStats> topArtistsTime(Timestamp startDate, Timestamp endDate) {
-		String sql = ("SELECT Artists.*, SUM(Streams.ms_played) / 60000 as sort_param "
+		String sql = ("SELECT Artists.*, SUM(SongStreams.ms_played) / 60000 as sort_param "
 				+ "FROM Artists "
 				+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
-				+ "LEFT JOIN Streams ON Tracks_Artists.spotify_track_id = Streams.spotify_track_id "
-				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
+				+ "LEFT JOIN SongStreams ON Tracks_Artists.spotify_track_id = SongStreams.spotify_track_id "
+				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate "
 				+ "GROUP By "
 				+ "Artists.id,"
 				+ "Artists.name "

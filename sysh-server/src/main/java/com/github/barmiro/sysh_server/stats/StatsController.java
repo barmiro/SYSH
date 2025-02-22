@@ -2,6 +2,7 @@ package com.github.barmiro.sysh_server.stats;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,21 +22,11 @@ public class StatsController {
 	
 	@GetMapping("/all")
 	FullStats statsAll() {
-
-		//6 years before Spotify was founded, safe minimum
-		Timestamp startDate = Timestamp.valueOf("2000-01-01 00:00:00");
-		
-		//This will be the placeholder for the upper limit for now;
-		//considered 2100, but I'm erring on the side of caution
-		//in terms of 32-bit epoch integer overflow
-		Timestamp endDate = Timestamp.valueOf("2038-01-01 00:00:00");
-		
-		//Might change to direct cache fetch? keeping as is for now to keep it abstracted away
-		return statsRepo.streamStats(startDate, endDate);
+		return statsRepo.streamStats(true);
 	}
 	
 	@GetMapping("/range")
-	FullStats stats(
+	StatsForRange stats(
 			@RequestParam
 			String start,
 			@RequestParam
@@ -50,19 +41,20 @@ public class StatsController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return statsRepo.streamStats(startDate, endDate);
+		return statsRepo.streamStats(startDate, endDate, true);
 	}
 	
 	@GetMapping("/year/{year}")
-	FullStats yearStats(@PathVariable Integer year) {
+	StatsForRange yearStats(@PathVariable Integer year) {
 		Timestamp startDate = Timestamp.valueOf(year + "-01-01 00:00:00");
 		Timestamp endDate = Timestamp.valueOf(year + "-12-31 23:59:59");
-		return statsRepo.streamStats(startDate, endDate);
+		return statsRepo.streamStats(startDate, endDate, true);
 	}
 	
+//	TODO: This will have to be changed, but this way it'll work for now
 	@GetMapping("/startup")
 	Timestamp startup() {
-		return statsRepo.getFirstStreamDate();
+		return statsRepo.getFirstStreamDate().orElse(Timestamp.valueOf(LocalDateTime.now()));
 	}
 
 }

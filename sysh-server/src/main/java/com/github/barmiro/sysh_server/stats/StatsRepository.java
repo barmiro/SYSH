@@ -28,17 +28,19 @@ public class StatsRepository {
 	
 	Logger log = LoggerFactory.getLogger(StatsRepository.class);
 	
-	public FullStats streamStats(Timestamp startDate, Timestamp endDate) {
 		
-		Optional<FullStats> cached = getCachedStats(startDate, endDate);
+	public StatsForRange streamStats(Timestamp startDate, Timestamp endDate, Boolean checkForCache) {
 		
-		if (cached.isPresent()) {
-			return cached.get();
+		if (checkForCache) {
+			Optional<StatsForRange> cached = getCachedStats(startDate, endDate);
+			if (cached.isPresent()) {
+				return cached.get();
+			}			
 		}
 		
 //		I will figure out how to do all of this in a single query one day.
 		String sql = ("SELECT "
-				+ "COUNT(Streams.*) "
+				+ "COUNT(SongStreams.*) "
 				+ "AS stream_count,"
 				+ "COUNT(DISTINCT CASE WHEN NOT EXISTS ("
 				+ "SELECT 1 FROM Track_Duplicates WHERE Tracks.spotify_track_id = Track_Duplicates.secondary_id"
@@ -46,25 +48,25 @@ public class StatsRepository {
 				+ "AS track_count,"
 				+ "COUNT(DISTINCT Tracks.album_id) "
 				+ "AS album_count "
-				+ "FROM Streams "
-				+ "JOIN Tracks ON Streams.spotify_track_id = Tracks.spotify_track_id "
-				+ "WHERE Streams.ms_played > 30000 "
-				+ "AND Streams.ts BETWEEN :startDate AND :endDate;");
+				+ "FROM SongStreams "
+				+ "JOIN Tracks ON SongStreams.spotify_track_id = Tracks.spotify_track_id "
+				+ "WHERE SongStreams.ms_played > 30000 "
+				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate;");
 		
 //		This is a separate query because I believe even streams below 30s
 //		should count towards streaming time
 		String minutes = ("SELECT "
 				+ "SUM(ms_played) / 60000 AS minutes_streamed "
-				+ "FROM Streams "
-				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate;");
+				+ "FROM SongStreams "
+				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate;");
 		
 		String artists = ("SELECT "
 				+ "COUNT(DISTINCT Tracks_Artists.artist_id) "
 				+ "FROM Tracks_Artists "
-				+ "JOIN Streams ON "
-				+ "Streams.spotify_track_id = Tracks_Artists.spotify_track_id "
-				+ "WHERE Streams.ms_played > 30000 "
-				+ "AND Streams.ts BETWEEN :startDate AND :endDate;");
+				+ "JOIN SongStreams ON "
+				+ "SongStreams.spotify_track_id = Tracks_Artists.spotify_track_id "
+				+ "WHERE SongStreams.ms_played > 30000 "
+				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate;");
 		
 		
 		StatsDTO statsDTO =  jdbc.sql(sql)
@@ -85,7 +87,7 @@ public class StatsRepository {
 				.query(Integer.class)
 				.single();
 		
-		return new FullStats(startDate,
+		return new StatsForRange(startDate,
 				endDate,
 				minutesStreamed,
 				statsDTO.stream_count(),
@@ -95,8 +97,71 @@ public class StatsRepository {
 		
 	}
 	
-	public Optional<FullStats> getCachedStats(Timestamp startDate, Timestamp endDate) {
-		String sql = ("SELECT * FROM Stats_Cache "
+	
+public FullStats streamStats(Boolean checkForCache) {
+		
+	
+		if(checkForCache) {
+			return getCachedStats();
+		}
+		
+		String sql = ("SELECT "
+				+ "COUNT(SongStreams.*) "
+				+ "AS stream_count,"
+				+ "COUNT(DISTINCT CASE WHEN NOT EXISTS ("
+				+ "SELECT 1 FROM Track_Duplicates WHERE Tracks.spotify_track_id = Track_Duplicates.secondary_id"
+				+ ") THEN Tracks.spotify_track_id END) "
+				+ "AS track_count,"
+				+ "COUNT(DISTINCT Tracks.album_id) "
+				+ "AS album_count "
+				+ "FROM SongStreams "
+				+ "JOIN Tracks ON SongStreams.spotify_track_id = Tracks.spotify_track_id "
+				+ "WHERE SongStreams.ms_played > 30000;");
+		
+		String minutes = ("SELECT "
+				+ "SUM(ms_played) / 60000 AS minutes_streamed "
+				+ "FROM SongStreams;");
+		
+		String artists = ("SELECT "
+				+ "COUNT(DISTINCT Tracks_Artists.artist_id) "
+				+ "FROM Tracks_Artists "
+				+ "JOIN SongStreams ON "
+				+ "SongStreams.spotify_track_id = Tracks_Artists.spotify_track_id "
+				+ "WHERE SongStreams.ms_played > 30000;");
+		
+		
+		StatsDTO statsDTO =  jdbc.sql(sql)
+				.query(StatsDTO.class)
+				.single();
+		
+		Integer minutesStreamed = jdbc.sql(minutes)
+				.query(Integer.class)
+				.single();
+		
+		Integer artistCount = jdbc.sql(artists)
+				.query(Integer.class)
+				.single();
+		
+		return new FullStats(
+				minutesStreamed,
+				statsDTO.stream_count(),
+				statsDTO.track_count(),
+				statsDTO.album_count(),
+				artistCount);
+		
+	}
+	
+	
+	
+	public FullStats getCachedStats() {
+
+		return jdbc.sql("SELECT * FROM Stats_Cache_Full;")
+				.query(FullStats.class)
+				.single();
+	}
+	
+	public Optional<StatsForRange> getCachedStats(Timestamp startDate, Timestamp endDate) {
+		String sql = ("SELECT * FROM Stats_Cache_Range "
 				+ "WHERE  start_date = :startDate "
 				+ "AND end_date = :endDate "
 				+ "LIMIT 1;");
@@ -104,19 +169,51 @@ public class StatsRepository {
 		return jdbc.sql(sql)
 				.param("startDate", startDate, Types.TIMESTAMP)
 				.param("endDate", endDate, Types.TIMESTAMP)
-				.query(FullStats.class)
+				.query(StatsForRange.class)
 				.optional();
 	}
 	
 	
-	public int addCachedStats(Timestamp startDate, Timestamp endDate
+	public int addCachedStats(
 			) throws IllegalAccessException, InvocationTargetException {
 			
-		FullStats stats = streamStats(startDate, endDate);
+		FullStats stats = streamStats(false);
 
 		List<RecordCompInfo> recordComps = CompInfo.get(stats);
 		
-		String sql = CompListToSql.insertCache(recordComps);
+		String sql = CompListToSql.updateFullCache(recordComps);
+		
+		StatementSpec jdbcCall = jdbc.sql(sql);
+		
+		for (RecordCompInfo comp:recordComps) {
+			jdbcCall = jdbcCall.param(
+					comp.compName(),
+					comp.compValue(),
+					comp.sqlType());
+		}
+		
+		int added = 0;
+		
+		try {
+			added = jdbcCall.update();		
+			
+		} catch(DataIntegrityViolationException e) {
+			log.error(
+					"Cached lifetime stats contain invalid values.");
+			return 0;
+		}
+		return added;
+	}
+
+	
+	public int addCachedStats(Timestamp startDate, Timestamp endDate
+			) throws IllegalAccessException, InvocationTargetException {
+			
+		StatsForRange stats = streamStats(startDate, endDate, false);
+
+		List<RecordCompInfo> recordComps = CompInfo.get(stats);
+		
+		String sql = CompListToSql.insertRangeCache(recordComps);
 		
 		StatementSpec jdbcCall = jdbc.sql(sql);
 		
@@ -145,10 +242,10 @@ public class StatsRepository {
 		return added;
 	}
 	
-	public Timestamp getFirstStreamDate() {
+	public Optional<Timestamp> getFirstStreamDate() {
 		return jdbc.sql(
-				"SELECT ts FROM streams ORDER BY ts ASC LIMIT 1")
+				"SELECT MIN(ts) FROM SongStreams")
 				.query(Timestamp.class)
-				.single();
+				.optional();
 	}
 }

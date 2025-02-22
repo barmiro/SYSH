@@ -12,7 +12,7 @@ import com.github.barmiro.sysh_server.catalog.albums.Album;
 import com.github.barmiro.sysh_server.catalog.albums.spotifyapideprecated.dto.albums.ApiAlbum;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
 import com.github.barmiro.sysh_server.catalog.artists.spotifyapi.dto.artists.ApiArtist;
-import com.github.barmiro.sysh_server.catalog.streams.Stream;
+import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.album.ApiTrackAlbum;
@@ -23,12 +23,12 @@ import com.github.barmiro.sysh_server.dataintake.recent.dto.recentstream.RecentS
 public class ConvertDTOs {
 	
 	
-	public static List<Stream> streamsJson(List<StreamDTO> streamDTOs) {
-		List<Stream> streams = new ArrayList<>();
+	public static List<SongStream> streamsJson(List<StreamDTO> streamDTOs) {
+		List<SongStream> streams = new ArrayList<>();
 		
 		for (StreamDTO streamDTO:streamDTOs) {
 			if (streamDTO.spotify_track_uri() != null && streamDTO.ms_played() > 0) {
-				Stream stream = new Stream(streamDTO.ts(),
+				SongStream stream = new SongStream(streamDTO.ts(),
 						streamDTO.ms_played(),
 						streamDTO.spotify_track_uri().replace("spotify:track:", ""));
 				
@@ -39,9 +39,9 @@ public class ConvertDTOs {
 	}
 	
 	
-	public static List<Stream> streamsRecent(
+	public static List<SongStream> streamsRecent(
 			ResponseEntity<String> response,
-			List<Stream> previous) {
+			List<SongStream> previous) {
 		ObjectMapper objectMapper = new ObjectMapper()
 				.configure(DeserializationFeature
 						.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -53,13 +53,13 @@ public class ConvertDTOs {
 					.items();
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-			return new ArrayList<Stream>();
+			return new ArrayList<SongStream>();
 		}
 		
-		List<Stream> streams = new ArrayList<>();
+		List<SongStream> streams = new ArrayList<>();
 		
 		for (RecentStream item:items) {
-			Stream stream = new Stream(
+			SongStream stream = new SongStream(
 					item.played_at(),
 					item.track().duration_ms(),
 					item.track().id());

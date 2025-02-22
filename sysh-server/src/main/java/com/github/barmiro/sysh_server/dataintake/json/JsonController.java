@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.barmiro.sysh_server.catalog.AddToCatalog;
-import com.github.barmiro.sysh_server.catalog.streams.Stream;
+import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
 
 @RestController
@@ -29,8 +29,10 @@ public class JsonController {
 		log.info("Adding json file...");
 		long start = System.currentTimeMillis();
 
-		List<Stream> streams = ConvertDTOs.streamsJson(streamDTOs);  // null?
-		
+		List<SongStream> streams = ConvertDTOs.streamsJson(streamDTOs);  // null?
+		if (streams.isEmpty()) {
+			return "No streams found";
+		}
 		String result = addToCatalog.adder(streams);
 		
 		long end = System.currentTimeMillis();

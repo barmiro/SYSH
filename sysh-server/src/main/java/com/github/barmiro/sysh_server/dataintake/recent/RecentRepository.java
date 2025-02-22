@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.barmiro.sysh_server.catalog.streams.Stream;
+import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.dataintake.recent.dto.ItemsWrapper;
 import com.github.barmiro.sysh_server.dataintake.recent.dto.recentstream.RecentStream;
@@ -27,7 +27,7 @@ public class RecentRepository {
 			.configure(DeserializationFeature
 					.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	
-	public List<Stream> convertRecentStreams(ResponseEntity<String> response) {
+	public List<SongStream> convertRecentStreams(ResponseEntity<String> response) {
 		
 		List<RecentStream> items;
 		try {
@@ -36,16 +36,16 @@ public class RecentRepository {
 					.items();
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-			return new ArrayList<Stream>();
+			return new ArrayList<SongStream>();
 		}
 		
-		List<Stream> streams = new ArrayList<>();
+		List<SongStream> streams = new ArrayList<>();
 		
-		List<Stream> previous = streamRepository.find(50);
+		List<SongStream> previous = streamRepository.find(50);
 		
 		for (RecentStream item:items) {
 			
-			Stream stream = new Stream(
+			SongStream stream = new SongStream(
 					item.played_at(),
 					item.track().duration_ms(),
 					item.track().id());

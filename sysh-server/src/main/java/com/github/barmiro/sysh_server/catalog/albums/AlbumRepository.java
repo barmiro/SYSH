@@ -62,9 +62,9 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		
 		String sql = ("SELECT Albums.*,"
 				+ "COUNT("
-				+ "CASE WHEN Streams.ms_played >= 30000 THEN Streams.spotify_track_id END"
+				+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
 				+ ") AS stream_count,"
-				+ "SUM(Streams.ms_played) AS total_ms_played,"
+				+ "SUM(SongStreams.ms_played) AS total_ms_played,"
 				+ "(SELECT Artists.name "
 				+ "FROM Artists "
 				+ "JOIN Tracks_Artists ON Tracks_Artists.artist_id = Artists.id "
@@ -73,8 +73,8 @@ public class AlbumRepository extends CatalogRepository<Album> {
 				+ "LIMIT 1) AS primary_artist_name "
 				+ "FROM Albums "
 				+ "LEFT JOIN Albums_Tracks ON Albums.id = Albums_Tracks.album_id "
-				+ "LEFT JOIN Streams ON Albums_Tracks.spotify_track_id = Streams.spotify_track_id "
-				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
+				+ "LEFT JOIN SongStreams ON Albums_Tracks.spotify_track_id = SongStreams.spotify_track_id "
+				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate "
 				+ "GROUP BY "
 				+ "Albums.id,"
 				+ "Albums.name,"
@@ -96,12 +96,12 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	
 	public List<AlbumStats> topAlbumsCount(Timestamp startDate, Timestamp endDate) {
 		
-		String sql = ("SELECT Albums.*, COUNT(Streams.spotify_track_id) as sort_param "
+		String sql = ("SELECT Albums.*, COUNT(SongStreams.spotify_track_id) as sort_param "
 				+ "FROM Albums "
 				+ "LEFT JOIN Albums_Tracks ON Albums.id = Albums_Tracks.album_id "
-				+ "LEFT JOIN Streams ON Albums_Tracks.spotify_track_id = Streams.spotify_track_id "
-				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
-				+ "AND Streams.ms_played >= 30000 "
+				+ "LEFT JOIN SongStreams ON Albums_Tracks.spotify_track_id = SongStreams.spotify_track_id "
+				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate "
+				+ "AND SongStreams.ms_played >= 30000 "
 				+ "GROUP By "
 				+ "Albums.id,"
 				+ "Albums.name "
@@ -115,11 +115,11 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	}
 	
 	public List<AlbumStats> topAlbumsTime(Timestamp startDate, Timestamp endDate) {
-		String sql = ("SELECT Albums.*, SUM(Streams.ms_played) / 60000 as sort_param "
+		String sql = ("SELECT Albums.*, SUM(SongStreams.ms_played) / 60000 as sort_param "
 				+ "FROM Albums "
 				+ "LEFT JOIN Albums_Tracks ON Albums.id = Albums_Tracks.album_id "
-				+ "LEFT JOIN Streams ON Albums_Tracks.spotify_track_id = Streams.spotify_track_id "
-				+ "WHERE Streams.ts BETWEEN :startDate AND :endDate "
+				+ "LEFT JOIN SongStreams ON Albums_Tracks.spotify_track_id = SongStreams.spotify_track_id "
+				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate "
 				+ "GROUP By "
 				+ "Albums.id,"
 				+ "Albums.name "

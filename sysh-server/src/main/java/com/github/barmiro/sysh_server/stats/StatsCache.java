@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
-import com.github.barmiro.sysh_server.catalog.streams.Stream;
+import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 
 import jakarta.annotation.PostConstruct;
 
@@ -40,10 +40,7 @@ public class StatsCache {
 			return;
 		}
 		
-		Optional<Timestamp> oldestStream = jdbc.sql(
-				"SELECT MIN(ts) FROM Streams")
-				.query(Timestamp.class)
-				.optional();
+		Optional<Timestamp> oldestStream = statsRepo.getFirstStreamDate();
 		
 		if(oldestStream.isEmpty()) {
 			log.error("Cache generator didn't find any streams.");
@@ -58,6 +55,12 @@ public class StatsCache {
 				.getYear();
 		
 		int addedYears = 0;
+		try {
+			statsRepo.addCachedStats();
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		for (int i = startYear; i <= endYear; i++) {
 			Timestamp start = Timestamp.valueOf(i + "-01-01 00:00:00");
 			Timestamp end = Timestamp.valueOf(i + "-12-31 23:59:59");
@@ -78,8 +81,10 @@ public class StatsCache {
 	}
 	
 	
+
+	
 	public void updateCache(
-			List<Stream> streams,
+			List<SongStream> streams,
 			int tracksAdded,
 			int albumsAdded,
 			int artistsAdded) {
@@ -93,7 +98,7 @@ public class StatsCache {
 //		this handles the edge case of recent streams being from two different years;
 //		introduces unnecessary cache re-gens at the beginning of the year,
 //		TODO: rethink this approach
-		for (Stream stream:streams) {
+		for (SongStream stream:streams) {
 			
 			int streamYear = stream.ts()
 					.toLocalDateTime()
@@ -111,17 +116,19 @@ public class StatsCache {
 		
 		Timestamp start = Timestamp.valueOf(baseYear + "-01-01 00:00:00");
 		Timestamp end = Timestamp.valueOf(baseYear + "-12-31 23:59:59");
+		String baseSql =  ("SET "
+				+ "minutes_streamed = minutes_streamed + :minutesAdded,"
+				+ "stream_count = stream_count + :streamsAdded,"
+				+ "track_count = track_count + :tracksAdded,"
+				+ "album_count = album_count + :albumsAdded,"
+				+ "artist_count = artist_count + :artistsAdded ");
 		
 //		this will not add anything to not-yet-existing yearly caches, but that's not an issue;
 //		a new yearly cache should be generated after it encounters two different years in a batch,
 //		1 out of 50 times the cache won't be generated right away,
 //		but you don't really need a cache for the first weeks of a year
-		int updatedCaches = jdbc.sql("UPDATE Stats_Cache SET "
-				+ "minutes_streamed = minutes_streamed + :minutesAdded,"
-				+ "stream_count = stream_count + :streamsAdded,"
-				+ "track_count = track_count + :tracksAdded,"
-				+ "album_count = album_count + :albumsAdded,"
-				+ "artist_count = artist_count + :artistsAdded "
+		int updatedRangeCaches = jdbc.sql("UPDATE Stats_Cache_Range "
+				+ baseSql
 				+ "WHERE start_date <= :start "
 				+ "AND end_date >= :end")
 		.param("minutesAdded", minutesAdded, Types.INTEGER)
@@ -133,7 +140,22 @@ public class StatsCache {
 		.param("end", end, Types.TIMESTAMP)
 		.update();
 		
-		log.info(updatedCaches + " caches have been updated.");
+		int updatedFullCache = jdbc.sql("UPDATE Stats_Cache_Full "
+				+ baseSql
+				+ " WHERE id = 1")
+		.param("minutesAdded", minutesAdded, Types.INTEGER)
+		.param("streamsAdded", streams.size(), Types.INTEGER)
+		.param("tracksAdded", tracksAdded, Types.INTEGER)
+		.param("albumsAdded", albumsAdded, Types.INTEGER)
+		.param("artistsAdded", artistsAdded, Types.INTEGER)
+		.update();
+		
+		log.info(updatedRangeCaches + " range stats caches have been updated.");
+		if (updatedFullCache == 1) {
+			log.info("Updated all time stats cache");
+		} else {
+			log.error("Full cache update error, affected rows: " + updatedFullCache);
+		}
 	}
 	
 }

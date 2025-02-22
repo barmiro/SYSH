@@ -13,7 +13,7 @@ import com.github.barmiro.sysh_server.catalog.artists.Artist;
 import com.github.barmiro.sysh_server.catalog.artists.spotifyapi.ArtistApiRepository;
 import com.github.barmiro.sysh_server.catalog.jointables.AlbumsTracks;
 import com.github.barmiro.sysh_server.catalog.jointables.TracksArtists;
-import com.github.barmiro.sysh_server.catalog.streams.Stream;
+import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
@@ -56,8 +56,7 @@ public class AddToCatalog {
 	}
 
 	@Transactional
-	public String adder(List<Stream> streams) {
-		
+	public String adder(List<SongStream> streams) {
 		
 		tkn.refresh();
 		
@@ -80,7 +79,7 @@ public class AddToCatalog {
 //		but async methods perform separate transactions :(
 		streamsAdded = streamRepository.addAll(streams);
 		
-		for (Stream stream:streams) {
+		for (SongStream stream:streams) {
 			trackIDs.add(stream.spotify_track_id());
 		}
 		

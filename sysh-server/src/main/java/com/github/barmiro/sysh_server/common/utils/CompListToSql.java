@@ -30,11 +30,27 @@ public class CompListToSql {
 		return sb.toString();
 	}
 	
-	public static <T> String insertCache(
+	public static <T> String updateFullCache(List<RecordCompInfo> comps) {
+		
+		StringBuilder sb = new StringBuilder()
+				.append("UPDATE Stats_Cache_Full SET ");
+		
+		for (RecordCompInfo comp:comps) {
+			sb.append(comp.compName() + " = :" + comp.compName() + ",");
+		}
+		
+		sb.deleteCharAt(sb.length() - 1);
+		
+		sb.append(" WHERE id = 1;");
+		
+		return sb.toString();
+	}
+	
+	public static <T> String insertRangeCache(
 			List<RecordCompInfo> comps) {
 		
 		StringBuilder sb = new StringBuilder()
-				.append("INSERT INTO Stats_Cache(");
+				.append("INSERT INTO Stats_Cache_Range(");
 		
 		for (RecordCompInfo comp:comps) {
 			sb.append(comp.compName() + ",");

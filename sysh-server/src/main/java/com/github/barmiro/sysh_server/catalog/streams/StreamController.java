@@ -17,7 +17,7 @@ public class StreamController {
 	
 	
 	@GetMapping("/getStreams")
-	List<Stream> getStreams() {
+	List<SongStream> getStreams() {
 		return streamRepository.findAll();
 	}
 	

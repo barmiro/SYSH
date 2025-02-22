@@ -40,8 +40,8 @@ import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
-import com.github.barmiro.sysh_server.stats.FullStats;
 import com.github.barmiro.sysh_server.stats.StatsCache;
+import com.github.barmiro.sysh_server.stats.StatsForRange;
 import com.github.barmiro.sysh_server.stats.StatsRepository;
 
 @Testcontainers
@@ -104,7 +104,7 @@ class IntegrationTest {
 	
 	
 
-	@Sql(statements = {"DELETE FROM Streams",
+	@Sql(statements = {"DELETE FROM SongStreams",
 			"DELETE FROM Tracks",
 			"DELETE FROM Track_Duplicates",
 			"DELETE FROM Albums",
@@ -177,8 +177,8 @@ class IntegrationTest {
 	void statsRepositoryTest() {
 		Timestamp startDate = Timestamp.valueOf("2000-01-01 00:00:00");
 		Timestamp endDate = Timestamp.valueOf("2025-02-01 00:00:00");
-		FullStats expectedStats = new FullStats(startDate, endDate, 23, 5, 5, 3, 3);
-		assertEquals(expectedStats, stats.streamStats(startDate, endDate));
+		StatsForRange expectedStats = new StatsForRange(startDate, endDate, 23, 5, 5, 3, 3);
+		assertEquals(expectedStats, stats.streamStats(startDate, endDate, true));
 	}
 
 }

@@ -1,4 +1,4 @@
-CREATE TABLE Streams (
+CREATE TABLE SongStreams (
     id SERIAL PRIMARY KEY,
     ts timestamp NOT NULL,
     ms_played integer NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE Artists_Albums (
     PRIMARY KEY (artist_id, album_id)
 );
 
-CREATE TABLE Stats_Cache (
+CREATE TABLE Stats_Cache_Range (
     start_date TIMESTAMP NOT NULL, 
     end_date TIMESTAMP NOT NULL, 
     minutes_streamed INTEGER, 
@@ -85,6 +85,25 @@ CREATE TABLE Stats_Cache (
     album_count INTEGER, 
     artist_count INTEGER,
     CONSTRAINT no_duplicate_stats UNIQUE (start_date, end_date)
+);
+
+CREATE TABLE Stats_Cache_Full (
+    id SERIAL PRIMARY KEY,
+    minutes_streamed INTEGER, 
+    stream_count INTEGER, 
+    track_count INTEGER, 
+    album_count INTEGER, 
+    artist_count INTEGER,
+    CONSTRAINT only_one_full_cache CHECK (id = 1)
+);
+INSERT INTO Stats_Cache_Full (
+    minutes_streamed,
+    stream_count,
+    track_count,
+    album_count,
+    artist_count)
+    VALUES (
+    0, 0, 0, 0, 0
 );
 
 CREATE TABLE Refresh (token varchar);

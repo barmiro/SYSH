@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 
 import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.AddToCatalog;
-import com.github.barmiro.sysh_server.catalog.streams.Stream;
+import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
 
@@ -46,8 +46,8 @@ public class RecentController {
 		
 
 		
-		List<Stream> previous = streamService.find(50);
-		List<Stream> streams = ConvertDTOs.streamsRecent(response, previous);
+		List<SongStream> previous = streamService.find(50);
+		List<SongStream> streams = ConvertDTOs.streamsRecent(response, previous);
 
 		String result;
 

@@ -2,7 +2,8 @@ package com.github.barmiro.sysh_server.catalog.streams;
 
 import java.sql.Timestamp;
 
-public record Stream(
+//This was originally Stream, but wanted to avoid collisions with the Stream class
+public record SongStream(
 	Timestamp ts,
 	Integer ms_played,
 	String spotify_track_id) {
