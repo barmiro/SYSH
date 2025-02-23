@@ -64,11 +64,8 @@ fun TopScreenBottomBar(
 
 
     LaunchedEffect(targetPage) {
-        if (targetPage - pagerState.currentPage > 12) {
-            pagerState.scrollToPage(targetPage)
-        } else {
             pagerState.animateScrollToPage(targetPage)
-        }
+
     }
 
     LaunchedEffect(dateRangeMode) {
