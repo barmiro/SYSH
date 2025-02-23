@@ -9,6 +9,7 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.IOException
+import java.net.ConnectException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -25,6 +26,37 @@ class StatsRepository @Inject constructor() {
         .build()
 
     val statsApi = retrofit.create(StatsApi::class.java)
+
+    fun getStats(): Flow<Resource<StatsDTO>> {
+        return flow {
+            emit(Resource.Loading(true))
+            try {
+                emit(
+                    Resource.Success(
+                        data = statsApi
+                            .fetchStatsAll()
+                            .body()
+                    )
+                )
+
+
+            } catch (e:IOException) {
+                e.printStackTrace()
+                emit(Resource.Error("IOException:\n" + e.message))
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                emit(Resource.Error("HttpException:\n" + e.code()))
+            } catch (e: ConnectException) {
+                e.printStackTrace()
+                emit(Resource.Error("ConnectException:\n" + e.message))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("Exception:\n" + e.message))
+            }
+        }
+    }
+
+
 
 //TODO: move to a common repo
     fun getOldestStreamDate(): Flow<Resource<LocalDate>> {

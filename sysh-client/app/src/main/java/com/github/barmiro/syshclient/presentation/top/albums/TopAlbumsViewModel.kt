@@ -56,9 +56,7 @@ class TopAlbumsViewModel @Inject constructor(
                     end = event.end,
                     sort = event.sort
                 )
-
                     getTopAlbums()
-
             }
         }
     }
@@ -84,7 +82,6 @@ class TopAlbumsViewModel @Inject constructor(
                         }
                         is Resource.Loading -> {
                             _isLoading.value = result.isLoading
-
                         }
 
                     }

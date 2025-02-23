@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -19,7 +18,6 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -34,10 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.github.barmiro.syshclient.presentation.home.HomeScreen
+import com.github.barmiro.syshclient.presentation.home.HomeViewModel
 import com.github.barmiro.syshclient.presentation.top.TopScreen
 import com.github.barmiro.syshclient.presentation.top.TopScreenViewModel
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
@@ -53,6 +52,7 @@ import kotlinx.serialization.Serializable
 class MainActivity : ComponentActivity() {
 //    @Inject lateinit var statsRepo: StatsRepository
 //    @Inject lateinit var topRepo: TopRepository
+    private val homeVM: HomeViewModel by viewModels()
     private val topScreenVM: TopScreenViewModel by viewModels()
     private val topTracksVM: TopTracksViewModel by viewModels()
     private val topAlbumsVM: TopAlbumsViewModel by viewModels()
@@ -60,6 +60,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         topScreenVM.getOldestStreamDate()
+        homeVM.getStats()
         enableEdgeToEdge()
         setContent {
             SyshClientTheme {
@@ -137,29 +138,7 @@ class MainActivity : ComponentActivity() {
                                 startDestination = MainScreen
                             ) {
                                 composable<MainScreen> {
-                                    Column(
-                                        modifier = Modifier.fillMaxSize().padding(32.dp),
-                                    ) {
-                                        Row(
-
-                                        ) {
-                                            Text(text = "Welcome to SYSH",
-                                                fontSize = 32.sp,
-                                                color = MaterialTheme.colorScheme.onBackground)
-                                        }
-                                        Row(
-
-                                        ) {
-                                            Text(text = "This is where your stats will be",
-                                                fontSize = 24.sp,
-                                                color = MaterialTheme.colorScheme.onBackground)
-                                        }
-                                        Button(onClick = {
-                                            navController.navigate(Top)
-                                        }) {
-                                            Text(text = "Let's go!")
-                                        }
-                                    }
+                                    HomeScreen(homeVM)
                                 }
                                 composable<Top> {
                                     TopScreen(topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM)
