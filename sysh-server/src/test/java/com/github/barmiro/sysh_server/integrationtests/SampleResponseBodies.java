@@ -15,13 +15,19 @@ public class SampleResponseBodies {
 		return "{ \"access_token\" : \"randomtoken\", \"token_type\": \"Bearer\", \"expires_in\": \"300\", \"refresh_token\": \"randomrefreshtoken\", \"scope\": \"user-read-email\" }";
 	}
 	
+
+	
 	static MultiValueMap<String, String> tokenRequest() {
+		
+
+
 		
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
 		
 		body.add("grant_type", "authorization_code");
 		body.add("code", "randomcode");
-		body.add("redirect_uri", "http://localhost:8080/callback");
+//		this is null because the corresponding env vars are not set in a test
+		body.add("redirect_uri", "http://null:null/callback");
 		
 		return body;
 	}

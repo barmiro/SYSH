@@ -76,15 +76,16 @@ public class TokenService {
 		return authenticated;
 	}
 	
-	
-	
+
+	private final String serverUrl = System.getenv("SYSH_SERVER_URL");
+	private final String serverPort = System.getenv("SYSH_SERVER_PORT");
 	public void getNewToken(String code) {
 		AuthResponseDTO responseBody;
 		MultiValueMap<String, String> newBody = new LinkedMultiValueMap<>();
 		
 		newBody.add("grant_type", "authorization_code");
 		newBody.add("code", code);
-		newBody.add("redirect_uri", "http://localhost:8080/callback");
+		newBody.add("redirect_uri", "http://" + serverUrl + ":" + serverPort + "/callback");
 		
 //		RestClient tokenClient = RestClient.builder()
 //				.baseUrl("https://accounts.spotify.com/api/token")

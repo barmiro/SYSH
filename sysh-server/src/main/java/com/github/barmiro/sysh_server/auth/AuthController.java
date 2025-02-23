@@ -20,6 +20,8 @@ public class AuthController {
 	
 	private final String clientId = System.getenv("SPOTIFY_CLIENT_ID");
 	private final String state = GetRandom.alphaNumeric(16);
+	private final String serverUrl = System.getenv("SYSH_SERVER_URL");
+	private final String serverPort = System.getenv("SYSH_SERVER_PORT");
 	
 	@GetMapping("/state")
 	public String state() {
@@ -35,7 +37,7 @@ public class AuthController {
 				+"user-read-currently-playing%20"
 				+"user-read-playback-state%20"
 				+"user-modify-playback-state&"
-				+"redirect_uri=http://localhost:8080/callback&"
+				+"redirect_uri=http://" + serverUrl + ":" + serverPort + "/callback&"
 				+"state=" + state;
 		return new RedirectView(url);
 	}

@@ -13,7 +13,7 @@ services:
       - SPOTIFY_CLIENT_ID:${SPOTIFY_CLIENT_ID}
       - TZ=Europe/Warsaw
     ports:
-      - '8080:8080'
+      - '${SYSH_SERVER_PORT}:${SYSH_SERVER_PORT}'
     depends_on:
       - postgres
 
