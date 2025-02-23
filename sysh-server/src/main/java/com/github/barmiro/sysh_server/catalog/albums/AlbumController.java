@@ -49,5 +49,18 @@ public class AlbumController {
 			return albumRepository.topAlbums("stream_count", startDate, endDate);
 		}
 	}
+	
+	@GetMapping("/albums/all")
+	public List<AlbumStats> topAlbumsAll(
+			@RequestParam(required = false)
+			Optional<String> sort) {
+		
+		String sortBy = sort.orElse("count");
+		if (sortBy.equals("time")) {
+			return albumRepository.topAlbums("total_ms_played", true);
+		} else {
+			return albumRepository.topAlbums("stream_count", true);
+		}
+	}
 
 }

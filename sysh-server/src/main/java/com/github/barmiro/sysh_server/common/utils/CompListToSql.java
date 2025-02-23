@@ -75,4 +75,27 @@ public class CompListToSql {
 		
 		return sb.toString();
 	}
+	
+	public static <T> String insertTopAlbumsCache(
+			List<RecordCompInfo> comps) {
+		
+		StringBuilder sb = new StringBuilder()
+				.append("INSERT INTO Top_Albums_Cache(");
+		
+		for (RecordCompInfo comp:comps) {
+			sb.append(comp.compName() + ",");
+		}
+		
+		sb.deleteCharAt(sb.length() - 1);
+		
+		sb.append(") VALUES (");
+		
+		for (RecordCompInfo comp:comps) {
+			sb.append(":" + comp.compName() + ",");
+		}
+		
+		sb.deleteCharAt(sb.length() - 1);
+		sb.append(");");
+		return sb.toString();
+	}
 }

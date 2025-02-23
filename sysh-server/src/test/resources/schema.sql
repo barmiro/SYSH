@@ -106,6 +106,18 @@ INSERT INTO Stats_Cache_Full (
     0, 0, 0, 0, 0
 );
 
+CREATE TABLE Top_Albums_Cache (
+    id VARCHAR,
+    name VARCHAR,
+    thumbnail_url VARCHAR,
+    primary_artist_name VARCHAR,
+    total_ms_played INTEGER,
+    stream_count INTEGER
+);
+CREATE INDEX albums_by_time ON Top_Albums_Cache (total_ms_played DESC);
+CREATE INDEX albums_by_count ON Top_Albums_Cache (stream_count DESC);
+
+
 CREATE TABLE Refresh (token varchar);
 
 
