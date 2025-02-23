@@ -32,7 +32,10 @@ public class AlbumsTracks {
 				+ ":album_id,"
 				+ ":spotify_track_id,"
 				+ ":disc_number,"
-				+ ":track_number)");
+				+ ":track_number) "
+				+ "ON CONFLICT ("
+				+ "album_id, spotify_track_id"
+				+ ") DO NOTHING;");
 		
 		int added = 0;
 		for (Track track:tracks) {

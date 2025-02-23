@@ -2,6 +2,7 @@ package com.github.barmiro.sysh_server.catalog.interfaces;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
+import java.sql.Types;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -41,12 +42,32 @@ public abstract class CatalogRepository<EntityClass extends CatalogEntity> {
 				.list();
 	}
 	
+	
 	public int addNew(EntityClass entity, Class<EntityClass> entCls
 			) throws IllegalAccessException, InvocationTargetException {
 		
+		String IdFieldName = entity.getIdFieldName();
+		Integer checkIfExistsSql = jdbc.sql("SELECT COUNT("
+				+ IdFieldName
+				+ ") FROM " 
+				+ getEntityClass().getSimpleName()
+				+ "s WHERE "
+				+ IdFieldName
+				+ " = :"
+				+ IdFieldName)
+				.param(IdFieldName, entity.getId(), Types.VARCHAR)
+				.query(Integer.class)
+				.single();
 
+		if (checkIfExistsSql > 0) {
+			log.error(
+					entity.getName() 
+					+ " : "
+					+ entity.getId() 
+					+ " already exists.");
+			return 0;
+		}
 		List<RecordCompInfo> recordComps = CompInfo.get(entity);
-		
 		String sql = CompListToSql.insert(recordComps, entCls);
 		StatementSpec jdbcCall = jdbc.sql(sql);
 		
@@ -70,7 +91,7 @@ public abstract class CatalogRepository<EntityClass extends CatalogEntity> {
 					+ " already exists.");
 			return 0;
 			
-		} catch(DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException e) {
 			log.error(
 					entity.getName() 
 					+ " : "

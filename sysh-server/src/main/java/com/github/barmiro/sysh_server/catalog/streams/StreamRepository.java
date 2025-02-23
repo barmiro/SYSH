@@ -82,6 +82,11 @@ public class StreamRepository {
 	}
 	
 	public int addAll(List<SongStream> streams) {
+		
+		if(streams.isEmpty()) {
+			log.info("No new streams found.");
+			return 0;
+		}
 		TimestampRange timestampRange = GetTimestampRange.fromSongStreamList(streams);
 		
 		log.info("Found " + streams.size() + " streams "

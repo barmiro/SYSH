@@ -20,5 +20,10 @@ public record Album(
 	public String getName() {
 		return name;
 	}
+	
+	@Override
+	public String getIdFieldName() {
+		return "id";
+	}
 
 }

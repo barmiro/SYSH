@@ -18,5 +18,9 @@ public record Artist(
 		return name;
 	}
 	
+	@Override
+	public String getIdFieldName() {
+		return "id";
+	}
 
 }

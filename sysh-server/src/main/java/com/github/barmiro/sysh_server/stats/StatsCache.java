@@ -34,7 +34,7 @@ public class StatsCache {
 	private boolean isTestEnv;
 	
 	@PostConstruct
-	void cacheGenerator() {
+	public void cacheGenerator() {
 		
 		if (isTestEnv) {
 			return;

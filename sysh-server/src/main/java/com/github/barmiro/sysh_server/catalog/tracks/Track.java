@@ -21,5 +21,9 @@ public record Track(
 		return name;
 	}
 	
+	@Override
+	public String getIdFieldName() {
+		return "spotify_track_id";
+	}
 
 }

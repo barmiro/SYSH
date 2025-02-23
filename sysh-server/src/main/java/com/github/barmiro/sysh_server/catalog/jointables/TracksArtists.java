@@ -31,7 +31,10 @@ public class TracksArtists {
 				+ ") VALUES ("
 				+ ":spotify_track_id,"
 				+ ":artist_id,"
-				+ ":artist_order)");
+				+ ":artist_order) "
+				+ "ON CONFLICT ("
+				+ "spotify_track_id, artist_id"
+				+ ") DO NOTHING;");
 		
 		int added = 0;
 		for (ApiTrack apiTrack:apiTracks) {
