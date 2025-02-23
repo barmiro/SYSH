@@ -63,7 +63,7 @@ class TopTracksViewModel @Inject constructor(
         }
     }
 
-    private fun getTopTracks(
+    fun getTopTracks(
         start: String? = state.value.start,
         end: String? = state.value.end,
         sort: String? = state.value.sort

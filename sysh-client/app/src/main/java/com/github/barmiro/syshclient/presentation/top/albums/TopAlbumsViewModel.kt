@@ -61,7 +61,7 @@ class TopAlbumsViewModel @Inject constructor(
         }
     }
 
-    private fun getTopAlbums(
+    fun getTopAlbums(
         start: String? = state.value.start,
         end: String? = state.value.end,
         sort: String? = state.value.sort

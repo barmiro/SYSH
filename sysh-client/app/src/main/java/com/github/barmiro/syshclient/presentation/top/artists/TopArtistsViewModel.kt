@@ -63,7 +63,7 @@ class TopArtistsViewModel @Inject constructor(
         }
     }
 
-    private fun getTopArtists(
+    fun getTopArtists(
         start: String? = state.value.start,
         end: String? = state.value.end,
         sort: String? = state.value.sort

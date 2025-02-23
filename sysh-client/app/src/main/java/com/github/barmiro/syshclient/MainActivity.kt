@@ -143,7 +143,7 @@ class MainActivity : ComponentActivity() {
                                 composable<Top> {
                                     TopScreen(topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM)
                                 }
-                                composable<TopTracks> {
+                                composable<Stats> {
                                     TopTracksScreen(topTracksVM)
                                 }
                                 composable<TopAlbums> {
@@ -170,7 +170,7 @@ data class BottomNavigationItem(
 object MainScreen
 
 @Serializable
-object TopTracks
+object Stats
 
 @Serializable
 object TopAlbums

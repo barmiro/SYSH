@@ -45,7 +45,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.temporal.ChronoUnit
 import java.util.Locale
-import kotlin.math.absoluteValue
 
 @Composable
 fun TopScreenBottomBar(
@@ -79,13 +78,12 @@ fun TopScreenBottomBar(
         targetPage = pageCount - 1
     }
 
-    LaunchedEffect(pagerState.targetPage, pagerState.currentPage, dateRangeMode) {
+    LaunchedEffect(targetPage, dateRangeMode) {
 //        to start loading data before the page settles
-        if((pagerState.getOffsetDistanceInPages(pagerState.targetPage)).absoluteValue <= 0.5) {
 
             if (dateRangeMode == "yearly") {
                 val year = pageNumberToYear(
-                    page = pagerState.currentPage,
+                    page = targetPage,
                     pageCount = pageCount
                 )
 
@@ -106,7 +104,7 @@ fun TopScreenBottomBar(
             if (dateRangeMode == "monthly") {
 
                 val month = pageNumberToMonth(
-                    page = pagerState.currentPage,
+                    page = targetPage,
                     pageCount = pageCount
                 )
 
@@ -129,7 +127,7 @@ fun TopScreenBottomBar(
                     )
                 )
             }
-        }
+
     }
 
 
@@ -157,7 +155,7 @@ fun TopScreenBottomBar(
                             ) {
                                 if (dateRangeMode == "monthly") {
                                     LeftBottomBarArrow(
-                                        currentPage = pagerState.currentPage,
+                                        currentPage = targetPage,
                                         onTargetPageChange = { targetPage = it},
                                         jump = 12
                                     )
@@ -169,7 +167,7 @@ fun TopScreenBottomBar(
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 LeftBottomBarArrow(
-                                    currentPage = pagerState.currentPage,
+                                    currentPage = targetPage,
                                     onTargetPageChange = { targetPage = it}
                                 )
                             }
@@ -198,7 +196,7 @@ fun TopScreenBottomBar(
                                 verticalArrangement = Arrangement.Center
                             ) {
                                 RightBottomBarArrow(
-                                    currentPage = pagerState.currentPage,
+                                    currentPage = targetPage,
                                     onTargetPageChange = { targetPage = it },
                                     pageCount = pageCount
                                 )
@@ -210,7 +208,7 @@ fun TopScreenBottomBar(
                             ) {
                                 if (dateRangeMode == "monthly") {
                                     RightBottomBarArrow(
-                                        currentPage = pagerState.currentPage,
+                                        currentPage = targetPage,
                                         onTargetPageChange = { targetPage = it},
                                         pageCount = pageCount,
                                         jump = 12
