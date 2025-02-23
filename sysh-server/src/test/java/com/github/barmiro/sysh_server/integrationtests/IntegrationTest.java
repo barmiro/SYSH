@@ -154,7 +154,7 @@ class IntegrationTest {
 	void topAlbumsTest() {
 		List<AlbumStats> albumStats = SampleResponseBodies.albumStats();
 		
-		List<AlbumStats> response = albc.topAlbums(Optional.empty(), Optional.empty(), Optional.empty());
+		List<AlbumStats> response = albc.topAlbums(Optional.empty(), "2000-01-01T00:00:00", "2038-01-01T00:00:00");
 
 				
 		assertEquals(albumStats, response);

@@ -55,12 +55,15 @@ public class StatsCache {
 				.getYear();
 		
 		int addedYears = 0;
+		log.info("Generating full stats cache...");
 		try {
 			statsRepo.addCachedStats();
+			log.info("Done");
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		log.info("Generating yearly stats cache...");
 		for (int i = startYear; i <= endYear; i++) {
 			Timestamp start = Timestamp.valueOf(i + "-01-01 00:00:00");
 			Timestamp end = Timestamp.valueOf(i + "-12-31 23:59:59");

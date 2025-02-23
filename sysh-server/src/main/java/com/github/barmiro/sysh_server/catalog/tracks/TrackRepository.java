@@ -11,9 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.jdbc.core.simple.JdbcClient.StatementSpec;
 import org.springframework.stereotype.Repository;
 
 import com.github.barmiro.sysh_server.catalog.interfaces.CatalogRepository;
+import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
+import com.github.barmiro.sysh_server.common.utils.CompInfo;
+import com.github.barmiro.sysh_server.common.utils.CompListToSql;
 
 
 
@@ -102,7 +106,12 @@ public class TrackRepository extends CatalogRepository<Track> {
 		if (duplicates > 0) {
 			log.info(duplicates + " tracks appear on multiple albums.");			
 		}
-		
+		try {
+			updateTopTracksCache();
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return added;
 	}
 	
@@ -160,6 +169,81 @@ public class TrackRepository extends CatalogRepository<Track> {
 				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(TrackStats.class)
 				.list();
+	}
+	
+	List<TrackStats> topTracks(String sort, Boolean checkForCache) {
+		
+		String sql;
+		
+		if(checkForCache) {
+			sql = ("SELECT * "
+					+ "FROM Top_Tracks_Cache "
+					+ "ORDER BY "
+					+ sort
+					+ " DESC;");
+		} else {
+			sql = ("SELECT t2.spotify_track_id, t2.name,"
+					+ "COUNT("
+					+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
+					+ ") AS stream_count,"
+					+ "SUM(SongStreams.ms_played) AS total_ms_played,"
+					+ "Albums.name AS album_name,"
+					+ "Albums.thumbnail_url,"
+					+ "Artists.name AS primary_artist_name "
+					+ "FROM Tracks t "
+					+ "LEFT JOIN Track_Duplicates ON Track_Duplicates.secondary_id = t.spotify_track_id "
+					+ "LEFT JOIN Tracks t2 ON t2.spotify_track_id = COALESCE(Track_Duplicates.primary_id, t.spotify_track_id) "
+					+ "LEFT JOIN SongStreams ON t.spotify_track_id = SongStreams.spotify_track_id "
+					+ "LEFT JOIN Albums ON t2.album_id = Albums.id "
+					+ "LEFT JOIN Tracks_Artists ON t2.spotify_track_id = Tracks_Artists.spotify_track_id "
+					+ "LEFT JOIN Artists ON Tracks_Artists.artist_id = Artists.id "
+					+ "WHERE Tracks_Artists.artist_order = 0 "
+					+ "GROUP BY "
+					+ "t2.spotify_track_id,"
+					+ "t2.name,"
+					+ "album_name,"
+					+ "Albums.thumbnail_url,"
+					+ "primary_artist_name "
+					+ "ORDER BY "
+					+ sort
+					+ " DESC;");
+		}
+		
+		return jdbc.sql(sql)
+				.query(TrackStats.class)
+				.list();
+	}
+	
+	int updateTopTracksCache(
+			) throws IllegalAccessException, InvocationTargetException {
+//		Doesn't have to be sorted, but I don't feel like overloading the constructor again
+		List<TrackStats> trackStatsList = topTracks("stream_count", false);
+		
+		
+		String wipeCache = ("DELETE FROM Top_Tracks_Cache;");
+		
+		int deletedRows = jdbc.sql(wipeCache).update();
+		
+		int rowsAdded = 0;
+		
+		for (TrackStats track:trackStatsList) {
+			List<RecordCompInfo> recordComps = CompInfo.get(track);
+			
+			String addTrackStats = CompListToSql.insertTopItemsCache(recordComps, "Track");
+			StatementSpec jdbcCall = jdbc.sql(addTrackStats);
+			
+			for (RecordCompInfo comp:recordComps) {
+				jdbcCall = jdbcCall.param(
+						comp.compName(),
+						comp.compValue(),
+						comp.sqlType());
+			}
+			rowsAdded += jdbcCall.update();
+		}
+		
+		log.info("Deleted " + deletedRows + " rows from top tracks cache");
+		log.info("Added " + rowsAdded + " rows to top tracks cache");
+		return rowsAdded;
 	}
 	
 }

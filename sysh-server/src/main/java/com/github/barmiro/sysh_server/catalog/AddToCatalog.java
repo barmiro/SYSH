@@ -1,6 +1,5 @@
 package com.github.barmiro.sysh_server.catalog;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,13 +114,6 @@ public class AddToCatalog {
 //		easier than returning all necessary values and handling it in recent logic
 		if (streams.size() > 0 && streams.size() <= 50) {
 			statsCache.updateCache(streams, tracksAdded, albumsAdded, artistsAdded);
-		}
-
-		try {
-			albumRepository.updateTopAlbumsCache();
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		
 		return (streamsAdded + " streams added.\n" 

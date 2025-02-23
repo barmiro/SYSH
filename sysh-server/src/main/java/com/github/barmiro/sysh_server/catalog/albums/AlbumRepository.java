@@ -58,7 +58,12 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		}
 		log.info("Added " + added + " new albums");
 		
-		
+		try {
+			updateTopAlbumsCache();
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return added;
 	}
 	
@@ -135,7 +140,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 				.list();
 	}
 	
-	public int updateTopAlbumsCache(
+	int updateTopAlbumsCache(
 			) throws IllegalAccessException, InvocationTargetException {
 //		Doesn't have to be sorted, but I don't feel like overloading the constructor again
 		List<AlbumStats> albumStatsList = topAlbums("stream_count", false);
@@ -150,7 +155,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		for (AlbumStats album:albumStatsList) {
 			List<RecordCompInfo> recordComps = CompInfo.get(album);
 			
-			String addAlbumStats = CompListToSql.insertTopAlbumsCache(recordComps);
+			String addAlbumStats = CompListToSql.insertTopItemsCache(recordComps, "Album");
 			StatementSpec jdbcCall = jdbc.sql(addAlbumStats);
 			
 			for (RecordCompInfo comp:recordComps) {

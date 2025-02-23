@@ -1,7 +1,6 @@
 package com.github.barmiro.sysh_server.catalog.tracks;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,24 +27,33 @@ public class TrackController {
 	public List<TrackStats> topTracks(
 			@RequestParam
 			Optional<String> sort,
-			@RequestParam(required = false)
-			Optional<String> start,
-			@RequestParam(required = false)
-			Optional<String> end) {
+			@RequestParam
+			String start,
+			@RequestParam
+			String end) {
 		
-		Timestamp startDate = Timestamp.valueOf(start
-				.orElse("2000-01-01T00:00:00")
-				.replace("T", " "));
-		Timestamp endDate = Timestamp.valueOf(end
-				.orElse(LocalDateTime.now().toString())
-				.replace("T", " "));
+		Timestamp startDate = Timestamp.valueOf(start.replace("T", " "));
+		Timestamp endDate = Timestamp.valueOf(end.replace("T", " "));
+		
 		String sortBy = sort.orElse("");
 		if (sortBy.equals("time")) {
 			return trackRepository.topTracks("total_ms_played", startDate, endDate);
 		} else {
 			return trackRepository.topTracks("stream_count", startDate, endDate);
 		} 
+	}
+	
+	@GetMapping("/tracks/all")
+	public List<TrackStats> topTracksAll(
+			@RequestParam(required = false)
+			Optional<String> sort) {
 		
+		String sortBy = sort.orElse("count");
+		if (sortBy.equals("time")) {
+			return trackRepository.topTracks("total_ms_played", true);
+		} else {
+			return trackRepository.topTracks("stream_count", true);
+		}
 	}
 	
 }

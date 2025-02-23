@@ -1,7 +1,6 @@
 package com.github.barmiro.sysh_server.catalog.albums;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,17 +29,13 @@ public class AlbumController {
 	public List<AlbumStats> topAlbums(
 			@RequestParam(required = false)
 			Optional<String> sort,
-			@RequestParam(required = false)
-			Optional<String> start,
-			@RequestParam(required = false)
-			Optional<String> end) {
+			@RequestParam
+			String start,
+			@RequestParam
+			String end) {
 		
-		Timestamp startDate = Timestamp.valueOf(start
-				.orElse("2000-01-01T00:00:00")
-				.replace("T", " "));
-		Timestamp endDate = Timestamp.valueOf(end
-				.orElse(LocalDateTime.now().toString())
-				.replace("T", " "));
+		Timestamp startDate = Timestamp.valueOf(start.replace("T", " "));
+		Timestamp endDate = Timestamp.valueOf(end.replace("T", " "));
 		
 		String sortBy = sort.orElse("count");
 		if (sortBy.equals("time")) {

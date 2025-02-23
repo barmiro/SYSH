@@ -76,11 +76,12 @@ public class CompListToSql {
 		return sb.toString();
 	}
 	
-	public static <T> String insertTopAlbumsCache(
-			List<RecordCompInfo> comps) {
+	public static <T> String insertTopItemsCache(
+			List<RecordCompInfo> comps,
+			String itemName) {
 		
 		StringBuilder sb = new StringBuilder()
-				.append("INSERT INTO Top_Albums_Cache(");
+				.append("INSERT INTO Top_" + itemName + "s_Cache(");
 		
 		for (RecordCompInfo comp:comps) {
 			sb.append(comp.compName() + ",");
