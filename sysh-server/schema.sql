@@ -76,6 +76,9 @@ CREATE TABLE Artists_Albums (
     PRIMARY KEY (artist_id, album_id)
 );
 
+CREATE TABLE Refresh (token varchar);
+
+
 CREATE TABLE Stats_Cache_Range (
     start_date TIMESTAMP NOT NULL, 
     end_date TIMESTAMP NOT NULL, 
@@ -111,8 +114,8 @@ CREATE TABLE Top_Albums_Cache (
     name VARCHAR,
     thumbnail_url VARCHAR,
     primary_artist_name VARCHAR,
-    total_ms_played INTEGER,
-    stream_count INTEGER
+    stream_count INTEGER DEFAULT 0,
+    total_ms_played INTEGER DEFAULT 0
 );
 CREATE INDEX albums_by_time ON Top_Albums_Cache (total_ms_played DESC);
 CREATE INDEX albums_by_count ON Top_Albums_Cache (stream_count DESC);
@@ -123,16 +126,12 @@ CREATE TABLE Top_Tracks_Cache (
     album_name VARCHAR,
     thumbnail_url VARCHAR,
     primary_artist_name VARCHAR,
-    stream_count INTEGER,
-    total_ms_played INTEGER
+    stream_count INTEGER DEFAULT 0,
+    total_ms_played INTEGER DEFAULT 0
 );
 
 CREATE INDEX tracks_by_time ON Top_Tracks_Cache (total_ms_played DESC);
 CREATE INDEX tracks_by_count ON Top_Tracks_Cache (stream_count DESC);
-
-
-CREATE TABLE Refresh (token varchar);
-
 
 
 

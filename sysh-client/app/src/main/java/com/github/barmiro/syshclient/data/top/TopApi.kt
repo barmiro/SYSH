@@ -10,17 +10,19 @@ import retrofit2.http.Query
 
 interface TopApi {
 
-    @GET("tracks")
+    @GET("tracks{optionalRangePath}")
     suspend fun fetchTopTracks(
-        @Query("start") start: String? = null,
-        @Query("end") end: String? = null,
+        @Path("optionalRangePath", encoded = true) rangePath: String? = "",
+        @Query("start") start: String? = "2000-01-01T00:00:00",
+        @Query("end") end: String? = "2038-01-1T00:00:00",
         @Query("sort") sort: String? = null
     ): Response<List<TrackDTO>>
 
-    @GET("albums")
+    @GET("albums{optionalRangePath}")
     suspend fun fetchTopAlbums(
-        @Query("start") start: String? = null,
-        @Query("end") end: String? = null,
+        @Path("optionalRangePath", encoded = true) rangePath: String? = "",
+        @Query("start") start: String? = "2000-01-01T00:00:00",
+        @Query("end") end: String? = "2038-01-01T00:00:00",
         @Query("sort") sort: String? = null
     ): Response<List<AlbumDTO>>
 

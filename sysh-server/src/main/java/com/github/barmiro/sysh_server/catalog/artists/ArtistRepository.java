@@ -43,7 +43,7 @@ public List<ArtistStats> topArtists(String sort, Timestamp startDate, Timestamp 
 				+ "COUNT("
 				+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
 				+ ") AS stream_count,"
-				+ "SUM(SongStreams.ms_played) AS total_ms_played "
+				+ "COALESCE(SUM(SongStreams.ms_played), 0) AS total_ms_played "
 				+ "FROM Artists "
 				+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
 				+ "LEFT JOIN SongStreams ON Tracks_Artists.spotify_track_id = SongStreams.spotify_track_id "
@@ -62,23 +62,4 @@ public List<ArtistStats> topArtists(String sort, Timestamp startDate, Timestamp 
 				.query(ArtistStats.class)
 				.list();
 	}
-	
-	public List<ArtistStats> topArtistsTime(Timestamp startDate, Timestamp endDate) {
-		String sql = ("SELECT Artists.*, SUM(SongStreams.ms_played) / 60000 as sort_param "
-				+ "FROM Artists "
-				+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
-				+ "LEFT JOIN SongStreams ON Tracks_Artists.spotify_track_id = SongStreams.spotify_track_id "
-				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate "
-				+ "GROUP By "
-				+ "Artists.id,"
-				+ "Artists.name "
-				+ "ORDER BY sort_param DESC;");
-		
-		return jdbc.sql(sql)
-				.param("startDate", startDate, Types.TIMESTAMP)
-				.param("endDate", endDate, Types.TIMESTAMP)
-				.query(ArtistStats.class)
-				.list();
-	}
-
 }

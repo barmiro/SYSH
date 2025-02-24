@@ -36,10 +36,18 @@ class TopRepository @Inject constructor() {
         end: String? = null,
         sort: String? = null
     ): Flow<Resource<List<TopTrack>>> {
+        var rangePath = ""
+        var startValue = start
+        var endValue = end
+        if (start == null || end == null) {
+            rangePath = "/all"
+            startValue = null
+            endValue = null
+        }
         return flow {
             emit(Resource.Loading(true))
             try {
-                val topTracks = topApi.fetchTopTracks(start, end, sort)
+                val topTracks = topApi.fetchTopTracks(rangePath, startValue, endValue, sort)
                     .body()
                     .orEmpty()
                 val isFetchSuccessful = topTracks.isNotEmpty()
@@ -72,10 +80,18 @@ class TopRepository @Inject constructor() {
         end: String? = null,
         sort: String? = null
     ): Flow<Resource<List<TopAlbum>>> {
+        var rangePath= ""
+        var startValue = start
+        var endValue = end
+        if (start == null || end == null) {
+            rangePath = "/all"
+            startValue = null
+            endValue = null
+        }
         return flow {
             emit(Resource.Loading(true))
             try {
-                val topAlbums = topApi.fetchTopAlbums(start, end, sort)
+                val topAlbums = topApi.fetchTopAlbums(rangePath, startValue, endValue, sort)
                     .body()
                     .orEmpty()
                 val isFetchSuccessful = topAlbums.isNotEmpty()

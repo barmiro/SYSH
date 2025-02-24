@@ -73,7 +73,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 				+ "COUNT("
 				+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
 				+ ") AS stream_count,"
-				+ "SUM(SongStreams.ms_played) AS total_ms_played,"
+				+ "COALESCE(SUM(SongStreams.ms_played), 0) AS total_ms_played,"
 				+ "(SELECT Artists.name "
 				+ "FROM Artists "
 				+ "JOIN Tracks_Artists ON Tracks_Artists.artist_id = Artists.id "
@@ -105,7 +105,12 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		String sql;
 		
 		if (checkForCache) {
-			sql = ("SELECT * "
+			sql = ("SELECT id,"
+					+ "name,"
+					+ "thumbnail_url,"
+					+ "primary_artist_name,"
+					+ "COALESCE(stream_count, 0) AS stream_count, "
+					+ "COALESCE(total_ms_played, 0) AS total_ms_played "
 					+ "FROM Top_Albums_Cache "
 					+ "ORDER BY "
 					+ sort

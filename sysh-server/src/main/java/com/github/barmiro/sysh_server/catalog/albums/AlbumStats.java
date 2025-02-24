@@ -5,7 +5,7 @@ public record AlbumStats(
 		String name,
 		String thumbnail_url,
 		String primary_artist_name,
-		Integer total_ms_played,
-		Integer stream_count) {
+		Integer stream_count,
+		Integer total_ms_played) {
 
 }

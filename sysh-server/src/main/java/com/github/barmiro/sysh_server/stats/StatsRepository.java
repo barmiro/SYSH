@@ -56,7 +56,7 @@ public class StatsRepository {
 //		This is a separate query because I believe even streams below 30s
 //		should count towards streaming time
 		String minutes = ("SELECT "
-				+ "SUM(ms_played) / 60000 AS minutes_streamed "
+				+ "COALESCE(SUM(ms_played) / 60000, 0) AS minutes_streamed "
 				+ "FROM SongStreams "
 				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate;");
 		
@@ -119,7 +119,7 @@ public FullStats streamStats(Boolean checkForCache) {
 				+ "WHERE SongStreams.ms_played > 30000;");
 		
 		String minutes = ("SELECT "
-				+ "SUM(ms_played) / 60000 AS minutes_streamed "
+				+ "COALESCE(SUM(ms_played) / 60000, 0) AS minutes_streamed "
 				+ "FROM SongStreams;");
 		
 		String artists = ("SELECT "
