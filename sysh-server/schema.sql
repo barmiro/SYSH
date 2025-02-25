@@ -1,3 +1,9 @@
+CREATE TABLE User_Data (
+    id SERIAL PRIMARY KEY,
+    display_name VARCHAR,
+    CONSTRAINT only_one_user_data CHECK (id = 1)
+);
+
 CREATE TABLE SongStreams (
     id SERIAL PRIMARY KEY,
     ts timestamp NOT NULL,

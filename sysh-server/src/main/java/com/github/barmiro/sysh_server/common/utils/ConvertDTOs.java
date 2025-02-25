@@ -19,10 +19,14 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.albu
 import com.github.barmiro.sysh_server.dataintake.json.StreamDTO;
 import com.github.barmiro.sysh_server.dataintake.recent.dto.ItemsWrapper;
 import com.github.barmiro.sysh_server.dataintake.recent.dto.recentstream.RecentStream;
+import com.github.barmiro.sysh_server.userdata.UserData;
 
 public class ConvertDTOs {
 	
-	
+	static ObjectMapper objectMapper = new ObjectMapper()
+		.configure(DeserializationFeature
+				.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			
 	public static List<SongStream> streamsJson(List<StreamDTO> streamDTOs) {
 		List<SongStream> streams = new ArrayList<>();
 		
@@ -38,13 +42,23 @@ public class ConvertDTOs {
 		return streams;
 	}
 	
-	
+	public static UserData userData(ResponseEntity<String> response) {
+		
+		UserData data;
+		try {
+			data = objectMapper
+					.readValue(response.getBody(), UserData.class);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			return new UserData("to SYSH");
+		}
+		
+		return data;
+	}
 	public static List<SongStream> streamsRecent(
 			ResponseEntity<String> response,
 			List<SongStream> previous) {
-		ObjectMapper objectMapper = new ObjectMapper()
-				.configure(DeserializationFeature
-						.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
 		List<RecentStream> items;
 		
 		try {

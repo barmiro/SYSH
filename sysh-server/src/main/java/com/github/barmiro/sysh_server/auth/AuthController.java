@@ -31,14 +31,14 @@ public class AuthController {
 	@GetMapping("/authorize")
 	public RedirectView authorize() {
 		String url = "https://accounts.spotify.com/authorize?"
-				+"response_type=code&"
-				+"client_id=" + clientId + "&"
-				+"scope=user-read-recently-played%20"
-				+"user-read-currently-playing%20"
-				+"user-read-playback-state%20"
-				+"user-modify-playback-state&"
-				+"redirect_uri=http://" + serverUrl + ":" + serverPort + "/callback&"
-				+"state=" + state;
+				+ "response_type=code&"
+				+ "client_id=" + clientId + "&"
+				+ "scope=user-read-recently-played%20"
+				+ "user-read-currently-playing%20"
+				+ "user-read-playback-state%20"
+				+ "user-modify-playback-state&"
+				+ "redirect_uri=http://" + serverUrl + ":" + serverPort + "/callback&"
+				+ "state=" + state;
 		return new RedirectView(url);
 	}
 	

@@ -20,7 +20,7 @@ import javax.inject.Singleton
 class TopRepository @Inject constructor() {
 
     val retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.0.100:5754/top/")
+        .baseUrl("http://100.114.214.19:5754/top/")
         .addConverterFactory(
             Json.asConverterFactory(
                 "application/json; charset=UTF8".toMediaType()))
