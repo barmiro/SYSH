@@ -63,6 +63,6 @@ public class AuthController {
 		
 		tkn.getNewToken(codeValue);
 		
-		return new RedirectView("/recent");	
+		return new RedirectView("/userData");	
 	};
 }

@@ -12,17 +12,20 @@ import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
 public class UserDataController {
 	TokenService tkn;
 	RestClient apiClient;
+	UserDataRepository userDataRepository;
 	
 	public UserDataController(TokenService tkn,
-			RestClient apiClient) {
+			RestClient apiClient,
+			UserDataRepository userDataRepository) {
 		this.tkn = tkn;
 		this.apiClient = apiClient;
+		this.userDataRepository = userDataRepository;
 	}
 	
 
 
 	@GetMapping("/userData")
-	public String recent() {
+	public String userData() {
 		
 		tkn.refresh();
 		
@@ -35,8 +38,13 @@ public class UserDataController {
 		
 		UserData userData = ConvertDTOs.userData(response);
 		
+		int updated = userDataRepository.addUserData(userData);
+		
+		return ("Found user display name: " 
+		+ userData.display_name()
+		+ ", rows updated: "
+		+ updated);
+				
 	
-
-		return result;
 	}
 }

@@ -4,6 +4,8 @@ CREATE TABLE User_Data (
     CONSTRAINT only_one_user_data CHECK (id = 1)
 );
 
+INSERT INTO User_Data(display_name) VALUES ('username unknown');
+
 CREATE TABLE SongStreams (
     id SERIAL PRIMARY KEY,
     ts timestamp NOT NULL,
