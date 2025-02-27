@@ -23,4 +23,5 @@ interface StatsApi {
 
     @GET("startup")
     suspend fun fetchStartupData(): Response<String>
+
 }

@@ -40,11 +40,11 @@ public class UserDataController {
 		
 		int updated = userDataRepository.addUserData(userData);
 		
-		return ("Found user display name: " 
-		+ userData.display_name()
-		+ ", rows updated: "
-		+ updated);
-				
+		if (updated == 1) {
+			return userData.display_name();			
+		}
+		
+		return ("unknown username");
 	
 	}
 }

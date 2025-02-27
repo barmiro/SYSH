@@ -25,7 +25,7 @@ fun HomeScreen(
     ) {
         Row(
         ) {
-            Text(text = "Welcome to SYSH",
+            Text(text = "Welcome, " + state.userDisplayName,
                 fontSize = 32.sp,
                 color = MaterialTheme.colorScheme.onBackground)
         }

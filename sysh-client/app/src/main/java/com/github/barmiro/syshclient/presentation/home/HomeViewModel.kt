@@ -3,6 +3,7 @@ package com.github.barmiro.syshclient.presentation.home
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.barmiro.syshclient.data.common.StartupDataRepository
 import com.github.barmiro.syshclient.data.stats.StatsRepository
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val statsRepository: StatsRepository
+    private val statsRepository: StatsRepository,
+    private val startupDataRepository: StartupDataRepository
 ): ViewModel(), DefaultLifecycleObserver {
 
 //    DTO for now
@@ -25,11 +27,36 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             statsRepository.getStats()
                 .collect { result ->
+                when(result) {
+                    is Resource.Success -> {
+                        result.data?.let { statsResult ->
+                            _homeState.update {
+                                it.copy(stats = statsResult)
+                            }
+                        }
+                    }
+                    is Resource.Error -> {
+
+                    }
+                    is Resource.Loading -> {
+                        _homeState.update {
+                            it.copy(isLoading = result.isLoading)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun getUserData() {
+        viewModelScope.launch {
+            startupDataRepository.getUserDisplayName()
+                .collect { result ->
                     when(result) {
                         is Resource.Success -> {
-                            result.data?.let { statsResult ->
+                            result.data?.let { userDataResult ->
                                 _homeState.update {
-                                    it.copy(stats = statsResult)
+                                    it.copy(userDisplayName = userDataResult)
                                 }
                             }
                         }
@@ -42,7 +69,6 @@ class HomeViewModel @Inject constructor(
                             }
                         }
                     }
-
                 }
         }
     }

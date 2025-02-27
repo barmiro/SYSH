@@ -61,6 +61,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         topScreenVM.getOldestStreamDate()
         homeVM.getStats()
+        homeVM.getUserData()
         enableEdgeToEdge()
         setContent {
             SyshClientTheme {
