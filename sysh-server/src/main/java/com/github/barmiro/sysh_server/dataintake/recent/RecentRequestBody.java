@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.auth;
+package com.github.barmiro.sysh_server.dataintake.recent;
 
 public record RecentRequestBody(
 	String grant_type,

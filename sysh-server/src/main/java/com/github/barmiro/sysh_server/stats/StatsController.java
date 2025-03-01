@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class StatsController {
 
 	StatsRepository statsRepo;
+	StatsCache statsCache;
 	
-	StatsController(StatsRepository statsRepo) {
+	StatsController(StatsRepository statsRepo, StatsCache statsCache) {
 		this.statsRepo = statsRepo;
+		this.statsCache = statsCache;
 	}
 	
 	@GetMapping("/all")
@@ -54,6 +56,7 @@ public class StatsController {
 //	TODO: This will have to be changed, but this way it'll work for now
 	@GetMapping("/startup")
 	Timestamp startup() {
+		statsCache.cacheGenerator();
 		return statsRepo.getFirstStreamDate().orElse(Timestamp.valueOf(LocalDateTime.now()));
 	}
 

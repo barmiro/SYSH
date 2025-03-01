@@ -114,9 +114,6 @@ public class AddToCatalog {
 //		easier than returning all necessary values and handling it in recent logic
 		if (streams.size() > 0 && streams.size() <= 50) {
 			statsCache.updateCache(streams, tracksAdded, albumsAdded, artistsAdded);
-		} else {
-//			TODO: this takes too long to run on each json added
-			statsCache.cacheGenerator();
 		}
 		
 		return (streamsAdded + " streams added.\n" 
