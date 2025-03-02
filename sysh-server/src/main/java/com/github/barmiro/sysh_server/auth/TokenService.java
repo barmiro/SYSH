@@ -5,6 +5,7 @@ import java.util.Base64;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.annotation.PostConstruct;
+
 @Service
 public class TokenService {
 	private String token;
@@ -30,10 +33,13 @@ public class TokenService {
 	private final String base64 = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
 
 	private RestClient tokenClient;
+	TokenInit tokenInit;
 	
 	public TokenService(
-			RestClient tokenClient) {
+			RestClient tokenClient,
+			TokenInit tokenInit) {
 		this.tokenClient = tokenClient;
+		this.tokenInit = tokenInit;
 	}
 	
 	ObjectMapper objectMapper = new ObjectMapper();
@@ -56,8 +62,11 @@ public class TokenService {
 	}
 	
 	public void setRefreshToken(String refreshToken) {
-		this.refreshToken = refreshToken;
-		authenticated = true;
+		if (refreshToken != null) {
+			this.refreshToken = refreshToken;			
+			authenticated = true;
+			tokenInit.saveToken(refreshToken);
+		}
 	}
 	
 	public String getRefreshToken() {
@@ -162,6 +171,14 @@ public class TokenService {
 		
 		
 		throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
+	}
+	
+	@Value("${test.env:false}")
+	private boolean isTestEnv;
+	
+	@PostConstruct
+	void initializeToken() {
+		setRefreshToken(tokenInit.initToken());
 	}
 	
 

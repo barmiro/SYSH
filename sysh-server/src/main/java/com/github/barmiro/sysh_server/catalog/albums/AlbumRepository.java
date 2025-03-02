@@ -108,7 +108,8 @@ public class AlbumRepository extends CatalogRepository<Album> {
 			sql = ("SELECT id,"
 					+ "name,"
 					+ "thumbnail_url,"
-					+ "primary_artist_name,"
+//					TODO: figure out why a null happened here
+					+ "COALESCE(primary_artist_name, 'Unknown Artist') AS primary_artist_name,"
 					+ "COALESCE(stream_count, 0) AS stream_count, "
 					+ "COALESCE(total_ms_played, 0) AS total_ms_played "
 					+ "FROM Top_Albums_Cache "

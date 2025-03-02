@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
-
 @Service
 public class DevDatabaseUpdater {
 

@@ -4,36 +4,20 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 
 @Component
 public class TokenInit {
 
 	JdbcClient jdbc;
-	TokenService tkn;
 	
-	TokenInit(JdbcClient jdbc, TokenService tkn) {
+	TokenInit(JdbcClient jdbc) {
 		this.jdbc = jdbc;
-		this.tkn = tkn;
 	}
 	
-//	I don't like this approach, but it was quick
-	@Value("${test.env:false}")
-	private boolean isTestEnv;
+	String initToken() {
 
-	@PostConstruct
-	void initToken() {
-
-		
-		if (isTestEnv) {
-			return;
-		}
-		
 		List<String> tokenList = new ArrayList<>();
 		try {
 			tokenList = jdbc.sql("SELECT token FROM Refresh LIMIT 1").query(String.class).list();
@@ -42,26 +26,24 @@ public class TokenInit {
 		}
 		
 		if (tokenList.size() == 0 || tokenList.get(0) == null || tokenList.get(0).isEmpty()) {
-			return;
+			return null;
 		}
-		tkn.setRefreshToken(tokenList.get(0));
-		jdbc.sql("DELETE FROM Refresh").update();
+		return tokenList.get(0);
+//		this was an approach to limit the time the token is stored, but it lead to needing many re-authorizations
+//		jdbc.sql("DELETE FROM Refresh").update();
 	}
 	
-	
-	@PreDestroy
-	public void saveToken() {
-		if (isTestEnv) {
-			return;
-		}
+//	TODO: change to ON CONFLICT DO UPDATE SET
+	public void saveToken(String refreshToken) {
+
 		
 		try {
 			jdbc.sql("DELETE FROM Refresh").update();
-			if (tkn.getRefreshToken() == null) {
+			if (refreshToken == null) {
 				return;
 			}
 			jdbc.sql("INSERT INTO Refresh (token) VALUES (:refreshToken)")
-			.param("refreshToken", tkn.getRefreshToken(), Types.VARCHAR)
+			.param("refreshToken", refreshToken, Types.VARCHAR)
 			.update();
 		} catch (Exception e) {
 			e.printStackTrace();
