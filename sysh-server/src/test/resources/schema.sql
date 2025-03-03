@@ -1,3 +1,13 @@
+CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
+
+CREATE TABLE Users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR NOT NULL,
+    role user_role DEFAULT 'USER',
+    display_name VARCHAR
+);
+
 CREATE TABLE User_Data (
     id SERIAL PRIMARY KEY,
     display_name VARCHAR,
