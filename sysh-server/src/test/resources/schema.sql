@@ -5,23 +5,17 @@ CREATE TABLE Users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR NOT NULL,
     role user_role DEFAULT 'USER',
-    display_name VARCHAR
+--    consider handling the default in java
+    display_name VARCHAR DEFAULT 'unknown username'
 );
-
-CREATE TABLE User_Data (
-    id SERIAL PRIMARY KEY,
-    display_name VARCHAR,
-    CONSTRAINT only_one_user_data CHECK (id = 1)
-);
-
-INSERT INTO User_Data(display_name) VALUES ('username unknown');
 
 CREATE TABLE SongStreams (
     id SERIAL PRIMARY KEY,
     ts timestamp NOT NULL,
+    user_id varchar REFERENCES Users(id),
     ms_played integer NOT NULL,
     spotify_track_id varchar NOT NULL,
-    CONSTRAINT no_duplicates UNIQUE (ts, spotify_track_id)
+    CONSTRAINT no_duplicates UNIQUE (ts, spotify_track_id, user_id)
 );
 
 
@@ -150,6 +144,3 @@ CREATE TABLE Top_Tracks_Cache (
 
 CREATE INDEX tracks_by_time ON Top_Tracks_Cache (total_ms_played DESC);
 CREATE INDEX tracks_by_count ON Top_Tracks_Cache (stream_count DESC);
-
-
-
