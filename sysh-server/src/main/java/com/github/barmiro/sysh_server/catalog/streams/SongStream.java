@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 //This was originally Stream, but wanted to avoid collisions with the Stream class
 public record SongStream(
 	Timestamp ts,
+//	String user_id,
 	Integer ms_played,
 	String spotify_track_id) {
 	

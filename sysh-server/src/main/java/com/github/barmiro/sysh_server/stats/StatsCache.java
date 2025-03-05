@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 
-import jakarta.annotation.PostConstruct;
-
 @Service
 public class StatsCache {
 
@@ -33,7 +31,7 @@ public class StatsCache {
 	@Value("${test.env:false}")
 	private boolean isTestEnv;
 	
-	@PostConstruct
+//	@PostConstruct
 	public void cacheGenerator() {
 		
 		if (isTestEnv) {
