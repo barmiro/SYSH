@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.config;
+package com.github.barmiro.sysh_server.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

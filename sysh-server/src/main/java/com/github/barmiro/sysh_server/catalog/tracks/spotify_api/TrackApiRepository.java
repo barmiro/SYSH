@@ -11,13 +11,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.interfaces.SpotifyApiRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.TracksWrapper;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
+import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
 
 @Repository
 public class TrackApiRepository extends SpotifyApiRepository<

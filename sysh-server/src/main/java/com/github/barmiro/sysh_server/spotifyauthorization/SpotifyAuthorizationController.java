@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.auth;
+package com.github.barmiro.sysh_server.spotifyauthorization;
 
 import java.util.Optional;
 
@@ -10,11 +10,11 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.github.barmiro.sysh_server.common.utils.GetRandom;
 
 @RestController
-public class AuthController {
+public class SpotifyAuthorizationController {
 	
 	private TokenService tkn;
 	
-	public AuthController(TokenService tkn) {
+	public SpotifyAuthorizationController(TokenService tkn) {
 		this.tkn = tkn;
 	}
 	

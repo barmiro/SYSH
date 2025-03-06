@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.auth;
+package com.github.barmiro.sysh_server.spotifyauthorization;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

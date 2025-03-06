@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.albums.Album;
 import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
@@ -21,6 +20,7 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiT
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.album.ApiTrackAlbum;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.artists.ApiTrackArtist;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
+import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
 import com.github.barmiro.sysh_server.stats.StatsCache;
 
 @Repository

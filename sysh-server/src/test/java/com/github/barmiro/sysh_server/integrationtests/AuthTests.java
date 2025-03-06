@@ -20,8 +20,8 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
-import com.github.barmiro.sysh_server.auth.TokenInit;
-import com.github.barmiro.sysh_server.auth.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.TokenInit;
+import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
 
 @SpringBootTest
 class AuthTests {

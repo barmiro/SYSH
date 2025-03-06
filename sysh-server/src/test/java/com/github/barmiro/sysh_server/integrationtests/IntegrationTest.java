@@ -25,7 +25,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.AddToCatalog;
 import com.github.barmiro.sysh_server.catalog.albums.AlbumController;
 import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
@@ -40,6 +39,7 @@ import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
+import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
 import com.github.barmiro.sysh_server.stats.StatsCache;
 import com.github.barmiro.sysh_server.stats.StatsForRange;
 import com.github.barmiro.sysh_server.stats.StatsRepository;

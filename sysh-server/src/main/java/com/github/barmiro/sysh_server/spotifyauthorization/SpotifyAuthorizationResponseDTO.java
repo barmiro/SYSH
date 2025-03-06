@@ -1,6 +1,6 @@
-package com.github.barmiro.sysh_server.auth;
+package com.github.barmiro.sysh_server.spotifyauthorization;
 
-public record AuthResponseDTO(
+public record SpotifyAuthorizationResponseDTO(
 		String access_token,
 		String token_type,
 		String scope,

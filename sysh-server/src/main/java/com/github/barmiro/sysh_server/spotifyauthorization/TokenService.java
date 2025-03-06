@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.auth;
+package com.github.barmiro.sysh_server.spotifyauthorization;
 
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -89,7 +89,7 @@ public class TokenService {
 	private final String serverUrl = System.getenv("SYSH_SERVER_URL");
 	private final String serverPort = System.getenv("SYSH_SERVER_PORT");
 	public void getNewToken(String code) {
-		AuthResponseDTO responseBody;
+		SpotifyAuthorizationResponseDTO responseBody;
 		MultiValueMap<String, String> newBody = new LinkedMultiValueMap<>();
 		
 		newBody.add("grant_type", "authorization_code");
@@ -110,7 +110,7 @@ public class TokenService {
 		
 		
 		try {
-			responseBody = objectMapper.readValue(newEntity.getBody(), AuthResponseDTO.class);
+			responseBody = objectMapper.readValue(newEntity.getBody(), SpotifyAuthorizationResponseDTO.class);
 			setToken(responseBody.access_token());
 			expTimeFromExpiresIn(responseBody.expires_in());
 			setRefreshToken(responseBody.refresh_token());
@@ -140,7 +140,7 @@ public class TokenService {
 		} else {
 			log.info("Token expires: " + expirationTime + ". Getting new token...");			
 		}
-		AuthResponseDTO responseBody;
+		SpotifyAuthorizationResponseDTO responseBody;
 		MultiValueMap<String, String> newBody = new LinkedMultiValueMap<>();
 		
 		newBody.add("grant_type", "refresh_token");
@@ -156,7 +156,7 @@ public class TokenService {
 		
 		
 		try {
-			responseBody = objectMapper.readValue(newEntity.getBody(), AuthResponseDTO.class);
+			responseBody = objectMapper.readValue(newEntity.getBody(), SpotifyAuthorizationResponseDTO.class);
 			setToken(responseBody.access_token());
 			expTimeFromExpiresIn(responseBody.expires_in());
 			if (responseBody.refresh_token() != null) {

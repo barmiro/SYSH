@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
-import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
+import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
 
 @RestController
 public class UserDataController {

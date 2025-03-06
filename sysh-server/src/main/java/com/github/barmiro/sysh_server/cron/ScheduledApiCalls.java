@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
+import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
 
 @Component
 public class ScheduledApiCalls {

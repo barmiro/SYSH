@@ -9,13 +9,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.barmiro.sysh_server.auth.TokenService;
 import com.github.barmiro.sysh_server.catalog.albums.Album;
 import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
 import com.github.barmiro.sysh_server.catalog.albums.spotifyapideprecated.dto.AlbumsWrapper;
 import com.github.barmiro.sysh_server.catalog.albums.spotifyapideprecated.dto.albums.ApiAlbum;
 import com.github.barmiro.sysh_server.catalog.interfaces.SpotifyApiRepository;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
+import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
 
 @Repository
 public class AlbumApiRepository extends SpotifyApiRepository<
