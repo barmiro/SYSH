@@ -12,9 +12,9 @@ import com.github.barmiro.sysh_server.common.utils.GetRandom;
 @RestController
 public class SpotifyAuthorizationController {
 	
-	private TokenService tkn;
+	private SpotifyTokenService tkn;
 	
-	public SpotifyAuthorizationController(TokenService tkn) {
+	public SpotifyAuthorizationController(SpotifyTokenService tkn) {
 		this.tkn = tkn;
 	}
 	

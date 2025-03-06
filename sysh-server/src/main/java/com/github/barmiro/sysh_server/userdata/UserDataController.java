@@ -6,15 +6,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 
 @RestController
 public class UserDataController {
-	TokenService tkn;
+	SpotifyTokenService tkn;
 	RestClient apiClient;
 	UserDataRepository userDataRepository;
 	
-	public UserDataController(TokenService tkn,
+	public UserDataController(SpotifyTokenService tkn,
 			RestClient apiClient,
 			UserDataRepository userDataRepository) {
 		this.tkn = tkn;

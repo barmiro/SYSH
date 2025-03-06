@@ -15,7 +15,7 @@ import com.github.barmiro.sysh_server.catalog.albums.spotifyapideprecated.dto.Al
 import com.github.barmiro.sysh_server.catalog.albums.spotifyapideprecated.dto.albums.ApiAlbum;
 import com.github.barmiro.sysh_server.catalog.interfaces.SpotifyApiRepository;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 
 @Repository
 public class AlbumApiRepository extends SpotifyApiRepository<
@@ -24,7 +24,7 @@ public class AlbumApiRepository extends SpotifyApiRepository<
 											ApiAlbum,
 											AlbumsWrapper> {
 
-	AlbumApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, AlbumRepository catalogRepository) {
+	AlbumApiRepository(JdbcClient jdbc, RestClient apiClient, SpotifyTokenService tkn, AlbumRepository catalogRepository) {
 		super(jdbc, apiClient, tkn, catalogRepository);
 	}
 

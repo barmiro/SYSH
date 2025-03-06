@@ -17,7 +17,7 @@ import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.TracksWrapper;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 
 @Repository
 public class TrackApiRepository extends SpotifyApiRepository<
@@ -27,7 +27,7 @@ public class TrackApiRepository extends SpotifyApiRepository<
 											TracksWrapper> {
 
 
-	public TrackApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, TrackRepository catalogRepository) {
+	public TrackApiRepository(JdbcClient jdbc, RestClient apiClient, SpotifyTokenService tkn, TrackRepository catalogRepository) {
 		super(jdbc, apiClient, tkn, catalogRepository);
 	}
 	

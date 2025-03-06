@@ -39,7 +39,7 @@ import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 import com.github.barmiro.sysh_server.stats.StatsCache;
 import com.github.barmiro.sysh_server.stats.StatsForRange;
 import com.github.barmiro.sysh_server.stats.StatsRepository;
@@ -58,7 +58,7 @@ class IntegrationTest {
 	private JdbcClient jdbc;
 	
 	@Autowired
-	private TokenService tkn;
+	private SpotifyTokenService tkn;
 	
 	@Autowired
 	private TrackRepository trackRepo;

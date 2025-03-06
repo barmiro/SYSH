@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 
 @Service
-public class TokenService {
+public class SpotifyTokenService {
 	private String token;
 	private LocalDateTime expirationTime;
 	private String refreshToken;
@@ -33,17 +33,17 @@ public class TokenService {
 	private final String base64 = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
 
 	private RestClient tokenClient;
-	TokenInit tokenInit;
+	SpotifyTokenInit tokenInit;
 	
-	public TokenService(
+	public SpotifyTokenService(
 			RestClient tokenClient,
-			TokenInit tokenInit) {
+			SpotifyTokenInit tokenInit) {
 		this.tokenClient = tokenClient;
 		this.tokenInit = tokenInit;
 	}
 	
 	ObjectMapper objectMapper = new ObjectMapper();
-	private static final Logger log = LoggerFactory.getLogger(TokenService.class);
+	private static final Logger log = LoggerFactory.getLogger(SpotifyTokenService.class);
 	
 	public void setToken(String token) {
 		this.token = token;

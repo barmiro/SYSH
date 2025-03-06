@@ -6,16 +6,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 
 @Component
 public class ScheduledApiCalls {
 
-	TokenService tkn;
+	SpotifyTokenService tkn;
 //	I should really move this to a service...
 	RecentController recentController;
 	
-	ScheduledApiCalls(TokenService tkn, RecentController recentController) {
+	ScheduledApiCalls(SpotifyTokenService tkn, RecentController recentController) {
 		this.tkn = tkn;
 		this.recentController = recentController;
 	}

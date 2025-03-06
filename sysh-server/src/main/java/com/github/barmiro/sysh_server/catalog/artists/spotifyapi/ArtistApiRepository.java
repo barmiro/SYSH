@@ -17,7 +17,7 @@ import com.github.barmiro.sysh_server.catalog.artists.spotifyapi.dto.ArtistsWrap
 import com.github.barmiro.sysh_server.catalog.artists.spotifyapi.dto.artists.ApiArtist;
 import com.github.barmiro.sysh_server.catalog.interfaces.SpotifyApiRepository;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 
 @Repository
 public class ArtistApiRepository extends SpotifyApiRepository<
@@ -26,7 +26,7 @@ public class ArtistApiRepository extends SpotifyApiRepository<
 											ApiArtist,
 											ArtistsWrapper> {
 
-	public ArtistApiRepository(JdbcClient jdbc, RestClient apiClient, TokenService tkn, ArtistRepository catalogRepository) {
+	public ArtistApiRepository(JdbcClient jdbc, RestClient apiClient, SpotifyTokenService tkn, ArtistRepository catalogRepository) {
 		super(jdbc, apiClient, tkn, catalogRepository);
 	}
 

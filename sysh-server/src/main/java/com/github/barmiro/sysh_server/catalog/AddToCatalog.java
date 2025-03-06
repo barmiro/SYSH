@@ -20,7 +20,7 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiT
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.album.ApiTrackAlbum;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.artists.ApiTrackArtist;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 import com.github.barmiro.sysh_server.stats.StatsCache;
 
 @Repository
@@ -33,7 +33,7 @@ public class AddToCatalog {
 	StreamRepository streamRepository;
 	AlbumsTracks albumsTracks;
 	TracksArtists tracksArtists;
-	TokenService tkn;
+	SpotifyTokenService tkn;
 	StatsCache statsCache;
 	
 	public AddToCatalog(
@@ -43,7 +43,7 @@ public class AddToCatalog {
 			StreamRepository streamRepository,
 			AlbumsTracks albumsTracks,
 			TracksArtists tracksArtists,
-			TokenService tkn,
+			SpotifyTokenService tkn,
 			StatsCache statsCache) {
 		this.trackApiRepository = trackApiRepository;
 		this.albumRepository = albumRepository;

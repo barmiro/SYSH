@@ -9,9 +9,9 @@ import org.springframework.web.client.HttpClientErrorException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 	
-	TokenService tkn;
+	SpotifyTokenService tkn;
 	
-	GlobalExceptionHandler(TokenService tkn) {
+	GlobalExceptionHandler(SpotifyTokenService tkn) {
 		this.tkn = tkn;
 	}
 

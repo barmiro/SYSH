@@ -15,7 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 
 @Repository
 public abstract class SpotifyApiRepository<
@@ -27,12 +27,12 @@ public abstract class SpotifyApiRepository<
 
 	protected final JdbcClient jdbc;
 	protected final RestClient apiClient;
-	protected final TokenService tkn;
+	protected final SpotifyTokenService tkn;
 	protected final RepositoryClass catalogRepository;
 	
 	protected SpotifyApiRepository(JdbcClient jdbc, 
 			RestClient apiClient, 
-			TokenService tkn,
+			SpotifyTokenService tkn,
 			RepositoryClass catalogRepository) {
 		this.jdbc = jdbc;
 		this.apiClient = apiClient;

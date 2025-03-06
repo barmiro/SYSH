@@ -8,11 +8,11 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TokenInit {
+public class SpotifyTokenInit {
 
 	JdbcClient jdbc;
 	
-	TokenInit(JdbcClient jdbc) {
+	SpotifyTokenInit(JdbcClient jdbc) {
 		this.jdbc = jdbc;
 	}
 	

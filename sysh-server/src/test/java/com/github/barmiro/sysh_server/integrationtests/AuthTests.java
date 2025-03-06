@@ -20,8 +20,8 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenInit;
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenInit;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 
 @SpringBootTest
 class AuthTests {
@@ -32,7 +32,7 @@ class AuthTests {
 	private final String base64 = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
 	
 	@Autowired
-	private TokenInit tokenInit;
+	private SpotifyTokenInit tokenInit;
 	
 	@SuppressWarnings("resource")
 	@Container
@@ -53,7 +53,7 @@ class AuthTests {
 		.baseUrl("https://accounts.spotify.com/api/token");
 		
 		customizer.customize(builder);
-		TokenService tkn = new TokenService(builder.build(), tokenInit);
+		SpotifyTokenService tkn = new SpotifyTokenService(builder.build(), tokenInit);
 		
 		customizer.getServer().expect(requestTo("https://accounts.spotify.com/api/token"))
 		.andExpect(content().formData(SampleResponseBodies.tokenRequest()))

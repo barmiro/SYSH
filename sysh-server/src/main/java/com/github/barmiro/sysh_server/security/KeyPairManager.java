@@ -11,6 +11,8 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -18,12 +20,12 @@ import java.security.spec.X509EncodedKeySpec;
 import org.springframework.stereotype.Component;
 
 @Component
-public class KeyPairGeneratorUtil {
+public class KeyPairManager {
     private final KeyPair keyPair;
     private static final String PRIVATE_KEY_PATH = "/keys/private.der";
     private static final String PUBLIC_KEY_PATH = "/keys/public.der";
     
-    public KeyPairGeneratorUtil() {
+    public KeyPairManager() {
     	if (keysExist()) {
     		this.keyPair = loadExistingKeys();
     	} else {
@@ -87,5 +89,12 @@ public class KeyPairGeneratorUtil {
     		throw new RuntimeException("Failed to write key file", e);
     	}
     }
-    
+//    i'm not sure how i feel about this casting
+    public RSAPrivateKey getPrivateKey() {
+    	return (RSAPrivateKey) keyPair.getPrivate();
+    }
+
+    public RSAPublicKey getPublicKey() {
+    	return (RSAPublicKey) keyPair.getPublic();
+    }
 }

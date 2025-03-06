@@ -11,17 +11,17 @@ import com.github.barmiro.sysh_server.catalog.AddToCatalog;
 import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
-import com.github.barmiro.sysh_server.spotifyauthorization.TokenService;
+import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 
 @RestController
 public class RecentController {
 	
-	TokenService tkn;
+	SpotifyTokenService tkn;
 	RestClient apiClient;
 	StreamRepository streamService;
 	AddToCatalog addToCatalog;
 	
-	public RecentController(TokenService tkn,
+	public RecentController(SpotifyTokenService tkn,
 			RestClient apiClient,
 			StreamRepository streamService,
 			AddToCatalog addToCatalog) {
