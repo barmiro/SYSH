@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.userdata;
+package com.github.barmiro.sysh_server.users;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,11 +12,11 @@ import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 public class UserDataController {
 	SpotifyTokenService tkn;
 	RestClient apiClient;
-	UserDataRepository userDataRepository;
+	SyshUserRepository userDataRepository;
 	
 	public UserDataController(SpotifyTokenService tkn,
 			RestClient apiClient,
-			UserDataRepository userDataRepository) {
+			SyshUserRepository userDataRepository) {
 		this.tkn = tkn;
 		this.apiClient = apiClient;
 		this.userDataRepository = userDataRepository;
@@ -25,7 +25,7 @@ public class UserDataController {
 
 
 	@GetMapping("/userData")
-	public String userData() {
+	public String getUserData() {
 		
 		tkn.refresh();
 		
@@ -36,15 +36,18 @@ public class UserDataController {
 				.retrieve()
 				.toEntity(String.class);
 		
-		UserData userData = ConvertDTOs.userData(response);
+		SpotifyUserData userData = ConvertDTOs.userData(response);
 		
-		int updated = userDataRepository.addUserData(userData);
-		
-		if (updated == 1) {
-			return userData.display_name();			
+//		int updated = userDataRepository.addUserData(userData);
+//		
+//		if (updated == 1) {
+//			return userData.display_name();			
+//		}
+		if (userData.display_name() == null) {
+			return ("unknown username");			
+		} else {
+			return userData.display_name();
 		}
-		
-		return ("unknown username");
 	
 	}
 }

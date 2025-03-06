@@ -1,10 +1,9 @@
-CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
+--CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
 
 CREATE TABLE Users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR NOT NULL,
-    role user_role DEFAULT 'USER',
+    username varchar(64) PRIMARY KEY,
+    password VARCHAR NOT NULL,
+    role varchar DEFAULT 'USER',
 --    consider handling the default in java
     display_name VARCHAR DEFAULT 'unknown username'
 );
@@ -12,10 +11,10 @@ CREATE TABLE Users (
 CREATE TABLE SongStreams (
     id SERIAL PRIMARY KEY,
     ts timestamp NOT NULL,
-    user_id varchar REFERENCES Users(id),
+    username varchar REFERENCES Users(username),
     ms_played integer NOT NULL,
     spotify_track_id varchar NOT NULL,
-    CONSTRAINT no_duplicates UNIQUE (ts, spotify_track_id, user_id)
+    CONSTRAINT no_duplicates UNIQUE (ts, spotify_track_id, username)
 );
 
 

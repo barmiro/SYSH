@@ -19,7 +19,7 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.albu
 import com.github.barmiro.sysh_server.dataintake.json.StreamDTO;
 import com.github.barmiro.sysh_server.dataintake.recent.dto.ItemsWrapper;
 import com.github.barmiro.sysh_server.dataintake.recent.dto.recentstream.RecentStream;
-import com.github.barmiro.sysh_server.userdata.UserData;
+import com.github.barmiro.sysh_server.users.SpotifyUserData;
 
 public class ConvertDTOs {
 	
@@ -42,19 +42,20 @@ public class ConvertDTOs {
 		return streams;
 	}
 	
-	public static UserData userData(ResponseEntity<String> response) {
+	public static SpotifyUserData userData(ResponseEntity<String> response) {
 		
-		UserData data;
+		SpotifyUserData data;
 		try {
 			data = objectMapper
-					.readValue(response.getBody(), UserData.class);
+					.readValue(response.getBody(), SpotifyUserData.class);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-			return new UserData("to SYSH");
+			return new SpotifyUserData("to SYSH");
 		}
 		
 		return data;
 	}
+	
 	public static List<SongStream> streamsRecent(
 			ResponseEntity<String> response,
 			List<SongStream> previous) {
