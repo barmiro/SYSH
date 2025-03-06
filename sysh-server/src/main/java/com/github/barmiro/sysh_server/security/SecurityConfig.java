@@ -17,7 +17,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.github.barmiro.sysh_server.users.SyshUserDetailsManager;
+import com.github.barmiro.sysh_server.users.SyshUserDetailsService;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -29,10 +29,10 @@ import com.nimbusds.jose.proc.SecurityContext;
 @EnableWebSecurity
 public class SecurityConfig {
 	private KeyPairManager keyPairManager;
-	private SyshUserDetailsManager userDetailsManager;
+	private SyshUserDetailsService userDetailsManager;
 	
 	public SecurityConfig(KeyPairManager keyPairManager,
-			SyshUserDetailsManager userDetailsManager) {
+			SyshUserDetailsService userDetailsManager) {
 		this.keyPairManager = keyPairManager;
 		this.userDetailsManager = userDetailsManager;
 	}

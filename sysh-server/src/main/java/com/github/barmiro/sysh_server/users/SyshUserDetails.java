@@ -34,6 +34,8 @@ public class SyshUserDetails implements UserDetails {
 		return user.username();
 	}
 	
-	
+	public String getSpotifyState() {
+		return user.spotify_state();
+	}
 
 }

@@ -1,54 +1,58 @@
 --CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
 
 CREATE TABLE Users (
-    username varchar(64) PRIMARY KEY,
+    username VARCHAR(64) PRIMARY KEY,
     password VARCHAR NOT NULL,
-    role varchar DEFAULT 'USER',
+    spotify_state VARCHAR,
+    access_token VARCHAR,
+    refresh_token VARCHAR,
+    expires_in TIMESTAMP,
+    role VARCHAR DEFAULT 'USER',
 --    consider handling the default in java
     display_name VARCHAR DEFAULT 'unknown username'
 );
 
 CREATE TABLE SongStreams (
     id SERIAL PRIMARY KEY,
-    ts timestamp NOT NULL,
-    username varchar REFERENCES Users(username),
-    ms_played integer NOT NULL,
-    spotify_track_id varchar NOT NULL,
+    ts TIMESTAMP NOT NULL,
+    username VARCHAR REFERENCES Users(username),
+    ms_played INTEGER NOT NULL,
+    spotify_track_id VARCHAR NOT NULL,
     CONSTRAINT no_duplicates UNIQUE (ts, spotify_track_id, username)
 );
 
 
 CREATE TABLE Tracks (
-    spotify_track_id varchar PRIMARY KEY,
-    name varchar,
-    duration_ms integer,
-    album_id varchar,
-    disc_number integer,
-    track_number integer
+    spotify_track_id VARCHAR PRIMARY KEY,
+    name VARCHAR,
+    duration_ms INTEGER,
+    album_id VARCHAR,
+    disc_number INTEGER,
+    track_number INTEGER
 );
 
 CREATE INDEX duration_name ON Tracks (duration_ms, name);
 
 CREATE TABLE Track_Duplicates (
-    primary_id varchar REFERENCES Tracks(spotify_track_id),
-    secondary_id varchar REFERENCES Tracks(spotify_track_id),
+    primary_id VARCHAR REFERENCES Tracks(spotify_track_id),
+    secondary_id VARCHAR REFERENCES Tracks(spotify_track_id),
     PRIMARY KEY (primary_id, secondary_id)
 );
 
 CREATE TABLE Albums (
-    id varchar PRIMARY KEY,
-    name varchar,
-    total_tracks integer,
-    release_date varchar,
-    image_url varchar,
-    thumbnail_url varchar
+    id VARCHAR PRIMARY KEY,
+    name VARCHAR,
+    total_tracks INTEGER,
+    release_date VARCHAR,
+    image_url VARCHAR,
+    thumbnail_url VARCHAR
 );
 
 CREATE TABLE Album_Tracklist (
-    album_id varchar REFERENCES Albums(id),
-    spotify_track_id varchar,
-    disc_number integer,
-    track_number integer,
+    album_id VARCHAR REFERENCES Albums(id),
+    spotify_track_id VARCHAR,
+    disc_number INTEGER,
+    track_number INTEGER,
     PRIMARY KEY (album_id, spotify_track_id)
 );
 
@@ -56,38 +60,36 @@ CREATE INDEX tracklist_index ON Album_Tracklist (album_id);
 
 
 CREATE TABLE Artists (
-    id varchar PRIMARY KEY,
-    name varchar,
-    image_url varchar,
-    thumbnail_url varchar
+    id VARCHAR PRIMARY KEY,
+    name VARCHAR,
+    image_url VARCHAR,
+    thumbnail_url VARCHAR
 );
 
 
 CREATE TABLE Albums_Tracks (
-    album_id varchar REFERENCES Albums(id),
-    spotify_track_id varchar REFERENCES Tracks(spotify_track_id),
-    disc_number integer,
-    track_number integer,
+    album_id VARCHAR REFERENCES Albums(id),
+    spotify_track_id VARCHAR REFERENCES Tracks(spotify_track_id),
+    disc_number INTEGER,
+    track_number INTEGER,
     PRIMARY KEY (album_id, spotify_track_id)
 );
 
 CREATE INDEX album_join ON Albums_Tracks (album_id);
 
 CREATE TABLE Tracks_Artists (
-    spotify_track_id varchar REFERENCES Tracks(spotify_track_id),
-    artist_id varchar REFERENCES Artists(id),
-    artist_order integer,
+    spotify_track_id VARCHAR REFERENCES Tracks(spotify_track_id),
+    artist_id VARCHAR REFERENCES Artists(id),
+    artist_order INTEGER,
     PRIMARY KEY (spotify_track_id, artist_id)
 );
 
 CREATE TABLE Artists_Albums (
-    artist_id varchar REFERENCES Artists(id),
-    album_id varchar REFERENCES Albums(id),
-    artist_order integer,
+    artist_id VARCHAR REFERENCES Artists(id),
+    album_id VARCHAR REFERENCES Albums(id),
+    artist_order INTEGER,
     PRIMARY KEY (artist_id, album_id)
 );
-
-CREATE TABLE Refresh (token varchar);
 
 
 CREATE TABLE Stats_Cache_Range (

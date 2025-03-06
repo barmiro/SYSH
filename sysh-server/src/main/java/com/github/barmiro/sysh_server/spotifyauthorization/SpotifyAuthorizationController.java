@@ -2,34 +2,35 @@ package com.github.barmiro.sysh_server.spotifyauthorization;
 
 import java.util.Optional;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.github.barmiro.sysh_server.common.utils.GetRandom;
+import com.github.barmiro.sysh_server.users.SyshUserDetails;
+import com.github.barmiro.sysh_server.users.SyshUserManager;
 
 @RestController
 public class SpotifyAuthorizationController {
 	
 	private SpotifyTokenService tkn;
+	private SyshUserManager manager;
 	
-	public SpotifyAuthorizationController(SpotifyTokenService tkn) {
+	public SpotifyAuthorizationController(SpotifyTokenService tkn, SyshUserManager manager) {
 		this.tkn = tkn;
+		this.manager = manager;
 	}
 	
 	private final String clientId = System.getenv("SPOTIFY_CLIENT_ID");
-	private final String state = GetRandom.alphaNumeric(16);
 	private final String serverUrl = System.getenv("SYSH_SERVER_URL");
 	private final String serverPort = System.getenv("SYSH_SERVER_PORT");
 	
-	@GetMapping("/state")
-	public String state() {
-		return state;
-	}
-	
 	@GetMapping("/authorize")
-	public RedirectView authorize() {
+	public String authorize(
+			@AuthenticationPrincipal SyshUserDetails userDetails) {
+		
+		String state = userDetails.getSpotifyState();
 		String url = "https://accounts.spotify.com/authorize?"
 				+ "response_type=code&"
 				+ "client_id=" + clientId + "&"
@@ -39,7 +40,7 @@ public class SpotifyAuthorizationController {
 				+ "user-modify-playback-state&"
 				+ "redirect_uri=http://" + serverUrl + ":" + serverPort + "/callback&"
 				+ "state=" + state;
-		return new RedirectView(url);
+		return url;
 	}
 	
 	
@@ -53,16 +54,20 @@ public class SpotifyAuthorizationController {
 	public RedirectView callback(@RequestParam(required=false) Optional<String> code, @RequestParam String state) {
 		
 		
-		if (!state.equals(this.state)) {
-			RedirectView stateMismatch = new RedirectView("/error");
-			stateMismatch.addStaticAttribute("message", "The state returned by Spotify was wrong");
-			return stateMismatch;
-		}
+		SyshUserDetails userDetails = manager.loadUserBySpotifyState(state);
 		
 		String codeValue = code.orElseThrow();
 		
 		tkn.getNewToken(codeValue);
 		
 		return new RedirectView("/userData");	
+		
+		
+//		if (!state.equals(this.state)) {
+//			RedirectView stateMismatch = new RedirectView("/error");
+//			stateMismatch.addStaticAttribute("message", "The state returned by Spotify was wrong");
+//			return stateMismatch;
+//		}
+		
 	};
 }
