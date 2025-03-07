@@ -49,7 +49,7 @@ public class StreamRepository {
 	public int wipeStreamsInRange(TimestampRange timestampRange, String username) {
 		
 		String sql = ("DELETE FROM SongStreams "
-				+ "WHERE username = :username"
+				+ "WHERE username = :username "
 				+ "AND ts BETWEEN :startTimestamp AND :endTimestamp");
 		
 		return jdbc.sql(sql)

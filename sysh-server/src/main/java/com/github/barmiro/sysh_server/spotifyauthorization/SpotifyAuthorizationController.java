@@ -52,10 +52,12 @@ public class SpotifyAuthorizationController {
 	@GetMapping("/callback")
 	public RedirectView callback(@RequestParam(required=false) Optional<String> code, @RequestParam String state) {
 		
-		
+		System.out.println("callback called");
 		String username = userManager.getUsernameBySpotifyState(state);
+		System.out.println(username);
 		
 		String codeValue = code.orElseThrow();
+		System.out.println(codeValue);
 		
 		tkn.getNewToken(codeValue, username);
 		
