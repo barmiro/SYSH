@@ -4,8 +4,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,12 +25,12 @@ public class JsonController {
 	private static final Logger log = LoggerFactory.getLogger(JsonController.class);
 	
 	@PostMapping("/addJson")
-	String addJson(@RequestBody List<StreamDTO> streamDTOs,
-			@AuthenticationPrincipal Jwt jwt) {
+	String addJson(@RequestBody List<StreamDTO> streamDTOs) {
 		
 		log.info("Adding json file...");
 		long start = System.currentTimeMillis();
-		String username = jwt.getPrincipalClaimName();
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
 		
 
 		List<SongStream> streams = ConvertDTOs.streamsJson(streamDTOs, username);  // null?

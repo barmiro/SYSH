@@ -65,7 +65,7 @@ public class CompListToSql {
 		}
 		
 		sb.deleteCharAt(sb.length() - 1);
-		sb.append(") ON CONFLICT (start_date, end_date) DO UPDATE SET ");
+		sb.append(") ON CONFLICT (username, start_date, end_date) DO UPDATE SET ");
 		
 		for (RecordCompInfo comp:comps) {
 			sb.append(comp.compName() + " = EXCLUDED." + comp.compName() + ",");

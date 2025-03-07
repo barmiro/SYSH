@@ -58,16 +58,20 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		}
 		log.info("Added " + added + " new albums");
 		
-		try {
-			updateTopAlbumsCache();
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		TODO: call this somewhere else, this method should be user-agnostic
+//		try {
+//			updateTopAlbumsCache(username);
+//		} catch (IllegalAccessException | InvocationTargetException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		return added;
 	}
 	
-	List<AlbumStats> topAlbums(String sort, Timestamp startDate, Timestamp endDate) {
+	List<AlbumStats> topAlbums(String sort,
+			Timestamp startDate,
+			Timestamp endDate,
+			String username) {
 		
 		String sql = ("SELECT Albums.*,"
 				+ "COUNT("
@@ -83,7 +87,8 @@ public class AlbumRepository extends CatalogRepository<Album> {
 				+ "FROM Albums "
 				+ "LEFT JOIN Albums_Tracks ON Albums.id = Albums_Tracks.album_id "
 				+ "LEFT JOIN SongStreams ON Albums_Tracks.spotify_track_id = SongStreams.spotify_track_id "
-				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate "
+				+ "WHERE SongStreams.username = :username "
+				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate "
 				+ "GROUP BY "
 				+ "Albums.id,"
 				+ "Albums.name,"
@@ -93,6 +98,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 				+ sort
 				+ " DESC;");
 		return jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
 				.param("startDate", startDate, Types.TIMESTAMP)
 				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(AlbumStats.class)
@@ -100,7 +106,9 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	}
 	
 	
-	List<AlbumStats> topAlbums(String sort, Boolean checkForCache) {
+	List<AlbumStats> topAlbums(String sort,
+			String username,
+			Boolean checkForCache) {
 		
 		String sql;
 		
@@ -113,6 +121,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 					+ "COALESCE(stream_count, 0) AS stream_count, "
 					+ "COALESCE(total_ms_played, 0) AS total_ms_played "
 					+ "FROM Top_Albums_Cache "
+					+ "WHERE username = :username "
 					+ "ORDER BY "
 					+ sort
 					+ " DESC;");
@@ -131,6 +140,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 					+ "FROM Albums "
 					+ "LEFT JOIN Albums_Tracks ON Albums.id = Albums_Tracks.album_id "
 					+ "LEFT JOIN SongStreams ON Albums_Tracks.spotify_track_id = SongStreams.spotify_track_id "
+					+ "WHERE SongStreams.username = :username "
 					+ "GROUP BY "
 					+ "Albums.id,"
 					+ "Albums.name,"
@@ -142,19 +152,22 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		}
 		
 		return jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
 				.query(AlbumStats.class)
 				.list();
 	}
 	
-	int updateTopAlbumsCache(
+	int updateTopAlbumsCache(String username
 			) throws IllegalAccessException, InvocationTargetException {
 //		Doesn't have to be sorted, but I don't feel like overloading the constructor again
-		List<AlbumStats> albumStatsList = topAlbums("stream_count", false);
+		List<AlbumStats> albumStatsList = topAlbums("stream_count", username, false);
 		
 		
-		String wipeCache = ("DELETE FROM Top_Albums_Cache;");
+		String wipeCache = ("DELETE FROM Top_Albums_Cache WHERE username = :username");
 		
-		int deletedRows = jdbc.sql(wipeCache).update();
+		int deletedRows = jdbc.sql(wipeCache)
+				.param("username", username, Types.VARCHAR)
+				.update();
 		
 		int rowsAdded = 0;
 		

@@ -3,6 +3,7 @@ package com.github.barmiro.sysh_server.stats;
 import java.sql.Timestamp;
 
 public record StatsForRange(
+		String username,
 		Timestamp start_date,
 		Timestamp end_date,
 		Integer minutes_streamed,

@@ -105,12 +105,14 @@ public class TrackRepository extends CatalogRepository<Track> {
 		if (duplicates > 0) {
 			log.info(duplicates + " tracks appear on multiple albums.");			
 		}
-		try {
-			updateTopTracksCache();
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+//		TODO: call this somewhere else, this method should be user-agnostic
+//		try {
+//			updateTopTracksCache(username);
+//		} catch (IllegalAccessException | InvocationTargetException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		return added;
 	}
 	
@@ -135,7 +137,10 @@ public class TrackRepository extends CatalogRepository<Track> {
 	}
 	
 	
-	List<TrackStats> topTracks(String sort, Timestamp startDate, Timestamp endDate) {
+	List<TrackStats> topTracks(String sort,
+			Timestamp startDate,
+			Timestamp endDate,
+			String username) {
 		
 		String sql = ("SELECT t2.spotify_track_id, t2.name,"
 				+ "COUNT("
@@ -152,7 +157,8 @@ public class TrackRepository extends CatalogRepository<Track> {
 				+ "LEFT JOIN Albums ON t2.album_id = Albums.id "
 				+ "LEFT JOIN Tracks_Artists ON t2.spotify_track_id = Tracks_Artists.spotify_track_id "
 				+ "LEFT JOIN Artists ON Tracks_Artists.artist_id = Artists.id "
-				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate "
+				+ "WHERE SongStreams.username = :username "
+				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate "
 				+ "AND Tracks_Artists.artist_order = 0 "
 				+ "GROUP BY "
 				+ "t2.spotify_track_id,"
@@ -164,13 +170,16 @@ public class TrackRepository extends CatalogRepository<Track> {
 				+ sort
 				+ " DESC;");
 		return jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
 				.param("startDate", startDate, Types.TIMESTAMP)
 				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(TrackStats.class)
 				.list();
 	}
 	
-	List<TrackStats> topTracks(String sort, Boolean checkForCache) {
+	List<TrackStats> topTracks(String sort,
+			String username,
+			Boolean checkForCache) {
 		
 		String sql;
 		
@@ -183,6 +192,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 					+ "COALESCE(stream_count, 0) AS stream_count, "
 					+ "COALESCE(total_ms_played, 0) AS total_ms_played "
 					+ "FROM Top_Tracks_Cache "
+					+ "WHERE username = :username "
 					+ "ORDER BY "
 					+ sort
 					+ " DESC;");
@@ -202,7 +212,8 @@ public class TrackRepository extends CatalogRepository<Track> {
 					+ "LEFT JOIN Albums ON t2.album_id = Albums.id "
 					+ "LEFT JOIN Tracks_Artists ON t2.spotify_track_id = Tracks_Artists.spotify_track_id "
 					+ "LEFT JOIN Artists ON Tracks_Artists.artist_id = Artists.id "
-					+ "WHERE Tracks_Artists.artist_order = 0 "
+					+ "WHERE SongStreams.username = :username "
+					+ "AND Tracks_Artists.artist_order = 0 "
 					+ "GROUP BY "
 					+ "t2.spotify_track_id,"
 					+ "t2.name,"
@@ -215,19 +226,22 @@ public class TrackRepository extends CatalogRepository<Track> {
 		}
 		
 		return jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
 				.query(TrackStats.class)
 				.list();
 	}
 	
-	int updateTopTracksCache(
+	int updateTopTracksCache(String username
 			) throws IllegalAccessException, InvocationTargetException {
 //		Doesn't have to be sorted, but I don't feel like overloading the constructor again
-		List<TrackStats> trackStatsList = topTracks("stream_count", false);
+		List<TrackStats> trackStatsList = topTracks("stream_count", username, false);
 		
 		
-		String wipeCache = ("DELETE FROM Top_Tracks_Cache;");
+		String wipeCache = ("DELETE FROM Top_Tracks_Cache WHERE username = :username");
 		
-		int deletedRows = jdbc.sql(wipeCache).update();
+		int deletedRows = jdbc.sql(wipeCache)
+				.param("username", username, Types.VARCHAR)
+				.update();
 		
 		int rowsAdded = 0;
 		

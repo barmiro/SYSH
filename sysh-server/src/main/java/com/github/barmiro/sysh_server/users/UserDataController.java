@@ -1,8 +1,7 @@
 package com.github.barmiro.sysh_server.users;
 
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
@@ -27,9 +26,10 @@ public class UserDataController {
 
 
 	@GetMapping("/userData")
-	public String getUserData(@AuthenticationPrincipal Jwt jwt) {
+	public String getUserData() {
 		
-		String username = jwt.getPrincipalClaimName();
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
 		tkn.refresh(username);
 		
 		ResponseEntity<String> response = apiClient

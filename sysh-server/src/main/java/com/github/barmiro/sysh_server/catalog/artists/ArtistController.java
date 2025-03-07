@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,12 +20,7 @@ public class ArtistController {
 	public ArtistController (ArtistRepository artistRepository) {
 		this.artistRepository = artistRepository;
 	}
-	
-	
-	@GetMapping("/getArtists")
-	List<Artist> getArtists() {
-		return artistRepository.findAll();
-	}
+
 
 	@GetMapping("/artists")
 	public List<ArtistStats> topArtists(
@@ -34,6 +30,7 @@ public class ArtistController {
 			Optional<String> start,
 			@RequestParam(required = false)
 			Optional<String> end) {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		Timestamp startDate = Timestamp.valueOf(start
 				.orElse("2000-01-01T00:00:00")
@@ -43,9 +40,9 @@ public class ArtistController {
 				.replace("T", " "));
 		String sortBy = sort.orElse("");
 		if (sortBy.equals("time")) {
-			return artistRepository.topArtists("total_ms_played", startDate, endDate);
+			return artistRepository.topArtists("total_ms_played", startDate, endDate, username);
 		} else {
-			return artistRepository.topArtists("stream_count", startDate, endDate);
+			return artistRepository.topArtists("stream_count", startDate, endDate, username);
 		} 
 		
 	}

@@ -1,6 +1,7 @@
 package com.github.barmiro.sysh_server.catalog.albums;
 
 public record AlbumStats(
+		String username,
 		String id,
 		String name,
 		String thumbnail_url,

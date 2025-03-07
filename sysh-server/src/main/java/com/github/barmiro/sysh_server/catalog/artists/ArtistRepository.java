@@ -37,7 +37,10 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 	
 	
 	
-public List<ArtistStats> topArtists(String sort, Timestamp startDate, Timestamp endDate) {
+public List<ArtistStats> topArtists(String sort,
+		Timestamp startDate,
+		Timestamp endDate,
+		String username) {
 		
 		String sql = ("SELECT Artists.*,"
 				+ "COUNT("
@@ -47,7 +50,8 @@ public List<ArtistStats> topArtists(String sort, Timestamp startDate, Timestamp 
 				+ "FROM Artists "
 				+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
 				+ "LEFT JOIN SongStreams ON Tracks_Artists.spotify_track_id = SongStreams.spotify_track_id "
-				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate "
+				+ "WHERE SongStreams.username = :username "
+				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate "
 				+ "GROUP By "
 				+ "Artists.id,"
 				+ "Artists.name,"
@@ -57,6 +61,7 @@ public List<ArtistStats> topArtists(String sort, Timestamp startDate, Timestamp 
 				+ " DESC;");
 		
 		return jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
 				.param("startDate", startDate, Types.TIMESTAMP)
 				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(ArtistStats.class)

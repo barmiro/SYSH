@@ -93,6 +93,7 @@ CREATE TABLE Artists_Albums (
 
 
 CREATE TABLE Stats_Cache_Range (
+    username VARCHAR,
     start_date TIMESTAMP NOT NULL, 
     end_date TIMESTAMP NOT NULL, 
     minutes_streamed INTEGER, 
@@ -100,48 +101,54 @@ CREATE TABLE Stats_Cache_Range (
     track_count INTEGER, 
     album_count INTEGER, 
     artist_count INTEGER,
-    CONSTRAINT no_duplicate_stats UNIQUE (start_date, end_date)
+    CONSTRAINT no_duplicate_stats UNIQUE (username, start_date, end_date)
 );
 
 CREATE TABLE Stats_Cache_Full (
-    id SERIAL PRIMARY KEY,
+    username VARCHAR PRIMARY KEY REFERENCES Users(username) ON DELETE CASCADE,
     minutes_streamed INTEGER, 
     stream_count INTEGER, 
     track_count INTEGER, 
     album_count INTEGER, 
-    artist_count INTEGER,
-    CONSTRAINT only_one_full_cache CHECK (id = 1)
-);
-INSERT INTO Stats_Cache_Full (
-    minutes_streamed,
-    stream_count,
-    track_count,
-    album_count,
-    artist_count)
-    VALUES (
-    0, 0, 0, 0, 0
+    artist_count INTEGER
 );
 
+--INSERT INTO Stats_Cache_Full (
+--    minutes_streamed,
+--    stream_count,
+--    track_count,
+--    album_count,
+--    artist_count)
+--    VALUES (
+--    0, 0, 0, 0, 0
+--);
+
 CREATE TABLE Top_Albums_Cache (
+    username VARCHAR,
     id VARCHAR,
     name VARCHAR,
     thumbnail_url VARCHAR,
     primary_artist_name VARCHAR,
     stream_count INTEGER DEFAULT 0,
-    total_ms_played INTEGER DEFAULT 0
+    total_ms_played INTEGER DEFAULT 0,
+    PRIMARY KEY (username, id),
+    FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
-CREATE INDEX albums_by_time ON Top_Albums_Cache (total_ms_played DESC);
-CREATE INDEX albums_by_count ON Top_Albums_Cache (stream_count DESC);
+CREATE INDEX albums_by_time ON Top_Albums_Cache (username, total_ms_played DESC);
+CREATE INDEX albums_by_count ON Top_Albums_Cache (username, stream_count DESC);
 
 CREATE TABLE Top_Tracks_Cache (
+    username VARCHAR,
     spotify_track_id VARCHAR,
     name VARCHAR,
     album_name VARCHAR,
     thumbnail_url VARCHAR,
     primary_artist_name VARCHAR,
     stream_count INTEGER DEFAULT 0,
-    total_ms_played INTEGER DEFAULT 0
+    total_ms_played INTEGER DEFAULT 0,
+    PRIMARY KEY (username, spotify_track_id),
+    FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE
 );
 
-CREATE INDEX tracks_by_time ON Top_Tracks_Cache (total_ms_played DESC);
-CREATE INDEX tracks_by_count ON Top_Tracks_Cache (stream_count DESC);
+CREATE INDEX tracks_by_time ON Top_Tracks_Cache (username, total_ms_played DESC);
+CREATE INDEX tracks_by_count ON Top_Tracks_Cache (username, stream_count DESC);

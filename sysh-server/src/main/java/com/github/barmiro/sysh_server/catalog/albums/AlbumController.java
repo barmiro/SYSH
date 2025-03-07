@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,15 +34,16 @@ public class AlbumController {
 			String start,
 			@RequestParam
 			String end) {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		Timestamp startDate = Timestamp.valueOf(start.replace("T", " "));
 		Timestamp endDate = Timestamp.valueOf(end.replace("T", " "));
 		
 		String sortBy = sort.orElse("count");
 		if (sortBy.equals("time")) {
-			return albumRepository.topAlbums("total_ms_played", startDate, endDate);
+			return albumRepository.topAlbums("total_ms_played", startDate, endDate, username);
 		} else {
-			return albumRepository.topAlbums("stream_count", startDate, endDate);
+			return albumRepository.topAlbums("stream_count", startDate, endDate, username);
 		}
 	}
 	
@@ -50,11 +52,13 @@ public class AlbumController {
 			@RequestParam(required = false)
 			Optional<String> sort) {
 		
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		
 		String sortBy = sort.orElse("count");
 		if (sortBy.equals("time")) {
-			return albumRepository.topAlbums("total_ms_played", true);
+			return albumRepository.topAlbums("total_ms_played", username, true);
 		} else {
-			return albumRepository.topAlbums("stream_count", true);
+			return albumRepository.topAlbums("stream_count", username, true);
 		}
 	}
 

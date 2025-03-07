@@ -32,16 +32,16 @@ public class StatsCache {
 	private boolean isTestEnv;
 	
 //	@PostConstruct
-	public void cacheGenerator() {
+	public void cacheGenerator(String username) {
 		
 		if (isTestEnv) {
 			return;
 		}
 		
-		Optional<Timestamp> oldestStream = statsRepo.getFirstStreamDate();
+		Optional<Timestamp> oldestStream = statsRepo.getFirstStreamDate(username);
 		
 		if(oldestStream.isEmpty()) {
-			log.error("Cache generator didn't find any streams.");
+			log.error("Cache generator didn't find any streams for user " + username);
 			return;
 		}
 		
@@ -53,20 +53,20 @@ public class StatsCache {
 				.getYear();
 		
 		int addedYears = 0;
-		log.info("Generating full stats cache...");
+		log.info("Generating full stats cache for user " + username);
 		try {
-			statsRepo.addCachedStats();
+			statsRepo.addCachedStats(username);
 			log.info("Done");
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		log.info("Generating yearly stats cache...");
+		log.info("Generating yearly stats cache for user " + username);
 		for (int i = startYear; i <= endYear; i++) {
 			Timestamp start = Timestamp.valueOf(i + "-01-01 00:00:00");
 			Timestamp end = Timestamp.valueOf(i + "-12-31 23:59:59");
 			try {
-				addedYears += statsRepo.addCachedStats(start, end);
+				addedYears += statsRepo.addCachedStats(start, end, username);
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -77,7 +77,9 @@ public class StatsCache {
 		+ " years in range " 
 		+ startYear 
 		+ " - " 
-		+ endYear);
+		+ endYear
+		+ " for user "
+		+ username);
 		
 	}
 	
@@ -86,6 +88,7 @@ public class StatsCache {
 	
 	public void updateCache(
 			List<SongStream> streams,
+			String username,
 			int tracksAdded,
 			int albumsAdded,
 			int artistsAdded) {
@@ -106,7 +109,7 @@ public class StatsCache {
 					.getYear();
 			
 			if (streamYear != baseYear) {
-				cacheGenerator();
+				cacheGenerator(username);
 				return;
 			}
 			
@@ -130,30 +133,33 @@ public class StatsCache {
 //		but you don't really need a cache for the first weeks of a year
 		int updatedRangeCaches = jdbc.sql("UPDATE Stats_Cache_Range "
 				+ baseSql
-				+ "WHERE start_date <= :start "
+				+ "WHERE username = :username "
+				+ "AND start_date <= :start "
 				+ "AND end_date >= :end")
 		.param("minutesAdded", minutesAdded, Types.INTEGER)
 		.param("streamsAdded", streams.size(), Types.INTEGER)
 		.param("tracksAdded", tracksAdded, Types.INTEGER)
 		.param("albumsAdded", albumsAdded, Types.INTEGER)
 		.param("artistsAdded", artistsAdded, Types.INTEGER)
+		.param("username", username, Types.VARCHAR)
 		.param("start", start, Types.TIMESTAMP)
 		.param("end", end, Types.TIMESTAMP)
 		.update();
 		
 		int updatedFullCache = jdbc.sql("UPDATE Stats_Cache_Full "
 				+ baseSql
-				+ " WHERE id = 1")
+				+ " WHERE username = :username")
 		.param("minutesAdded", minutesAdded, Types.INTEGER)
 		.param("streamsAdded", streams.size(), Types.INTEGER)
 		.param("tracksAdded", tracksAdded, Types.INTEGER)
 		.param("albumsAdded", albumsAdded, Types.INTEGER)
 		.param("artistsAdded", artistsAdded, Types.INTEGER)
+		.param("username", username, Types.VARCHAR)
 		.update();
 		
-		log.info(updatedRangeCaches + " range stats caches have been updated.");
+		log.info(updatedRangeCaches + " range stats caches have been updated for user " + username);
 		if (updatedFullCache == 1) {
-			log.info("Updated all time stats cache");
+			log.info("Updated all time stats cache for user " + username);
 		} else {
 			log.error("Full cache update error, affected rows: " + updatedFullCache);
 		}

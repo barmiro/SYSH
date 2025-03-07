@@ -1,6 +1,7 @@
 package com.github.barmiro.sysh_server.catalog.tracks;
 
 public record TrackStats(
+		String username,
 		String spotify_track_id,
 		String name,
 		String album_name,

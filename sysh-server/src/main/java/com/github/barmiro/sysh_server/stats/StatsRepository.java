@@ -29,10 +29,10 @@ public class StatsRepository {
 	Logger log = LoggerFactory.getLogger(StatsRepository.class);
 	
 		
-	public StatsForRange streamStats(Timestamp startDate, Timestamp endDate, Boolean checkForCache) {
+	public StatsForRange streamStats(Timestamp startDate, Timestamp endDate, Boolean checkForCache, String username) {
 		
 		if (checkForCache) {
-			Optional<StatsForRange> cached = getCachedStats(startDate, endDate);
+			Optional<StatsForRange> cached = getCachedStats(startDate, endDate, username);
 			if (cached.isPresent()) {
 				return cached.get();
 			}			
@@ -51,6 +51,7 @@ public class StatsRepository {
 				+ "FROM SongStreams "
 				+ "JOIN Tracks ON SongStreams.spotify_track_id = Tracks.spotify_track_id "
 				+ "WHERE SongStreams.ms_played > 30000 "
+				+ "AND SongStreams.username = :username "
 				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate;");
 		
 //		This is a separate query because I believe even streams below 30s
@@ -58,7 +59,8 @@ public class StatsRepository {
 		String minutes = ("SELECT "
 				+ "COALESCE(SUM(ms_played) / 60000, 0) AS minutes_streamed "
 				+ "FROM SongStreams "
-				+ "WHERE SongStreams.ts BETWEEN :startDate AND :endDate;");
+				+ "WHERE SongStreams.username = :username "
+				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate;");
 		
 		String artists = ("SELECT "
 				+ "COUNT(DISTINCT Tracks_Artists.artist_id) "
@@ -66,28 +68,33 @@ public class StatsRepository {
 				+ "JOIN SongStreams ON "
 				+ "SongStreams.spotify_track_id = Tracks_Artists.spotify_track_id "
 				+ "WHERE SongStreams.ms_played > 30000 "
+				+ "AND SongStreams.username = :username "
 				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate;");
 		
 		
 		StatsDTO statsDTO =  jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
 				.param("startDate", startDate, Types.TIMESTAMP)
 				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(StatsDTO.class)
 				.single();
 		
 		Integer minutesStreamed = jdbc.sql(minutes)
+				.param("username", username, Types.VARCHAR)
 				.param("startDate", startDate, Types.TIMESTAMP)
 				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(Integer.class)
 				.single();
 		
 		Integer artistCount = jdbc.sql(artists)
+				.param("username", username, Types.VARCHAR)
 				.param("startDate", startDate, Types.TIMESTAMP)
 				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(Integer.class)
 				.single();
 		
-		return new StatsForRange(startDate,
+		return new StatsForRange(username,
+				startDate,
 				endDate,
 				minutesStreamed,
 				statsDTO.stream_count(),
@@ -98,11 +105,11 @@ public class StatsRepository {
 	}
 	
 	
-public FullStats streamStats(Boolean checkForCache) {
+public FullStats streamStats(String username, Boolean checkForCache) {
 		
 	
 		if(checkForCache) {
-			return getCachedStats();
+			return getCachedStats(username);
 		}
 		
 		String sql = ("SELECT "
@@ -116,33 +123,40 @@ public FullStats streamStats(Boolean checkForCache) {
 				+ "AS album_count "
 				+ "FROM SongStreams "
 				+ "JOIN Tracks ON SongStreams.spotify_track_id = Tracks.spotify_track_id "
-				+ "WHERE SongStreams.ms_played > 30000;");
+				+ "WHERE username = :username "
+				+ "AND SongStreams.ms_played > 30000;");
+		
 		
 		String minutes = ("SELECT "
 				+ "COALESCE(SUM(ms_played) / 60000, 0) AS minutes_streamed "
-				+ "FROM SongStreams;");
+				+ "FROM SongStreams "
+				+ "WHERE username = :username;");
 		
 		String artists = ("SELECT "
 				+ "COUNT(DISTINCT Tracks_Artists.artist_id) "
 				+ "FROM Tracks_Artists "
 				+ "JOIN SongStreams ON "
 				+ "SongStreams.spotify_track_id = Tracks_Artists.spotify_track_id "
-				+ "WHERE SongStreams.ms_played > 30000;");
+				+ "WHERE username = :username "
+				+ "AND SongStreams.ms_played > 30000;");
 		
 		
 		StatsDTO statsDTO =  jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
 				.query(StatsDTO.class)
 				.single();
 		
 		Integer minutesStreamed = jdbc.sql(minutes)
+				.param("username", username, Types.VARCHAR)
 				.query(Integer.class)
 				.single();
 		
 		Integer artistCount = jdbc.sql(artists)
+				.param("username", username, Types.VARCHAR)
 				.query(Integer.class)
 				.single();
 		
-		return new FullStats(
+		return new FullStats(username,
 				minutesStreamed,
 				statsDTO.stream_count(),
 				statsDTO.track_count(),
@@ -153,20 +167,24 @@ public FullStats streamStats(Boolean checkForCache) {
 	
 	
 	
-	public FullStats getCachedStats() {
+	public FullStats getCachedStats(String username) {
 
-		return jdbc.sql("SELECT * FROM Stats_Cache_Full;")
+		return jdbc.sql("SELECT * FROM Stats_Cache_Full "
+				+ "WHERE username = :username")
+				.param("username", username, Types.VARCHAR)
 				.query(FullStats.class)
 				.single();
 	}
 	
-	public Optional<StatsForRange> getCachedStats(Timestamp startDate, Timestamp endDate) {
+	public Optional<StatsForRange> getCachedStats(Timestamp startDate, Timestamp endDate, String username) {
 		String sql = ("SELECT * FROM Stats_Cache_Range "
-				+ "WHERE  start_date = :startDate "
+				+ "WHERE username = :username "
+				+ "AND start_date = :startDate "
 				+ "AND end_date = :endDate "
 				+ "LIMIT 1;");
 		
 		return jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
 				.param("startDate", startDate, Types.TIMESTAMP)
 				.param("endDate", endDate, Types.TIMESTAMP)
 				.query(StatsForRange.class)
@@ -174,10 +192,10 @@ public FullStats streamStats(Boolean checkForCache) {
 	}
 	
 	
-	public int addCachedStats(
+	public int addCachedStats(String username
 			) throws IllegalAccessException, InvocationTargetException {
 			
-		FullStats stats = streamStats(false);
+		FullStats stats = streamStats(username, false);
 
 		List<RecordCompInfo> recordComps = CompInfo.get(stats);
 		
@@ -206,10 +224,10 @@ public FullStats streamStats(Boolean checkForCache) {
 	}
 
 	
-	public int addCachedStats(Timestamp startDate, Timestamp endDate
+	public int addCachedStats(Timestamp startDate, Timestamp endDate, String username
 			) throws IllegalAccessException, InvocationTargetException {
 			
-		StatsForRange stats = streamStats(startDate, endDate, false);
+		StatsForRange stats = streamStats(startDate, endDate, false, username);
 
 		List<RecordCompInfo> recordComps = CompInfo.get(stats);
 		
@@ -231,7 +249,9 @@ public FullStats streamStats(Boolean checkForCache) {
 			
 		} catch(DataIntegrityViolationException e) {
 			log.error(
-					"Cached stats for "
+					"Cached stats for user "
+					+ username
+					+ " in range "
 					+ startDate
 					+ " : "
 					+ endDate 
@@ -242,9 +262,10 @@ public FullStats streamStats(Boolean checkForCache) {
 		return added;
 	}
 	
-	public Optional<Timestamp> getFirstStreamDate() {
-		return jdbc.sql(
-				"SELECT MIN(ts) FROM SongStreams")
+	public Optional<Timestamp> getFirstStreamDate(String username) {
+		return jdbc.sql("SELECT MIN(ts) FROM SongStreams "
+				+ "WHERE username = :username")
+				.param("username", username, Types.VARCHAR)
 				.query(Timestamp.class)
 				.optional();
 	}
