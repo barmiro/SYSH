@@ -2,24 +2,23 @@ package com.github.barmiro.sysh_server.spotifyauthorization;
 
 import java.util.Optional;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.github.barmiro.sysh_server.users.SyshUserDetails;
 import com.github.barmiro.sysh_server.users.SyshUserManager;
 
 @RestController
 public class SpotifyAuthorizationController {
 	
 	private SpotifyTokenService tkn;
-	private SyshUserManager manager;
+	private SyshUserManager userManager;
 	
 	public SpotifyAuthorizationController(SpotifyTokenService tkn, SyshUserManager manager) {
 		this.tkn = tkn;
-		this.manager = manager;
+		this.userManager = manager;
 	}
 	
 	private final String clientId = System.getenv("SPOTIFY_CLIENT_ID");
@@ -27,10 +26,10 @@ public class SpotifyAuthorizationController {
 	private final String serverPort = System.getenv("SYSH_SERVER_PORT");
 	
 	@GetMapping("/authorize")
-	public String authorize(
-			@AuthenticationPrincipal SyshUserDetails userDetails) {
+	public String authorize() {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
-		String state = userDetails.getSpotifyState();
+		String state = userManager.getUserSpotifyState(username);
 		String url = "https://accounts.spotify.com/authorize?"
 				+ "response_type=code&"
 				+ "client_id=" + clientId + "&"
@@ -54,11 +53,11 @@ public class SpotifyAuthorizationController {
 	public RedirectView callback(@RequestParam(required=false) Optional<String> code, @RequestParam String state) {
 		
 		
-		SyshUserDetails userDetails = manager.loadUserBySpotifyState(state);
+		String username = userManager.getUsernameBySpotifyState(state);
 		
 		String codeValue = code.orElseThrow();
 		
-		tkn.getNewToken(codeValue);
+		tkn.getNewToken(codeValue, username);
 		
 		return new RedirectView("/userData");	
 		

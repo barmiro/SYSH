@@ -6,7 +6,7 @@ CREATE TABLE Users (
     spotify_state VARCHAR,
     access_token VARCHAR,
     refresh_token VARCHAR,
-    expires_in TIMESTAMP,
+    token_expires TIMESTAMP,
     role VARCHAR DEFAULT 'USER',
 --    consider handling the default in java
     display_name VARCHAR DEFAULT 'unknown username'

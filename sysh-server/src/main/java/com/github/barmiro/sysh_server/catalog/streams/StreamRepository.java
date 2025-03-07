@@ -46,12 +46,14 @@ public class StreamRepository {
 	
 //	There are some possible edge cases where this could lead to tracks with no streams
 //	but in normal usage only streams from the recent endpoint should get deleted and replaced with json data
-	public int wipeStreamsInRange(TimestampRange timestampRange) {
+	public int wipeStreamsInRange(TimestampRange timestampRange, String username) {
 		
 		String sql = ("DELETE FROM SongStreams "
-				+ "WHERE ts BETWEEN :startTimestamp AND :endTimestamp");
+				+ "WHERE username = :username"
+				+ "AND ts BETWEEN :startTimestamp AND :endTimestamp");
 		
 		return jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
 				.param("startTimestamp", timestampRange.startTimestamp(), Types.TIMESTAMP)
 				.param("endTimestamp", timestampRange.endTimestamp(), Types.TIMESTAMP)
 				.update();
@@ -61,21 +63,24 @@ public class StreamRepository {
 	public int addNew(SongStream stream) {
 		String sql = ("INSERT INTO SongStreams("
 				+ "ts,"
+				+ "username,"
 				+ "ms_played,"
 				+ "spotify_track_id"
 				+ ") VALUES ("
 				+ ":ts,"
+				+ ":username,"
 				+ ":ms_played,"
 				+ ":spotify_track_id) "
 				//this filters out duplicates, and accurately adds quick double-plays
 				//(ignoring the first, extremely-short-but-technically-there plays)
 				//in practice, it's only ~0.1% of streaming time, but might matter for a song's stats
-				+ "ON CONFLICT (ts, spotify_track_id) DO "
+				+ "ON CONFLICT (ts, spotify_track_id, username) DO "
 				+ "UPDATE SET ms_played = EXCLUDED.ms_played "
 				+ "WHERE SongStreams.ms_played < EXCLUDED.ms_played");
 		
 		return this.jdbc.sql(sql)
 				.param("ts", stream.ts(), Types.TIMESTAMP)
+				.param("username", stream.username(), Types.VARCHAR)
 				.param("ms_played", stream.ms_played(), Types.INTEGER)
 				.param("spotify_track_id", stream.spotify_track_id(), Types.VARCHAR)
 				.update();
@@ -95,9 +100,11 @@ public class StreamRepository {
 				+ " to "
 				+ timestampRange.endTimestamp());
 		
+		String username = streams.getFirst().username();
 		
 		int deletedStreams = wipeStreamsInRange(
-				timestampRange);
+				timestampRange,
+				username);
 		
 //		This should always be 0 when adding recent streams, except sometimes right after importing json data
 //		Watching the logs from this might tell us more about why stats.fm has some duplicates slipping through

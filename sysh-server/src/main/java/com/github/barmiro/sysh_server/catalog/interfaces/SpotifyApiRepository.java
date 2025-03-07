@@ -135,13 +135,13 @@ public abstract class SpotifyApiRepository<
 	}
 	
 	
-	protected ResponseEntity<String> getResponse(String packet) {
+	protected ResponseEntity<String> getResponse(String packet, String username) {
 		
 		
 		ResponseEntity<String> response = apiClient
 				.get()
 				.uri(packet)
-				.header("Authorization", "Bearer " + tkn.getToken())
+				.header("Authorization", "Bearer " + tkn.getToken(username))
 				.retrieve()
 				.toEntity(String.class);
 		

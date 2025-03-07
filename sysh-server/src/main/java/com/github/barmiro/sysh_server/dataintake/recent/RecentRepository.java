@@ -27,7 +27,7 @@ public class RecentRepository {
 			.configure(DeserializationFeature
 					.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	
-	public List<SongStream> convertRecentStreams(ResponseEntity<String> response) {
+	public List<SongStream> convertRecentStreams(ResponseEntity<String> response, String username) {
 		
 		List<RecentStream> items;
 		try {
@@ -47,6 +47,7 @@ public class RecentRepository {
 			
 			SongStream stream = new SongStream(
 					item.played_at(),
+					username,
 					item.track().duration_ms(),
 					item.track().id());
 			

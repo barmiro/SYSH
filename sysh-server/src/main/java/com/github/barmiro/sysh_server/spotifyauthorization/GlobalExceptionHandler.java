@@ -20,7 +20,8 @@ public class GlobalExceptionHandler {
 		if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 			for (int i = 0; i < 5; i++) {
 				try {
-					tkn.refresh();
+//					TODO: adapt for multiple users
+//					tkn.refresh();
 				} catch (HttpClientErrorException ex) {
 					if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
 						Thread.sleep(2000 * i);

@@ -56,9 +56,9 @@ public class AddToCatalog {
 	}
 
 	@Transactional
-	public String adder(List<SongStream> streams) {
+	public String adder(List<SongStream> streams, String username) {
 		
-		tkn.refresh();
+		tkn.refresh(username);
 		
 		int streamsAdded = 0;
 		int tracksAdded = 0;
@@ -83,7 +83,7 @@ public class AddToCatalog {
 			trackIDs.add(stream.spotify_track_id());
 		}
 		
-		apiTracks.addAll(trackApiRepository.getApiTracks(trackIDs));
+		apiTracks.addAll(trackApiRepository.getApiTracks(trackIDs, username));
 		tracks.addAll(trackApiRepository.addNewTracks(apiTracks));
 		tracksAdded = tracks.size();
 		
@@ -105,7 +105,7 @@ public class AddToCatalog {
 			}
 		}
 		
-		artists.addAll(artistApiRepository.addNewArtists(artistIDs));
+		artists.addAll(artistApiRepository.addNewArtists(artistIDs, username));
 		artistsAdded = artists.size();
 		
 		tracksArtists.updateJoinTable(apiTracks);

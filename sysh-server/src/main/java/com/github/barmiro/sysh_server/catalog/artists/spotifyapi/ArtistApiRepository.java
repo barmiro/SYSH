@@ -32,7 +32,7 @@ public class ArtistApiRepository extends SpotifyApiRepository<
 
 	private static final Logger log = LoggerFactory.getLogger(ArtistApiRepository.class);
 	
-	public List<Artist> addNewArtists(List<String> artist_ids) {
+	public List<Artist> addNewArtists(List<String> artist_ids, String username) {
 		
 		List<String> newIDs = getNewIDs(artist_ids, "id");
 		log.info("Found " + newIDs.size() + " new artists.");
@@ -49,7 +49,7 @@ public class ArtistApiRepository extends SpotifyApiRepository<
 		
 		List<ApiArtist> apiArtists = new ArrayList<>();
 		for (String packet:packets) {
-			ResponseEntity<String> response = getResponse(packet);
+			ResponseEntity<String> response = getResponse(packet, username);
 
 			try {
 				apiArtists.addAll(mapResponse(response));

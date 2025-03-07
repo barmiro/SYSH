@@ -1,11 +1,11 @@
 package com.github.barmiro.sysh_server.spotifyauthorization;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +18,7 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.barmiro.sysh_server.users.SyshUserDetails;
 import com.github.barmiro.sysh_server.users.SyshUserManager;
-
-import jakarta.annotation.PostConstruct;
 
 @Service
 public class SpotifyTokenService {
@@ -33,15 +30,12 @@ public class SpotifyTokenService {
 	private final String base64 = Base64.getEncoder().encodeToString((clientId + ":" + clientSecret).getBytes());
 
 	private RestClient tokenClient;
-	private SpotifyTokenInit tokenInit;
 	private SyshUserManager userManager;
 	
 	public SpotifyTokenService(
 			RestClient tokenClient,
-			SpotifyTokenInit tokenInit,
 			SyshUserManager userManager) {
 		this.tokenClient = tokenClient;
-		this.tokenInit = tokenInit;
 		this.userManager = userManager;
 	}
 	
@@ -56,8 +50,9 @@ public class SpotifyTokenService {
 		return userManager.getUserSpotifyAccessToken(username);
 	}
 	
-	public LocalDateTime expTimeFromExpiresIn(int seconds) {
-		return LocalDateTime.now().plusSeconds(seconds);
+	public void expTimeFromExpiresIn(String username, int seconds) {
+		Timestamp tokenExpires = Timestamp.valueOf(LocalDateTime.now().plusSeconds(seconds));
+		userManager.updateUserTokenExpirationTime(username, tokenExpires);
 	}
 	
 	public LocalDateTime getExpTime(String username) {
@@ -67,8 +62,6 @@ public class SpotifyTokenService {
 	public void setRefreshToken(String username, String refreshToken) {
 		if (refreshToken != null) {
 			userManager.updateUserSpotifyRefreshToken(username, refreshToken);
-//			TODO: deal with this
-			tokenInit.saveToken(refreshToken);
 		}
 	}
 	
@@ -78,18 +71,15 @@ public class SpotifyTokenService {
 	
 	
 	
-	public boolean expirationImminent() {
+	public boolean expirationImminent(String username) {
+		LocalDateTime expirationTime = userManager.getUserTokenExpirationTime(username);
+		
 		if (LocalDateTime.now().plusMinutes(5).isAfter(expirationTime)) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
-	public boolean isAuthenticated() {
-		return authenticated;
-	}
-	
 
 	
 	private final String serverUrl = System.getenv("SYSH_SERVER_URL");
@@ -115,9 +105,12 @@ public class SpotifyTokenService {
 		try {
 			responseBody = objectMapper.readValue(newEntity.getBody(), SpotifyAuthorizationResponseDTO.class);
 			setToken(username, responseBody.access_token());
-			expTimeFromExpiresIn(responseBody.expires_in());
+			expTimeFromExpiresIn(username, responseBody.expires_in());
 			setRefreshToken(username, responseBody.refresh_token());
-			authenticated = true;
+			log.info("Set token for user " + username 
+					+ ": access " + responseBody.access_token()
+					+ ", refresh " + responseBody.refresh_token()
+					+ ", expires in " + responseBody.expires_in());
 			return;
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
@@ -131,12 +124,12 @@ public class SpotifyTokenService {
 	
 	public boolean refresh(String username) {
 		
-		if (expirationTime == null) {
-			if (!authenticated) {
-				log.info("Not authenticated with Spotify yet");
-				throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
-			}
-			log.info("The server has been restarted. Refreshing token...");
+		LocalDateTime expirationTime = userManager.getUserTokenExpirationTime(username);
+		String refreshToken = userManager.getUserSpotifyRefreshToken(username);
+		
+		if (expirationTime == null || refreshToken == null) {
+			log.error("User " + username + " not authenticated with Spotify");
+			throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
 		} else if (LocalDateTime.now().plusMinutes(5).isBefore(expirationTime)) {
 			log.info("Token valid until: " + expirationTime + ". Proceeding...");
 			return false;
@@ -160,10 +153,10 @@ public class SpotifyTokenService {
 		
 		try {
 			responseBody = objectMapper.readValue(newEntity.getBody(), SpotifyAuthorizationResponseDTO.class);
-			setToken(responseBody.access_token());
-			expTimeFromExpiresIn(responseBody.expires_in());
+			setToken(username, responseBody.access_token());
+			expTimeFromExpiresIn(username, responseBody.expires_in());
 			if (responseBody.refresh_token() != null) {
-				setRefreshToken(responseBody.refresh_token());				
+				setRefreshToken(username, responseBody.refresh_token());				
 			}
 			return true;
 		} catch (JsonMappingException e) {
@@ -175,14 +168,5 @@ public class SpotifyTokenService {
 		
 		throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
 	}
-	
-	@Value("${test.env:false}")
-	private boolean isTestEnv;
-	
-	@PostConstruct
-	void initializeToken() {
-		setRefreshToken(tokenInit.initToken());
-	}
-	
 
 }

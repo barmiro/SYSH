@@ -30,7 +30,7 @@ public class AlbumApiRepository extends SpotifyApiRepository<
 
 
 	
-	public List<Album> addNewAlbums(List<String> album_ids) {
+	public List<Album> addNewAlbums(List<String> album_ids, String username) {
 		
 		List<String> newIDs = getNewIDs(album_ids, "id");
 		System.out.println("Found " + newIDs.size() + " new albums.");
@@ -47,7 +47,7 @@ public class AlbumApiRepository extends SpotifyApiRepository<
 		
 		List<ApiAlbum> apiAlbums = new ArrayList<>();
 		for (String packet:packets) {
-			ResponseEntity<String> response = getResponse(packet);				
+			ResponseEntity<String> response = getResponse(packet, username);				
 
 			try {
 				apiAlbums.addAll(mapResponse(response));

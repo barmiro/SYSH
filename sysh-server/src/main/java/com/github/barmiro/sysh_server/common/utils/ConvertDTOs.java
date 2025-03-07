@@ -27,12 +27,13 @@ public class ConvertDTOs {
 		.configure(DeserializationFeature
 				.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			
-	public static List<SongStream> streamsJson(List<StreamDTO> streamDTOs) {
+	public static List<SongStream> streamsJson(List<StreamDTO> streamDTOs, String username) {
 		List<SongStream> streams = new ArrayList<>();
 		
 		for (StreamDTO streamDTO:streamDTOs) {
 			if (streamDTO.spotify_track_uri() != null && streamDTO.ms_played() > 0) {
 				SongStream stream = new SongStream(streamDTO.ts(),
+						username,
 						streamDTO.ms_played(),
 						streamDTO.spotify_track_uri().replace("spotify:track:", ""));
 				
@@ -57,6 +58,7 @@ public class ConvertDTOs {
 	}
 	
 	public static List<SongStream> streamsRecent(
+			String username,
 			ResponseEntity<String> response,
 			List<SongStream> previous) {
 
@@ -76,6 +78,7 @@ public class ConvertDTOs {
 		for (RecentStream item:items) {
 			SongStream stream = new SongStream(
 					item.played_at(),
+					username,
 					item.track().duration_ms(),
 					item.track().id());
 			

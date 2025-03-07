@@ -33,7 +33,7 @@ public class TrackApiRepository extends SpotifyApiRepository<
 	
 	private static final Logger log = LoggerFactory.getLogger(TrackApiRepository.class);
 
-	public List<ApiTrack> getApiTracks(List<String> track_ids) {
+	public List<ApiTrack> getApiTracks(List<String> track_ids, String username) {
 		
 		List<String> newIDs = getNewIDs(track_ids, "spotify_track_id");
 		log.info("Found " + newIDs.size() + " new tracks.");
@@ -49,7 +49,7 @@ public class TrackApiRepository extends SpotifyApiRepository<
 		for (String packet:packets) {
 			
 			ResponseEntity<String> response = null;
-			response = getResponse(packet);
+			response = getResponse(packet, username);
 			
 			if (response == null) {
 				log.error("Response for " + packet + " is null.");
