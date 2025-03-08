@@ -162,6 +162,7 @@ public class StatsCache {
 			log.info("Updated all time stats cache for user " + username);
 		} else {
 			log.error("Full cache update error, affected rows: " + updatedFullCache);
+			cacheGenerator(username);
 		}
 	}
 	

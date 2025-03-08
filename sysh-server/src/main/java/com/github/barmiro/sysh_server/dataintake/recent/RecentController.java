@@ -50,7 +50,7 @@ public class RecentController {
 		
 
 		
-		List<SongStream> previous = streamService.find(50);
+		List<SongStream> previous = streamService.find(50, username);
 		List<SongStream> streams = ConvertDTOs.streamsRecent(username, response, previous);
 
 		String result;
@@ -73,7 +73,7 @@ public class RecentController {
 		
 
 		
-		List<SongStream> previous = streamService.find(50);
+		List<SongStream> previous = streamService.find(50, username);
 		List<SongStream> streams = ConvertDTOs.streamsRecent(username, response, previous);
 
 		String result;

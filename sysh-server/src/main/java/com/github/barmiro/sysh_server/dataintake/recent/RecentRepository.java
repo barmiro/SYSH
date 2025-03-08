@@ -41,7 +41,7 @@ public class RecentRepository {
 		
 		List<SongStream> streams = new ArrayList<>();
 		
-		List<SongStream> previous = streamRepository.find(50);
+		List<SongStream> previous = streamRepository.find(50, username);
 		
 		for (RecentStream item:items) {
 			

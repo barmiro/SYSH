@@ -31,8 +31,11 @@ public class StreamRepository {
 				.list();
 	}
 	
-	public List<SongStream> find(int limit) {
-		return jdbc.sql("SELECT * FROM SongStreams ORDER BY ts DESC LIMIT :limit")
+	public List<SongStream> find(int limit, String username) {
+		return jdbc.sql("SELECT * FROM SongStreams "
+				+ "WHERE username = :username "
+				+ "ORDER BY ts DESC LIMIT :limit")
+				.param("username", username, Types.VARCHAR)
 				.param("limit", limit, Types.INTEGER)
 				.query(SongStream.class)
 				.list();

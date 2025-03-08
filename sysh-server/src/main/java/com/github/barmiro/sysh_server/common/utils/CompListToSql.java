@@ -31,17 +31,25 @@ public class CompListToSql {
 	}
 	
 	public static <T> String updateFullCache(List<RecordCompInfo> comps) {
-		
+//		this delete is TEMPORARY
 		StringBuilder sb = new StringBuilder()
-				.append("UPDATE Stats_Cache_Full SET ");
+				.append("DELETE FROM Stats_Cache_Full WHERE username = :username;"
+						+ "INSERT INTO Stats_Cache_Full (");
 		
 		for (RecordCompInfo comp:comps) {
-			sb.append(comp.compName() + " = :" + comp.compName() + ",");
+			sb.append(comp.compName() + ",");
 		}
 		
 		sb.deleteCharAt(sb.length() - 1);
 		
-		sb.append(" WHERE id = 1;");
+		sb.append(") VALUES (");
+		
+		for (RecordCompInfo comp:comps) {
+			sb.append(":" + comp.compName() + ",");
+		}
+		
+		sb.deleteCharAt(sb.length() - 1);
+		sb.append(")");
 		
 		return sb.toString();
 	}
