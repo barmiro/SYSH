@@ -71,7 +71,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel: SessionViewModel by viewModels()
             val isLoggedIn by viewModel.isLoggedIn.collectAsState()
-            viewModel.setLoggedIn(false)
             SyshClientTheme {
                 if (!isLoggedIn) {
                     LoginScreen(loginVM)

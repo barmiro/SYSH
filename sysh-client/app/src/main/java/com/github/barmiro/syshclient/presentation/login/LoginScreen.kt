@@ -65,7 +65,6 @@ fun LoginScreen(viewModel: LoginViewModel) {
             Button(
                 onClick = {
                     viewModel.getToken(username.value.text, password.value.text)
-                    viewModel.setLoggedIn(true)
                 }
             ) {
                 Text("log in")

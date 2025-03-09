@@ -20,6 +20,7 @@ class SessionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            userPreferencesRepository.setLoggedIn(false)
             userPreferencesRepository.isLoggedIn.collect {
                 _isLoggedIn.value = it
             }

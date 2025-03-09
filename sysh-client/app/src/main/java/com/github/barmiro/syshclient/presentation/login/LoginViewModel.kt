@@ -24,6 +24,7 @@ class LoginViewModel @Inject constructor(
                     is Resource.Success -> {
                         result.data?.let {
                             userPrefRepo.saveToken(it)
+                            userPrefRepo.setLoggedIn(true)
                         }
                     }
 
