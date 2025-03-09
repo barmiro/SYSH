@@ -1,10 +1,13 @@
 package com.github.barmiro.syshclient.data.stats
 
+import com.github.barmiro.syshclient.data.common.JwtInterceptor
+import com.github.barmiro.syshclient.data.common.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -16,10 +19,17 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class StatsRepository @Inject constructor() {
+class StatsRepository @Inject constructor(
+    private val userPrefRepo: UserPreferencesRepository
+) {
+
+    val client = OkHttpClient.Builder()
+        .addInterceptor(JwtInterceptor(userPrefRepo))
+        .build()
 
     val retrofit = Retrofit.Builder()
         .baseUrl("http://192.168.0.147:5754/stats/")
+        .client(client)
         .addConverterFactory(
             Json.asConverterFactory(
                 "application/json; charset=UTF8".toMediaType()))

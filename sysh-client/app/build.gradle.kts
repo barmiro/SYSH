@@ -66,9 +66,11 @@ dependencies {
     implementation(libs.converter.kotlinx.serialization)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
-
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    implementation(libs.logging.interceptor)
 
     ksp(libs.hilt.compiler)
 }
