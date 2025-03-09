@@ -12,6 +12,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,9 +22,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import com.github.barmiro.syshclient.util.Resource
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
+fun RegisterScreen(viewModel: RegisterViewModel,
+                   loginVM: LoginViewModel) {
+
+    val username = remember {
+        mutableStateOf(TextFieldValue())
+    }
+    val password = remember {
+        mutableStateOf(TextFieldValue())
+    }
+
+
+//    I'll put this here for now, but I'll have to reconsider this
+    val registerState by viewModel.registerState.collectAsState()
+    LaunchedEffect(registerState) {
+        when (registerState) {
+            is Resource.Success -> {
+//                LoginScreen(loginVM)
+            }
+            else -> {
+
+            }
+        }
+    }
 
 
 
@@ -35,12 +61,6 @@ fun LoginScreen(viewModel: LoginViewModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val username = remember {
-                mutableStateOf(TextFieldValue())
-            }
-            val password = remember {
-                mutableStateOf(TextFieldValue())
-            }
 
             Text(text = "Welcome to SYSH!",
                 color = MaterialTheme.colorScheme.onBackground )
@@ -65,7 +85,7 @@ fun LoginScreen(viewModel: LoginViewModel) {
 
             Button(
                 onClick = {
-                    viewModel.getToken(username.value.text, password.value.text)
+                    viewModel.register(username.value.text, password.value.text)
                 }
             ) {
                 Text("log in")

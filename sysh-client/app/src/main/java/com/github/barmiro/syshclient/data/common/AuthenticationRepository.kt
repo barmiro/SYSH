@@ -54,4 +54,32 @@ class AuthenticationRepository @Inject constructor() {
             emit(Resource.Loading(false))
         }
     }
+
+    fun register(username: String, password: String): Flow<Resource<String>> {
+        return flow {
+            emit(Resource.Loading(true))
+            val response = try{
+                val authHeader = Credentials.basic(username, password)
+                authApi.getToken(authHeader).string()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                emit(Resource.Error("Encountered IOException: " + e.message))
+                ""
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                emit(Resource.Error("Encountered HttpException: " + e.code()))
+                ""
+            }
+            val isRegistrationSuccessful = response == username
+            if (isRegistrationSuccessful) {
+                emit(
+                    Resource.Success(
+                        data = response
+                    ))
+            } else {
+                emit(Resource.Error("Couldn't fetch token"))
+            }
+            emit(Resource.Loading(false))
+        }
+    }
 }
