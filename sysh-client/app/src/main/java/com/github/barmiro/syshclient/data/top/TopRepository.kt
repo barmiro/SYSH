@@ -1,5 +1,7 @@
 package com.github.barmiro.syshclient.data.top
 
+import com.github.barmiro.syshclient.data.common.JwtInterceptor
+import com.github.barmiro.syshclient.data.common.UserPreferencesRepository
 import com.github.barmiro.syshclient.domain.top.TopAlbum
 import com.github.barmiro.syshclient.domain.top.TopArtist
 import com.github.barmiro.syshclient.domain.top.TopTrack
@@ -8,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
 import okio.IOException
 import retrofit2.HttpException
 import retrofit2.Retrofit
@@ -17,10 +20,17 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TopRepository @Inject constructor() {
+class TopRepository @Inject constructor(
+    private val userPrefRepo: UserPreferencesRepository
+) {
+
+    val client = OkHttpClient.Builder()
+        .addInterceptor(JwtInterceptor(userPrefRepo))
+        .build()
 
     val retrofit = Retrofit.Builder()
         .baseUrl("http://192.168.0.147:5754/top/")
+        .client(client)
         .addConverterFactory(
             Json.asConverterFactory(
                 "application/json; charset=UTF8".toMediaType()))

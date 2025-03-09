@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TrackDTO(
+    val username: String,
     val spotify_track_id: String,
     val name: String,
     val album_name: String,

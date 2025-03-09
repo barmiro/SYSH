@@ -75,10 +75,16 @@ public class RecentController {
 		
 		List<SongStream> previous = streamService.find(50, username);
 		List<SongStream> streams = ConvertDTOs.streamsRecent(username, response, previous);
+		
+		if (streams.isEmpty()) {
+			return "No new streams found";
+		}
 
 		String result;
 
 		result = addToCatalog.adder(streams, username);
+		
+		
 
 		return result;
 	}

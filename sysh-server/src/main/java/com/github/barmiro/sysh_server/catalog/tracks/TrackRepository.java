@@ -143,6 +143,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 			String username) {
 		
 		String sql = ("SELECT t2.spotify_track_id, t2.name,"
+				+ ":username AS username,"
 				+ "COUNT("
 				+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
 				+ ") AS stream_count,"
@@ -189,6 +190,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 					+ "album_name,"
 					+ "thumbnail_url,"
 					+ "primary_artist_name,"
+					+ "username,"
 					+ "COALESCE(stream_count, 0) AS stream_count, "
 					+ "COALESCE(total_ms_played, 0) AS total_ms_played "
 					+ "FROM Top_Tracks_Cache "
@@ -198,6 +200,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 					+ " DESC;");
 		} else {
 			sql = ("SELECT t2.spotify_track_id, t2.name,"
+					+ ":username AS username,"
 					+ "COUNT("
 					+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
 					+ ") AS stream_count,"
@@ -225,6 +228,17 @@ public class TrackRepository extends CatalogRepository<Track> {
 					+ " DESC;");
 		}
 		
+		List<TrackStats> rawList = jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
+				.query(TrackStats.class)
+				.list();
+		
+		if (checkForCache && rawList.isEmpty()) {
+			System.out.println("empty result");
+			updateTopTracksCache(username);
+
+		}
+		
 		return jdbc.sql(sql)
 				.param("username", username, Types.VARCHAR)
 				.query(TrackStats.class)
@@ -232,7 +246,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 	}
 	
 	int updateTopTracksCache(String username
-			) throws IllegalAccessException, InvocationTargetException {
+			) {
 //		Doesn't have to be sorted, but I don't feel like overloading the constructor again
 		List<TrackStats> trackStatsList = topTracks("stream_count", username, false);
 		
@@ -246,7 +260,14 @@ public class TrackRepository extends CatalogRepository<Track> {
 		int rowsAdded = 0;
 		
 		for (TrackStats track:trackStatsList) {
-			List<RecordCompInfo> recordComps = CompInfo.get(track);
+			List<RecordCompInfo> recordComps;
+			try {
+				recordComps = CompInfo.get(track);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return 0;
+			}
 			
 			String addTrackStats = CompListToSql.insertTopItemsCache(recordComps, "Track");
 			StatementSpec jdbcCall = jdbc.sql(addTrackStats);

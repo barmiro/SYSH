@@ -114,6 +114,8 @@ public class AddToCatalog {
 //		easier than returning all necessary values and handling it in recent logic
 		if (streams.size() > 0 && streams.size() <= 50) {
 			statsCache.updateCache(streams, username, tracksAdded, albumsAdded, artistsAdded);
+			albumRepository.updateTopAlbumsCache(username);
+			
 		}
 		
 		return (streamsAdded + " streams added.\n" 

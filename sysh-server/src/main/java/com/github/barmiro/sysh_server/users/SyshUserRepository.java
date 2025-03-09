@@ -113,7 +113,7 @@ public class SyshUserRepository {
 	}
 	
 	public List<String> findAllUsernames() {
-		return jdbc.sql("SELECT username FROM Users")
+		return jdbc.sql("SELECT username FROM Users ORDER BY username ASC")
 				.query(String.class)
 				.list();
 	}

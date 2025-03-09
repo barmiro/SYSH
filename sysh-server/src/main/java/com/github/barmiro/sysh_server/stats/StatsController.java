@@ -66,7 +66,7 @@ public class StatsController {
 	Timestamp startup() {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		statsCache.cacheGenerator(username);
+//		statsCache.cacheGenerator(username);
 		return statsRepo.getFirstStreamDate(username).orElse(Timestamp.valueOf(LocalDateTime.now()));
 	}
 

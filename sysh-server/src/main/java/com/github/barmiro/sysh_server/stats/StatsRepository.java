@@ -263,6 +263,7 @@ public FullStats streamStats(String username, Boolean checkForCache) {
 	}
 	
 	public Optional<Timestamp> getFirstStreamDate(String username) {
+		System.out.println(username);
 		return jdbc.sql("SELECT MIN(ts) FROM SongStreams "
 				+ "WHERE username = :username")
 				.param("username", username, Types.VARCHAR)

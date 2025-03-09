@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AlbumDTO(
+    val username: String,
     val id: String,
     val name: String,
     val thumbnail_url: String,

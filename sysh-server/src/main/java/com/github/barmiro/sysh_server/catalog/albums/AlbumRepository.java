@@ -65,6 +65,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
+		
 		return added;
 	}
 	
@@ -74,6 +75,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 			String username) {
 		
 		String sql = ("SELECT Albums.*,"
+				+ ":username AS username,"
 				+ "COUNT("
 				+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
 				+ ") AS stream_count,"
@@ -113,7 +115,8 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		String sql;
 		
 		if (checkForCache) {
-			sql = ("SELECT id,"
+			sql = ("SELECT username,"
+					+ "id,"
 					+ "name,"
 					+ "thumbnail_url,"
 //					TODO: figure out why a null happened here
@@ -127,6 +130,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 					+ " DESC;");
 		} else {
 			sql = ("SELECT Albums.*,"
+					+ ":username AS username,"
 					+ "COUNT("
 					+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
 					+ ") AS stream_count,"
@@ -151,14 +155,26 @@ public class AlbumRepository extends CatalogRepository<Album> {
 					+ " DESC;");
 		}
 		
+		List<AlbumStats> rawList = jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
+				.query(AlbumStats.class)
+				.list();
+		
+		if (checkForCache && rawList.isEmpty()) {
+			System.out.println("empty result");
+			updateTopAlbumsCache(username);
+
+		}
+		
 		return jdbc.sql(sql)
 				.param("username", username, Types.VARCHAR)
 				.query(AlbumStats.class)
 				.list();
 	}
 	
-	int updateTopAlbumsCache(String username
-			) throws IllegalAccessException, InvocationTargetException {
+
+	public int updateTopAlbumsCache(String username
+			) {
 //		Doesn't have to be sorted, but I don't feel like overloading the constructor again
 		List<AlbumStats> albumStatsList = topAlbums("stream_count", username, false);
 		
@@ -172,10 +188,17 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		int rowsAdded = 0;
 		
 		for (AlbumStats album:albumStatsList) {
-			List<RecordCompInfo> recordComps = CompInfo.get(album);
+			List<RecordCompInfo> recordComps;
+			try {
+				recordComps = CompInfo.get(album);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return 0;
+			}
 			
 			String addAlbumStats = CompListToSql.insertTopItemsCache(recordComps, "Album");
-			StatementSpec jdbcCall = jdbc.sql(addAlbumStats);
+			StatementSpec jdbcCall = jdbc.sql(addAlbumStats + " ON CONFLICT (username, id) DO NOTHING");
 			
 			for (RecordCompInfo comp:recordComps) {
 				jdbcCall = jdbcCall.param(

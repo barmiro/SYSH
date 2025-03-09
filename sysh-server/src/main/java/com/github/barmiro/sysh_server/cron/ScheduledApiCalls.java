@@ -1,6 +1,9 @@
 package com.github.barmiro.sysh_server.cron;
 
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +42,22 @@ public class ScheduledApiCalls {
 			log.error("No users found");
 		}
 		
-		for (String username:usernameList) {
-			try {
-				recentController.recentByUsername(username);				
-			} catch (HttpClientErrorException e) {
-				
-			}
-		}
+//		the list is sorted alphabetically, so in normal operation the 25 minute delay will be kept,
+//		might theoretically miss some streams when adding new users, but it's extremely unlikely
+	    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+	    long delayBetweenUsers = 1500000 / usernameList.size();
+	    
+	    for (int i = 0; i < usernameList.size(); i++) {
+	        String username = usernameList.get(i);
+	        scheduler.schedule(() -> {
+	            try {
+	                recentController.recentByUsername(username);
+	            } catch (HttpClientErrorException e) {
+	                log.error("Error processing user: " + username, e);
+	            }
+	        }, i * delayBetweenUsers, TimeUnit.MILLISECONDS);
+	    }
+
+	    scheduler.shutdown();
 	}
 }
