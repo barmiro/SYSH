@@ -1,5 +1,7 @@
 package com.github.barmiro.sysh_server.users;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,7 @@ public class UserDataController {
 		this.userDataRepository = userDataRepository;
 	}
 	
+	Logger log = LoggerFactory.getLogger(UserDataController.class);
 
 
 	@GetMapping("/userData")
@@ -31,26 +34,28 @@ public class UserDataController {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		tkn.refresh(username);
-		
-		ResponseEntity<String> response = apiClient
-				.get()
-				.uri("me/")
-				.header("Authorization", "Bearer " + tkn.getToken(username))
-				.retrieve()
-				.toEntity(String.class);
-		
-		SpotifyUserData userData = ConvertDTOs.userData(response);
-		
-//		int updated = userDataRepository.addUserData(userData);
-//		
-//		if (updated == 1) {
-//			return userData.display_name();			
-//		}
-		if (userData.display_name() == null) {
-			return ("unknown username");			
-		} else {
-			return userData.display_name();
+		try {
+			ResponseEntity<String> response = apiClient
+					.get()
+					.uri("me/")
+					.header("Authorization", "Bearer " + tkn.getToken(username))
+					.retrieve()
+					.toEntity(String.class);
+			
+			SpotifyUserData userData = ConvertDTOs.userData(response);
+			
+			int updated = userDataRepository.addUserDisplayName(username, userData.display_name());
+			
+			if (updated == 1) {
+				return userData.display_name();			
+			} else {
+				log.error("Couldn't add display name for " + username + " to database");
+			}
+		} catch (Exception e) {
+			log.error("Couldn't fetch display name for " + username + " from Spotify: " + e.getMessage());
 		}
+		
+		return userDataRepository.getUserDisplayName(username);
 	
 	}
 }

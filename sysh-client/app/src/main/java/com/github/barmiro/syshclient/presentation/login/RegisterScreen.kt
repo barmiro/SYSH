@@ -25,8 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.github.barmiro.syshclient.util.Resource
 
 @Composable
-fun RegisterScreen(viewModel: RegisterViewModel,
-                   loginVM: LoginViewModel) {
+fun RegisterScreen(viewModel: RegisterViewModel) {
 
     val username = remember {
         mutableStateOf(TextFieldValue())

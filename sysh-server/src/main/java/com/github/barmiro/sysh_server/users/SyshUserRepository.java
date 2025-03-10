@@ -149,6 +149,23 @@ public class SyshUserRepository {
 				.param("spotify_state", spotifyState, Types.VARCHAR)
 				.update();
 	}
+	
+	public int addUserDisplayName(String username, String displayName) {
+		return jdbc.sql("UPDATE Users SET "
+				+ "display_name = :display_name "
+				+ "WHERE username = :username")
+				.param("display_name", displayName, Types.VARCHAR)
+				.param("username", username, Types.VARCHAR)
+				.update();
+	}
+	
+	public String getUserDisplayName(String username) {
+		return jdbc.sql("SELECT display_name FROM Users "
+				+ "WHERE username = :username")
+				.param("username", username, Types.VARCHAR)
+				.query(String.class)
+				.single();
+	}
 
 	
 }
