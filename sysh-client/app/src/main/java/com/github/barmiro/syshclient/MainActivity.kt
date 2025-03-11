@@ -25,6 +25,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,14 +34,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.barmiro.syshclient.presentation.common.SessionViewModel
 import com.github.barmiro.syshclient.presentation.home.HomeScreen
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
+import com.github.barmiro.syshclient.presentation.login.AuthViewModel
 import com.github.barmiro.syshclient.presentation.login.LoginScreen
-import com.github.barmiro.syshclient.presentation.login.LoginViewModel
+import com.github.barmiro.syshclient.presentation.login.RegisterScreen
 import com.github.barmiro.syshclient.presentation.top.TopScreen
 import com.github.barmiro.syshclient.presentation.top.TopScreenViewModel
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
@@ -63,60 +66,62 @@ class MainActivity : ComponentActivity() {
     private val topTracksVM: TopTracksViewModel by viewModels()
     private val topAlbumsVM: TopAlbumsViewModel by viewModels()
     private val topArtistsVM: TopArtistsViewModel by viewModels()
-    private val loginVM: LoginViewModel by viewModels()
+    private val authVM: AuthViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
         setContent {
-            val viewModel: SessionViewModel by viewModels()
-            val isLoggedIn by viewModel.isLoggedIn.collectAsState()
+            val sessionVM: SessionViewModel by viewModels()
+            val isLoggedIn by sessionVM.isLoggedIn.collectAsState()
+            val navController = rememberNavController()
+
             SyshClientTheme {
-                if (!isLoggedIn) {
-                    LoginScreen(loginVM)
-                } else {
-                    topScreenVM.getOldestStreamDate()
-                    homeVM.getStats()
-                    homeVM.getUserData()
-                    val navItems = listOf(
-                        BottomNavigationItem(
-                            title = "Home",
-                            selectedIcon = Icons.Filled.Home,
-                            unselectedIcon = Icons.Outlined.Home,
-                            navigateTo = MainScreen
-                        ),
-                        BottomNavigationItem(
-                            title = "Top",
-                            selectedIcon = Icons.Filled.Star,
-                            unselectedIcon = Icons.Outlined.Star,
-                            navigateTo = Top
-                        ),
-                        BottomNavigationItem(
-                            title = "Stats",
-                            selectedIcon = Icons.Filled.Info,
-                            unselectedIcon = Icons.Outlined.Info,
-                            navigateTo = TopAlbums
-                        ),
-                        BottomNavigationItem(
-                            title = "Settings",
-                            selectedIcon = Icons.Filled.Settings,
-                            unselectedIcon = Icons.Outlined.Settings,
-                            navigateTo = MainScreen
-                        )
+
+
+                val navItems = listOf(
+                    BottomNavigationItem(
+                        title = "Home",
+                        selectedIcon = Icons.Filled.Home,
+                        unselectedIcon = Icons.Outlined.Home,
+                        navigateTo = MainScreen
+                    ),
+                    BottomNavigationItem(
+                        title = "Top",
+                        selectedIcon = Icons.Filled.Star,
+                        unselectedIcon = Icons.Outlined.Star,
+                        navigateTo = Top
+                    ),
+                    BottomNavigationItem(
+                        title = "Stats",
+                        selectedIcon = Icons.Filled.Info,
+                        unselectedIcon = Icons.Outlined.Info,
+                        navigateTo = TopAlbums
+                    ),
+                    BottomNavigationItem(
+                        title = "Settings",
+                        selectedIcon = Icons.Filled.Settings,
+                        unselectedIcon = Icons.Outlined.Settings,
+                        navigateTo = MainScreen
                     )
+                )
 
-                    var selectedNavItemIndex by rememberSaveable {
-                        mutableIntStateOf(0)
-                    }
-                    val navController = rememberNavController()
+                var selectedNavItemIndex by rememberSaveable {
+                    mutableIntStateOf(0)
+                }
 
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = MaterialTheme.colorScheme.background)
-                    ) {
-                        Scaffold(
-                            bottomBar = {
+
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color = MaterialTheme.colorScheme.background)
+                ) {
+                    Scaffold(
+                        bottomBar = {
+                            if (isLoggedIn) {
+                                topScreenVM.getOldestStreamDate()
+                                homeVM.getStats()
+                                homeVM.getUserData()
                                 NavigationBar {
                                     navItems.forEachIndexed { index, item ->
                                         NavigationBarItem(
@@ -144,31 +149,14 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
-                        ) { innerPadding ->
-                            Column(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding(), top = 0.dp)){
-                                NavHost(
-                                    navController = navController,
-                                    startDestination = MainScreen
-                                ) {
-                                    composable<MainScreen> {
-                                        HomeScreen(homeVM)
-                                    }
-                                    composable<Top> {
-                                        TopScreen(topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM)
-                                    }
-                                    composable<Stats> {
-                                        TopTracksScreen(topTracksVM)
-                                    }
-                                    composable<TopAlbums> {
-                                        TopAlbumsScreen(topAlbumsVM)
-                                    }
-                                }
-                            }
-
                         }
+                    ) { innerPadding ->
+                        Column(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding(), top = 0.dp)){
+                            AppNavHost(navController, isLoggedIn, homeVM, topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM, authVM, sessionVM)
+                        }
+
                     }
                 }
-
             }
         }
     }
@@ -193,7 +181,47 @@ object TopAlbums
 @Serializable
 object Top
 
+@Serializable
+object Login
 
+@Serializable
+object Register
+
+@Composable
+fun AppNavHost(navController: NavHostController,
+               isLoggedIn: Boolean,
+               homeVM: HomeViewModel,
+               topScreenVM: TopScreenViewModel,
+               topTracksVM: TopTracksViewModel,
+               topAlbumsVM: TopAlbumsViewModel,
+               topArtistsVM: TopArtistsViewModel,
+               authVM: AuthViewModel,
+               sessionVM: SessionViewModel) {
+
+    NavHost(
+        navController = navController,
+        startDestination = if (isLoggedIn) MainScreen else Login
+    ) {
+        composable<Login> {
+            LoginScreen(authVM, sessionVM, navController)
+        }
+        composable<Register> {
+            RegisterScreen(authVM, sessionVM, navController)
+        }
+        composable<MainScreen> {
+            HomeScreen(homeVM)
+        }
+        composable<Top> {
+            TopScreen(topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM)
+        }
+        composable<Stats> {
+            TopTracksScreen(topTracksVM)
+        }
+        composable<TopAlbums> {
+            TopAlbumsScreen(topAlbumsVM)
+        }
+    }
+}
 
 //@Composable
 //fun Greeting(name: String, modifier: Modifier = Modifier) {

@@ -20,7 +20,11 @@ class SessionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+
+//                !!! DELETE BEFORE PUBLISHING !!!
             userPreferencesRepository.setLoggedIn(false)
+//          ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+
             userPreferencesRepository.isLoggedIn.collect {
                 _isLoggedIn.value = it
             }
@@ -30,6 +34,12 @@ class SessionViewModel @Inject constructor(
     fun setLoggedIn(value: Boolean) {
         viewModelScope.launch {
             userPreferencesRepository.setLoggedIn(value)
+        }
+    }
+
+    fun saveToken(token: String) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveToken(token)
         }
     }
 }

@@ -3,11 +3,14 @@ package com.github.barmiro.syshclient.data.common
 import com.github.barmiro.syshclient.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 import okhttp3.Credentials
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.HttpException
 import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,6 +25,9 @@ class AuthenticationRepository @Inject constructor() {
             HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
             .build()
         )
+        .addConverterFactory(
+            Json.asConverterFactory(
+                "application/json; charset=UTF8".toMediaType()))
         .build()
 
     val authApi = retrofit.create(AuthenticationApi::class.java)
@@ -59,8 +65,7 @@ class AuthenticationRepository @Inject constructor() {
         return flow {
             emit(Resource.Loading(true))
             val response = try{
-                val authHeader = Credentials.basic(username, password)
-                authApi.getToken(authHeader).string()
+                authApi.register(CreateUserDTO(username, password)).string()
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered IOException: " + e.message))
@@ -71,6 +76,8 @@ class AuthenticationRepository @Inject constructor() {
                 ""
             }
             val isRegistrationSuccessful = response == username
+            println("Response: $response")
+            println("Username: $username")
             if (isRegistrationSuccessful) {
                 emit(
                     Resource.Success(
