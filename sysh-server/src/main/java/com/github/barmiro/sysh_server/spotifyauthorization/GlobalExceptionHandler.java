@@ -1,5 +1,7 @@
 package com.github.barmiro.sysh_server.spotifyauthorization;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,13 +14,8 @@ import org.springframework.web.client.HttpServerErrorException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 	
-	SpotifyTokenService tkn;
-	
-	GlobalExceptionHandler(SpotifyTokenService tkn) {
-		this.tkn = tkn;
-	}
 
-
+	Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 	
 	@ExceptionHandler(HttpClientErrorException.class)
 	public ResponseEntity<String> handleHttpClientError(HttpClientErrorException e) {
@@ -33,7 +30,7 @@ public class GlobalExceptionHandler {
 				return new ResponseEntity<String>("User '"
 						+ username 
 						+ "' not authorized with Spotify",
-						HttpStatus.BAD_GATEWAY);
+						HttpStatus.FORBIDDEN);
 				
 			} else if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
 				

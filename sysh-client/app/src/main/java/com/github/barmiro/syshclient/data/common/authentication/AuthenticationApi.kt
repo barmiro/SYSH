@@ -10,10 +10,10 @@ interface AuthenticationApi {
     @POST("token")
     suspend fun getToken(
         @Header("Authorization") authHeader: String
-    ) : Response<TokenDTO>
+    ) : Response<TokenResponse>
 
     @POST("register")
     suspend fun register(
         @Body user: CreateUserDTO
-    ) : Response<String>
+    ) : Response<RegisterResponse>
 }

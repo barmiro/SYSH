@@ -18,8 +18,8 @@ class AuthViewModel @Inject constructor(
     private val userPrefRepo: UserPreferencesRepository
 ) : ViewModel() {
 
-    private val _registerState = MutableStateFlow<Resource<String>?>(null)
-    val registerState: StateFlow<Resource<String>?> = _registerState.asStateFlow()
+    private val _registerState = MutableStateFlow<String?>(null)
+    val registerState: StateFlow<String?> = _registerState.asStateFlow()
 
     private val _isRegistered = MutableStateFlow<Boolean>(false)
     val isRegistered: StateFlow<Boolean> = _isRegistered.asStateFlow()
@@ -33,6 +33,7 @@ class AuthViewModel @Inject constructor(
                     }
 
                     is Resource.Error -> {
+                        _registerState.value = result.message
                     }
 
                     is Resource.Loading -> {

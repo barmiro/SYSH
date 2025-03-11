@@ -20,12 +20,20 @@ public class DevDatabaseUpdater {
 //	public void updateDatabase() {
 ////		this is a dev-environment database updater, so that I don't have to reinitialize the database
 //		if (!isTestEnv) {
-//			jdbc.sql("CREATE TABLE IF NOT EXISTS User_Data ("
-//					+ "id SERIAL PRIMARY KEY,"
-//					+ "display_name VARCHAR,"
-//					+ "CONSTRAINT only_one_user_data CHECK (id = 1)"
-//					+ "); "
-//					+ "INSERT INTO User_Data(display_name) VALUES ('username unknown') ON CONFLICT DO NOTHING;")
+//			String sql = ("CREATE FUNCTION create_stats_cache_full()\n"
+//					+ "RETURNS TRIGGER AS $$\n"
+//					+ "BEGIN\n"
+//					+ "    INSERT INTO Stats_Cache_Full (username)\n"
+//					+ "    VALUES (NEW.username);\n"
+//					+ "    RETURN NEW;\n"
+//					+ "END;\n"
+//					+ "$$ LANGUAGE plpgsql;\n"
+//					+ "\n"
+//					+ "CREATE TRIGGER user_insert_trigger\n"
+//					+ "AFTER INSERT ON Users\n"
+//					+ "FOR EACH ROW\n"
+//					+ "EXECUTE FUNCTION create_stats_cache_full();");
+//			jdbc.sql(sql)
 //			.update();			
 //		}
 //	}

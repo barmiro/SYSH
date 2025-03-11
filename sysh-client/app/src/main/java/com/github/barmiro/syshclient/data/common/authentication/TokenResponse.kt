@@ -3,6 +3,6 @@ package com.github.barmiro.syshclient.data.common.authentication
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TokenDTO(
+data class TokenResponse(
     val token: String
 )

@@ -114,7 +114,7 @@ CREATE TABLE Stats_Cache_Full (
 );
 
 CREATE FUNCTION create_stats_cache_full()
-RETURN TRIGGER AS $$
+RETURNS TRIGGER AS $$
 BEGIN
     INSERT INTO Stats_Cache_Full (username)
     VALUES (NEW.username);
@@ -125,7 +125,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER user_insert_trigger
 AFTER INSERT ON Users
 FOR EACH ROW
-EXECUTE FUNCTION create_stats_cache_full;
+EXECUTE FUNCTION create_stats_cache_full();
 
 --INSERT INTO Stats_Cache_Full (
 --    minutes_streamed,

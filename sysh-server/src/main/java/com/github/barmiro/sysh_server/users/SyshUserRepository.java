@@ -39,13 +39,13 @@ public class SyshUserRepository {
 				.single();
 	}
 	
-	public SyshUser findByUsername(String username) {
+	public Optional<SyshUser> findByUsername(String username) {
 		return jdbc.sql("SELECT * FROM Users "
 				+ "WHERE username = :username "
 				+ "LIMIT 1")
 				.param("username", username, Types.VARCHAR)
 				.query(SyshUser.class)
-				.single();
+				.optional();
 	}
 	
 	public String findBySpotifyState(String spotifyState) {

@@ -81,6 +81,10 @@ private static final Logger log = LoggerFactory.getLogger(SyshUserManager.class)
 		return userRepo.findAllUsernames();
 	}
 	
+	public Boolean isUsernameTaken(String username) {
+		return userRepo.findByUsername(username).isPresent();
+	}
+	
 	public void createUser(SyshUserDetails user) {
 		int created = userRepo.createUser(user);
 		if (created == 0) {

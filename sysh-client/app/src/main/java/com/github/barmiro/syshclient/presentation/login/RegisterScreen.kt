@@ -40,10 +40,15 @@ fun RegisterScreen(authVM: AuthViewModel,
 
 //    I'll put this here for now, but I'll have to reconsider this
     val isRegistered = authVM.isRegistered.collectAsState().value
+    val registerState = authVM.registerState.collectAsState().value
     LaunchedEffect(isRegistered) {
         if (isRegistered) {
             navController.navigate(Login)
         }
+    }
+
+    LaunchedEffect(registerState) {
+        println(registerState)
     }
 
 
