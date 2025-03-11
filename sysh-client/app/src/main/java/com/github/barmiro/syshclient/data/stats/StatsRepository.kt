@@ -3,6 +3,7 @@ package com.github.barmiro.syshclient.data.stats
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
+import com.github.barmiro.syshclient.util.Resource.Error
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
@@ -12,7 +13,6 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.IOException
-import java.net.ConnectException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -37,32 +37,31 @@ class StatsRepository @Inject constructor(
 
     val statsApi = retrofit.create(StatsApi::class.java)
 
-    fun getStats(): Flow<Resource<StatsDTO>> {
+    fun getStats(
+        start: String?,
+        end: String?
+    ): Flow<Resource<StatsDTO>> {
         return flow {
             emit(Resource.Loading(true))
-            try {
+
+            val response = if (start.isNullOrEmpty() || end.isNullOrEmpty()) {
+                    statsApi.fetchStatsAll()
+            } else {
+                statsApi.fetchStatsRange(start, end)
+            }
+            if (response.isSuccessful) {
                 emit(
                     Resource.Success(
-                        data = statsApi
-                            .fetchStatsAll()
-                            .body()
+                        data = response.body()
                     )
                 )
-
-
-            } catch (e:IOException) {
-                e.printStackTrace()
-                emit(Resource.Error("IOException:\n" + e.message))
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                emit(Resource.Error("HttpException:\n" + e.code()))
-            } catch (e: ConnectException) {
-                e.printStackTrace()
-                emit(Resource.Error("ConnectException:\n" + e.message))
-            } catch (e: Exception) {
-                e.printStackTrace()
-                emit(Resource.Error("Exception:\n" + e.message))
+            } else {
+                emit(
+                    Resource.Error(response.message())
+                )
             }
+            emit(Resource.Loading(false))
+
         }
     }
 
@@ -77,11 +76,11 @@ class StatsRepository @Inject constructor(
                     .body()
             } catch (e: IOException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered IOException: " + e.message))
+                emit(Error("Encountered IOException: " + e.message))
                 ""
             } catch (e: HttpException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered HttpException: " + e.code()))
+                emit(Error("Encountered HttpException: " + e.code()))
                 ""
             }
             val isFetchSuccessful = !oldestStreamDate.isNullOrEmpty()
@@ -93,7 +92,7 @@ class StatsRepository @Inject constructor(
                     data = LocalDate.parse(dateFromTimestamp, formatter)
                 ))
             } else {
-                emit(Resource.Error("Received list is empty"))
+                emit(Error("Received list is empty"))
             }
             emit(Resource.Loading(false))
         }
@@ -102,3 +101,9 @@ class StatsRepository @Inject constructor(
 
 }
 
+
+//                var endOrLocalDateTimeNow = end
+//                if (end.isNullOrEmpty()) {
+//                    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+//                    endOrLocalDateTimeNow = formatter.format(LocalDateTime.now())
+//                }

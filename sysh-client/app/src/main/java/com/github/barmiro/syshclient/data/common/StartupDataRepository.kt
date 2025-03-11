@@ -1,8 +1,11 @@
 package com.github.barmiro.syshclient.data.common
 
+import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
+import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import okhttp3.OkHttpClient
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import java.io.IOException
@@ -10,9 +13,18 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class StartupDataRepository @Inject constructor() {
+class StartupDataRepository @Inject constructor(
+    private val userPrefRepo: UserPreferencesRepository
+) {
+
+    val client = OkHttpClient.Builder()
+        .addInterceptor(JwtInterceptor(userPrefRepo))
+        .build()
+
+
     val retrofit = Retrofit.Builder()
         .baseUrl("http://192.168.0.147:5754/")
+        .client(client)
         .build()
 
     val startupApi = retrofit.create(StartupDataApi::class.java)

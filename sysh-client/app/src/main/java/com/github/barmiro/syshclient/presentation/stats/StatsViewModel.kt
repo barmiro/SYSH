@@ -1,14 +1,11 @@
-package com.github.barmiro.syshclient.presentation.top.tracks
+package com.github.barmiro.syshclient.presentation.stats
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.barmiro.syshclient.data.top.TopRepository
-import com.github.barmiro.syshclient.domain.top.TopTrack
+import com.github.barmiro.syshclient.data.stats.StatsRepository
+import com.github.barmiro.syshclient.presentation.home.HomeState
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.TopScreenState
 import com.github.barmiro.syshclient.presentation.top.TopScreenStateManager
@@ -16,18 +13,21 @@ import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TopTracksViewModel @Inject constructor(
-    private val topRepository: TopRepository,
+class StatsViewModel @Inject constructor(
+    private val statsRepository: StatsRepository,
     private val stateManager: TopScreenStateManager
 ): ViewModel(), DefaultLifecycleObserver {
 
     val state: StateFlow<TopScreenState> = stateManager.state
-    var trackList by mutableStateOf<List<TopTrack>>(emptyList())
     private var isDataLoaded = false
+
+    private val _homeState = MutableStateFlow(HomeState())
+    val homeState: StateFlow<HomeState> = _homeState
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> get() = _isLoading
@@ -35,63 +35,56 @@ class TopTracksViewModel @Inject constructor(
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
 
-    var previousValues by mutableStateOf(listOf(state.value.sort, state.value.start, state.value.end))
-
     override fun onCreate(owner: LifecycleOwner) {
-        if ((trackList.isEmpty() && !isDataLoaded)
-            || listOf(state.value.sort, state.value.start, state.value.end) != previousValues) {
-            getTopTracks()
-            previousValues = listOf(state.value.sort, state.value.start, state.value.end)
-        }
+        getStats()
     }
+
 
     fun onEvent(event: TopScreenEvent) {
         when(event) {
             is TopScreenEvent.Refresh -> {
-                getTopTracks()
-            } else -> {
-
+                getStats()
             }
-
-//            is TopScreenEvent.OnSearchParameterChange -> {
-//                stateManager.updateState(
-//                    start = event.start,
-//                    end = event.end,
-//                    sort = event.sort
-//                )
-//                viewModelScope.launch {
-//                    getTopTracks()
-//                }
-//            }
-
-
+            is TopScreenEvent.OnSearchParameterChange -> {
+                stateManager.updateState(
+                    start = event.start,
+                    end = event.end,
+                    sort = event.sort
+                )
+                getStats()
+            }
         }
     }
 
-    fun getTopTracks(
+    fun getStats(
         start: String? = state.value.start,
-        end: String? = state.value.end,
-        sort: String? = state.value.sort
+        end: String? = state.value.end
     ) {
         viewModelScope.launch {
-            topRepository.getTopTracks(start, end, sort)
+            statsRepository.getStats(start, end)
                 .collect { result ->
                     when(result) {
                         is Resource.Success -> {
-                            result.data?.let { topTracks ->
-                                _errorMessage.value = null
-                                trackList = topTracks
-                                isDataLoaded = true
+                            result.data?.let { statsResult ->
+                                _homeState.update {
+                                    it.copy(stats = statsResult)
+                                }
                             }
                         }
                         is Resource.Error -> {
+                            println(result)
                             _errorMessage.value = result.message
                         }
                         is Resource.Loading -> {
-                            _isLoading.value = result.isLoading
+                            _homeState.update {
+                                it.copy(isLoading = result.isLoading)
+                            }
                         }
+
                     }
                 }
         }
     }
+
+
 }

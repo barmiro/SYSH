@@ -44,12 +44,13 @@ import com.github.barmiro.syshclient.presentation.home.HomeViewModel
 import com.github.barmiro.syshclient.presentation.login.AuthViewModel
 import com.github.barmiro.syshclient.presentation.login.LoginScreen
 import com.github.barmiro.syshclient.presentation.login.RegisterScreen
+import com.github.barmiro.syshclient.presentation.stats.StatsScreen
+import com.github.barmiro.syshclient.presentation.stats.StatsViewModel
 import com.github.barmiro.syshclient.presentation.top.TopScreen
 import com.github.barmiro.syshclient.presentation.top.TopScreenViewModel
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
-import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
     private val topTracksVM: TopTracksViewModel by viewModels()
     private val topAlbumsVM: TopAlbumsViewModel by viewModels()
     private val topArtistsVM: TopArtistsViewModel by viewModels()
+    private val statsVM: StatsViewModel by viewModels()
     private val authVM: AuthViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,7 +98,7 @@ class MainActivity : ComponentActivity() {
                         title = "Stats",
                         selectedIcon = Icons.Filled.Info,
                         unselectedIcon = Icons.Outlined.Info,
-                        navigateTo = TopAlbums
+                        navigateTo = Stats
                     ),
                     BottomNavigationItem(
                         title = "Settings",
@@ -122,6 +124,7 @@ class MainActivity : ComponentActivity() {
                                 topScreenVM.getOldestStreamDate()
                                 homeVM.getStats()
                                 homeVM.getUserData()
+                                statsVM.getStats()
                                 NavigationBar {
                                     navItems.forEachIndexed { index, item ->
                                         NavigationBarItem(
@@ -152,7 +155,7 @@ class MainActivity : ComponentActivity() {
                         }
                     ) { innerPadding ->
                         Column(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding(), top = 0.dp)){
-                            AppNavHost(navController, isLoggedIn, homeVM, topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM, authVM, sessionVM)
+                            AppNavHost(navController, isLoggedIn, homeVM, topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM, statsVM, authVM, sessionVM)
                         }
 
                     }
@@ -195,6 +198,7 @@ fun AppNavHost(navController: NavHostController,
                topTracksVM: TopTracksViewModel,
                topAlbumsVM: TopAlbumsViewModel,
                topArtistsVM: TopArtistsViewModel,
+               statsVM: StatsViewModel,
                authVM: AuthViewModel,
                sessionVM: SessionViewModel) {
 
@@ -215,7 +219,7 @@ fun AppNavHost(navController: NavHostController,
             TopScreen(topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM)
         }
         composable<Stats> {
-            TopTracksScreen(topTracksVM)
+            StatsScreen(statsVM)
         }
         composable<TopAlbums> {
             TopAlbumsScreen(topAlbumsVM)

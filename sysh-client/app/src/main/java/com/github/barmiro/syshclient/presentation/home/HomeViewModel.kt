@@ -25,7 +25,7 @@ class HomeViewModel @Inject constructor(
 
     fun getStats() {
         viewModelScope.launch {
-            statsRepository.getStats()
+            statsRepository.getStats("", "")
                 .collect { result ->
                 when(result) {
                     is Resource.Success -> {
