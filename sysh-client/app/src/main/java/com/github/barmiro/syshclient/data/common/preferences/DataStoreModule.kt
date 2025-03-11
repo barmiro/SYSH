@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.data.common
+package com.github.barmiro.syshclient.data.common.preferences
 
 import android.content.Context
 import androidx.datastore.core.DataStore

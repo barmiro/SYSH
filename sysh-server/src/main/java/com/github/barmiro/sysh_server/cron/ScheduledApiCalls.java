@@ -1,5 +1,6 @@
 package com.github.barmiro.sysh_server.cron;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -9,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
 import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 import com.github.barmiro.sysh_server.users.SyshUserManager;
@@ -51,10 +52,13 @@ public class ScheduledApiCalls {
 	        String username = usernameList.get(i);
 	        scheduler.schedule(() -> {
 	            try {
-	                recentController.recentByUsername(username);
-	            } catch (HttpClientErrorException e) {
-	                log.error("Error processing user: " + username, e);
-	            }
+					recentController.recentByUsername(username);
+				} catch (JsonProcessingException 
+						| ClassCastException 
+						| IllegalAccessException
+						| InvocationTargetException e) {
+					e.printStackTrace();
+				}
 	        }, i * delayBetweenUsers, TimeUnit.MILLISECONDS);
 	    }
 

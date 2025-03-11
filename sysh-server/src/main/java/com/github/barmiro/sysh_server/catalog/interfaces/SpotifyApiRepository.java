@@ -13,7 +13,6 @@ import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 
@@ -58,7 +57,7 @@ public abstract class SpotifyApiRepository<
 	@SuppressWarnings("unchecked")
 	protected List<ApiEntityClass> mapResponse(
 			ResponseEntity<String> response
-			) throws JsonMappingException, JsonProcessingException, ClassCastException {
+			) throws JsonProcessingException {
 		
 		Class<WrapperClass> wrapper = getWrapperClass();
 		
@@ -116,8 +115,7 @@ public abstract class SpotifyApiRepository<
 	protected List<String> prepIdPackets(
 			List<String> IDlist,
 			int limit
-			) throws Exception {
-		
+			) {
 
 		int listSize = IDlist.size();
 		

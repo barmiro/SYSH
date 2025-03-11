@@ -1,7 +1,7 @@
 package com.github.barmiro.syshclient.data.top
 
-import com.github.barmiro.syshclient.data.common.JwtInterceptor
-import com.github.barmiro.syshclient.data.common.UserPreferencesRepository
+import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
+import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.domain.top.TopAlbum
 import com.github.barmiro.syshclient.domain.top.TopArtist
 import com.github.barmiro.syshclient.domain.top.TopTrack

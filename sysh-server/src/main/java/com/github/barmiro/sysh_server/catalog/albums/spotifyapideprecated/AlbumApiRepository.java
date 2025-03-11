@@ -1,5 +1,6 @@
 package com.github.barmiro.sysh_server.catalog.albums.spotifyapideprecated;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class AlbumApiRepository extends SpotifyApiRepository<
 
 
 	
-	public List<Album> addNewAlbums(List<String> album_ids, String username) {
+	public List<Album> addNewAlbums(List<String> album_ids, String username) throws IllegalAccessException, InvocationTargetException {
 		
 		List<String> newIDs = getNewIDs(album_ids, "id");
 		System.out.println("Found " + newIDs.size() + " new albums.");

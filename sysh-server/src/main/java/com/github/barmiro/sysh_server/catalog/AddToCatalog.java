@@ -1,11 +1,13 @@
 package com.github.barmiro.sysh_server.catalog;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.barmiro.sysh_server.catalog.albums.Album;
 import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
@@ -56,7 +58,7 @@ public class AddToCatalog {
 	}
 
 	@Transactional
-	public String adder(List<SongStream> streams, String username) {
+	public String adder(List<SongStream> streams, String username) throws JsonProcessingException, ClassCastException, IllegalAccessException, InvocationTargetException {
 		
 		tkn.refresh(username);
 		

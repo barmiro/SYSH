@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class SyshUserDetails implements UserDetails {
 
+	private static final long serialVersionUID = -898339266300426059L;
 	private SyshUser user;
 	
 	public SyshUserDetails(SyshUser user) {

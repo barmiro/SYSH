@@ -1,5 +1,6 @@
 package com.github.barmiro.sysh_server.catalog.tracks.spotify_api;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,17 +34,14 @@ public class TrackApiRepository extends SpotifyApiRepository<
 	
 	private static final Logger log = LoggerFactory.getLogger(TrackApiRepository.class);
 
-	public List<ApiTrack> getApiTracks(List<String> track_ids, String username) {
+	public List<ApiTrack> getApiTracks(List<String> track_ids, String username) throws JsonProcessingException, ClassCastException {
 		
 		List<String> newIDs = getNewIDs(track_ids, "spotify_track_id");
 		log.info("Found " + newIDs.size() + " new tracks.");
 		List<String> packets = new ArrayList<>();
-		try {
-			packets = prepIdPackets(newIDs, 50);			
-		} catch (Exception e) {
-			log.error("Method prepIdPackets threw an exception: " + e.getMessage());
-			return new ArrayList<ApiTrack>();
-		}
+		
+		packets = prepIdPackets(newIDs, 50);			
+
 		
 		List<ApiTrack> apiTracks = new ArrayList<>();
 		for (String packet:packets) {
@@ -55,12 +53,9 @@ public class TrackApiRepository extends SpotifyApiRepository<
 				log.error("Response for " + packet + " is null.");
 				continue;
 			}
-			
-			try {
-				apiTracks.addAll(mapResponse(response));
-			} catch (JsonProcessingException e) {
-				log.info("Method mapApiTracks threw an exception: " + e.getMessage());
-			}
+
+			apiTracks.addAll(mapResponse(response));
+
 		}
 		
 		if (apiTracks.size() == 0) {
@@ -71,7 +66,7 @@ public class TrackApiRepository extends SpotifyApiRepository<
 		return apiTracks;
 	}
 		
-	public List<Track> addNewTracks (List<ApiTrack> apiTracks) {
+	public List<Track> addNewTracks (List<ApiTrack> apiTracks) throws IllegalAccessException, InvocationTargetException {
 		
 		List<Track> tracks = ConvertDTOs.apiTracks(apiTracks);
 		

@@ -2,8 +2,8 @@ package com.github.barmiro.syshclient.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.barmiro.syshclient.data.common.AuthenticationRepository
-import com.github.barmiro.syshclient.data.common.UserPreferencesRepository
+import com.github.barmiro.syshclient.data.common.authentication.AuthenticationRepository
+import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

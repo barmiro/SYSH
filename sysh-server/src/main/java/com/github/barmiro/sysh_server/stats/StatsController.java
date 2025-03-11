@@ -35,19 +35,15 @@ public class StatsController {
 			@RequestParam
 			String start,
 			@RequestParam
-			String end) {
+			String end) throws IllegalAccessException, InvocationTargetException {
 		
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		Timestamp startDate = Timestamp.valueOf(start.replace("T", " "));
 		Timestamp endDate = Timestamp.valueOf(end.replace("T", " "));
 		
-		try {
-			System.out.println(statsRepo.addCachedStats(startDate, endDate, username));
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		System.out.println(statsRepo.addCachedStats(startDate, endDate, username));
+		
 		return statsRepo.streamStats(startDate, endDate, true, username);
 	}
 	

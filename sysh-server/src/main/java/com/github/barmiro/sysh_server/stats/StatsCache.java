@@ -32,7 +32,7 @@ public class StatsCache {
 	private boolean isTestEnv;
 	
 //	@PostConstruct
-	public void cacheGenerator(String username) {
+	public void cacheGenerator(String username) throws IllegalAccessException, InvocationTargetException {
 		
 		if (isTestEnv) {
 			return;
@@ -54,23 +54,16 @@ public class StatsCache {
 		
 		int addedYears = 0;
 		log.info("Generating full stats cache for user " + username);
-		try {
-			statsRepo.addCachedStats(username);
-			log.info("Done");
-		} catch (IllegalAccessException | InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		statsRepo.addCachedStats(username);
+		log.info("Done");
+
 		log.info("Generating yearly stats cache for user " + username);
 		for (int i = startYear; i <= endYear; i++) {
 			Timestamp start = Timestamp.valueOf(i + "-01-01 00:00:00");
 			Timestamp end = Timestamp.valueOf(i + "-12-31 23:59:59");
-			try {
-				addedYears += statsRepo.addCachedStats(start, end, username);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			addedYears += statsRepo.addCachedStats(start, end, username);
+
 		}
 		log.info("Added " 
 		+ addedYears 
@@ -91,7 +84,7 @@ public class StatsCache {
 			String username,
 			int tracksAdded,
 			int albumsAdded,
-			int artistsAdded) {
+			int artistsAdded) throws IllegalAccessException, InvocationTargetException {
 		
 		int baseYear = streams.get(0).ts()
 				.toLocalDateTime()

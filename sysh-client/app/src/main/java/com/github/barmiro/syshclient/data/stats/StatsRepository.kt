@@ -1,7 +1,7 @@
 package com.github.barmiro.syshclient.data.stats
 
-import com.github.barmiro.syshclient.data.common.JwtInterceptor
-import com.github.barmiro.syshclient.data.common.UserPreferencesRepository
+import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
+import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

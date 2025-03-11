@@ -46,15 +46,11 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		return newAlbums;
 	}
 
-	public int addAlbums(List<Album> albums) {
+	public int addAlbums(List<Album> albums) throws IllegalAccessException, InvocationTargetException {
 		int added = 0;
 		for (Album album:getNewAlbums(albums)) {
-			try {
-				added += addNew(album, Album.class);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			added += addNew(album, Album.class);
+
 		}
 		log.info("Added " + added + " new albums");
 		
@@ -110,7 +106,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	
 	List<AlbumStats> topAlbums(String sort,
 			String username,
-			Boolean checkForCache) {
+			Boolean checkForCache) throws IllegalAccessException, InvocationTargetException {
 		
 		String sql;
 		
@@ -174,7 +170,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	
 
 	public int updateTopAlbumsCache(String username
-			) {
+			) throws IllegalAccessException, InvocationTargetException {
 //		Doesn't have to be sorted, but I don't feel like overloading the constructor again
 		List<AlbumStats> albumStatsList = topAlbums("stream_count", username, false);
 		
@@ -189,13 +185,9 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		
 		for (AlbumStats album:albumStatsList) {
 			List<RecordCompInfo> recordComps;
-			try {
-				recordComps = CompInfo.get(album);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return 0;
-			}
+
+			recordComps = CompInfo.get(album);
+
 			
 			String addAlbumStats = CompListToSql.insertTopItemsCache(recordComps, "Album");
 			StatementSpec jdbcCall = jdbc.sql(addAlbumStats + " ON CONFLICT (username, id) DO NOTHING");

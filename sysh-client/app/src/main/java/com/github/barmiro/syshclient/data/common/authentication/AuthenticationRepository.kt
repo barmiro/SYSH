@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.data.common
+package com.github.barmiro.syshclient.data.common.authentication
 
 import com.github.barmiro.syshclient.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +38,7 @@ class AuthenticationRepository @Inject constructor() {
             emit(Resource.Loading(true))
             val token = try{
                 val authHeader = Credentials.basic(username, password)
-                authApi.getToken(authHeader).string()
+                authApi.getToken(authHeader).body()?.token
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered IOException: " + e.message))
@@ -65,7 +65,7 @@ class AuthenticationRepository @Inject constructor() {
         return flow {
             emit(Resource.Loading(true))
             val response = try{
-                authApi.register(CreateUserDTO(username, password)).string()
+                authApi.register(CreateUserDTO(username, password)).body()
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered IOException: " + e.message))
@@ -76,8 +76,6 @@ class AuthenticationRepository @Inject constructor() {
                 ""
             }
             val isRegistrationSuccessful = response == username
-            println("Response: $response")
-            println("Username: $username")
             if (isRegistrationSuccessful) {
                 emit(
                     Resource.Success(

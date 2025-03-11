@@ -1,5 +1,6 @@
 package com.github.barmiro.sysh_server.catalog.albums;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class AlbumController {
 	@GetMapping("/albums/all")
 	public List<AlbumStats> topAlbumsAll(
 			@RequestParam(required = false)
-			Optional<String> sort) {
+			Optional<String> sort) throws IllegalAccessException, InvocationTargetException {
 		
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		

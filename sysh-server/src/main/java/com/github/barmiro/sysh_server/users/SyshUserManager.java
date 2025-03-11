@@ -65,7 +65,7 @@ private static final Logger log = LoggerFactory.getLogger(SyshUserManager.class)
 	public LocalDateTime getUserTokenExpirationTime(String username) {
 		try {
 			return userRepo.getTokenExpirationTime(username).orElse(null).toLocalDateTime();			
-		} catch (NullPointerException e) {
+		} catch (NullPointerException e) { // TODO: i don't like this
 			return null;
 		}
 		

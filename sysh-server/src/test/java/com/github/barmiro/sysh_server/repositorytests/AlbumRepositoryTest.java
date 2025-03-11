@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +57,7 @@ class AlbumRepositoryTest {
 	}
 	
 	
-	@Test void testValidAlbums() {
+	@Test void testValidAlbums() throws IllegalAccessException, InvocationTargetException {
 		assertEquals(rowCount, albums.size());
 		ar.addAlbums(albums);
 		
@@ -68,7 +69,7 @@ class AlbumRepositoryTest {
 	}
 	
 	
-	@Test void testEmptyAlbum() {
+	@Test void testEmptyAlbum() throws IllegalAccessException, InvocationTargetException {
 
 		Album empty = new Album(null, null, null, null, null, null);
 		albums.add(empty);

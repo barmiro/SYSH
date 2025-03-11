@@ -2,7 +2,7 @@ package com.github.barmiro.syshclient.presentation.common
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.barmiro.syshclient.data.common.UserPreferencesRepository
+import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +17,9 @@ class SessionViewModel @Inject constructor(
 
     private val _isLoggedIn = MutableStateFlow<Boolean>(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
+    private val _isAuthorizedWithSpotify = MutableStateFlow<Boolean>(false)
+    val isAuthorizedWithSpotify: StateFlow<Boolean> = _isAuthorizedWithSpotify.asStateFlow()
 
     init {
         viewModelScope.launch {

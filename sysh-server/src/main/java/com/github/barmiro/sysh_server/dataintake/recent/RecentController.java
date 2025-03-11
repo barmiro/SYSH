@@ -1,5 +1,6 @@
 package com.github.barmiro.sysh_server.dataintake.recent;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.barmiro.sysh_server.catalog.AddToCatalog;
 import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
@@ -35,7 +37,8 @@ public class RecentController {
 
 
 	@GetMapping("/recent")
-	public String recent() {
+	public String recent(
+			) throws JsonProcessingException, ClassCastException, IllegalAccessException, InvocationTargetException {
 		
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
@@ -60,7 +63,7 @@ public class RecentController {
 		return result;
 	}
 	
-	public String recentByUsername(String username) {
+	public String recentByUsername(String username) throws JsonProcessingException, ClassCastException, IllegalAccessException, InvocationTargetException {
 		
 		tkn.refresh(username);
 		

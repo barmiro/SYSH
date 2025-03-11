@@ -1,5 +1,6 @@
-package com.github.barmiro.syshclient.data.common
+package com.github.barmiro.syshclient.data.common.authentication
 
+import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import okhttp3.Interceptor
 import okhttp3.Response
 

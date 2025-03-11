@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +61,7 @@ class TrackServiceTest {
 	}
 	
 	
-	@Test void testValidTracks() {
+	@Test void testValidTracks() throws IllegalAccessException, InvocationTargetException {
 		assertEquals(rowCount, tracks.size());
 		tr.addTracks(tracks);
 		
@@ -72,7 +73,7 @@ class TrackServiceTest {
 	}
 	
 	
-	@Test void testDuplicates() {
+	@Test void testDuplicates() throws IllegalAccessException, InvocationTargetException {
 		
 		List<Track> duplicates = new ArrayList<>();
 		
@@ -114,7 +115,7 @@ class TrackServiceTest {
 		
 	}
 	
-	@Test void testEmptyTrack() {
+	@Test void testEmptyTrack() throws IllegalAccessException, InvocationTargetException {
 		int tableSize = rowCount * 2;
 
 		Track empty = new Track(null, null, null, null, null, null);

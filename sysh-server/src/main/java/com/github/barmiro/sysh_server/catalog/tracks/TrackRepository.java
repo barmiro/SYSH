@@ -78,18 +78,15 @@ public class TrackRepository extends CatalogRepository<Track> {
 	}
 
 	
-	public int addTracks(List<Track> tracks) {
+	public int addTracks(List<Track> tracks) throws IllegalAccessException, InvocationTargetException {
 		int added = 0;
 		int duplicates = 0;
 		for (Track track:tracks) {
 			
 			String duplicate = checkForDuplicates(track);
 			
-			try {
-				added += addNew(track, Track.class);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
-			}
+			added += addNew(track, Track.class);
+
 			
 			if (duplicate != null) {
 				try {
@@ -264,7 +261,6 @@ public class TrackRepository extends CatalogRepository<Track> {
 			try {
 				recordComps = CompInfo.get(track);
 			} catch (IllegalAccessException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return 0;
 			}

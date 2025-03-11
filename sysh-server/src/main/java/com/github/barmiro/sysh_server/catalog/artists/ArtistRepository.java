@@ -7,8 +7,10 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.HttpServerErrorException;
 
 import com.github.barmiro.sysh_server.catalog.interfaces.CatalogRepository;
 
@@ -29,6 +31,8 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 				added += addNew(artist, Artist.class);
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				log.error(e.getMessage());
+				e.printStackTrace();
+				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		log.info("Added " + added + " new artists");

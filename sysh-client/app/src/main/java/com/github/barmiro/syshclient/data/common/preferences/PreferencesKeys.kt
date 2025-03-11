@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.data.common
+package com.github.barmiro.syshclient.data.common.preferences
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey

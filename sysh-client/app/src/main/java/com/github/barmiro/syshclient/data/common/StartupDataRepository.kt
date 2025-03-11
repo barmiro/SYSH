@@ -22,7 +22,7 @@ class StartupDataRepository @Inject constructor() {
         return flow {
             emit(Resource.Loading(true))
             val userDisplayName = try{
-                startupApi.getUserData().string()
+                startupApi.getUserData().body()?.string()
             } catch (e: IOException) {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered IOException: " + e.message))

@@ -20,11 +20,14 @@ public class AuthController {
 	
 	
 	@PostMapping("/token")
-	public String token(Authentication authentication) {
+	public TokenResponse token(Authentication authentication) {
 		log.info("Token requested tor user: '{}'", authentication.getName());
 		String token = jwtService.generateToken(authentication);
 		log.info("Token granted: {}", token);
-		return token;
+		
+		TokenResponse response = new TokenResponse(token);
+		
+		return response;
 	}
 	
 }

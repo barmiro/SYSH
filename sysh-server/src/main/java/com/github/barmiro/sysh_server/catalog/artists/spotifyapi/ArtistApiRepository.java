@@ -32,31 +32,22 @@ public class ArtistApiRepository extends SpotifyApiRepository<
 
 	private static final Logger log = LoggerFactory.getLogger(ArtistApiRepository.class);
 	
-	public List<Artist> addNewArtists(List<String> artist_ids, String username) {
+	public List<Artist> addNewArtists(List<String> artist_ids, String username) throws JsonProcessingException {
 		
 		List<String> newIDs = getNewIDs(artist_ids, "id");
 		log.info("Found " + newIDs.size() + " new artists.");
 		
 		List<String> packets = new ArrayList<>();
 
-		try {
-			packets = prepIdPackets(newIDs, 50);			
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.error("Method prepIdPackets threw an exception.");
-			return new ArrayList<Artist>();
-		}
+
+		packets = prepIdPackets(newIDs, 50);			
+
 		
 		List<ApiArtist> apiArtists = new ArrayList<>();
 		for (String packet:packets) {
 			ResponseEntity<String> response = getResponse(packet, username);
+			apiArtists.addAll(mapResponse(response));
 
-			try {
-				apiArtists.addAll(mapResponse(response));
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-				log.error("Method mapApiArtists threw an exception");
-			}
 		}
 		
 		if (apiArtists.size() == 0) {

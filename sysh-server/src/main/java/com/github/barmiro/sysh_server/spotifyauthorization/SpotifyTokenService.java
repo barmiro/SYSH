@@ -16,7 +16,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.barmiro.sysh_server.users.SyshUserManager;
 
@@ -112,9 +111,6 @@ public class SpotifyTokenService {
 					+ ", refresh " + responseBody.refresh_token()
 					+ ", expires in " + responseBody.expires_in());
 			return;
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-			throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
@@ -159,14 +155,10 @@ public class SpotifyTokenService {
 				setRefreshToken(username, responseBody.refresh_token());				
 			}
 			return true;
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
+			throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
 		}
-		
-		
-		throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
 	}
 
 }

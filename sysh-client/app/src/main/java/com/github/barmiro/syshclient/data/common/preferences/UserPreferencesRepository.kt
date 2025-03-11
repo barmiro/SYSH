@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.data.common
+package com.github.barmiro.syshclient.data.common.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -55,6 +55,8 @@ class UserPreferencesRepository @Inject constructor(
             it[PreferencesKeys.IS_FRESH_INSTALL] = isFreshInstall
         }
     }
+
+//    suspend fun setAuthenticatedWithSpo
 
 
     val username: Flow<String?> = dataStore.data.map {
