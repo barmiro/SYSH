@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.users;
+package com.github.barmiro.sysh_server.security;
 
 import java.util.Collection;
 import java.util.Collections;

@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import com.github.barmiro.sysh_server.security.SyshUserDetails;
+
 @Service
 public class SyshUserManager {
 

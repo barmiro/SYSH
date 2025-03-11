@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.users;
+package com.github.barmiro.sysh_server.security;
 
 public record SyshUser(
 		String username,

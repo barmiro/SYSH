@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import com.github.barmiro.sysh_server.common.utils.GetRandom;
+import com.github.barmiro.sysh_server.security.SyshUser;
 
 @Repository
 public class SyshUserRepository {

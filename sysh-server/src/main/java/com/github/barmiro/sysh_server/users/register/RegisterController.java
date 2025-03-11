@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.barmiro.sysh_server.users.SyshUser;
-import com.github.barmiro.sysh_server.users.SyshUserDetails;
+import com.github.barmiro.sysh_server.security.SyshUser;
+import com.github.barmiro.sysh_server.security.SyshUserDetails;
 import com.github.barmiro.sysh_server.users.SyshUserManager;
 
 @RestController
