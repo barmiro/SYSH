@@ -18,19 +18,10 @@ public class GlobalExceptionHandler {
 		this.tkn = tkn;
 	}
 
-	@ExceptionHandler(InternalUnauthorizedException.class)
-	public ResponseEntity<String> handleInternalUnauthorized(InternalUnauthorizedException e) {
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-	}
-	
-//	public ResponseEntity<ErrorResponse> handleInternalUnauthorized(InternalUnauthorizedException e) {
-//		
-//        return new ErrorResponse(HttpStatus.UNAUTHORIZED);
-//	}
-	
+
 	
 	@ExceptionHandler(HttpClientErrorException.class)
-	public ResponseEntity<String> handleHttpClientError(HttpClientErrorException e) throws InterruptedException {
+	public ResponseEntity<String> handleHttpClientError(HttpClientErrorException e) {
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		
@@ -39,29 +30,35 @@ public class GlobalExceptionHandler {
 			String username = auth.getName();
 			
 			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-				throw new HttpServerErrorException(null);
+				return new ResponseEntity<String>("User '"
+						+ username 
+						+ "' not authorized with Spotify",
+						HttpStatus.BAD_GATEWAY);
+				
+			} else if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+				
+				return new ResponseEntity<String>("The server is making too many calls to Spotify. "
+						+ "If the issue persists, please contact your system administrator",
+						HttpStatus.TOO_MANY_REQUESTS);
 			}
-			
 		}
 		
-		
-		System.out.println("Encountered error: " + e.getStatusCode() + "\nAll changes rolled back.");
+		System.out.println("Encountered error: "
+				+ e.getStatusCode()
+				+ "\nAll changes rolled back.");
 		
 		return new ResponseEntity<String>(e.getMessage(), e.getStatusCode());
 	}
 	
+	@ExceptionHandler(HttpServerErrorException.class)
+	public ResponseEntity<String> handleHttpServerError(HttpServerErrorException e) {
+		return new ResponseEntity<String>("Spotify is having some issues. Please try again later.", HttpStatus.BAD_GATEWAY);
+	}
+	
+	
+	
 }
 
 
-//for (int i = 0; i < 5; i++) {
-//	try {
-//		tkn.refresh(username);
-//	} catch (HttpClientErrorException ex) {
-//		if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-//			Thread.sleep(2000 * i);
-//		} else {
-//			throw ex;
-//		}
-//	}
-//	
-//}
+
+

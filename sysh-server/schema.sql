@@ -106,12 +106,26 @@ CREATE TABLE Stats_Cache_Range (
 
 CREATE TABLE Stats_Cache_Full (
     username VARCHAR PRIMARY KEY REFERENCES Users(username) ON DELETE CASCADE,
-    minutes_streamed INTEGER, 
-    stream_count INTEGER, 
-    track_count INTEGER, 
-    album_count INTEGER, 
-    artist_count INTEGER
+    minutes_streamed INTEGER DEFAULT 0, 
+    stream_count INTEGER DEFAULT 0, 
+    track_count INTEGER DEFAULT 0, 
+    album_count INTEGER DEFAULT 0, 
+    artist_count INTEGER DEFAULT 0
 );
+
+CREATE FUNCTION create_stats_cache_full()
+RETURN TRIGGER AS $$
+BEGIN
+    INSERT INTO Stats_Cache_Full (username)
+    VALUES (NEW.username);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER user_insert_trigger
+AFTER INSERT ON Users
+FOR EACH ROW
+EXECUTE FUNCTION create_stats_cache_full;
 
 --INSERT INTO Stats_Cache_Full (
 --    minutes_streamed,
@@ -152,3 +166,8 @@ CREATE TABLE Top_Tracks_Cache (
 
 CREATE INDEX tracks_by_time ON Top_Tracks_Cache (username, total_ms_played DESC);
 CREATE INDEX tracks_by_count ON Top_Tracks_Cache (username, stream_count DESC);
+
+
+
+
+

@@ -8,7 +8,10 @@ import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -133,6 +136,11 @@ public abstract class SpotifyApiRepository<
 	}
 	
 	
+    @Retryable(
+            value = { HttpServerErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 2000, multiplier = 2)
+        )
 	protected ResponseEntity<String> getResponse(String packet, String username) {
 		
 		

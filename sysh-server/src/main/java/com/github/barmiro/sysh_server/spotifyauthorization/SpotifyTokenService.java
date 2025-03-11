@@ -9,10 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -84,6 +87,15 @@ public class SpotifyTokenService {
 	private final String serverUrl = System.getenv("SYSH_SERVER_URL");
 	private final String serverPort = System.getenv("SYSH_SERVER_PORT");
 	
+	
+	
+	
+	
+    @Retryable(
+            value = { HttpServerErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 2000, multiplier = 2)
+        )
 	public void getNewToken(String code, String username) {
 		SpotifyAuthorizationResponseDTO responseBody;
 		MultiValueMap<String, String> newBody = new LinkedMultiValueMap<>();
@@ -117,7 +129,13 @@ public class SpotifyTokenService {
 		}
 		
 	}
-	
+    
+    
+    @Retryable(
+            value = { HttpServerErrorException.class },
+            maxAttempts = 5,
+            backoff = @Backoff(delay = 2000, multiplier = 2)
+        )
 	public boolean refresh(String username) {
 		
 		LocalDateTime expirationTime = userManager.getUserTokenExpirationTime(username);
