@@ -102,7 +102,7 @@ fun TopScreen(
                     if (state.sort == "time") {
                         IconButton(
                             onClick = {
-                                TopScreenEvent.OnSearchParameterChange("count")
+                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange("count"))
                             }
                         ) {
                             Icon(
@@ -114,7 +114,7 @@ fun TopScreen(
                     } else {
                         IconButton(
                             onClick = {
-                                TopScreenEvent.OnSearchParameterChange("time")
+                                viewModel.onEvent(TopScreenEvent.OnSearchParameterChange("time"))
                             }
                         ) {
                             Icon(

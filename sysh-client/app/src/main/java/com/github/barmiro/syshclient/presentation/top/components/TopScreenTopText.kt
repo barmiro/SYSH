@@ -83,3 +83,41 @@ fun TopScreenTopText(
         }
     }
 }
+
+@Composable
+fun StatsScreenTopText(
+    state: TopScreenState) {
+    var oldRangeText by remember { mutableStateOf("") }
+    var targetRangeText by remember { mutableStateOf("") }
+    val delayBase = 150L
+
+    val rangeText = when (state.dateRangeMode) {
+        null -> "All time"
+        "yearly" -> "Yearly"
+        "monthly" -> "Monthly"
+        "custom" -> "Custom date range"
+        else -> "Invalid date range mode"
+    }
+
+
+    LaunchedEffect(rangeText) {
+        targetRangeText = oldRangeText
+        for(i in 1..targetRangeText.length) {
+            targetRangeText = targetRangeText.dropLast(1)
+            delay(delayBase / oldRangeText.length)
+        }
+        delay(delayBase)
+        for(i in 1..rangeText.length) {
+            targetRangeText += rangeText[i - 1]
+            delay(delayBase / rangeText.length)
+        }
+        oldRangeText = rangeText
+    }
+
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
+        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Text(text = targetRangeText, fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.padding(0.dp)
+                .animateContentSize(spring(1f, 3000f)))
+        }
+    }
+}

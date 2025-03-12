@@ -9,7 +9,7 @@ import javax.inject.Singleton
 data class TopScreenState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
-    val oldestStreamDate: LocalDate? = LocalDate.of(2006, 1, 1),
+    val oldestStreamDate: LocalDate = LocalDate.of(2006, 1, 1),
     val sort: String? = null,
     val start: String? = null,
     val end: String? = null,

@@ -25,7 +25,7 @@ class SessionViewModel @Inject constructor(
         viewModelScope.launch {
 
 //                !!! DELETE BEFORE PUBLISHING !!!
-            userPreferencesRepository.setLoggedIn(false)
+//            userPreferencesRepository.setLoggedIn(false)
 //          ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 
             userPreferencesRepository.isLoggedIn.collect {

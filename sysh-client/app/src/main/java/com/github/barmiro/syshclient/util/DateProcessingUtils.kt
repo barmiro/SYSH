@@ -1,8 +1,10 @@
 package com.github.barmiro.syshclient.util
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
-import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import java.util.Calendar
 import java.util.Date
 
@@ -17,40 +19,6 @@ fun setToEndOfDay(date: Long): Date {
     return calendar.time
 }
 
-fun yearToDateRange(year: Int): Pair<Long, Long> {
-    return Pair(
-        LocalDateTime
-            .of(year, 1, 1, 0, 0, 0)
-            .atOffset(ZoneOffset.UTC)
-            .toInstant()
-            .toEpochMilli(),
-
-//        this will be automatically converted to 23:59:59 anyway, set all 0's for consistency
-        LocalDateTime
-            .of(year, 12, 31, 0, 0, 0)
-            .atOffset(ZoneOffset.UTC)
-            .toInstant()
-            .toEpochMilli()
-    )
-}
-
-fun monthToDateRange(yearMonth: YearMonth): Pair<Long, Long> {
-    return Pair(
-        LocalDateTime
-            .of(yearMonth.year, yearMonth.monthValue, 1, 0, 0, 0)
-            .atOffset(ZoneOffset.UTC)
-            .toInstant()
-            .toEpochMilli(),
-
-//        this will be automatically converted to 23:59:59 anyway, set all 0's for consistency
-        LocalDateTime
-            .of(yearMonth.year, yearMonth.monthValue, yearMonth.lengthOfMonth(), 0, 0, 0)
-            .atOffset(ZoneOffset.UTC)
-            .toInstant()
-            .toEpochMilli()
-    )
-}
-
 fun monthToStart(yearMonth: YearMonth): String {
     val year = yearMonth.year
     val month = when {
@@ -60,6 +28,7 @@ fun monthToStart(yearMonth: YearMonth): String {
 
     return "$year-$month-01T00:00:00"
 }
+
 
 
 fun monthToEnd(yearMonth: YearMonth): String {
@@ -81,4 +50,18 @@ fun yearToStart(year: Int): String {
 
 fun yearToEnd(year: Int): String {
     return "$year-12-31T23:59:59"
+}
+
+fun localDateFromTimestampString(string: String?): LocalDate? {
+    if (string.isNullOrEmpty()) {
+        return null
+    }
+
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+
+    return try {
+        LocalDateTime.parse(string, formatter).toLocalDate()
+    } catch (e: DateTimeParseException) {
+        null
+    }
 }
