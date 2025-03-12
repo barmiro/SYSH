@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient.presentation.top.components
 
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -8,7 +9,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -17,9 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.TopScreenState
 import com.github.barmiro.syshclient.util.monthToEnd
@@ -33,10 +31,12 @@ import java.time.YearMonth
 @Composable
 fun TopScreenTopBar(
     state: TopScreenState,
-//    onDateRangeSelect: (Pair<Long?, Long?>?) -> Unit,
     onDateRangeModeChange: (String) -> Unit,
     onDateRangePickerVisibilityChange: (Boolean) -> Unit,
-    onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit
+    onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit,
+    onDateRangePageChange: (TopScreenEvent.OnDateRangePageChange) -> Unit,
+    titleText: String,
+    actions: @Composable (RowScope.() -> Unit)
 ) {
     var expanded by remember { mutableStateOf(false) }
     CenterAlignedTopAppBar(
@@ -45,7 +45,7 @@ fun TopScreenTopBar(
             titleContentColor = MaterialTheme.colorScheme.onBackground
         ),
         title = {
-            Text(text = "Top",
+            Text(text = titleText,
                 fontWeight = FontWeight.Bold)
         },
         navigationIcon = {
@@ -59,8 +59,8 @@ fun TopScreenTopBar(
                 DropdownMenuItem(
                     text = { Text("All time") },
                     onClick = {
-//                        onDateRangeSelect(null)
                         onDateRangeModeChange("")
+                        onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
                         onVMSearchParameterChange(
                             TopScreenEvent.OnSearchParameterChange(
                                 start = "",
@@ -75,8 +75,8 @@ fun TopScreenTopBar(
                     onClick = {
                         if (state.dateRangeMode != "yearly") {
                             val year: Int = LocalDate.now().year
-//                            onDateRangeSelect(yearToDateRange(year))
                             onDateRangeModeChange("yearly")
+                            onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
                             onVMSearchParameterChange(
                                 TopScreenEvent.OnSearchParameterChange(
                                     start = yearToStart(year),
@@ -93,11 +93,11 @@ fun TopScreenTopBar(
                     onClick = {
                         if (state.dateRangeMode != "monthly") {
                             val month: YearMonth = YearMonth.now()
-//                            onDateRangeSelect(monthToDateRange(month))
                             onDateRangeModeChange("monthly")
+                            onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
                             onVMSearchParameterChange(
                                 TopScreenEvent.OnSearchParameterChange(
-                                    start = monthToStart(month) , end = monthToEnd(month)
+                                    start = monthToStart(month), end = monthToEnd(month)
                                 )
                             )
                         }
@@ -114,36 +114,6 @@ fun TopScreenTopBar(
                 )
             }
         },
-        actions = {
-            if (state.sort == "time") {
-                IconButton(
-                    onClick = {
-                        onVMSearchParameterChange(
-                            TopScreenEvent.OnSearchParameterChange("count")
-                        )
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.sort_24px),
-                        tint = IconButtonDefaults.iconButtonColors().contentColor,
-                        contentDescription = "Sort icon"
-                    )
-                }
-            } else {
-                IconButton(
-                    onClick = {
-                        onVMSearchParameterChange(
-                            TopScreenEvent.OnSearchParameterChange("time")
-                        )
-                    }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.sort_24px),
-                        tint = IconButtonDefaults.iconButtonColors().contentColor,
-                        contentDescription = "Sort icon"
-                    )
-                }
-            }
-        }
+        actions = actions
     )
 }

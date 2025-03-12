@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -29,8 +32,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsScreen
@@ -56,18 +61,11 @@ fun TopScreen(
 
     val state by viewModel.state.collectAsState()
 
-//    var dateRange by remember { mutableStateOf<Pair<Long?, Long?>?>(null) }
-
-
-
-//    var dateRangeMode by remember { mutableStateOf("") }
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
 
     var tabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Tracks", "Albums", "Artists")
     val tabPagerState = rememberPagerState(pageCount = { 3 })
-
-
 
     if (isDateRangePickerVisible) {
         DateRangePickerModal(
@@ -97,7 +95,36 @@ fun TopScreen(
                 state = state,
                 onDateRangeModeChange = { viewModel.onEvent(TopScreenEvent.OnDateRangeModeChange(it)) },
                 onDateRangePickerVisibilityChange = { isDateRangePickerVisible = it },
-                onVMSearchParameterChange = { viewModel.onEvent(it) }
+                onVMSearchParameterChange = { viewModel.onEvent(it) },
+                onDateRangePageChange = {viewModel.onEvent(it) },
+                titleText = "Top",
+                actions = {
+                    if (state.sort == "time") {
+                        IconButton(
+                            onClick = {
+                                TopScreenEvent.OnSearchParameterChange("count")
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.sort_24px),
+                                tint = IconButtonDefaults.iconButtonColors().contentColor,
+                                contentDescription = "Sort icon"
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = {
+                                TopScreenEvent.OnSearchParameterChange("time")
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.sort_24px),
+                                tint = IconButtonDefaults.iconButtonColors().contentColor,
+                                contentDescription = "Sort icon"
+                            )
+                        }
+                    }
+                }
             )
 //            TODO: this is a terrible hack
             Box(
@@ -151,9 +178,8 @@ fun TopScreen(
         }
         TopScreenBottomBar(
             state = state,
-//            dateRange = dateRange,
-//            onDateRangeChange = { dateRange = it },
-            onVMSearchParameterChange = { viewModel.onEvent(it)}
+            onVMSearchParameterChange = { viewModel.onEvent(it) },
+            onDateRangePageChange = { viewModel.onEvent(it) }
         )
     }
 }

@@ -13,7 +13,8 @@ data class TopScreenState(
     val sort: String? = null,
     val start: String? = null,
     val end: String? = null,
-    val dateRangeMode: String? = null
+    val dateRangeMode: String? = null,
+    val dateRangePageNumber: Int? = null
 )
 
 @Singleton
@@ -28,7 +29,8 @@ class TopScreenStateManager @Inject constructor() {
         sort: String? = null,
         start: String? = null,
         end: String? = null,
-        dateRangeMode: String? = null
+        dateRangeMode: String? = null,
+        dateRangePageNumber: Int? = null
     ) {
         _state.value = _state.value.copy(
             isLoading = isLoading ?: _state.value.isLoading,
@@ -37,7 +39,8 @@ class TopScreenStateManager @Inject constructor() {
             sort = handleNullOrEmptyString(sort, _state.value.sort),
             start = handleNullOrEmptyString(start, _state.value.start),
             end = handleNullOrEmptyString(end, _state.value.end),
-            dateRangeMode = handleNullOrEmptyString(dateRangeMode, _state.value.dateRangeMode)
+            dateRangeMode = handleNullOrEmptyString(dateRangeMode, _state.value.dateRangeMode),
+            dateRangePageNumber = handleNullOrNegativeInt(dateRangePageNumber, _state.value.dateRangePageNumber)
         )
     }
 }
@@ -47,6 +50,14 @@ private fun handleNullOrEmptyString(newValue: String?, currentValue: String?): S
     return when {
         newValue == null -> currentValue
         newValue.isEmpty() -> null
+        else -> newValue
+    }
+}
+
+private fun handleNullOrNegativeInt(newValue: Int?, currentValue: Int?): Int? {
+    return when {
+        newValue == null -> currentValue
+        newValue < 0 -> null
         else -> newValue
     }
 }

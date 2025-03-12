@@ -50,9 +50,8 @@ import java.util.Locale
 @Composable
 fun TopScreenBottomBar(
     state: TopScreenState,
-//    dateRange: Pair<Long?, Long?>?,
-//    onDateRangeChange: (Pair<Long?, Long?>?) -> Unit,
-    onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit
+    onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit,
+    onDateRangePageChange: (TopScreenEvent.OnDateRangePageChange) -> Unit
     ) {
 
     var pageCount by remember { mutableIntStateOf(100) }
@@ -63,8 +62,8 @@ fun TopScreenBottomBar(
 
 
     LaunchedEffect(targetPage) {
-            pagerState.animateScrollToPage(targetPage)
-
+        pagerState.animateScrollToPage(targetPage)
+        onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(targetPage))
     }
 
     LaunchedEffect(state.dateRangeMode) {
@@ -75,7 +74,7 @@ fun TopScreenBottomBar(
                 .toInt() + 1
             else -> 1
         }
-        targetPage = pageCount - 1
+        targetPage = state.dateRangePageNumber ?: (pageCount - 1)
     }
 
     LaunchedEffect(targetPage, state.dateRangeMode) {

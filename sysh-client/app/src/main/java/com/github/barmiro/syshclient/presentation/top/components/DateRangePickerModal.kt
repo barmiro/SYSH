@@ -1,10 +1,15 @@
 package com.github.barmiro.syshclient.presentation.top.components
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DateRangePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,6 +33,7 @@ fun DateRangePickerModal(
     val dateRangePickerState = rememberDateRangePickerState()
 
     DatePickerDialog(
+        modifier = Modifier.verticalScroll(rememberScrollState()),
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
@@ -68,14 +74,26 @@ fun DateRangePickerModal(
             state = dateRangePickerState,
             title = {
                 Text(
-                    text = "Select date range"
+                    text = "Select date range",
+                    modifier = Modifier.padding(16.dp)
+                )
+            },
+//            this is NOT ideal, but the default material 3 config is broken
+//            and the text can overflow into multiple lines, this helps a bit
+            headline = {
+                DateRangePickerDefaults.DateRangePickerHeadline(
+                    dateRangePickerState.selectedStartDateMillis,
+                    dateRangePickerState.selectedEndDateMillis,
+                    dateRangePickerState.displayMode,
+                    DatePickerDefaults.dateFormatter(),
+                    Modifier.fillMaxWidth(1f)
+                        .padding(horizontal = 16.dp)
+                        .offset(y = (-4).dp)
                 )
             },
             showModeToggle = true,
             modifier = Modifier
-                .fillMaxWidth()
-                .height(500.dp)
-                .padding(16.dp)
+                .fillMaxSize()
         )
     }
 }

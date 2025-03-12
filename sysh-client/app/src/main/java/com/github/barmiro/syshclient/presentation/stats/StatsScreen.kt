@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
+import com.github.barmiro.syshclient.presentation.top.components.TopScreenBottomBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopText
 
@@ -41,7 +42,10 @@ fun StatsScreen(
                 state = state,
                 onDateRangeModeChange = { viewModel.onEvent(TopScreenEvent.OnDateRangeModeChange(it)) },
                 onDateRangePickerVisibilityChange = { isDateRangePickerVisible = it },
-                onVMSearchParameterChange = { viewModel.onEvent(it) }
+                onVMSearchParameterChange = { viewModel.onEvent(it) },
+                onDateRangePageChange = {viewModel.onEvent(it) },
+                titleText = "Stats",
+                actions = { }
             )
 //            TODO: this is a terrible hack
             Box(
@@ -71,5 +75,10 @@ fun StatsScreen(
                 StatsItem(itemText = "${homeState.stats.artist_count} artists")
             }
         }
+        TopScreenBottomBar(
+            state = state,
+            onVMSearchParameterChange = { viewModel.onEvent(it)},
+            onDateRangePageChange = { viewModel.onEvent(it) }
+        )
     }
 }
