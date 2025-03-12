@@ -50,16 +50,19 @@ class TopArtistsViewModel @Inject constructor(
             is TopScreenEvent.Refresh -> {
                 getTopArtists()
             }
-            is TopScreenEvent.OnSearchParameterChange -> {
-                stateManager.updateState(
-                    start = event.start,
-                    end = event.end,
-                    sort = event.sort
-                )
-                viewModelScope.launch {
-                    getTopArtists()
-                }
+            else -> {
+
             }
+//            is TopScreenEvent.OnSearchParameterChange -> {
+//                stateManager.updateState(
+//                    start = event.start,
+//                    end = event.end,
+//                    sort = event.sort
+//                )
+//                viewModelScope.launch {
+//                    getTopArtists()
+//                }
+//            }
         }
     }
 

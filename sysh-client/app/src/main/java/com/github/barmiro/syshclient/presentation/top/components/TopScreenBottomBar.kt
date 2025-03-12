@@ -34,24 +34,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
-import com.github.barmiro.syshclient.util.monthToDateRange
+import com.github.barmiro.syshclient.presentation.top.TopScreenState
 import com.github.barmiro.syshclient.util.monthToEnd
 import com.github.barmiro.syshclient.util.monthToStart
-import com.github.barmiro.syshclient.util.yearToDateRange
 import com.github.barmiro.syshclient.util.yearToEnd
 import com.github.barmiro.syshclient.util.yearToStart
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @Composable
 fun TopScreenBottomBar(
-    oldestStreamDate: LocalDate,
-    dateRangeMode: String,
-    dateRange: Pair<Long?, Long?>?,
-    onDateRangeChange: (Pair<Long?, Long?>?) -> Unit,
+    state: TopScreenState,
+//    dateRange: Pair<Long?, Long?>?,
+//    onDateRangeChange: (Pair<Long?, Long?>?) -> Unit,
     onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit
     ) {
 
@@ -67,10 +67,10 @@ fun TopScreenBottomBar(
 
     }
 
-    LaunchedEffect(dateRangeMode) {
-        pageCount = when (dateRangeMode) {
-            "yearly" -> LocalDate.now().year - oldestStreamDate.year + 1
-            "monthly" -> YearMonth.from(oldestStreamDate)
+    LaunchedEffect(state.dateRangeMode) {
+        pageCount = when (state.dateRangeMode) {
+            "yearly" -> LocalDate.now().year - state.oldestStreamDate!!.year + 1
+            "monthly" -> YearMonth.from(state.oldestStreamDate)
                 .until(YearMonth.from(LocalDate.now()), ChronoUnit.MONTHS)
                 .toInt() + 1
             else -> 1
@@ -78,10 +78,10 @@ fun TopScreenBottomBar(
         targetPage = pageCount - 1
     }
 
-    LaunchedEffect(targetPage, dateRangeMode) {
+    LaunchedEffect(targetPage, state.dateRangeMode) {
 //        to start loading data before the page settles
 
-            if (dateRangeMode == "yearly") {
+            if (state.dateRangeMode == "yearly") {
                 val year = pageNumberToYear(
                     page = targetPage,
                     pageCount = pageCount
@@ -94,14 +94,14 @@ fun TopScreenBottomBar(
                         .toString()
                 }
 
-                onDateRangeChange(yearToDateRange(year))
+//                onDateRangeChange(yearToDateRange(year))
                 onVMSearchParameterChange(
                     TopScreenEvent.OnSearchParameterChange(
                         start = yearToStart(year),
                         end = yearToEnd(year)))
             }
 
-            if (dateRangeMode == "monthly") {
+            if (state.dateRangeMode == "monthly") {
 
                 val month = pageNumberToMonth(
                     page = targetPage,
@@ -119,7 +119,7 @@ fun TopScreenBottomBar(
                     "$monthName $year"
                 }
 
-                onDateRangeChange(monthToDateRange(month))
+//                onDateRangeChange(monthToDateRange(month))
                 onVMSearchParameterChange(
                     TopScreenEvent.OnSearchParameterChange(
                         start = monthToStart(month),
@@ -132,7 +132,7 @@ fun TopScreenBottomBar(
 
 
 
-    if (dateRangeMode.isNotEmpty()) {
+    if (!state.dateRangeMode.isNullOrEmpty()) {
         Box (modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -146,14 +146,14 @@ fun TopScreenBottomBar(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (dateRangeMode == "custom") {
-                            BottomBarCustomRangeText(dateRange)
+                        if (state.dateRangeMode == "custom") {
+                            BottomBarNewCustomText(state.start, state.end)
                         } else {
                             Column(modifier = Modifier.fillMaxWidth().weight(1f),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                if (dateRangeMode == "monthly") {
+                                if (state.dateRangeMode == "monthly") {
                                     LeftBottomBarArrow(
                                         currentPage = targetPage,
                                         onTargetPageChange = { targetPage = it},
@@ -206,7 +206,7 @@ fun TopScreenBottomBar(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
-                                if (dateRangeMode == "monthly") {
+                                if (state.dateRangeMode == "monthly") {
                                     RightBottomBarArrow(
                                         currentPage = targetPage,
                                         onTargetPageChange = { targetPage = it},
@@ -233,6 +233,21 @@ fun pageNumberToMonth(page: Int, pageCount: Int): YearMonth {
         .now()
         .minusMonths(pageCount - page - 1L)
 
+}
+
+@Composable
+fun BottomBarNewCustomText(start: String?, end:String?) {
+    if (start != null && end != null) {
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        val startDateTime = LocalDateTime.parse(start, inputFormatter)
+        val endDateTime = LocalDateTime.parse(end, inputFormatter)
+
+        val outputFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+        val formattedStart = startDateTime.format(outputFormatter)
+        val formattedEnd = endDateTime.format(outputFormatter)
+
+        Text("$formattedStart - $formattedEnd")
+    }
 }
 
 @Composable

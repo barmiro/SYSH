@@ -12,11 +12,17 @@ import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
+import com.github.barmiro.syshclient.util.setToEndOfDay
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateRangePickerModal(
-    onDateRangeSelected: (Pair<Long?, Long?>) -> Unit,
+    onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit,
+    onDateRangeModeChange: (TopScreenEvent.OnDateRangeModeChange) -> Unit,
     onDismiss: () -> Unit
 ) {
     val dateRangePickerState = rememberDateRangePickerState()
@@ -26,12 +32,23 @@ fun DateRangePickerModal(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onDateRangeSelected(
-                        Pair(
-                            dateRangePickerState.selectedStartDateMillis,
-                            dateRangePickerState.selectedEndDateMillis
-                        )
-                    )
+                    if (dateRangePickerState.selectedStartDateMillis != null) {
+                        if (dateRangePickerState.selectedEndDateMillis == null) {
+                            dateRangePickerState.setSelection(
+                                dateRangePickerState.selectedStartDateMillis,
+                                LocalDateTime.now()
+                                    .atOffset(ZoneOffset.UTC)
+                                    .toInstant()
+                                    .toEpochMilli())
+                        }
+
+                        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                        val start = formatter.format(dateRangePickerState.selectedStartDateMillis)
+                        val end = formatter.format(setToEndOfDay(dateRangePickerState.selectedEndDateMillis!!))
+
+                        onVMSearchParameterChange(TopScreenEvent.OnSearchParameterChange(null, start, end))
+                        onDateRangeModeChange(TopScreenEvent.OnDateRangeModeChange("custom"))
+                    }
                     onDismiss()
                 },
                 enabled = dateRangePickerState.selectedStartDateMillis != null

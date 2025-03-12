@@ -42,10 +42,6 @@ import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopInd
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopText
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
-import com.github.barmiro.syshclient.util.setToEndOfDay
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import kotlin.math.absoluteValue
 
 
@@ -60,8 +56,11 @@ fun TopScreen(
 
     val state by viewModel.state.collectAsState()
 
-    var dateRange by remember { mutableStateOf<Pair<Long?, Long?>?>(null) }
-    var dateRangeMode by remember { mutableStateOf("") }
+//    var dateRange by remember { mutableStateOf<Pair<Long?, Long?>?>(null) }
+
+
+
+//    var dateRangeMode by remember { mutableStateOf("") }
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
 
     var tabIndex by remember { mutableIntStateOf(0) }
@@ -72,28 +71,8 @@ fun TopScreen(
 
     if (isDateRangePickerVisible) {
         DateRangePickerModal(
-            onDateRangeSelected = {
-                if (it.first != null) {
-                    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-                    dateRange = when {
-                        it.second == null -> Pair(
-                            it.first,
-//                            this mess is here for compatibility with Material 3's date range picker
-//                            the server deals with converting the timezone
-//                            I'll change it at some point because it will cause issues when moving between timezones
-                            LocalDateTime.now()
-                                .atOffset(ZoneOffset.UTC)
-                                .toInstant()
-                                .toEpochMilli())
-                        else -> it
-                    }
-
-                    val start = formatter.format(dateRange!!.first)
-                    val end = formatter.format(setToEndOfDay(dateRange!!.second!!))
-                    viewModel.onEvent((TopScreenEvent.OnSearchParameterChange(null, start, end)))
-                    dateRangeMode = "custom"
-                }
-            },
+            onVMSearchParameterChange = { viewModel.onEvent(it) },
+            onDateRangeModeChange = { viewModel.onEvent(it) },
             onDismiss = {
                 isDateRangePickerVisible = false
             }
@@ -116,9 +95,7 @@ fun TopScreen(
         topBar = {
             TopScreenTopBar(
                 state = state,
-                dateRangeMode = dateRangeMode,
-                onDateRangeSelect = { dateRange = it },
-                onDateRangeModeChange = { dateRangeMode = it },
+                onDateRangeModeChange = { viewModel.onEvent(TopScreenEvent.OnDateRangeModeChange(it)) },
                 onDateRangePickerVisibilityChange = { isDateRangePickerVisible = it },
                 onVMSearchParameterChange = { viewModel.onEvent(it) }
             )
@@ -126,7 +103,7 @@ fun TopScreen(
             Box(
                 modifier = Modifier.fillMaxWidth().height(88.dp), contentAlignment = Alignment.BottomCenter
             ) {
-                TopScreenTopText(state, dateRangeMode)
+                TopScreenTopText(state)
             }
         }
     ) { innerPadding ->
@@ -173,10 +150,9 @@ fun TopScreen(
             }
         }
         TopScreenBottomBar(
-            oldestStreamDate = state.oldestStreamDate!!,
-            dateRangeMode = dateRangeMode,
-            dateRange = dateRange,
-            onDateRangeChange = { dateRange = it },
+            state = state,
+//            dateRange = dateRange,
+//            onDateRangeChange = { dateRange = it },
             onVMSearchParameterChange = { viewModel.onEvent(it)}
         )
     }

@@ -24,6 +24,7 @@ class StatsViewModel @Inject constructor(
 ): ViewModel(), DefaultLifecycleObserver {
 
     val state: StateFlow<TopScreenState> = stateManager.state
+
     private var isDataLoaded = false
 
     private val _homeState = MutableStateFlow(HomeState())
@@ -52,6 +53,11 @@ class StatsViewModel @Inject constructor(
                     sort = event.sort
                 )
                 getStats()
+            }
+            is TopScreenEvent.OnDateRangeModeChange -> {
+                stateManager.updateState(
+                    dateRangeMode = event.dateRangeMode
+                )
             }
         }
     }

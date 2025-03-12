@@ -22,10 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.TopScreenState
-import com.github.barmiro.syshclient.util.monthToDateRange
 import com.github.barmiro.syshclient.util.monthToEnd
 import com.github.barmiro.syshclient.util.monthToStart
-import com.github.barmiro.syshclient.util.yearToDateRange
 import com.github.barmiro.syshclient.util.yearToEnd
 import com.github.barmiro.syshclient.util.yearToStart
 import java.time.LocalDate
@@ -35,8 +33,7 @@ import java.time.YearMonth
 @Composable
 fun TopScreenTopBar(
     state: TopScreenState,
-    dateRangeMode: String,
-    onDateRangeSelect: (Pair<Long?, Long?>?) -> Unit,
+//    onDateRangeSelect: (Pair<Long?, Long?>?) -> Unit,
     onDateRangeModeChange: (String) -> Unit,
     onDateRangePickerVisibilityChange: (Boolean) -> Unit,
     onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit
@@ -62,7 +59,7 @@ fun TopScreenTopBar(
                 DropdownMenuItem(
                     text = { Text("All time") },
                     onClick = {
-                        onDateRangeSelect(null)
+//                        onDateRangeSelect(null)
                         onDateRangeModeChange("")
                         onVMSearchParameterChange(
                             TopScreenEvent.OnSearchParameterChange(
@@ -76,9 +73,9 @@ fun TopScreenTopBar(
                 DropdownMenuItem(
                     text = { Text("Yearly") },
                     onClick = {
-                        if (dateRangeMode != "yearly") {
+                        if (state.dateRangeMode != "yearly") {
                             val year: Int = LocalDate.now().year
-                            onDateRangeSelect(yearToDateRange(year))
+//                            onDateRangeSelect(yearToDateRange(year))
                             onDateRangeModeChange("yearly")
                             onVMSearchParameterChange(
                                 TopScreenEvent.OnSearchParameterChange(
@@ -94,9 +91,9 @@ fun TopScreenTopBar(
                 DropdownMenuItem(
                     text = { Text("Monthly") },
                     onClick = {
-                        if (dateRangeMode != "monthly") {
+                        if (state.dateRangeMode != "monthly") {
                             val month: YearMonth = YearMonth.now()
-                            onDateRangeSelect(monthToDateRange(month))
+//                            onDateRangeSelect(monthToDateRange(month))
                             onDateRangeModeChange("monthly")
                             onVMSearchParameterChange(
                                 TopScreenEvent.OnSearchParameterChange(

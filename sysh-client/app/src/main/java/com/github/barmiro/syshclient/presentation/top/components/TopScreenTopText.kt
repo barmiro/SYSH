@@ -25,16 +25,15 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun TopScreenTopText(
-    state: TopScreenState,
-    dateRangeMode: String) {
+    state: TopScreenState) {
     var oldRangeText by remember { mutableStateOf("") }
     var oldSortText by remember { mutableStateOf("") }
     var targetRangeText by remember { mutableStateOf("") }
     var targetSortText by remember { mutableStateOf("") }
     val delayBase = 150L
 
-    val rangeText = when (dateRangeMode) {
-        "" -> "All time"
+    val rangeText = when (state.dateRangeMode) {
+        null -> "All time"
         "yearly" -> "Yearly"
         "monthly" -> "Monthly"
         "custom" -> "Custom date range"

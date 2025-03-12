@@ -50,14 +50,17 @@ class TopAlbumsViewModel @Inject constructor(
             is TopScreenEvent.Refresh -> {
                 getTopAlbums()
             }
-            is TopScreenEvent.OnSearchParameterChange -> {
-                stateManager.updateState(
-                    start = event.start,
-                    end = event.end,
-                    sort = event.sort
-                )
-                    getTopAlbums()
+            else -> {
+
             }
+//            is TopScreenEvent.OnSearchParameterChange -> {
+//                stateManager.updateState(
+//                    start = event.start,
+//                    end = event.end,
+//                    sort = event.sort
+//                )
+//                    getTopAlbums()
+//            }
         }
     }
 

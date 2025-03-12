@@ -12,7 +12,8 @@ data class TopScreenState(
     val oldestStreamDate: LocalDate? = LocalDate.of(2006, 1, 1),
     val sort: String? = null,
     val start: String? = null,
-    val end: String? = null
+    val end: String? = null,
+    val dateRangeMode: String? = null
 )
 
 @Singleton
@@ -26,7 +27,8 @@ class TopScreenStateManager @Inject constructor() {
         oldestStreamDate: LocalDate? = null,
         sort: String? = null,
         start: String? = null,
-        end: String? = null
+        end: String? = null,
+        dateRangeMode: String? = null
     ) {
         _state.value = _state.value.copy(
             isLoading = isLoading ?: _state.value.isLoading,
@@ -34,7 +36,8 @@ class TopScreenStateManager @Inject constructor() {
             oldestStreamDate = oldestStreamDate ?: _state.value.oldestStreamDate,
             sort = handleNullOrEmptyString(sort, _state.value.sort),
             start = handleNullOrEmptyString(start, _state.value.start),
-            end = handleNullOrEmptyString(end, _state.value.end)
+            end = handleNullOrEmptyString(end, _state.value.end),
+            dateRangeMode = handleNullOrEmptyString(dateRangeMode, _state.value.dateRangeMode)
         )
     }
 }
