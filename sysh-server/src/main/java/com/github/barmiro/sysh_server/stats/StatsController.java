@@ -27,7 +27,7 @@ public class StatsController {
 	FullStats statsAll() {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		return statsRepo.streamStats(username, true);
+		return statsRepo.streamStats(username, false);
 	}
 	
 	@GetMapping("/range")
@@ -42,7 +42,7 @@ public class StatsController {
 		Timestamp startDate = Timestamp.valueOf(start.replace("T", " "));
 		Timestamp endDate = Timestamp.valueOf(end.replace("T", " "));
 		
-		System.out.println(statsRepo.addCachedStats(startDate, endDate, username));
+		statsRepo.addCachedStats(startDate, endDate, username);
 		
 		return statsRepo.streamStats(startDate, endDate, true, username);
 	}

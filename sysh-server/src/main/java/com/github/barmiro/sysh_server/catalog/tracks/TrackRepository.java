@@ -242,7 +242,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 				.list();
 	}
 	
-	int updateTopTracksCache(String username
+	public int updateTopTracksCache(String username
 			) {
 //		Doesn't have to be sorted, but I don't feel like overloading the constructor again
 		List<TrackStats> trackStatsList = topTracks("stream_count", username, false);

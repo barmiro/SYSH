@@ -17,6 +17,7 @@ import com.github.barmiro.sysh_server.catalog.jointables.TracksArtists;
 import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.Track;
+import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.ApiTrack;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.album.ApiTrackAlbum;
@@ -29,6 +30,7 @@ import com.github.barmiro.sysh_server.stats.StatsCache;
 public class AddToCatalog {
 	
 //	this list is getting pretty long, I don't want this to become a god object
+	TrackRepository trackRepository;
 	TrackApiRepository trackApiRepository;
 	AlbumRepository albumRepository;
 	ArtistApiRepository artistApiRepository;
@@ -39,6 +41,7 @@ public class AddToCatalog {
 	StatsCache statsCache;
 	
 	public AddToCatalog(
+			TrackRepository trackRepository,
 			TrackApiRepository trackApiRepository,
 			AlbumRepository albumRepository,
 			ArtistApiRepository artistApiRepository,
@@ -47,6 +50,7 @@ public class AddToCatalog {
 			TracksArtists tracksArtists,
 			SpotifyTokenService tkn,
 			StatsCache statsCache) {
+		this.trackRepository = trackRepository;
 		this.trackApiRepository = trackApiRepository;
 		this.albumRepository = albumRepository;
 		this.artistApiRepository = artistApiRepository;
@@ -116,6 +120,7 @@ public class AddToCatalog {
 //		easier than returning all necessary values and handling it in recent logic
 		if (streams.size() > 0 && streams.size() <= 50) {
 			statsCache.updateCache(streams, username, tracksAdded, albumsAdded, artistsAdded);
+			trackRepository.updateTopTracksCache(username);
 			albumRepository.updateTopAlbumsCache(username);
 			
 		}
