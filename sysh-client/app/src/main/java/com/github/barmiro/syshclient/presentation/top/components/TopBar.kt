@@ -1,6 +1,10 @@
 package com.github.barmiro.syshclient.presentation.top.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -17,7 +21,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.TopScreenState
 import com.github.barmiro.syshclient.util.monthToEnd
@@ -45,8 +51,22 @@ fun TopScreenTopBar(
             titleContentColor = MaterialTheme.colorScheme.onBackground
         ),
         title = {
-            Text(text = titleText,
-                fontWeight = FontWeight.Bold)
+            Column(
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(text = titleText,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth())
+
+                }
+                Row() {
+                    TopScreenTopText(state)
+                }
+            }
         },
         navigationIcon = {
             IconButton(onClick = { expanded = !expanded }) {

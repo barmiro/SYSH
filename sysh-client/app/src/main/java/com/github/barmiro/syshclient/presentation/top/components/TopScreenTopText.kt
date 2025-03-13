@@ -73,7 +73,7 @@ fun TopScreenTopText(
         oldSortText = sortText
     }
 
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             Text(text = targetRangeText, fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.padding(0.dp)
                 .animateContentSize(spring(1f, 3000f)))

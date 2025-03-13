@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -44,7 +43,6 @@ import com.github.barmiro.syshclient.presentation.top.components.DateRangePicker
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenBottomBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopIndicator
-import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopText
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import kotlin.math.absoluteValue
@@ -127,13 +125,20 @@ fun TopScreen(
                 }
             )
 //            TODO: this is a terrible hack
-            Box(
-                modifier = Modifier.fillMaxWidth().height(88.dp), contentAlignment = Alignment.BottomCenter
-            ) {
-                TopScreenTopText(state)
-            }
+//            Box(
+//                modifier = Modifier.fillMaxWidth().height(88.dp), contentAlignment = Alignment.BottomCenter
+//            ) {
+//                TopScreenTopText(state)
+//            }
         }
     ) { innerPadding ->
+//        Row(modifier = Modifier.fillMaxWidth().padding(top = (innerPadding.calculateTopPadding() - 16.dp), bottom = 0.dp)) {
+//            Box(
+//                modifier = Modifier.fillMaxWidth().height(16.dp).zIndex(20f), contentAlignment = Alignment.BottomCenter
+//            ) {
+//                TopScreenTopText(state)
+//            }
+//        }
         Row(modifier = Modifier.fillMaxWidth().padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp)) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 TabRow(selectedTabIndex = tabIndex,

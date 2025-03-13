@@ -27,7 +27,7 @@ public class StatsController {
 	FullStats statsAll() {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		return statsRepo.streamStats(username, false);
+		return statsRepo.streamStats(username, true);
 	}
 	
 	@GetMapping("/range")
