@@ -8,4 +8,7 @@ interface StartupDataApi {
 
     @GET("userData")
     suspend fun getUserData(): Response<ResponseBody>
+
+    @GET("authorize")
+    suspend fun spotifyAuthorize(): Response<ResponseBody>
 }

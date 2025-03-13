@@ -116,7 +116,9 @@ CREATE TABLE Stats_Cache_Full (
 CREATE FUNCTION create_stats_cache_full()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO Stats_Cache_Full (username)
+    INSERT INTO Stats_Cache_Full (
+    username,
+    )
     VALUES (NEW.username);
     RETURN NEW;
 END;

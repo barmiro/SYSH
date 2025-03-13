@@ -18,8 +18,7 @@ class SessionViewModel @Inject constructor(
     private val _isLoggedIn = MutableStateFlow<Boolean>(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
-    private val _isAuthorizedWithSpotify = MutableStateFlow<Boolean>(false)
-    val isAuthorizedWithSpotify: StateFlow<Boolean> = _isAuthorizedWithSpotify.asStateFlow()
+
 
     init {
         viewModelScope.launch {

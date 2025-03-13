@@ -77,8 +77,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val sessionVM: SessionViewModel by viewModels()
             val isLoggedIn by sessionVM.isLoggedIn.collectAsState()
-            val isAuthorizedWithSpotify by sessionVM.isAuthorizedWithSpotify.collectAsState()
-            val goToMainScreen = isLoggedIn && isAuthorizedWithSpotify
+            val isAuthorizedWithSpotify by authVM.isAuthorizedWithSpotify.collectAsState()
             val navController = rememberNavController()
 
             SyshClientTheme {
@@ -123,7 +122,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Scaffold(
                         bottomBar = {
-                            if (goToMainScreen) {
+                            if (isLoggedIn && isAuthorizedWithSpotify) {
                                 topScreenVM.getOldestStreamDate()
                                 homeVM.getStats()
                                 statsVM.getStats()
@@ -157,7 +156,7 @@ class MainActivity : ComponentActivity() {
                         }
                     ) { innerPadding ->
                         Column(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding(), top = 0.dp)){
-                            AppNavHost(navController, goToMainScreen, homeVM, topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM, statsVM, authVM, sessionVM)
+                            AppNavHost(navController, isLoggedIn, isAuthorizedWithSpotify, homeVM, topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM, statsVM, authVM, sessionVM)
                         }
 
                     }
@@ -197,7 +196,8 @@ object SpotifyAuth
 
 @Composable
 fun AppNavHost(navController: NavHostController,
-               goToMainScreen: Boolean,
+               isLoggedIn: Boolean,
+               isAuthorizedWithSpotify: Boolean,
                homeVM: HomeViewModel,
                topScreenVM: TopScreenViewModel,
                topTracksVM: TopTracksViewModel,
@@ -209,7 +209,7 @@ fun AppNavHost(navController: NavHostController,
 
     NavHost(
         navController = navController,
-        startDestination = if (goToMainScreen) MainScreen else Login
+        startDestination = if (isLoggedIn && isAuthorizedWithSpotify) MainScreen else Login
     ) {
         composable<Login> {
             LoginScreen(authVM, sessionVM, navController)
@@ -230,7 +230,7 @@ fun AppNavHost(navController: NavHostController,
             TopAlbumsScreen(topAlbumsVM)
         }
         composable<SpotifyAuth> {
-            SpotifyAuthScreen()
+            SpotifyAuthScreen(authVM)
         }
     }
 }

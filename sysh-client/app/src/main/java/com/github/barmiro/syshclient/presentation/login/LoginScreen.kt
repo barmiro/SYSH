@@ -44,16 +44,16 @@ fun LoginScreen(authVM: AuthViewModel,
     }
 
     LaunchedEffect(responseCode) {
-        println("RESPONSE CODE: $responseCode")
+
         when (responseCode) {
             200 -> {
                 navController.navigate(MainScreen)
             }
-            null -> {
-//                navController.navigate(SpotifyAuth)
+            403 -> {
+                navController.navigate(SpotifyAuth)
             }
             else -> {
-                navController.navigate(SpotifyAuth)
+
             }
         }
     }

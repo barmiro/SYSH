@@ -35,8 +35,11 @@ class AuthViewModel @Inject constructor(
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
+    private val _spotifyAuthUrl: MutableStateFlow<String?> = MutableStateFlow(null)
+    val spotifyAuthUrl: StateFlow<String?> = _spotifyAuthUrl
 
-
+    private val _isAuthorizedWithSpotify = MutableStateFlow<Boolean>(false)
+    val isAuthorizedWithSpotify: StateFlow<Boolean> = _isAuthorizedWithSpotify.asStateFlow()
 
 
     fun register(username: String, password: String) {
@@ -96,6 +99,9 @@ class AuthViewModel @Inject constructor(
                                 userPrefRepo.setAuthorizedWithSpotify(true)
                                 userPrefRepo.saveUserDisplayName(it)
                             }
+                            userPrefRepo.isAuthorizedWithSpotify.collect {
+                                _isAuthorizedWithSpotify.value = it
+                            }
                             _responseCode.value = 200
                         }
 
@@ -113,7 +119,22 @@ class AuthViewModel @Inject constructor(
 
     fun spotifyAuthorization() {
         viewModelScope.launch {
-//            authRepo.spotifyAuthorization()
+            startupDataRepository.getSpotifyAuthUrl()
+                .collect { result ->
+                    when(result) {
+                        is Resource.Success -> {
+                            result.data?.let {
+                                _spotifyAuthUrl.value = result.data
+                            }
+                        }
+                        is Resource.Error -> {
+                            _responseCode.value = result.code
+                        }
+                        is Resource.Loading -> {
+                            _isLoading.value = result.isLoading
+                        }
+                    }
+                }
         }
     }
 

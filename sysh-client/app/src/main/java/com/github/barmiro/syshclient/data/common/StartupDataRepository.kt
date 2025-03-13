@@ -61,4 +61,34 @@ class StartupDataRepository @Inject constructor(
         }
     }
 
+    fun getSpotifyAuthUrl(): Flow<Resource<String>> {
+        return flow{
+            emit(Resource.Loading(true))
+
+            val response = startupApi.spotifyAuthorize()
+
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(
+                        Resource.Success(
+                            data = it.string()
+                        )
+                    )
+                } ?: emit(
+                    Error(
+                        message = "Couldn't generate Spotify authorization URL",
+                        code = response.code()
+                    )
+                )
+            } else {
+                emit(Error(
+                    message = response.message(),
+                    code = response.code()
+                ))
+            }
+
+            emit(Resource.Loading(false))
+        }
+    }
+
 }
