@@ -2,6 +2,7 @@ package com.github.barmiro.syshclient.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.barmiro.syshclient.data.common.StartupDataRepository
 import com.github.barmiro.syshclient.data.common.authentication.AuthenticationRepository
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
@@ -15,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepo: AuthenticationRepository,
-    private val userPrefRepo: UserPreferencesRepository
+    private val userPrefRepo: UserPreferencesRepository,
+    private val startupDataRepository: StartupDataRepository
 ) : ViewModel() {
 
     private val _registerState = MutableStateFlow<String?>(null)
@@ -23,6 +25,19 @@ class AuthViewModel @Inject constructor(
 
     private val _isRegistered = MutableStateFlow<Boolean>(false)
     val isRegistered: StateFlow<Boolean> = _isRegistered.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private val _responseCode: MutableStateFlow<Int?> = MutableStateFlow(null)
+    val responseCode: StateFlow<Int?> = _responseCode
+
+    private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
+
+
+
 
     fun register(username: String, password: String) {
         viewModelScope.launch {
@@ -33,10 +48,13 @@ class AuthViewModel @Inject constructor(
                     }
 
                     is Resource.Error -> {
+                        _responseCode.value = result.code
                         _registerState.value = result.message
+                        _errorMessage.value = result.message
                     }
 
                     is Resource.Loading -> {
+                        _isLoading.value = result.isLoading
                     }
                 }
             }
@@ -56,12 +74,46 @@ class AuthViewModel @Inject constructor(
                     }
 
                     is Resource.Error -> {
+                        _responseCode.value = result.code
+                        _errorMessage.value = result.message
                     }
 
                     is Resource.Loading -> {
+                        _isLoading.value = result.isLoading
                     }
                 }
             }
+        }
+    }
+
+    fun getUserData() {
+        viewModelScope.launch {
+            startupDataRepository.getUserDisplayName()
+                .collect { result ->
+                    when(result) {
+                        is Resource.Success -> {
+                            result.data?.let {
+                                userPrefRepo.setAuthorizedWithSpotify(true)
+                                userPrefRepo.saveUserDisplayName(it)
+                            }
+                            _responseCode.value = 200
+                        }
+
+                        is Resource.Error -> {
+                            _responseCode.value = result.code
+                        }
+                        is Resource.Loading -> {
+                            _isLoading.value = result.isLoading
+                        }
+                    }
+                }
+        }
+    }
+
+
+    fun spotifyAuthorization() {
+        viewModelScope.launch {
+//            authRepo.spotifyAuthorization()
         }
     }
 

@@ -1,6 +1,7 @@
 package com.github.barmiro.syshclient.data.common.authentication
 
 import com.github.barmiro.syshclient.util.Resource
+import com.github.barmiro.syshclient.util.Resource.Error
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
@@ -66,26 +67,31 @@ class AuthenticationRepository @Inject constructor() {
             emit(Resource.Loading(true))
             val response = authApi.register(
                 CreateUserDTO(username, password))
-            if (response.isSuccessful) {
-                val responseUsername = response.body()?.username
 
-                if (responseUsername == username) {
+            if (response.isSuccessful) {
+                response.body()?.takeIf {
+                    it.username == username
+                } ?.let {
                     emit(
                         Resource.Success(
-                            data = responseUsername
-                        ))
-                } else {
-                    emit(Resource.Error("User registration failed"))
-                }
-
+                            data = it.username
+                        )
+                    )
+                } ?: emit(
+                    Error(
+                        message = "User registration failed"
+                    )
+                )
             } else {
-                if (response.code() == 409) {
-                    emit(Resource.Error("Username taken"))
-                } else {
-                    emit(Resource.Error("Server error: " + response.code()))
-                }
+                emit(
+                    Error(
+                        message = response.message(),
+                        code = response.code()
+                    )
+                )
             }
             emit(Resource.Loading(false))
         }
     }
+
 }

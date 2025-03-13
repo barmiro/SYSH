@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient.presentation.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -9,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel
@@ -19,7 +21,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier.fillMaxSize().padding(32.dp),
     ) {
-        HomeItem(itemText = "Welcome, " + state.userDisplayName)
+        HomeItem(itemText = "Welcome, " + viewModel.userDisplayName.collectAsState().value)
         HomeItem(itemText = "${state.stats.stream_count} streams")
         HomeItem(itemText = "${state.stats.minutes_streamed} minutes")
         HomeItem(itemText = "${state.stats.minutes_streamed / 60} hours")

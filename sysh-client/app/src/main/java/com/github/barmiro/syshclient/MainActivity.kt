@@ -44,6 +44,7 @@ import com.github.barmiro.syshclient.presentation.home.HomeViewModel
 import com.github.barmiro.syshclient.presentation.login.AuthViewModel
 import com.github.barmiro.syshclient.presentation.login.LoginScreen
 import com.github.barmiro.syshclient.presentation.login.RegisterScreen
+import com.github.barmiro.syshclient.presentation.login.SpotifyAuthScreen
 import com.github.barmiro.syshclient.presentation.stats.StatsScreen
 import com.github.barmiro.syshclient.presentation.stats.StatsViewModel
 import com.github.barmiro.syshclient.presentation.top.TopScreen
@@ -76,6 +77,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val sessionVM: SessionViewModel by viewModels()
             val isLoggedIn by sessionVM.isLoggedIn.collectAsState()
+            val isAuthorizedWithSpotify by sessionVM.isAuthorizedWithSpotify.collectAsState()
+            val goToMainScreen = isLoggedIn && isAuthorizedWithSpotify
             val navController = rememberNavController()
 
             SyshClientTheme {
@@ -120,10 +123,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Scaffold(
                         bottomBar = {
-                            if (isLoggedIn) {
+                            if (goToMainScreen) {
                                 topScreenVM.getOldestStreamDate()
                                 homeVM.getStats()
-                                homeVM.getUserData()
                                 statsVM.getStats()
                                 NavigationBar {
                                     navItems.forEachIndexed { index, item ->
@@ -155,7 +157,7 @@ class MainActivity : ComponentActivity() {
                         }
                     ) { innerPadding ->
                         Column(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding(), top = 0.dp)){
-                            AppNavHost(navController, isLoggedIn, homeVM, topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM, statsVM, authVM, sessionVM)
+                            AppNavHost(navController, goToMainScreen, homeVM, topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM, statsVM, authVM, sessionVM)
                         }
 
                     }
@@ -190,9 +192,12 @@ object Login
 @Serializable
 object Register
 
+@Serializable
+object SpotifyAuth
+
 @Composable
 fun AppNavHost(navController: NavHostController,
-               isLoggedIn: Boolean,
+               goToMainScreen: Boolean,
                homeVM: HomeViewModel,
                topScreenVM: TopScreenViewModel,
                topTracksVM: TopTracksViewModel,
@@ -204,7 +209,7 @@ fun AppNavHost(navController: NavHostController,
 
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn) MainScreen else Login
+        startDestination = if (goToMainScreen) MainScreen else Login
     ) {
         composable<Login> {
             LoginScreen(authVM, sessionVM, navController)
@@ -223,6 +228,9 @@ fun AppNavHost(navController: NavHostController,
         }
         composable<TopAlbums> {
             TopAlbumsScreen(topAlbumsVM)
+        }
+        composable<SpotifyAuth> {
+            SpotifyAuthScreen()
         }
     }
 }

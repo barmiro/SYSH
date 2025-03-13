@@ -56,6 +56,18 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun setAuthorizedWithSpotify(isAuthorizedWithSpotify: Boolean) {
+        dataStore.edit {
+            it[PreferencesKeys.IS_AUTHORIZED_WITH_SPOTIFY] = isAuthorizedWithSpotify
+        }
+    }
+
+    suspend fun saveUserDisplayName(displayName: String) {
+        dataStore.edit {
+            it[PreferencesKeys.USER_DISPLAY_NAME] = displayName
+        }
+    }
+
 //    suspend fun setAuthenticatedWithSpo
 
 
@@ -73,6 +85,14 @@ class UserPreferencesRepository @Inject constructor(
 
     val isFreshInstall: Flow<Boolean> = dataStore.data.map {
         it[PreferencesKeys.IS_FRESH_INSTALL] ?: true
+    }
+
+    val isAuthorizedWithSpotify: Flow<Boolean> = dataStore.data.map {
+        it[PreferencesKeys.IS_AUTHORIZED_WITH_SPOTIFY] ?: false
+    }
+
+    val userDisplayName: Flow<String?> = dataStore.data.map {
+        it[PreferencesKeys.USER_DISPLAY_NAME]
     }
 
     suspend fun clearAllPreferences() {

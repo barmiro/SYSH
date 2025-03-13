@@ -125,7 +125,7 @@ public class SpotifyTokenService {
 			return;
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-			throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
+			throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
 		}
 		
 	}
@@ -175,7 +175,7 @@ public class SpotifyTokenService {
 			return true;
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-			throw new HttpClientErrorException(HttpStatus.BAD_GATEWAY);
+			throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
 		}
 	}
 

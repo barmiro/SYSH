@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.navigation.NavHostController
 import com.github.barmiro.syshclient.MainScreen
 import com.github.barmiro.syshclient.Register
+import com.github.barmiro.syshclient.SpotifyAuth
 import com.github.barmiro.syshclient.presentation.common.SessionViewModel
 
 @Composable
@@ -34,10 +35,26 @@ fun LoginScreen(authVM: AuthViewModel,
 ) {
 
     val isLoggedIn by sessionVM.isLoggedIn.collectAsState()
+    val responseCode by authVM.responseCode.collectAsState()
 
     LaunchedEffect(isLoggedIn) {
         if (isLoggedIn) {
-            navController.navigate(MainScreen)
+            authVM.getUserData()
+        }
+    }
+
+    LaunchedEffect(responseCode) {
+        println("RESPONSE CODE: $responseCode")
+        when (responseCode) {
+            200 -> {
+                navController.navigate(MainScreen)
+            }
+            null -> {
+//                navController.navigate(SpotifyAuth)
+            }
+            else -> {
+                navController.navigate(SpotifyAuth)
+            }
         }
     }
 
@@ -46,55 +63,77 @@ fun LoginScreen(authVM: AuthViewModel,
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            val username = remember {
-                mutableStateOf(TextFieldValue())
-            }
-            val password = remember {
-                mutableStateOf(TextFieldValue())
-            }
-
-            Text(text = "Welcome to SYSH!",
-                color = MaterialTheme.colorScheme.onBackground )
-
-            Text(text = "Please log in:",
-                color = MaterialTheme.colorScheme.onBackground )
-
-            OutlinedTextField(value = username.value,
-                onValueChange = { username.value = it },
-                label = {
-                    Text("Username")
-                }
-            )
-            OutlinedTextField(value = password.value,
-                onValueChange = { password.value = it },
-                label = {
-                    Text("Password")
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                visualTransformation = PasswordVisualTransformation()
-            )
-
-            Button(
-                onClick = {
-                    authVM.getToken(username.value.text, password.value.text)
-                }
+        if (isLoggedIn && authVM.isLoading.collectAsState().value) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("log in")
+                Text(text = "Loading...",
+                    color = MaterialTheme.colorScheme.onBackground )
             }
-
-            TextButton(
-                onClick = {
-                    navController.navigate(Register)
-                }
+//        }  else if (!authVM.errorMessage.collectAsState().value.isNullOrEmpty()) {
+//            Column(
+//                modifier = Modifier.fillMaxSize(),
+//                verticalArrangement = Arrangement.Center,
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                Text(text = authVM.errorMessage.collectAsState().value!!,
+//                    color = MaterialTheme.colorScheme.onBackground,
+//                    textAlign = TextAlign.Center)
+//            }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Create an account")
-            }
+                val username = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+                val password = remember {
+                    mutableStateOf(TextFieldValue())
+                }
 
+                Text(text = "Welcome to SYSH!",
+                    color = MaterialTheme.colorScheme.onBackground )
+
+                Text(text = "Please log in:",
+                    color = MaterialTheme.colorScheme.onBackground )
+
+                OutlinedTextField(value = username.value,
+                    onValueChange = { username.value = it },
+                    label = {
+                        Text("Username")
+                    }
+                )
+                OutlinedTextField(value = password.value,
+                    onValueChange = { password.value = it },
+                    label = {
+                        Text("Password")
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    visualTransformation = PasswordVisualTransformation()
+                )
+
+                Button(
+                    onClick = {
+                        authVM.getToken(username.value.text, password.value.text)
+                    }
+                ) {
+                    Text("log in")
+                }
+
+                TextButton(
+                    onClick = {
+                        navController.navigate(Register)
+                    }
+                ) {
+                    Text("Create an account")
+                }
+
+            }
         }
+
     }
 }

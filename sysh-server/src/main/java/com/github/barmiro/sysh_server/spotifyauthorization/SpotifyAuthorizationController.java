@@ -2,11 +2,13 @@ package com.github.barmiro.sysh_server.spotifyauthorization;
 
 import java.util.Optional;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
 
 import com.github.barmiro.sysh_server.users.SyshUserManager;
 
@@ -50,7 +52,9 @@ public class SpotifyAuthorizationController {
 	
 	
 	@GetMapping("/callback")
-	public RedirectView callback(@RequestParam(required=false) Optional<String> code, @RequestParam String state) {
+	public ResponseEntity<Void> callback(
+			@RequestParam(required=false) Optional<String> code,
+			@RequestParam String state) {
 		
 		System.out.println("callback called");
 		String username = userManager.getUsernameBySpotifyState(state);
@@ -61,14 +65,13 @@ public class SpotifyAuthorizationController {
 		
 		tkn.getNewToken(codeValue, username);
 		
-		return new RedirectView("/userData");	
+		String redirectUrl = "sysh://open";
 		
+		return ResponseEntity
+				.status(HttpStatus.FOUND)
+				.header(HttpHeaders.LOCATION, redirectUrl)
+				.build();
 		
-//		if (!state.equals(this.state)) {
-//			RedirectView stateMismatch = new RedirectView("/error");
-//			stateMismatch.addStaticAttribute("message", "The state returned by Spotify was wrong");
-//			return stateMismatch;
-//		}
 		
 	};
 	

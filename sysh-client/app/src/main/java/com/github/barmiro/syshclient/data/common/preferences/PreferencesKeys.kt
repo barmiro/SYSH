@@ -8,4 +8,6 @@ object PreferencesKeys {
     val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
     val IS_FRESH_INSTALL = booleanPreferencesKey("is_fresh_install")
     val TOKEN = stringPreferencesKey("jwt_token")
+    val USER_DISPLAY_NAME = stringPreferencesKey("user_display_name")
+    val IS_AUTHORIZED_WITH_SPOTIFY = booleanPreferencesKey("is_authorized_with_spotify")
 }

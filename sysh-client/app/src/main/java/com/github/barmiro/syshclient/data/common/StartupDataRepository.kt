@@ -3,12 +3,12 @@ package com.github.barmiro.syshclient.data.common
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
+import com.github.barmiro.syshclient.util.Resource.Error
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.OkHttpClient
-import retrofit2.HttpException
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,6 +18,7 @@ class StartupDataRepository @Inject constructor(
 ) {
 
     val client = OkHttpClient.Builder()
+        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
         .addInterceptor(JwtInterceptor(userPrefRepo))
         .build()
 
@@ -33,26 +34,29 @@ class StartupDataRepository @Inject constructor(
     fun getUserDisplayName(): Flow<Resource<String>> {
         return flow {
             emit(Resource.Loading(true))
-            val userDisplayName = try{
-                startupApi.getUserData().body()?.string()
-            } catch (e: IOException) {
-                e.printStackTrace()
-                emit(Resource.Error("Encountered IOException: " + e.message))
-                ""
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                emit(Resource.Error("Encountered HttpException: " + e.code()))
-                ""
-            }
-            val isFetchSuccessful = !userDisplayName.isNullOrEmpty()
-            if (isFetchSuccessful) {
-                emit(
-                    Resource.Success(
-                        data = userDisplayName
-                    ))
+
+            val response = startupApi.getUserData()
+
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    emit(
+                        Resource.Success(
+                            data = it.string()
+                        )
+                    )
+                } ?: emit(
+                    Error(
+                        message = "No username found",
+                        code = response.code()
+                    )
+                )
             } else {
-                emit(Resource.Error("No username found"))
+                emit(Error(
+                    message = response.message(),
+                    code = response.code()
+                ))
             }
+
             emit(Resource.Loading(false))
         }
     }
