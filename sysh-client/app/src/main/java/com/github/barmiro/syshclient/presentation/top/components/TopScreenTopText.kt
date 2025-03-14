@@ -5,12 +5,12 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -114,7 +114,40 @@ fun StatsScreenTopText(
         oldRangeText = rangeText
     }
 
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
+        Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Text(text = targetRangeText, fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.padding(0.dp)
+                .animateContentSize(spring(1f, 3000f)))
+        }
+    }
+}
+
+@Composable
+fun HomeScreenTopText(
+    state: State<String?>
+) {
+    var oldRangeText by remember { mutableStateOf("") }
+    var targetRangeText by remember { mutableStateOf("") }
+    val delayBase = 150L
+
+
+    LaunchedEffect(state.value) {
+        targetRangeText = oldRangeText
+        for(i in 1..targetRangeText.length) {
+            targetRangeText = targetRangeText.dropLast(1)
+            delay(delayBase / oldRangeText.length)
+        }
+        delay(delayBase)
+        state.value?.let {
+            for(i in 1..it.length) {
+                targetRangeText += it[i - 1]
+                delay(delayBase / it.length)
+            }
+            oldRangeText = it
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             Text(text = targetRangeText, fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.padding(0.dp)
                 .animateContentSize(spring(1f, 3000f)))

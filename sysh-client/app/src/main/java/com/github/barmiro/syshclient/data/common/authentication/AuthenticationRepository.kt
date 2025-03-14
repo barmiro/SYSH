@@ -13,6 +13,7 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.IOException
+import java.net.ConnectException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -48,6 +49,14 @@ class AuthenticationRepository @Inject constructor() {
                 e.printStackTrace()
                 emit(Resource.Error("Encountered HttpException: " + e.code()))
                 ""
+            } catch (e: ConnectException) {
+                e.printStackTrace()
+                emit(Resource.Error("ConnectException:\n" + e.message))
+                ""
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("Exception:\n" + e.message))
+                ""
             }
             val isFetchSuccessful = !token.isNullOrEmpty()
             if (isFetchSuccessful) {
@@ -65,30 +74,45 @@ class AuthenticationRepository @Inject constructor() {
     fun register(username: String, password: String): Flow<Resource<String>> {
         return flow {
             emit(Resource.Loading(true))
-            val response = authApi.register(
-                CreateUserDTO(username, password))
 
-            if (response.isSuccessful) {
-                response.body()?.takeIf {
-                    it.username == username
-                } ?.let {
-                    emit(
-                        Resource.Success(
-                            data = it.username
+            try {
+                val response = authApi.register(
+                    CreateUserDTO(username, password))
+
+                if (response.isSuccessful) {
+                    response.body()?.takeIf {
+                        it.username == username
+                    } ?.let {
+                        emit(
+                            Resource.Success(
+                                data = it.username
+                            )
+                        )
+                    } ?: emit(
+                        Error(
+                            message = "User registration failed"
                         )
                     )
-                } ?: emit(
-                    Error(
-                        message = "User registration failed"
+                } else {
+                    emit(
+                        Error(
+                            message = response.message(),
+                            code = response.code()
+                        )
                     )
-                )
-            } else {
-                emit(
-                    Error(
-                        message = response.message(),
-                        code = response.code()
-                    )
-                )
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                emit(Resource.Error("Encountered IOException: " + e.message))
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                emit(Resource.Error("Encountered HttpException: " + e.code()))
+            } catch (e: ConnectException) {
+                e.printStackTrace()
+                emit(Resource.Error("ConnectException:\n" + e.message))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("Exception:\n" + e.message))
             }
             emit(Resource.Loading(false))
         }

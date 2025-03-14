@@ -13,6 +13,7 @@ import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.IOException
+import java.net.ConnectException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -44,21 +45,35 @@ class StatsRepository @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
 
-            val response = if (start.isNullOrEmpty() || end.isNullOrEmpty()) {
+            try {
+                val response = if (start.isNullOrEmpty() || end.isNullOrEmpty()) {
                     statsApi.fetchStatsAll()
-            } else {
-                statsApi.fetchStatsRange(start, end)
-            }
-            if (response.isSuccessful) {
-                emit(
-                    Resource.Success(
-                        data = response.body()
+                } else {
+                    statsApi.fetchStatsRange(start, end)
+                }
+                if (response.isSuccessful) {
+                    emit(
+                        Resource.Success(
+                            data = response.body()
+                        )
                     )
-                )
-            } else {
-                emit(
-                    Resource.Error(response.message())
-                )
+                } else {
+                    emit(
+                        Resource.Error(response.message())
+                    )
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                emit(Error("Encountered IOException: " + e.message))
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                emit(Error("Encountered HttpException: " + e.code()))
+            } catch (e: ConnectException) {
+                e.printStackTrace()
+                emit(Resource.Error("ConnectException:\n" + e.message))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("Exception:\n" + e.message))
             }
             emit(Resource.Loading(false))
 
@@ -81,6 +96,14 @@ class StatsRepository @Inject constructor(
             } catch (e: HttpException) {
                 e.printStackTrace()
                 emit(Error("Encountered HttpException: " + e.code()))
+                ""
+            } catch (e: ConnectException) {
+                e.printStackTrace()
+                emit(Resource.Error("ConnectException:\n" + e.message))
+                ""
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("Exception:\n" + e.message))
                 ""
             }
             val isFetchSuccessful = !oldestStreamDate.isNullOrEmpty()

@@ -72,7 +72,8 @@ public class TrackRepository extends CatalogRepository<Track> {
 				 + "secondary_id"
 				 + ") VALUES ("
 				 + "'" + primaryID + "',"
-				 + "'" + track.spotify_track_id() + "')");
+				 + "'" + track.spotify_track_id() + "')"
+				 		+ " ON CONFLICT (primary_id, secondary_id) DO NOTHING");
 		 return makeJoin;
 		 
 	}

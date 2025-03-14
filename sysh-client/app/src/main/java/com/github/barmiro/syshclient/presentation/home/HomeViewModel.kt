@@ -6,11 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.data.stats.StatsRepository
 import com.github.barmiro.syshclient.util.Resource
+import com.github.barmiro.syshclient.util.yearToEnd
+import com.github.barmiro.syshclient.util.yearToStart
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,7 +40,11 @@ class HomeViewModel @Inject constructor(
 
     fun getStats() {
         viewModelScope.launch {
-            statsRepository.getStats("", "")
+            val year = LocalDate.now().year
+            statsRepository.getStats(
+                start = yearToStart(year),
+                end = yearToEnd(year)
+            )
                 .collect { result ->
                 when(result) {
                     is Resource.Success -> {

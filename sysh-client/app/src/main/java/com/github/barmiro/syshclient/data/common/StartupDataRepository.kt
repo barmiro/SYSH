@@ -8,7 +8,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.HttpException
 import retrofit2.Retrofit
+import java.io.IOException
+import java.net.ConnectException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,28 +38,40 @@ class StartupDataRepository @Inject constructor(
         return flow {
             emit(Resource.Loading(true))
 
-            val response = startupApi.getUserData()
-
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    emit(
-                        Resource.Success(
-                            data = it.string()
+            try {
+                val response = startupApi.getUserData()
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        emit(
+                            Resource.Success(
+                                data = it.string()
+                            )
+                        )
+                    } ?: emit(
+                        Error(
+                            message = "No username found",
+                            code = response.code()
                         )
                     )
-                } ?: emit(
-                    Error(
-                        message = "No username found",
+                } else {
+                    emit(Error(
+                        message = response.message(),
                         code = response.code()
-                    )
-                )
-            } else {
-                emit(Error(
-                    message = response.message(),
-                    code = response.code()
-                ))
+                    ))
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                emit(Resource.Error("Encountered IOException: " + e.message))
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                emit(Resource.Error("Encountered HttpException: " + e.code()))
+            } catch (e: ConnectException) {
+                e.printStackTrace()
+                emit(Resource.Error("ConnectException:\n" + e.message))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("Exception:\n" + e.message))
             }
-
             emit(Resource.Loading(false))
         }
     }
@@ -65,26 +80,40 @@ class StartupDataRepository @Inject constructor(
         return flow{
             emit(Resource.Loading(true))
 
-            val response = startupApi.spotifyAuthorize()
 
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    emit(
-                        Resource.Success(
-                            data = it.string()
+            try {
+                val response = startupApi.spotifyAuthorize()
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        emit(
+                            Resource.Success(
+                                data = it.string()
+                            )
+                        )
+                    } ?: emit(
+                        Error(
+                            message = "Couldn't generate Spotify authorization URL",
+                            code = response.code()
                         )
                     )
-                } ?: emit(
-                    Error(
-                        message = "Couldn't generate Spotify authorization URL",
+                } else {
+                    emit(Error(
+                        message = response.message(),
                         code = response.code()
-                    )
-                )
-            } else {
-                emit(Error(
-                    message = response.message(),
-                    code = response.code()
-                ))
+                    ))
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+                emit(Resource.Error("Encountered IOException: " + e.message))
+            } catch (e: HttpException) {
+                e.printStackTrace()
+                emit(Resource.Error("Encountered HttpException: " + e.code()))
+            } catch (e: ConnectException) {
+                e.printStackTrace()
+                emit(Resource.Error("ConnectException:\n" + e.message))
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emit(Resource.Error("Exception:\n" + e.message))
             }
 
             emit(Resource.Loading(false))

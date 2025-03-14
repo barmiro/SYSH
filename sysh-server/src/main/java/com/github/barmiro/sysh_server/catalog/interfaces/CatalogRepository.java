@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.sql.Types;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,19 +48,22 @@ public abstract class CatalogRepository<EntityClass extends CatalogEntity> {
 			) throws IllegalAccessException, InvocationTargetException {
 		
 		String IdFieldName = entity.getIdFieldName();
-		Integer checkIfExistsSql = jdbc.sql("SELECT COUNT("
+		String checkSql = ("SELECT "
 				+ IdFieldName
-				+ ") FROM " 
+				+ " FROM " 
 				+ getEntityClass().getSimpleName()
 				+ "s WHERE "
 				+ IdFieldName
 				+ " = :"
-				+ IdFieldName)
+				+ IdFieldName);
+		
+		Optional<String> checkIfExistsSql = jdbc.sql(checkSql)
 				.param(IdFieldName, entity.getId(), Types.VARCHAR)
-				.query(Integer.class)
-				.single();
+				.query(String.class)
+				.optional();
 
-		if (checkIfExistsSql > 0) {
+//		System.out.println(entity.getId() + " : " + entity.getName() + " : " + checkIfExistsSql);
+		if (checkIfExistsSql.isPresent()) {
 			log.error(
 					entity.getName() 
 					+ " : "

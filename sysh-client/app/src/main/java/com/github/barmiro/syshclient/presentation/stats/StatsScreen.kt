@@ -2,13 +2,12 @@ package com.github.barmiro.syshclient.presentation.stats
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,8 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.components.StatsScreenTopText
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenBottomBar
@@ -52,14 +53,15 @@ fun StatsScreen(
                 onVMSearchParameterChange = { viewModel.onEvent(it) },
                 onDateRangePageChange = {viewModel.onEvent(it) },
                 titleText = "Stats",
-                actions = { }
+                animatedText = { StatsScreenTopText(state) },
+                actions = {
+                    IconButton(
+                        onClick = {
+                        }
+                    ) {
+                    }
+                }
             )
-//            TODO: this is a terrible hack
-            Box(
-                modifier = Modifier.fillMaxWidth().height(88.dp), contentAlignment = Alignment.BottomCenter
-            ) {
-                StatsScreenTopText(state)
-            }
         }
     ) { innerPadding ->
         Row(modifier = Modifier.fillMaxWidth().padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp, start = 8.dp, end = 8.dp)) {
@@ -101,59 +103,115 @@ fun StatsScreen(
                 val daysStreamed = homeState.stats.minutes_streamed / 1440f
                 val percentageOfTime = (daysStreamed / totalDays) * 100
 
-                Column (
-                    modifier = Modifier.weight(1f),
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Top
                 ) {
-                    StatsItem(
-                        dateRangeMode = state.dateRangeMode,
-                        itemValue = numberFormat.format(homeState.stats.stream_count),
-                        itemText = "Streams",
-                        perDayValue = (homeState.stats.stream_count / totalDays).toString()  + " a day"
-                    )
-                    StatsItem(
-                        dateRangeMode = state.dateRangeMode,
-                        itemValue = numberFormat.format(hoursStreamed.toInt()),
-                        itemText =  "Hours",
-                        perDayValue = "$hoursPerDay:$minutesMod a day"
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "General",
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            GeneralStatsItem(
+                                dateRangeMode = state.dateRangeMode,
+                                itemValue = numberFormat.format(homeState.stats.stream_count),
+                                itemText = "Streams",
+                                perDayValue = (homeState.stats.stream_count / totalDays).toString() + " a day"
+                            )
+                            GeneralStatsItem(
+                                dateRangeMode = state.dateRangeMode,
+                                itemValue = numberFormat.format(hoursStreamed.toInt()),
+                                itemText = "Hours",
+                                perDayValue = "$hoursPerDay:$minutesMod a day"
+                            )
+                        }
 
-                    StatsItem(
-                        dateRangeMode = state.dateRangeMode,
-                        itemValue = numberFormat.format(homeState.stats.track_count),
-                        itemText = "Tracks"
-                    )
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            GeneralStatsItem(
+                                dateRangeMode = state.dateRangeMode,
+                                itemValue = numberFormat.format(homeState.stats.minutes_streamed),
+                                itemText = "Minutes",
+                                perDayValue = (minutesPerDay).toString() + " a day"
+                            )
+                            GeneralStatsItem(
+                                dateRangeMode = state.dateRangeMode,
+                                itemValue = String.format(
+                                    "%.1f",
+                                    daysStreamed
+                                ),
+                                itemText = "Days",
+                                perDayValue = String.format(
+                                    "%.1f",
+                                    percentageOfTime
+                                ) + "% of total time"
+                            )
+                        }
+                    }
 
-                    StatsItem(
-                        dateRangeMode = state.dateRangeMode,
-                        itemValue = numberFormat.format(homeState.stats.artist_count),
-                        itemText = "Artists"
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Collection",
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+
+                            CollectionStatsItem(
+                                dateRangeMode = state.dateRangeMode,
+                                itemValue = numberFormat.format(homeState.stats.track_count),
+                                itemText = "Tracks"
+                            )
+
+
+                        }
+
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            CollectionStatsItem(
+                                dateRangeMode = state.dateRangeMode,
+                                itemValue = numberFormat.format(homeState.stats.album_count),
+                                itemText = "Albums"
+                            )
+                        }
+
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            CollectionStatsItem(
+                                dateRangeMode = state.dateRangeMode,
+                                itemValue = numberFormat.format(homeState.stats.artist_count),
+                                itemText = "Artists"
+                            )
+                        }
+                    }
                 }
-                Column (
-                    modifier = Modifier.weight(1f),
-                ) {
-                    StatsItem(
-                        dateRangeMode = state.dateRangeMode,
-                        itemValue = numberFormat.format(homeState.stats.minutes_streamed),
-                        itemText = "Minutes",
-                        perDayValue = (minutesPerDay).toString() + " a day"
-                    )
-                    StatsItem(
-                        dateRangeMode = state.dateRangeMode,
-                        itemValue = String.format(
-                            "%.1f",
-                            daysStreamed
-                        ),
-                        itemText = "Days",
-                        perDayValue = String.format("%.1f", percentageOfTime) + "% of total time"
-                    )
 
-                    StatsItem(
-                        dateRangeMode = state.dateRangeMode,
-                        itemValue = numberFormat.format(homeState.stats.album_count),
-                        itemText = "Albums"
-                    )
-                }
+
+
             }
         }
         TopScreenBottomBar(
@@ -163,21 +221,3 @@ fun StatsScreen(
         )
     }
 }
-
-
-
-//if (state.dateRangeMode == "yearly") {
-//    val today = LocalDate.now()
-//    val startOfYear = today.withDayOfYear(1)
-//    val endOfYear = today.withDayOfYear(today.lengthOfYear())
-//    val daysPassed = ChronoUnit.DAYS.between(startOfYear, today).toDouble() + 1
-//    val totalDays = ChronoUnit.DAYS.between(startOfYear, endOfYear).toDouble()
-//
-//    val fractionPassed = daysPassed / totalDays
-//    require(fractionPassed != 0.0) { }
-//    val projectedMinutes: Int = (homeState.stats.minutes_streamed / fractionPassed).toInt()
-//
-//    StatsItem(itemText = "On track to reach $projectedMinutes minutes this year"
-//
-//    )
-//}

@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import com.github.barmiro.syshclient.presentation.home.HomeState
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.TopScreenState
 import com.github.barmiro.syshclient.util.monthToEnd
@@ -42,6 +43,7 @@ fun TopScreenTopBar(
     onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit,
     onDateRangePageChange: (TopScreenEvent.OnDateRangePageChange) -> Unit,
     titleText: String,
+    animatedText: @Composable (RowScope.() -> Unit),
     actions: @Composable (RowScope.() -> Unit)
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -63,9 +65,9 @@ fun TopScreenTopBar(
                         modifier = Modifier.fillMaxWidth())
 
                 }
-                Row() {
-                    TopScreenTopText(state)
-                }
+                Row(
+                    content = animatedText
+                )
             }
         },
         navigationIcon = {
@@ -133,6 +135,109 @@ fun TopScreenTopBar(
                     }
                 )
             }
+        },
+        actions = actions
+    )
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreenTopBar(
+    state: HomeState,
+    titleText: String,
+    animatedText: @Composable (RowScope.() -> Unit),
+    actions: @Composable (RowScope.() -> Unit)
+) {
+    var expanded by remember { mutableStateOf(false) }
+    CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground
+        ),
+        title = {
+            Column(
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(text = titleText,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth())
+
+                }
+                Row(
+                    content = animatedText
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(Icons.Default.DateRange, contentDescription = "Date range options")
+            }
+//            DropdownMenu(
+//                expanded = expanded,
+//                onDismissRequest = { expanded = false }
+//            ) {
+//                DropdownMenuItem(
+//                    text = { Text("All time") },
+//                    onClick = {
+//                        onDateRangeModeChange("")
+//                        onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
+//                        onVMSearchParameterChange(
+//                            TopScreenEvent.OnSearchParameterChange(
+//                                start = "",
+//                                end = ""
+//                            )
+//                        )
+//                        expanded = false
+//                    }
+//                )
+//                DropdownMenuItem(
+//                    text = { Text("Yearly") },
+//                    onClick = {
+//                        if (state.dateRangeMode != "yearly") {
+//                            val year: Int = LocalDate.now().year
+//                            onDateRangeModeChange("yearly")
+//                            onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
+//                            onVMSearchParameterChange(
+//                                TopScreenEvent.OnSearchParameterChange(
+//                                    start = yearToStart(year),
+//                                    end = yearToEnd(year)
+//                                )
+//                            )
+//                        }
+//
+//                        expanded = false
+//                    }
+//                )
+//                DropdownMenuItem(
+//                    text = { Text("Monthly") },
+//                    onClick = {
+//                        if (state.dateRangeMode != "monthly") {
+//                            val month: YearMonth = YearMonth.now()
+//                            onDateRangeModeChange("monthly")
+//                            onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
+//                            onVMSearchParameterChange(
+//                                TopScreenEvent.OnSearchParameterChange(
+//                                    start = monthToStart(month), end = monthToEnd(month)
+//                                )
+//                            )
+//                        }
+//
+//                        expanded = false
+//                    }
+//                )
+//                DropdownMenuItem(
+//                    text = { Text("Custom range") },
+//                    onClick = {
+//                        onDateRangePickerVisibilityChange(true)
+//                        expanded = false
+//                    }
+//                )
+//            }
         },
         actions = actions
     )

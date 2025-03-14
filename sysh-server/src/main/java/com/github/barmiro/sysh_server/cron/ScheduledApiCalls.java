@@ -41,6 +41,7 @@ public class ScheduledApiCalls {
 		
 		if (usernameList.isEmpty()) {
 			log.error("No users found");
+			return;
 		}
 		
 //		the list is sorted alphabetically, so in normal operation the 25 minute delay will be kept,

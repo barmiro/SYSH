@@ -43,6 +43,7 @@ import com.github.barmiro.syshclient.presentation.top.components.DateRangePicker
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenBottomBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopIndicator
+import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopText
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksScreen
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import kotlin.math.absoluteValue
@@ -96,6 +97,7 @@ fun TopScreen(
                 onVMSearchParameterChange = { viewModel.onEvent(it) },
                 onDateRangePageChange = {viewModel.onEvent(it) },
                 titleText = "Top",
+                animatedText = { TopScreenTopText(state) },
                 actions = {
                     if (state.sort == "time") {
                         IconButton(

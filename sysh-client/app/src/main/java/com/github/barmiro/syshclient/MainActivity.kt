@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -45,6 +46,8 @@ import com.github.barmiro.syshclient.presentation.login.AuthViewModel
 import com.github.barmiro.syshclient.presentation.login.LoginScreen
 import com.github.barmiro.syshclient.presentation.login.RegisterScreen
 import com.github.barmiro.syshclient.presentation.login.SpotifyAuthScreen
+import com.github.barmiro.syshclient.presentation.settings.SettingsScreen
+import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
 import com.github.barmiro.syshclient.presentation.stats.StatsScreen
 import com.github.barmiro.syshclient.presentation.stats.StatsViewModel
 import com.github.barmiro.syshclient.presentation.top.TopScreen
@@ -70,12 +73,15 @@ class MainActivity : ComponentActivity() {
     private val topArtistsVM: TopArtistsViewModel by viewModels()
     private val statsVM: StatsViewModel by viewModels()
     private val authVM: AuthViewModel by viewModels()
+    private val settingsVM: SettingsViewModel by viewModels()
+    private val sessionVM: SessionViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
         setContent {
-            val sessionVM: SessionViewModel by viewModels()
+
             val isLoggedIn by sessionVM.isLoggedIn.collectAsState()
             val isAuthorizedWithSpotify by authVM.isAuthorizedWithSpotify.collectAsState()
             val navController = rememberNavController()
@@ -106,7 +112,7 @@ class MainActivity : ComponentActivity() {
                         title = "Settings",
                         selectedIcon = Icons.Filled.Settings,
                         unselectedIcon = Icons.Outlined.Settings,
-                        navigateTo = MainScreen
+                        navigateTo = Settings
                     )
                 )
 
@@ -156,7 +162,20 @@ class MainActivity : ComponentActivity() {
                         }
                     ) { innerPadding ->
                         Column(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding(), top = 0.dp)){
-                            AppNavHost(navController, isLoggedIn, isAuthorizedWithSpotify, homeVM, topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM, statsVM, authVM, sessionVM)
+                            AppNavHost(navController,
+                                isLoggedIn,
+                                isAuthorizedWithSpotify,
+                                homeVM,
+                                topScreenVM,
+                                topTracksVM,
+                                topAlbumsVM,
+                                topArtistsVM,
+                                statsVM,
+                                authVM,
+                                sessionVM,
+                                settingsVM,
+                                onPickZipFile = { pickZipFile() }
+                            )
                         }
 
                     }
@@ -164,6 +183,21 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private val zipPickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let {
+            println("zipPickerLauncher")
+            settingsVM.handleZipFile(it, applicationContext)
+        }
+    }
+
+    private fun pickZipFile() {
+        zipPickerLauncher.launch(arrayOf("application/zip"))
+    }
+
+
+
+
 }
 
 data class BottomNavigationItem(
@@ -194,6 +228,9 @@ object Register
 @Serializable
 object SpotifyAuth
 
+@Serializable
+object Settings
+
 @Composable
 fun AppNavHost(navController: NavHostController,
                isLoggedIn: Boolean,
@@ -205,7 +242,9 @@ fun AppNavHost(navController: NavHostController,
                topArtistsVM: TopArtistsViewModel,
                statsVM: StatsViewModel,
                authVM: AuthViewModel,
-               sessionVM: SessionViewModel) {
+               sessionVM: SessionViewModel,
+               settingsVM: SettingsViewModel,
+               onPickZipFile: () -> Unit) {
 
     NavHost(
         navController = navController,
@@ -232,21 +271,8 @@ fun AppNavHost(navController: NavHostController,
         composable<SpotifyAuth> {
             SpotifyAuthScreen(authVM)
         }
+        composable<Settings> {
+            SettingsScreen(settingsVM, onPickZipFile)
+        }
     }
 }
-
-//@Composable
-//fun Greeting(name: String, modifier: Modifier = Modifier) {
-//    Text(
-//        text = "Hello $name!",
-//        modifier = modifier
-//    )
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun GreetingPreview() {
-//    SyshClientTheme {
-//        Greeting("Android")
-//    }
-//}
