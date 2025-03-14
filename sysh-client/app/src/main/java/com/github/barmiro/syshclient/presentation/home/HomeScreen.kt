@@ -64,12 +64,21 @@ fun HomeScreen(
             val totalDays = ChronoUnit.DAYS.between(startOfYear, endOfYear).toDouble()
 
             val fractionPassedYear = daysPassed / totalDays
-            require(fractionPassedYear != 0.0) { }
-            val projectedMinutesYear: Int = (state.stats.minutes_streamed / fractionPassedYear).toInt()
+            val fractionPassedWrappedLower = daysPassed / (totalDays - 45)
+            val fractionPassedWrappedUpper = daysPassed / (totalDays - 30)
 
-            val fractionPassedWrapped = daysPassed / (totalDays - 45)
-            require(fractionPassedWrapped != 0.0) { }
-            val projectedMinutesWrapped: Int = (state.stats.minutes_streamed / fractionPassedWrapped).toInt()
+            require(fractionPassedYear > 0.0
+                    && fractionPassedWrappedLower > 0.0
+                    && fractionPassedWrappedUpper > 0.0) { }
+
+            val projectedMinutesYear: Int = (state.stats.minutes_streamed / fractionPassedYear).toInt()
+            val projectedMinutesWrappedLower: Int = ((
+                    state.stats.minutes_streamed / fractionPassedWrappedLower
+                    ).toInt() / 100) * 100
+
+            val projectedMinutesWrappedUpper: Int = ((
+                    state.stats.minutes_streamed / fractionPassedWrappedUpper
+                    ).toInt() / 100) * 100
 
             val numberFormat = NumberFormat.getInstance(Locale.US)
 
@@ -144,8 +153,10 @@ fun HomeScreen(
                     ) {
                         HomeItem(itemText = "Minutes by end of year",
                             itemValue = numberFormat.format(projectedMinutesYear))
-                        HomeItem(itemText = "Minutes by Spotify Wrapped",
-                            itemValue = numberFormat.format(projectedMinutesWrapped))
+                        HomeItem(itemText = "Minutes on Spotify Wrapped",
+                            itemValue = (numberFormat.format(projectedMinutesWrappedLower)
+                                    + " - "
+                                    + numberFormat.format(projectedMinutesWrappedUpper)))
                     }
                 }
 
