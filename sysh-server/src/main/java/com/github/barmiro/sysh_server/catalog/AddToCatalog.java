@@ -119,7 +119,8 @@ public class AddToCatalog {
 //		the <= 50 condition limits this cache update to recent streams,
 //		easier than returning all necessary values and handling it in recent logic
 		if (streams.size() > 0 && streams.size() <= 50) {
-			statsCache.updateCache(streams, username, tracksAdded, albumsAdded, artistsAdded);
+//			statsCache.updateCache(streams, username, tracksAdded, albumsAdded, artistsAdded);
+			statsCache.cacheGenerator(username);
 			trackRepository.updateTopTracksCache(username);
 			albumRepository.updateTopAlbumsCache(username);
 			
