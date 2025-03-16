@@ -126,21 +126,9 @@ fun TopScreen(
                     }
                 }
             )
-//            TODO: this is a terrible hack
-//            Box(
-//                modifier = Modifier.fillMaxWidth().height(88.dp), contentAlignment = Alignment.BottomCenter
-//            ) {
-//                TopScreenTopText(state)
-//            }
         }
     ) { innerPadding ->
-//        Row(modifier = Modifier.fillMaxWidth().padding(top = (innerPadding.calculateTopPadding() - 16.dp), bottom = 0.dp)) {
-//            Box(
-//                modifier = Modifier.fillMaxWidth().height(16.dp).zIndex(20f), contentAlignment = Alignment.BottomCenter
-//            ) {
-//                TopScreenTopText(state)
-//            }
-//        }
+
         Row(modifier = Modifier.fillMaxWidth().padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp)) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 TabRow(selectedTabIndex = tabIndex,

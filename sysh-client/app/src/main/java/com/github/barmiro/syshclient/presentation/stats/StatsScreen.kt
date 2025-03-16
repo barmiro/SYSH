@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
+import com.github.barmiro.syshclient.presentation.top.components.DateRangePickerModal
 import com.github.barmiro.syshclient.presentation.top.components.StatsScreenTopText
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenBottomBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopBar
@@ -43,6 +44,16 @@ fun StatsScreen(
     val state by viewModel.state.collectAsState()
 
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
+
+    if (isDateRangePickerVisible) {
+        DateRangePickerModal(
+            onVMSearchParameterChange = { viewModel.onEvent(it) },
+            onDateRangeModeChange = { viewModel.onEvent(it) },
+            onDismiss = {
+                isDateRangePickerVisible = false
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
