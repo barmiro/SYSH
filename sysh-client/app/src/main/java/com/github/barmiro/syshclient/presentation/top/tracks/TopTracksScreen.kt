@@ -88,7 +88,7 @@ fun TopTracksScreen(
                                     .clickable {
                                         //TODO
                                     }
-                                    .padding(12.dp)
+                                    .padding(vertical = 12.dp, horizontal = 10.dp)
                             )
                         }
                     }

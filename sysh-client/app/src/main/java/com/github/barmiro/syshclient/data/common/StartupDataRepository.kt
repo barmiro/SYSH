@@ -19,12 +19,10 @@ import javax.inject.Singleton
 class StartupDataRepository @Inject constructor(
     private val userPrefRepo: UserPreferencesRepository
 ) {
-
     val client = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
         .addInterceptor(JwtInterceptor(userPrefRepo))
         .build()
-
 
     val retrofit = Retrofit.Builder()
         .baseUrl("http://192.168.0.147:5754/")
@@ -32,7 +30,6 @@ class StartupDataRepository @Inject constructor(
         .build()
 
     val startupApi = retrofit.create(StartupDataApi::class.java)
-
 
     fun getUserDisplayName(): Flow<Resource<String>> {
         return flow {
@@ -79,8 +76,6 @@ class StartupDataRepository @Inject constructor(
     fun getSpotifyAuthUrl(): Flow<Resource<String>> {
         return flow{
             emit(Resource.Loading(true))
-
-
             try {
                 val response = startupApi.spotifyAuthorize()
                 if (response.isSuccessful) {
@@ -119,5 +114,4 @@ class StartupDataRepository @Inject constructor(
             emit(Resource.Loading(false))
         }
     }
-
 }

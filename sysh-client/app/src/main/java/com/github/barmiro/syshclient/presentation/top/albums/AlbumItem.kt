@@ -1,5 +1,7 @@
 package com.github.barmiro.syshclient.presentation.top.albums
 
+import androidx.compose.foundation.MarqueeSpacing
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,15 +19,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.github.barmiro.syshclient.domain.top.TopAlbum
-import java.text.NumberFormat
-import java.util.Locale
+import com.github.barmiro.syshclient.presentation.top.components.TopItemSortParamDisplay
+import com.github.barmiro.syshclient.presentation.top.components.TopListIndexText
+import com.github.barmiro.syshclient.util.drawMarqueeTextFadedEdge
 
 @Composable
 fun AlbumItem(
@@ -49,23 +54,7 @@ fun AlbumItem(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (index < 100) {
-                    Text(
-                        text = index.toString(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center
-                    )
-                } else {
-                    Text(
-                        text = index.toString(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                TopListIndexText(index)
             }
             Column(
             ) {
@@ -77,22 +66,34 @@ fun AlbumItem(
                 )
             }
             Column(
-                modifier = Modifier.weight(5f).padding(horizontal = 8.dp)
+                modifier = Modifier.weight(5f)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth()
+                    .graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                    .drawWithContent {
+                        drawContent()
+                        drawMarqueeTextFadedEdge(isRightEdge = false)
+                        drawMarqueeTextFadedEdge(isRightEdge = true)
+                    }
                 ) {
                     Text(
                         text = album.name,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.onBackground,
-                        overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
-                        modifier = Modifier.weight(5f)
+                        modifier = Modifier
+                            .basicMarquee(
+                                iterations = 3,
+                                velocity = 48.dp,
+                                repeatDelayMillis = 3000,
+                                initialDelayMillis = 1000,
+                                spacing = MarqueeSpacing(32.dp)
+                            )
+                            .padding(start = 8.dp)
                     )
                 }
-//            Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = album.primaryArtistName,
                     color = MaterialTheme.colorScheme.onBackground,
@@ -102,71 +103,14 @@ fun AlbumItem(
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                     modifier = Modifier.alpha(0.5F)
+                        .padding(start = 8.dp)
                 )
             }
-            val sortParam: String
-            val sortParamName: String
-            val otherParam: String
-            val otherParamName: String
-            val format = NumberFormat.getInstance(Locale.US)
-            if (sort == "time") {
-                sortParam = format.format(album.minutesPlayed)
-                sortParamName = "minutes"
-                otherParam = format.format(album.streamCount)
-                otherParamName = "streams"
-            } else {
-                sortParam = format.format(album.streamCount)
-                sortParamName = "streams"
-                otherParam = format.format(album.minutesPlayed)
-                otherParamName = "minutes"
-            }
-            Column(
-                Modifier.weight(2.2f),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.End
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Text(
-                        text = sortParam,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        maxLines = 1,
-                        textAlign = TextAlign.End,
-                        lineHeight = 18.sp
-                    )
-                }
-                Row(
-                    modifier = Modifier.padding(0.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Text(
-                        text = sortParamName,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        maxLines = 1,
-                        textAlign = TextAlign.End,
-                        lineHeight = 12.sp
-                    )
-                }
-                Row(
-                    modifier = Modifier.padding(0.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Text(
-                        text = "$otherParam $otherParamName",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        maxLines = 1,
-                        textAlign = TextAlign.End,
-                        lineHeight = 12.sp,
-                        modifier = Modifier.alpha(0.5F)
-                    )
-                }
-            }
+            TopItemSortParamDisplay(
+                sort = sort,
+                minutesPlayed = album.minutesPlayed,
+                streamCount = album.streamCount
+            )
         }
 
     }

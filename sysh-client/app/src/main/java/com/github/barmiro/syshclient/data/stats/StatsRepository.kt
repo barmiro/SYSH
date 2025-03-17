@@ -23,11 +23,9 @@ import javax.inject.Singleton
 class StatsRepository @Inject constructor(
     private val userPrefRepo: UserPreferencesRepository
 ) {
-
     val client = OkHttpClient.Builder()
         .addInterceptor(JwtInterceptor(userPrefRepo))
         .build()
-
 
     val retrofit = Retrofit.Builder()
         .baseUrl("http://192.168.0.147:5754/stats/")
@@ -81,8 +79,6 @@ class StatsRepository @Inject constructor(
         }
     }
 
-
-
 //TODO: move to a common repo
     fun getOldestStreamDate(): Flow<Resource<LocalDate>> {
         return flow {
@@ -121,13 +117,4 @@ class StatsRepository @Inject constructor(
             emit(Resource.Loading(false))
         }
     }
-
-
 }
-
-
-//                var endOrLocalDateTimeNow = end
-//                if (end.isNullOrEmpty()) {
-//                    val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//                    endOrLocalDateTimeNow = formatter.format(LocalDateTime.now())
-//                }
