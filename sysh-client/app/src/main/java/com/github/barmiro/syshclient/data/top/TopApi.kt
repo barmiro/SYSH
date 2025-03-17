@@ -15,7 +15,9 @@ interface TopApi {
         @Path("optionalRangePath", encoded = true) rangePath: String? = "",
         @Query("start") start: String? = "2000-01-01T00:00:00",
         @Query("end") end: String? = "2038-01-1T00:00:00",
-        @Query("sort") sort: String? = null
+        @Query("sort") sort: String? = null,
+        @Query("offset") offset: Int,
+        @Query("size") size: Int
     ): Response<List<TrackDTO>>
 
     @GET("albums{optionalRangePath}")
@@ -23,21 +25,17 @@ interface TopApi {
         @Path("optionalRangePath", encoded = true) rangePath: String? = "",
         @Query("start") start: String? = "2000-01-01T00:00:00",
         @Query("end") end: String? = "2038-01-01T00:00:00",
-        @Query("sort") sort: String? = null
+        @Query("sort") sort: String? = null,
+        @Query("offset") offset: Int,
+        @Query("size") size: Int
     ): Response<List<AlbumDTO>>
 
     @GET("artists")
     suspend fun fetchTopArtists(
         @Query("start") start: String? = null,
         @Query("end") end: String? = null,
-        @Query("sort") sort: String? = null
+        @Query("sort") sort: String? = null,
+        @Query("offset") offset: Int,
+        @Query("size") size: Int
     ): Response<List<ArtistDTO>>
-
-    @GET("{entity}")
-    suspend fun<T> fetchTopItems(
-        @Path("entity") entity: String,
-        @Query("start") start: String? = null,
-        @Query("end") end: String? = null,
-        @Query("sort") sort: String? = null
-    ): Response<List<T>>
 }

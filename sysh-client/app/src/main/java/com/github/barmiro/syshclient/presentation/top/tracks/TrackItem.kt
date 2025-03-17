@@ -37,6 +37,7 @@ fun TrackItem(
     Surface(
         modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
         shape = RoundedCornerShape(8.dp),
+//        TODO: change the color
         color = NavigationBarDefaults.containerColor
     ) {
         Row(

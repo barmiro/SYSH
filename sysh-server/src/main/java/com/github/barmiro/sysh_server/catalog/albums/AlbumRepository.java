@@ -68,7 +68,18 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	List<AlbumStats> topAlbums(String sort,
 			Timestamp startDate,
 			Timestamp endDate,
+			Integer offset,
+			String size,
 			String username) {
+		
+		String listSpec = ("ORDER BY "
+				+ sort
+				+ " DESC "
+				+ "LIMIT "
+				+ size
+				+ " OFFSET "
+				+ offset);
+		
 		
 		String sql = ("SELECT Albums.*,"
 				+ ":username AS username,"
@@ -92,9 +103,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 				+ "Albums.name,"
 				+ "Albums.thumbnail_url,"
 				+ "primary_artist_name "
-				+ "ORDER BY "
-				+ sort
-				+ " DESC;");
+				+ listSpec);
 		return jdbc.sql(sql)
 				.param("username", username, Types.VARCHAR)
 				.param("startDate", startDate, Types.TIMESTAMP)
@@ -106,9 +115,21 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	
 	List<AlbumStats> topAlbums(String sort,
 			String username,
+			Integer offset,
+			String size,
 			Boolean checkForCache) throws IllegalAccessException, InvocationTargetException {
 		
 		String sql;
+		
+		
+		
+		String listSpec = ("ORDER BY "
+				+ sort
+				+ " DESC "
+				+ "LIMIT "
+				+ size
+				+ " OFFSET "
+				+ offset);
 		
 		if (checkForCache) {
 			sql = ("SELECT username,"
@@ -121,9 +142,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 					+ "COALESCE(total_ms_played, 0) AS total_ms_played "
 					+ "FROM Top_Albums_Cache "
 					+ "WHERE username = :username "
-					+ "ORDER BY "
-					+ sort
-					+ " DESC;");
+					+ listSpec);
 		} else {
 			sql = ("SELECT Albums.*,"
 					+ ":username AS username,"
@@ -146,9 +165,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 					+ "Albums.name,"
 					+ "Albums.thumbnail_url,"
 					+ "primary_artist_name "
-					+ "ORDER BY "
-					+ sort
-					+ " DESC;");
+					+ listSpec);
 		}
 		
 		List<AlbumStats> rawList = jdbc.sql(sql)
@@ -172,7 +189,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 	public int updateTopAlbumsCache(String username
 			) throws IllegalAccessException, InvocationTargetException {
 //		Doesn't have to be sorted, but I don't feel like overloading the constructor again
-		List<AlbumStats> albumStatsList = topAlbums("stream_count", username, false);
+		List<AlbumStats> albumStatsList = topAlbums("stream_count", username, 0, "ALL", false);
 		
 		
 		String wipeCache = ("DELETE FROM Top_Albums_Cache WHERE username = :username");

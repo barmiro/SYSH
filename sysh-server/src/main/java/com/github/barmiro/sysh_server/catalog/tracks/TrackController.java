@@ -31,31 +31,46 @@ public class TrackController {
 			@RequestParam
 			String start,
 			@RequestParam
-			String end) {
+			String end,
+			@RequestParam(required = false)
+			Optional<Integer> offset,
+			@RequestParam(required = false)
+			Optional<String> size) {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		Timestamp startDate = Timestamp.valueOf(start.replace("T", " "));
 		Timestamp endDate = Timestamp.valueOf(end.replace("T", " "));
 		
+		Integer offsetValue = offset.orElse(0);
+		String sizeString = size.orElse("ALL");
+		
 		String sortBy = sort.orElse("");
 		if (sortBy.equals("time")) {
-			return trackRepository.topTracks("total_ms_played", startDate, endDate, username);
+			return trackRepository.topTracks("total_ms_played", startDate, endDate, offsetValue, sizeString, username);
 		} else {
-			return trackRepository.topTracks("stream_count", startDate, endDate, username);
+			return trackRepository.topTracks("stream_count", startDate, endDate, offsetValue, sizeString, username);
 		} 
 	}
 	
 	@GetMapping("/tracks/all")
 	public List<TrackStats> topTracksAll(
 			@RequestParam(required = false)
-			Optional<String> sort) {
+			Optional<String> sort,
+			@RequestParam(required = false)
+			Optional<Integer> offset,
+			@RequestParam(required = false)
+			Optional<String> size) {
+		
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		
+		Integer offsetValue = offset.orElse(0);
+		String sizeString = size.orElse("ALL");
 		
 		String sortBy = sort.orElse("count");
 		if (sortBy.equals("time")) {
-			return trackRepository.topTracks("total_ms_played", username, true);
+			return trackRepository.topTracks("total_ms_played", username, offsetValue, sizeString, true);
 		} else {
-			return trackRepository.topTracks("stream_count", username, true);
+			return trackRepository.topTracks("stream_count", username, offsetValue, sizeString, true);
 		}
 	}
 	

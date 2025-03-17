@@ -34,32 +34,46 @@ public class AlbumController {
 			@RequestParam
 			String start,
 			@RequestParam
-			String end) {
+			String end,
+			@RequestParam(required = false)
+			Optional<Integer> offset,
+			@RequestParam(required = false)
+			Optional<String> size) {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		Timestamp startDate = Timestamp.valueOf(start.replace("T", " "));
 		Timestamp endDate = Timestamp.valueOf(end.replace("T", " "));
 		
+		Integer offsetValue = offset.orElse(0);
+		String sizeString = size.orElse("ALL");
+		
 		String sortBy = sort.orElse("count");
 		if (sortBy.equals("time")) {
-			return albumRepository.topAlbums("total_ms_played", startDate, endDate, username);
+			return albumRepository.topAlbums("total_ms_played", startDate, endDate, offsetValue, sizeString, username);
 		} else {
-			return albumRepository.topAlbums("stream_count", startDate, endDate, username);
+			return albumRepository.topAlbums("stream_count", startDate, endDate, offsetValue, sizeString, username);
 		}
 	}
 	
 	@GetMapping("/albums/all")
 	public List<AlbumStats> topAlbumsAll(
 			@RequestParam(required = false)
-			Optional<String> sort) throws IllegalAccessException, InvocationTargetException {
+			Optional<String> sort,
+			@RequestParam(required = false)
+			Optional<Integer> offset,
+			@RequestParam(required = false)
+			Optional<String> size) throws IllegalAccessException, InvocationTargetException {
 		
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
+		Integer offsetValue = offset.orElse(0);
+		String sizeString = size.orElse("ALL");
+		
 		String sortBy = sort.orElse("count");
 		if (sortBy.equals("time")) {
-			return albumRepository.topAlbums("total_ms_played", username, true);
+			return albumRepository.topAlbums("total_ms_played", username, offsetValue, sizeString, true);
 		} else {
-			return albumRepository.topAlbums("stream_count", username, true);
+			return albumRepository.topAlbums("stream_count", username, offsetValue, sizeString, true);
 		}
 	}
 

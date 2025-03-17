@@ -29,7 +29,11 @@ public class ArtistController {
 			@RequestParam(required = false)
 			Optional<String> start,
 			@RequestParam(required = false)
-			Optional<String> end) {
+			Optional<String> end,
+			@RequestParam(required = false)
+			Optional<Integer> offset,
+			@RequestParam(required = false)
+			Optional<String> size) {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		Timestamp startDate = Timestamp.valueOf(start
@@ -38,11 +42,15 @@ public class ArtistController {
 		Timestamp endDate = Timestamp.valueOf(end
 				.orElse(LocalDateTime.now().toString())
 				.replace("T", " "));
+		
+		Integer offsetValue = offset.orElse(0);
+		String sizeString = size.orElse("ALL");
+		
 		String sortBy = sort.orElse("");
 		if (sortBy.equals("time")) {
-			return artistRepository.topArtists("total_ms_played", startDate, endDate, username);
+			return artistRepository.topArtists("total_ms_played", startDate, endDate, offsetValue, sizeString, username);
 		} else {
-			return artistRepository.topArtists("stream_count", startDate, endDate, username);
+			return artistRepository.topArtists("stream_count", startDate, endDate, offsetValue, sizeString, username);
 		} 
 		
 	}

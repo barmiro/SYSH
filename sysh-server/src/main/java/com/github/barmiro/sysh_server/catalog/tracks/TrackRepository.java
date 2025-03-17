@@ -138,7 +138,17 @@ public class TrackRepository extends CatalogRepository<Track> {
 	List<TrackStats> topTracks(String sort,
 			Timestamp startDate,
 			Timestamp endDate,
+			Integer offset,
+			String size,
 			String username) {
+		
+		String listSpec = ("ORDER BY "
+				+ sort
+				+ " DESC "
+				+ "LIMIT "
+				+ size
+				+ " OFFSET "
+				+ offset);
 		
 		String sql = ("SELECT t2.spotify_track_id, t2.name,"
 				+ ":username AS username,"
@@ -165,9 +175,8 @@ public class TrackRepository extends CatalogRepository<Track> {
 				+ "album_name,"
 				+ "Albums.thumbnail_url,"
 				+ "primary_artist_name "
-				+ "ORDER BY "
-				+ sort
-				+ " DESC;");
+				+ listSpec);
+		
 		return jdbc.sql(sql)
 				.param("username", username, Types.VARCHAR)
 				.param("startDate", startDate, Types.TIMESTAMP)
@@ -178,9 +187,19 @@ public class TrackRepository extends CatalogRepository<Track> {
 	
 	List<TrackStats> topTracks(String sort,
 			String username,
+			Integer offset,
+			String size,
 			Boolean checkForCache) {
 		
 		String sql;
+		
+		String listSpec = ("ORDER BY "
+				+ sort
+				+ " DESC "
+				+ "LIMIT "
+				+ size
+				+ " OFFSET "
+				+ offset);
 		
 		if(checkForCache) {
 			sql = ("SELECT spotify_track_id,"
@@ -193,9 +212,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 					+ "COALESCE(total_ms_played, 0) AS total_ms_played "
 					+ "FROM Top_Tracks_Cache "
 					+ "WHERE username = :username "
-					+ "ORDER BY "
-					+ sort
-					+ " DESC;");
+					+ listSpec);
 		} else {
 			sql = ("SELECT t2.spotify_track_id, t2.name,"
 					+ ":username AS username,"
@@ -221,9 +238,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 					+ "album_name,"
 					+ "Albums.thumbnail_url,"
 					+ "primary_artist_name "
-					+ "ORDER BY "
-					+ sort
-					+ " DESC;");
+					+ listSpec);
 		}
 		
 		List<TrackStats> rawList = jdbc.sql(sql)
@@ -246,7 +261,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 	public int updateTopTracksCache(String username
 			) {
 //		Doesn't have to be sorted, but I don't feel like overloading the constructor again
-		List<TrackStats> trackStatsList = topTracks("stream_count", username, false);
+		List<TrackStats> trackStatsList = topTracks("stream_count", username, 0, "ALL", false);
 		
 		
 		String wipeCache = ("DELETE FROM Top_Tracks_Cache WHERE username = :username");

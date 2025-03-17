@@ -44,31 +44,39 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 public List<ArtistStats> topArtists(String sort,
 		Timestamp startDate,
 		Timestamp endDate,
+		Integer offset,
+		String size,
 		String username) {
+	
+	String listSpec = ("ORDER BY "
+			+ sort
+			+ " DESC "
+			+ "LIMIT "
+			+ size
+			+ " OFFSET "
+			+ offset);
 		
-		String sql = ("SELECT Artists.*,"
-				+ "COUNT("
-				+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
-				+ ") AS stream_count,"
-				+ "COALESCE(SUM(SongStreams.ms_played), 0) AS total_ms_played "
-				+ "FROM Artists "
-				+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
-				+ "LEFT JOIN SongStreams ON Tracks_Artists.spotify_track_id = SongStreams.spotify_track_id "
-				+ "WHERE SongStreams.username = :username "
-				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate "
-				+ "GROUP By "
-				+ "Artists.id,"
-				+ "Artists.name,"
-				+ "Artists.thumbnail_url "
-				+ "ORDER BY "
-				+ sort
-				+ " DESC;");
-		
-		return jdbc.sql(sql)
-				.param("username", username, Types.VARCHAR)
-				.param("startDate", startDate, Types.TIMESTAMP)
-				.param("endDate", endDate, Types.TIMESTAMP)
-				.query(ArtistStats.class)
-				.list();
+	String sql = ("SELECT Artists.*,"
+			+ "COUNT("
+			+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
+			+ ") AS stream_count,"
+			+ "COALESCE(SUM(SongStreams.ms_played), 0) AS total_ms_played "
+			+ "FROM Artists "
+			+ "LEFT JOIN Tracks_Artists ON Artists.id = Tracks_Artists.artist_id "
+			+ "LEFT JOIN SongStreams ON Tracks_Artists.spotify_track_id = SongStreams.spotify_track_id "
+			+ "WHERE SongStreams.username = :username "
+			+ "AND SongStreams.ts BETWEEN :startDate AND :endDate "
+			+ "GROUP By "
+			+ "Artists.id,"
+			+ "Artists.name,"
+			+ "Artists.thumbnail_url "
+			+ listSpec);
+	
+	return jdbc.sql(sql)
+			.param("username", username, Types.VARCHAR)
+			.param("startDate", startDate, Types.TIMESTAMP)
+			.param("endDate", endDate, Types.TIMESTAMP)
+			.query(ArtistStats.class)
+			.list();
 	}
 }

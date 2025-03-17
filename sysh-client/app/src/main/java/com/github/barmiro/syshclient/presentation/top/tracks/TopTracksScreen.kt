@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 
 @Composable
@@ -33,6 +37,8 @@ fun TopTracksScreen(
     val state by viewModel.state.collectAsState()
     viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
 
+    val tracks = viewModel.tracks.collectAsLazyPagingItems()
+
     var previousValues by remember {mutableStateOf(listOf(state.sort, state.start, state.end))}
     LaunchedEffect(state.sort, state.start, state.end) {
         if (listOf(state.sort, state.start, state.end) != previousValues) {
@@ -40,47 +46,52 @@ fun TopTracksScreen(
         }
         previousValues = listOf(state.sort, state.start, state.end)
     }
-    if (viewModel.isLoading.collectAsState().value) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Loading...",
-                color = MaterialTheme.colorScheme.onBackground )
-        }
-    } else if (!viewModel.errorMessage.collectAsState().value.isNullOrEmpty()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = viewModel.errorMessage.collectAsState().value!!,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center)
-        }
-    } else {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(viewModel.trackList.size) { i ->
-                    val track = viewModel.trackList[i]
-                    TrackItem(
-                        index = i + 1,
-                        track = track,
-                        sort = state.sort,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                //TODO
-                            }
-                            .padding(12.dp)
-                    )
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        when (val loadState = tracks.loadState.refresh) {
+            is LoadState.Loading -> {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                }
+            }
+            is LoadState.Error -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = loadState.error.message ?: "Encountered unknown error",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Center)
+                }
+            }
+            else -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(tracks.itemCount) { i ->
+                        tracks[i]?.let { track ->
+                            TrackItem(
+                                index = i + 1,
+                                track = track,
+                                sort = state.sort,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        //TODO
+                                    }
+                                    .padding(12.dp)
+                            )
+                        }
+                    }
                 }
             }
         }

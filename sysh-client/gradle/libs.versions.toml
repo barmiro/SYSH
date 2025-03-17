@@ -14,6 +14,7 @@ composeBom = "2025.01.01"
 loggingInterceptor = "4.12.0"
 navigationCompose = "2.8.6"
 okhttp = "4.12.0"
+paging = "3.3.6"
 retrofit = "2.11.0"
 hilt = "2.55"
 ksp = "2.1.10-1.0.29"
@@ -24,6 +25,7 @@ converterKotlinxSerialization = "2.11.0"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

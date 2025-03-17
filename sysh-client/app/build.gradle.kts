@@ -69,8 +69,10 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.androidx.paging.compose)
 
     implementation(libs.logging.interceptor)
+
 
     ksp(libs.hilt.compiler)
 }
