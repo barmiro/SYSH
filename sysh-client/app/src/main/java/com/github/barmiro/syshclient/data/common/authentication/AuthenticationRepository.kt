@@ -38,35 +38,45 @@ class AuthenticationRepository @Inject constructor() {
     fun getToken(username: String, password: String): Flow<Resource<String>> {
         return flow {
             emit(Resource.Loading(true))
-            val token = try{
+
+            try {
                 val authHeader = Credentials.basic(username, password)
-                authApi.getToken(authHeader).body()?.token
+                val response = authApi.getToken(authHeader)
+                if (response.isSuccessful) {
+                    response.body()?.takeIf {
+                        it.token.isNotEmpty()
+                    } ?.let {
+                        emit(
+                            Resource.Success(
+                                data = it.token
+                            )
+                        )
+                    } ?: emit(
+                        Error(
+                            message = "Server error, please contact your system administrator",
+                            code = 500
+                        )
+                    )
+                } else if (response.code() == 401) {
+                    emit(Error(message = "Incorrect username or password"))
+                } else {
+                    emit(Error(message = response.message(),
+                        code = response.code()))
+                }
             } catch (e: IOException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered IOException: " + e.message))
-                ""
+                emit(Error("Couldn't connect to server: " + e.message, code = 600))
             } catch (e: HttpException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered HttpException: " + e.code()))
-                ""
+                emit(Error("Encountered HttpException: " + e.code(), code = e.code()))
             } catch (e: ConnectException) {
                 e.printStackTrace()
-                emit(Resource.Error("ConnectException:\n" + e.message))
-                ""
+                emit(Error("ConnectException:\n" + e.message, code = 601))
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Resource.Error("Exception:\n" + e.message))
-                ""
+                emit(Error("Error:\n" + e.message, code = 666))
             }
-            val isFetchSuccessful = !token.isNullOrEmpty()
-            if (isFetchSuccessful) {
-                emit(
-                    Resource.Success(
-                        data = token
-                    ))
-            } else {
-                emit(Resource.Error("Couldn't fetch token"))
-            }
+
             emit(Resource.Loading(false))
         }
     }
@@ -103,16 +113,16 @@ class AuthenticationRepository @Inject constructor() {
                 }
             } catch (e: IOException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered IOException: " + e.message))
+                emit(Error("Encountered IOException: " + e.message))
             } catch (e: HttpException) {
                 e.printStackTrace()
-                emit(Resource.Error("Encountered HttpException: " + e.code()))
+                emit(Error("Encountered HttpException: " + e.code()))
             } catch (e: ConnectException) {
                 e.printStackTrace()
-                emit(Resource.Error("ConnectException:\n" + e.message))
+                emit(Error("ConnectException:\n" + e.message, code = 600))
             } catch (e: Exception) {
                 e.printStackTrace()
-                emit(Resource.Error("Exception:\n" + e.message))
+                emit(Error("Exception:\n" + e.message))
             }
             emit(Resource.Loading(false))
         }

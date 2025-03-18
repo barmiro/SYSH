@@ -29,7 +29,7 @@ class AuthViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _responseCode: MutableStateFlow<Int?> = MutableStateFlow(null)
+    private val _responseCode: MutableStateFlow<Int?> = MutableStateFlow(0)
     val responseCode: StateFlow<Int?> = _responseCode
 
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
@@ -66,7 +66,9 @@ class AuthViewModel @Inject constructor(
 
 
     fun getToken(username: String, password: String) {
+        _responseCode.value = 0
         viewModelScope.launch {
+            userPrefRepo.setLoggedIn(false)
             authRepo.getToken(username, password).collect { result ->
                 when (result) {
                     is Resource.Success -> {
@@ -77,6 +79,7 @@ class AuthViewModel @Inject constructor(
                     }
 
                     is Resource.Error -> {
+                        println(result.message)
                         _responseCode.value = result.code
                         _errorMessage.value = result.message
                     }
@@ -107,6 +110,7 @@ class AuthViewModel @Inject constructor(
 
                         is Resource.Error -> {
                             _responseCode.value = result.code
+                            println(responseCode.value)
                         }
                         is Resource.Loading -> {
                             _isLoading.value = result.isLoading
