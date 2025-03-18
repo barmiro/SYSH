@@ -44,32 +44,18 @@ class ImportRepository @Inject constructor(
     val importApi = retrofit.create(ImportApi::class.java)
 
 
-    fun processZip(zipFile: File): Flow<Resource<String>> = flow {
-            val extractedFiles = extractJsonFiles(zipFile)
-            println("processZip")
-            for (jsonFile in extractedFiles) {
-                println("jsonFile")
-                uploadJsonFile(jsonFile).collect { result ->
-                    emit(result)
-                }
-            }
-    }
-
-    private fun extractJsonFiles(zipFile: File): List<File> {
+    fun extractJsonFiles(zipFile: File): List<File> {
         val extractedFiles = mutableListOf<File>()
         val zipInputStream = ZipInputStream(FileInputStream(zipFile))
-        println("extract")
         zipInputStream.use { inputStream ->
             var entry = inputStream.nextEntry
             while (entry != null) {
 //                this is very fragile
-                println(entry.name)
                 if (entry.name.matches(Regex(".*/Streaming_History_Audio.*\\.json"))) {
                     val outputFile = File(zipFile.parent, File(entry.name).name)
                     outputFile.outputStream().use { output ->
                         inputStream.copyTo(output)
                     }
-                    println("valid entry")
                     extractedFiles.add(outputFile)
                 }
                 entry = inputStream.nextEntry
@@ -79,7 +65,7 @@ class ImportRepository @Inject constructor(
     }
 
 
-    private fun uploadJsonFile(jsonFile: File): Flow<Resource<String>> {
+    fun uploadJsonFile(jsonFile: File): Flow<Resource<String>> {
         return flow {
             emit(Resource.Loading(true))
             try {
@@ -109,6 +95,16 @@ class ImportRepository @Inject constructor(
             }
         }
     }
+}
 
+data class FileStatus(
+    val file: File,
+    val status: UploadStatus
+)
 
+sealed class UploadStatus {
+    object Waiting : UploadStatus()
+    object Processing : UploadStatus()
+    data class Success(val message: String?) : UploadStatus()
+    data class Failed(val message: String?) : UploadStatus()
 }

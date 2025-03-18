@@ -66,7 +66,7 @@ public class AddToCatalog {
 		
 		tkn.refresh(username);
 		
-		int streamsAdded = 0;
+		Integer streamsAdded = 0;
 		int tracksAdded = 0;
 		int albumsAdded = 0;
 		int artistsAdded = 0;
@@ -126,10 +126,7 @@ public class AddToCatalog {
 			
 		}
 		
-		return (streamsAdded + " streams added.\n" 
-				+ tracksAdded + " tracks added.\n"
-				+ albumsAdded + " albums added.\n"
-				+ artistsAdded + " artists added.\n");
+		return (streamsAdded.toString());
 	}
 	
 }
