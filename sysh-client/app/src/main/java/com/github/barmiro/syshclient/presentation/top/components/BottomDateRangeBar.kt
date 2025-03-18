@@ -59,16 +59,27 @@ fun TopScreenBottomBar(
     var targetPage by remember { mutableIntStateOf(pagerState.currentPage) }
     var pageTextGenerator by remember { mutableStateOf<((Int) -> String)>({ "Page $it" }) }
 
+    var isScrollToPageExternal by remember { mutableStateOf(false)}
 
 
     LaunchedEffect(targetPage) {
-        pagerState.animateScrollToPage(targetPage)
-        onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(targetPage))
+        if (pagerState.currentPage != targetPage) {
+            isScrollToPageExternal = true
+            pagerState.animateScrollToPage(targetPage)
+            onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(targetPage))
+            isScrollToPageExternal = false
+        }
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (!isScrollToPageExternal && pagerState.currentPage != targetPage) {
+            targetPage = pagerState.currentPage
+        }
     }
 
     LaunchedEffect(state.dateRangeMode) {
         pageCount = when (state.dateRangeMode) {
-            "yearly" -> LocalDate.now().year - state.oldestStreamDate!!.year + 1
+            "yearly" -> LocalDate.now().year - state.oldestStreamDate.year + 1
             "monthly" -> YearMonth.from(state.oldestStreamDate)
                 .until(YearMonth.from(LocalDate.now()), ChronoUnit.MONTHS)
                 .toInt() + 1
@@ -78,7 +89,6 @@ fun TopScreenBottomBar(
     }
 
     LaunchedEffect(targetPage, state.dateRangeMode) {
-//        to start loading data before the page settles
 
             if (state.dateRangeMode == "yearly") {
                 val year = pageNumberToYear(
