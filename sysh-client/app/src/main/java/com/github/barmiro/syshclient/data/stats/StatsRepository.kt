@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient.data.stats
 
+import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
@@ -24,11 +25,12 @@ class StatsRepository @Inject constructor(
     private val userPrefRepo: UserPreferencesRepository
 ) {
     val client = OkHttpClient.Builder()
+        .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(JwtInterceptor(userPrefRepo))
         .build()
 
     val retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.0.147:5754/stats/")
+        .baseUrl("http://localhost/stats/")
         .client(client)
         .addConverterFactory(
             Json.asConverterFactory(

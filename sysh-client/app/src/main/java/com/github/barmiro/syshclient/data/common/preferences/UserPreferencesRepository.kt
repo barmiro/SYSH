@@ -19,18 +19,29 @@ class UserPreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) {
 
+//    these are for use by interceptors, I might have to rethink this approach
     private val _tokenFlow = MutableStateFlow<String?>(null)
     val tokenFlow: StateFlow<String?> = _tokenFlow.asStateFlow()
 
+    private val _serverUrlFlow = MutableStateFlow<String?>(null)
+    val serverUrlFlow: StateFlow<String?> = _serverUrlFlow.asStateFlow()
+
     init {
-        // Load the token initially
         CoroutineScope(Dispatchers.IO).launch {
-            dataStore.data.map { it[PreferencesKeys.TOKEN] }.collect {
-                _tokenFlow.value = it
+            dataStore.data.map {
+                it[PreferencesKeys.TOKEN] to it[PreferencesKeys.SERVER_URL]
+            }.collect { (token, serverUrl) ->
+                _tokenFlow.value = token
+                _serverUrlFlow.value = serverUrl
             }
         }
     }
 
+    suspend fun saveServerUrl(serverUrl: String) {
+        dataStore.edit {
+            it[PreferencesKeys.SERVER_URL] = serverUrl
+        }
+    }
 
     suspend fun saveUsername(username: String) {
         dataStore.edit {
@@ -68,8 +79,9 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
-//    suspend fun setAuthenticatedWithSpo
-
+    val serverUrl: Flow<String?> = dataStore.data.map {
+        it[PreferencesKeys.SERVER_URL]
+    }
 
     val username: Flow<String?> = dataStore.data.map {
         it[PreferencesKeys.USERNAME]

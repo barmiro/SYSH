@@ -1,5 +1,7 @@
 package com.github.barmiro.syshclient.data.common.authentication
 
+import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
+import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
 import com.github.barmiro.syshclient.util.Resource.Error
 import kotlinx.coroutines.flow.Flow
@@ -18,15 +20,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthenticationRepository @Inject constructor() {
+class AuthenticationRepository @Inject constructor(
+    private val userPrefRepo: UserPreferencesRepository
+) {
+
+    val client = OkHttpClient.Builder()
+        .addInterceptor(ServerUrlInterceptor(userPrefRepo))
+        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
+        .build()
 
     val retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.0.147:5754/")
+        .baseUrl("http://localhost/")
 //        TODO: remove
-        .client(OkHttpClient.Builder().addInterceptor(
-            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
-            .build()
-        )
+        .client(client)
         .addConverterFactory(
             Json.asConverterFactory(
                 "application/json; charset=UTF8".toMediaType()))

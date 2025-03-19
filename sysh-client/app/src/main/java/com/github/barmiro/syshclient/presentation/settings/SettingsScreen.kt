@@ -69,10 +69,7 @@ fun SettingsScreen(
                 }
             }
         }
-
-
     }
-
 }
 
 

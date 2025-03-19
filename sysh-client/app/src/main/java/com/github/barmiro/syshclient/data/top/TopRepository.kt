@@ -3,6 +3,7 @@ package com.github.barmiro.syshclient.data.top
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.domain.top.TopAlbum
@@ -23,11 +24,12 @@ class TopRepository @Inject constructor(
 ) {
 
     val client = OkHttpClient.Builder()
+        .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(JwtInterceptor(userPrefRepo))
         .build()
 
     val retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.0.147:5754/top/")
+        .baseUrl("http://localhost/top/")
         .client(client)
         .addConverterFactory(
             Json.asConverterFactory(

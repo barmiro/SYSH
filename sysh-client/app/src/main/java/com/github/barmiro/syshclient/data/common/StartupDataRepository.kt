@@ -20,12 +20,14 @@ class StartupDataRepository @Inject constructor(
     private val userPrefRepo: UserPreferencesRepository
 ) {
     val client = OkHttpClient.Builder()
+        .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
         .addInterceptor(JwtInterceptor(userPrefRepo))
         .build()
 
+
     val retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.0.147:5754/")
+        .baseUrl("http://localhost/")
         .client(client)
         .build()
 

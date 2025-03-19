@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient.data.common.dataimport
 
+import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
@@ -26,15 +27,16 @@ class ImportRepository @Inject constructor(
 ) {
 
     val client = OkHttpClient.Builder()
+        .addInterceptor(ServerUrlInterceptor(userPrefRepo))
+        .addInterceptor(JwtInterceptor(userPrefRepo))
+        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
         .writeTimeout(60, TimeUnit.SECONDS)
         .readTimeout(300, TimeUnit.SECONDS)
-        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
-        .addInterceptor(JwtInterceptor(userPrefRepo))
         .build()
 
 
     val retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.0.147:5754/")
+        .baseUrl("http://localhost/")
         .client(client)
 //        .addConverterFactory(
 //            Json.asConverterFactory(

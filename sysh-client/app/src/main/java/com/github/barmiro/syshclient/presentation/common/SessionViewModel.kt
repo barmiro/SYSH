@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,6 +21,12 @@ class SessionViewModel @Inject constructor(
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
 
+    val serverUrl: StateFlow<String?> = userPreferencesRepository.serverUrl
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
     init {
         viewModelScope.launch {
@@ -26,10 +34,15 @@ class SessionViewModel @Inject constructor(
 //                !!! DELETE BEFORE PUBLISHING !!!
 //            userPreferencesRepository.clearAllPreferences()
 //          ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-
             userPreferencesRepository.isLoggedIn.collect {
                 _isLoggedIn.value = it
             }
+        }
+    }
+
+    fun saveServerUrl(serverUrl: String) {
+        viewModelScope.launch {
+            userPreferencesRepository.saveServerUrl(serverUrl)
         }
     }
 
