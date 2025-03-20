@@ -38,13 +38,13 @@ fun JsonFileUploadItem(
     modifier: Modifier
 ) {
     Surface(
-        modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
+        modifier = modifier,
         shape = RoundedCornerShape(8.dp),
 //        TODO: change the color
         color = NavigationBarDefaults.containerColor
     ) {
         Row(
-            modifier = modifier,
+            modifier = Modifier.padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
