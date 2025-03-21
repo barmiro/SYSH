@@ -1,17 +1,20 @@
-package com.github.barmiro.syshclient.data.common
+package com.github.barmiro.syshclient.data.common.startup
 
+import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
+import com.github.barmiro.syshclient.data.common.handleNetworkException
+import com.github.barmiro.syshclient.data.common.preferences.ServerInfo
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
 import com.github.barmiro.syshclient.util.Resource.Error
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.HttpException
 import retrofit2.Retrofit
-import java.io.IOException
-import java.net.ConnectException
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,9 +32,48 @@ class StartupDataRepository @Inject constructor(
     val retrofit = Retrofit.Builder()
         .baseUrl("http://localhost/")
         .client(client)
+        .addConverterFactory(
+            Json.asConverterFactory(
+                "application/json; charset=UTF8".toMediaType()))
         .build()
 
     val startupApi = retrofit.create(StartupDataApi::class.java)
+
+    fun getServerInfo(): Flow<Resource<ServerInfo>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                val response = startupApi.getServerInfo()
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        emit(
+                            Resource.Success(
+                                data = it
+                            )
+                        )
+                    } ?: emit(
+                        Error(
+                            message = "Server didn't return any data",
+                            code = response.code()
+                        )
+                    )
+                } else {
+                    emit(
+                        Error(
+                            message = response.message(),
+                            code = response.code()
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
+            }
+            emit(Resource.Loading(false))
+        }
+
+    }
 
     fun getUserDisplayName(): Flow<Resource<String>> {
         return flow {
@@ -58,18 +100,9 @@ class StartupDataRepository @Inject constructor(
                         code = response.code()
                     ))
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                emit(Resource.Error("Encountered IOException: " + e.message))
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                emit(Resource.Error("Encountered HttpException: " + e.code()))
-            } catch (e: ConnectException) {
-                e.printStackTrace()
-                emit(Resource.Error("ConnectException:\n" + e.message))
             } catch (e: Exception) {
-                e.printStackTrace()
-                emit(Resource.Error("Exception:\n" + e.message))
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
             }
             emit(Resource.Loading(false))
         }
@@ -99,18 +132,9 @@ class StartupDataRepository @Inject constructor(
                         code = response.code()
                     ))
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                emit(Resource.Error("Encountered IOException: " + e.message))
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                emit(Resource.Error("Encountered HttpException: " + e.code()))
-            } catch (e: ConnectException) {
-                e.printStackTrace()
-                emit(Resource.Error("ConnectException:\n" + e.message))
             } catch (e: Exception) {
-                e.printStackTrace()
-                emit(Resource.Error("Exception:\n" + e.message))
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
             }
 
             emit(Resource.Loading(false))

@@ -22,13 +22,17 @@ public class SyshUserRepository {
 		this.jdbc = jdbc;
 	}
 
-//	public int addUserData(SyshUser data) {
-//		return jdbc.sql("UPDATE User_Data SET "
-//				+ "display_name = :display_name "
-//				+ "WHERE id = 1;")
-//				.param("display_name", data.display_name(), Types.VARCHAR)
-//				.update();
-//	}
+	public Boolean usersExist() {
+		int userCount = jdbc.sql("SELECT COUNT(username) FROM Users")
+			.query(Integer.class)
+			.single();
+		
+		if (userCount == 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 	
 	public String getRole(SyshUser user) {
 		return jdbc.sql("SELECT role FROM Users "

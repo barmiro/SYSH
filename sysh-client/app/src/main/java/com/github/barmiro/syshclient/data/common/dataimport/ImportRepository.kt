@@ -2,20 +2,19 @@ package com.github.barmiro.syshclient.data.common.dataimport
 
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
+import com.github.barmiro.syshclient.data.common.handleNetworkException
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
+import com.github.barmiro.syshclient.util.Resource.Error
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.HttpException
 import retrofit2.Retrofit
 import java.io.File
 import java.io.FileInputStream
-import java.io.IOException
-import java.net.ConnectException
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
@@ -81,19 +80,9 @@ class ImportRepository @Inject constructor(
                 if (response.isSuccessful) {
                     emit(Resource.Success(response.body()?.string()))
                 }
-
-            } catch (e: IOException) {
-                e.printStackTrace()
-                emit(Resource.Error("Encountered IOException: " + e.message))
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                emit(Resource.Error("Encountered HttpException: " + e.code()))
-            } catch (e: ConnectException) {
-                e.printStackTrace()
-                emit(Resource.Error("ConnectException:\n" + e.message))
             } catch (e: Exception) {
-                e.printStackTrace()
-                emit(Resource.Error("Exception:\n" + e.message))
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
             }
         }
     }

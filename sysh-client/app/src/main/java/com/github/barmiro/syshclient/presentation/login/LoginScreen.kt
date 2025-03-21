@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.navigation.NavHostController
-import com.github.barmiro.syshclient.MainScreen
+import com.github.barmiro.syshclient.Home
 import com.github.barmiro.syshclient.Register
 import com.github.barmiro.syshclient.SpotifyAuth
 import com.github.barmiro.syshclient.presentation.common.SessionViewModel
@@ -56,7 +56,7 @@ fun LoginScreen(authVM: AuthViewModel,
     LaunchedEffect(responseCode) {
         when (responseCode) {
             200 -> {
-                navController.navigate(MainScreen)
+                navController.navigate(Home)
             }
             403 -> {
                 navController.navigate(SpotifyAuth)
@@ -105,17 +105,6 @@ fun LoginScreen(authVM: AuthViewModel,
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
-                    val storedServerUrl by sessionVM.serverUrl.collectAsState()
-
-                    val serverUrl = remember {
-                        mutableStateOf(TextFieldValue())
-                    }
-//                    otherwise it's stuck at initial value (null)
-                    LaunchedEffect(storedServerUrl) {
-                        serverUrl.value = TextFieldValue(text = storedServerUrl.orEmpty())
-                    }
-
                     val username = remember {
                         mutableStateOf(TextFieldValue())
                     }
@@ -129,12 +118,6 @@ fun LoginScreen(authVM: AuthViewModel,
                     Text(text = "Please log in:",
                         color = MaterialTheme.colorScheme.onBackground )
 
-                    OutlinedTextField(value = serverUrl.value,
-                        onValueChange = { serverUrl.value = it },
-                        label = {
-                            Text("Server URL")
-                        }
-                    )
 
                     OutlinedTextField(value = username.value,
                         onValueChange = { username.value = it },
@@ -153,7 +136,6 @@ fun LoginScreen(authVM: AuthViewModel,
 
                     Button(
                         onClick = {
-                            sessionVM.saveServerUrl(serverUrl.value.text)
                             authVM.getToken(username.value.text, password.value.text)
                         }
                     ) {

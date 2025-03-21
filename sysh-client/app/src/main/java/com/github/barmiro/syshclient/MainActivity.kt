@@ -39,6 +39,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.github.barmiro.syshclient.data.common.startup.StartupViewModel
 import com.github.barmiro.syshclient.presentation.common.SessionViewModel
 import com.github.barmiro.syshclient.presentation.home.HomeScreen
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
@@ -48,6 +49,7 @@ import com.github.barmiro.syshclient.presentation.login.RegisterScreen
 import com.github.barmiro.syshclient.presentation.login.SpotifyAuthScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
+import com.github.barmiro.syshclient.presentation.startup.StartupScreen
 import com.github.barmiro.syshclient.presentation.stats.StatsScreen
 import com.github.barmiro.syshclient.presentation.stats.StatsViewModel
 import com.github.barmiro.syshclient.presentation.top.TopScreen
@@ -65,7 +67,7 @@ class MainActivity : ComponentActivity() {
 //    @Inject lateinit var statsRepo: StatsRepository
 //    @Inject lateinit var topRepo: TopRepository
 
-
+    private val startupVM: StartupViewModel by viewModels()
     private val homeVM: HomeViewModel by viewModels()
     private val topScreenVM: TopScreenViewModel by viewModels()
     private val topTracksVM: TopTracksViewModel by viewModels()
@@ -94,7 +96,7 @@ class MainActivity : ComponentActivity() {
                         title = "Home",
                         selectedIcon = Icons.Filled.Home,
                         unselectedIcon = Icons.Outlined.Home,
-                        navigateTo = MainScreen
+                        navigateTo = Home
                     ),
                     BottomNavigationItem(
                         title = "Top",
@@ -165,6 +167,7 @@ class MainActivity : ComponentActivity() {
                             AppNavHost(navController,
                                 isLoggedIn,
                                 isAuthorizedWithSpotify,
+                                startupVM,
                                 homeVM,
                                 topScreenVM,
                                 topTracksVM,
@@ -208,7 +211,10 @@ data class BottomNavigationItem(
 )
 
 @Serializable
-object MainScreen
+object Startup
+
+@Serializable
+object Home
 
 @Serializable
 object Stats
@@ -235,6 +241,7 @@ object Settings
 fun AppNavHost(navController: NavHostController,
                isLoggedIn: Boolean,
                isAuthorizedWithSpotify: Boolean,
+               startupVM: StartupViewModel,
                homeVM: HomeViewModel,
                topScreenVM: TopScreenViewModel,
                topTracksVM: TopTracksViewModel,
@@ -248,15 +255,19 @@ fun AppNavHost(navController: NavHostController,
 
     NavHost(
         navController = navController,
-        startDestination = if (isLoggedIn && isAuthorizedWithSpotify) MainScreen else Login
+        startDestination = Startup
     ) {
+        composable<Startup> {
+            StartupScreen(startupVM, sessionVM, navController)
+        }
+
         composable<Login> {
             LoginScreen(authVM, sessionVM, navController)
         }
         composable<Register> {
             RegisterScreen(authVM, sessionVM, navController)
         }
-        composable<MainScreen> {
+        composable<Home> {
             HomeScreen(homeVM)
         }
         composable<Top> {

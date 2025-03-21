@@ -59,17 +59,4 @@ public class UserDataController {
 		return userDataRepository.getUserDisplayName(username);
 	
 	}
-	
-	@GetMapping("/startup")
-	public void startup() {
-		
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		
-		try {
-			tkn.refresh(username);
-		} catch (HttpClientErrorException e) {
-			
-		}
-		
-	}
 }

@@ -2,6 +2,7 @@ package com.github.barmiro.syshclient.data.stats
 
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
+import com.github.barmiro.syshclient.data.common.handleNetworkException
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
 import com.github.barmiro.syshclient.util.Resource.Error
@@ -10,11 +11,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
-import java.io.IOException
-import java.net.ConnectException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -60,21 +58,12 @@ class StatsRepository @Inject constructor(
                     )
                 } else {
                     emit(
-                        Resource.Error(response.message())
+                        Error(response.message())
                     )
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                emit(Error("Encountered IOException: " + e.message))
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                emit(Error("Encountered HttpException: " + e.code()))
-            } catch (e: ConnectException) {
-                e.printStackTrace()
-                emit(Resource.Error("ConnectException:\n" + e.message))
             } catch (e: Exception) {
-                e.printStackTrace()
-                emit(Resource.Error("Exception:\n" + e.message))
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
             }
             emit(Resource.Loading(false))
 
@@ -85,36 +74,20 @@ class StatsRepository @Inject constructor(
     fun getOldestStreamDate(): Flow<Resource<LocalDate>> {
         return flow {
             emit(Resource.Loading(true))
-            val oldestStreamDate = try{
-                statsApi.fetchStartupData()
-                    .body()
-            } catch (e: IOException) {
-                e.printStackTrace()
-                emit(Error("Encountered IOException: " + e.message))
-                ""
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                emit(Error("Encountered HttpException: " + e.code()))
-                ""
-            } catch (e: ConnectException) {
-                e.printStackTrace()
-                emit(Resource.Error("ConnectException:\n" + e.message))
-                ""
+            try {
+                statsApi.fetchStartupData().body()?.let {
+                    val oldestStreamDate: LocalDate = LocalDate.parse(
+                        it.substringBefore('T'),
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    )
+                    emit(Resource.Success(
+                        data = oldestStreamDate
+                        )
+                    )
+                }
             } catch (e: Exception) {
-                e.printStackTrace()
-                emit(Resource.Error("Exception:\n" + e.message))
-                ""
-            }
-            val isFetchSuccessful = !oldestStreamDate.isNullOrEmpty()
-            if (isFetchSuccessful) {
-                val dateFromTimestamp = oldestStreamDate!!.substringBefore('T')
-                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                emit(
-                    Resource.Success(
-                    data = LocalDate.parse(dateFromTimestamp, formatter)
-                ))
-            } else {
-                emit(Error("Received list is empty"))
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
             }
             emit(Resource.Loading(false))
         }

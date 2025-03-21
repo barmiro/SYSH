@@ -1,6 +1,7 @@
 package com.github.barmiro.syshclient.data.common.authentication
 
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
+import com.github.barmiro.syshclient.data.common.handleNetworkException
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
 import com.github.barmiro.syshclient.util.Resource.Error
@@ -11,11 +12,8 @@ import okhttp3.Credentials
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
-import java.io.IOException
-import java.net.ConnectException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -69,18 +67,9 @@ class AuthenticationRepository @Inject constructor(
                     emit(Error(message = response.message(),
                         code = response.code()))
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                emit(Error("Couldn't connect to server: " + e.message, code = 600))
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                emit(Error("Encountered HttpException: " + e.code(), code = e.code()))
-            } catch (e: ConnectException) {
-                e.printStackTrace()
-                emit(Error("ConnectException:\n" + e.message, code = 601))
             } catch (e: Exception) {
-                e.printStackTrace()
-                emit(Error("Error:\n" + e.message, code = 666))
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
             }
 
             emit(Resource.Loading(false))
@@ -117,18 +106,9 @@ class AuthenticationRepository @Inject constructor(
                         )
                     )
                 }
-            } catch (e: IOException) {
-                e.printStackTrace()
-                emit(Error("Encountered IOException: " + e.message))
-            } catch (e: HttpException) {
-                e.printStackTrace()
-                emit(Error("Encountered HttpException: " + e.code()))
-            } catch (e: ConnectException) {
-                e.printStackTrace()
-                emit(Error("ConnectException:\n" + e.message, code = 600))
             } catch (e: Exception) {
-                e.printStackTrace()
-                emit(Error("Exception:\n" + e.message))
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
             }
             emit(Resource.Loading(false))
         }

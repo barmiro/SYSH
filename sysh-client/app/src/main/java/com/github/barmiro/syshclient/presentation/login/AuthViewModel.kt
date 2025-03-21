@@ -2,7 +2,7 @@ package com.github.barmiro.syshclient.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.barmiro.syshclient.data.common.StartupDataRepository
+import com.github.barmiro.syshclient.data.common.startup.StartupDataRepository
 import com.github.barmiro.syshclient.data.common.authentication.AuthenticationRepository
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.util.Resource
@@ -40,6 +40,8 @@ class AuthViewModel @Inject constructor(
 
     private val _isAuthorizedWithSpotify = MutableStateFlow<Boolean>(false)
     val isAuthorizedWithSpotify: StateFlow<Boolean> = _isAuthorizedWithSpotify.asStateFlow()
+
+
 
 
     fun register(username: String, password: String) {
@@ -110,7 +112,6 @@ class AuthViewModel @Inject constructor(
 
                         is Resource.Error -> {
                             _responseCode.value = result.code
-                            println(responseCode.value)
                         }
                         is Resource.Loading -> {
                             _isLoading.value = result.isLoading
@@ -123,23 +124,23 @@ class AuthViewModel @Inject constructor(
 
     fun spotifyAuthorization() {
         viewModelScope.launch {
-            startupDataRepository.getSpotifyAuthUrl()
+            startupDataRepository
+                .getSpotifyAuthUrl()
                 .collect { result ->
-                    when(result) {
-                        is Resource.Success -> {
-                            result.data?.let {
-                                _spotifyAuthUrl.value = result.data
-                            }
-                        }
-                        is Resource.Error -> {
-                            _responseCode.value = result.code
-                        }
-                        is Resource.Loading -> {
-                            _isLoading.value = result.isLoading
+                when(result) {
+                    is Resource.Success -> {
+                        result.data?.let {
+                            _spotifyAuthUrl.value = result.data
                         }
                     }
+                    is Resource.Error -> {
+                        _responseCode.value = result.code
+                    }
+                    is Resource.Loading -> {
+                        _isLoading.value = result.isLoading
+                    }
                 }
+            }
         }
     }
-
 }
