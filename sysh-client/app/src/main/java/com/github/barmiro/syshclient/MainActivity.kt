@@ -140,7 +140,11 @@ class MainActivity : ComponentActivity() {
                                             selected = selectedNavItemIndex == index,
                                             onClick = {
                                                 selectedNavItemIndex = index
-                                                navController.navigate(item.navigateTo)
+                                                navController.navigate(item.navigateTo) {
+                                                    popUpTo(navController.graph.startDestinationId) {
+                                                        inclusive = true
+                                                    }
+                                                }
                                             },
                                             icon = {
                                                 Icon(
