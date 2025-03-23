@@ -4,6 +4,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.barmiro.syshclient.data.stats.StatsDTO
 import com.github.barmiro.syshclient.data.stats.StatsRepository
 import com.github.barmiro.syshclient.presentation.home.HomeState
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
@@ -27,8 +28,12 @@ class StatsViewModel @Inject constructor(
 
     private var isDataLoaded = false
 
+//    TODO: refactor
     private val _homeState = MutableStateFlow(HomeState())
     val homeState: StateFlow<HomeState> = _homeState
+
+    private val _statsSeries = MutableStateFlow<List<StatsDTO>>(emptyList())
+    val statsSeries: StateFlow<List<StatsDTO>> = _statsSeries
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> get() = _isLoading
@@ -44,6 +49,7 @@ class StatsViewModel @Inject constructor(
     fun onEvent(event: TopScreenEvent) {
         when(event) {
             is TopScreenEvent.Refresh -> {
+                getStatsSeries(step = "month")
                 getStats()
             }
             is TopScreenEvent.OnSearchParameterChange -> {
@@ -53,6 +59,7 @@ class StatsViewModel @Inject constructor(
                     sort = event.sort
                 )
                 getStats()
+                getStatsSeries(step = "month")
             }
             is TopScreenEvent.OnDateRangeModeChange -> {
                 stateManager.updateState(
@@ -97,5 +104,31 @@ class StatsViewModel @Inject constructor(
         }
     }
 
+    fun getStatsSeries(
+        start: String? = state.value.start,
+        end: String? = state.value.end,
+        step: String? = "month"
+    ) {
+        viewModelScope.launch {
+            statsRepository.getStatsSeries(start, end, step)
+                .collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            result.data?.let { statsResult ->
+                                _statsSeries.value = statsResult
+                            }
+                        }
 
+                        is Resource.Error -> {
+                            println(result)
+                            _errorMessage.value = result.message
+                        }
+
+                        is Resource.Loading -> {
+                        }
+
+                    }
+                }
+        }
+    }
 }

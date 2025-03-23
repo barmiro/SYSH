@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +31,19 @@ import com.github.barmiro.syshclient.presentation.top.components.StatsScreenTopT
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenBottomBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopBar
 import com.github.barmiro.syshclient.util.localDateFromTimestampString
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.common.fill
+import com.patrykandpatrick.vico.compose.common.vicoTheme
+import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -42,6 +57,7 @@ fun StatsScreen(
 
     val homeState by viewModel.homeState.collectAsState()
     val state by viewModel.state.collectAsState()
+    val statsSeries by viewModel.statsSeries.collectAsState()
 
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
 
@@ -115,110 +131,164 @@ fun StatsScreen(
                 val percentageOfTime = (daysStreamed / totalDays) * 100
 
 
-                Column(
-                    modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Top
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 48.dp), verticalArrangement = Arrangement.Top
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "General",
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
-                    ) {
-                        Column (
-                            modifier = Modifier.weight(1f),
+                    item() {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
                         ) {
-                            GeneralStatsItem(
-                                dateRangeMode = state.dateRangeMode,
-                                itemValue = numberFormat.format(homeState.stats.stream_count),
-                                itemText = "Streams",
-                                perDayValue = (homeState.stats.stream_count / totalDays).toString() + " a day"
+                            Text(
+                                text = "General",
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp
                             )
-                            GeneralStatsItem(
-                                dateRangeMode = state.dateRangeMode,
-                                itemValue = numberFormat.format(hoursStreamed.toInt()),
-                                itemText = "Hours",
-                                perDayValue = "$hoursPerDay:$minutesMod a day"
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+                        ) {
+                            Column (
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                GeneralStatsItem(
+                                    dateRangeMode = state.dateRangeMode,
+                                    itemValue = numberFormat.format(homeState.stats.stream_count),
+                                    itemText = "Streams",
+                                    perDayValue = (homeState.stats.stream_count / totalDays).toString() + " a day"
+                                )
+                                GeneralStatsItem(
+                                    dateRangeMode = state.dateRangeMode,
+                                    itemValue = numberFormat.format(hoursStreamed.toInt()),
+                                    itemText = "Hours",
+                                    perDayValue = "$hoursPerDay:$minutesMod a day"
+                                )
+                            }
+
+                            Column (
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                GeneralStatsItem(
+                                    dateRangeMode = state.dateRangeMode,
+                                    itemValue = numberFormat.format(homeState.stats.minutes_streamed),
+                                    itemText = "Minutes",
+                                    perDayValue = (minutesPerDay).toString() + " a day"
+                                )
+                                GeneralStatsItem(
+                                    dateRangeMode = state.dateRangeMode,
+                                    itemValue = String.format(
+                                        "%.1f",
+                                        daysStreamed
+                                    ),
+                                    itemText = "Days",
+                                    perDayValue = String.format(
+                                        "%.1f",
+                                        percentageOfTime
+                                    ) + "% of total time"
+                                )
+                            }
+                        }
+
+                    }
+
+                    item() {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Collection",
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+                        ) {
+                            Column (
+                                modifier = Modifier.weight(1f),
+                            ) {
+
+                                CollectionStatsItem(
+                                    dateRangeMode = state.dateRangeMode,
+                                    itemValue = numberFormat.format(homeState.stats.track_count),
+                                    itemText = "Tracks"
+                                )
+
+
+                            }
+
+                            Column (
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                CollectionStatsItem(
+                                    dateRangeMode = state.dateRangeMode,
+                                    itemValue = numberFormat.format(homeState.stats.album_count),
+                                    itemText = "Albums"
+                                )
+                            }
+
+                            Column (
+                                modifier = Modifier.weight(1f),
+                            ) {
+                                CollectionStatsItem(
+                                    dateRangeMode = state.dateRangeMode,
+                                    itemValue = numberFormat.format(homeState.stats.artist_count),
+                                    itemText = "Artists"
+                                )
+                            }
+                        }
+
+                    }
+
+                    item() {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Graphs",
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp
                             )
                         }
 
-                        Column (
-                            modifier = Modifier.weight(1f),
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
                         ) {
-                            GeneralStatsItem(
-                                dateRangeMode = state.dateRangeMode,
-                                itemValue = numberFormat.format(homeState.stats.minutes_streamed),
-                                itemText = "Minutes",
-                                perDayValue = (minutesPerDay).toString() + " a day"
-                            )
-                            GeneralStatsItem(
-                                dateRangeMode = state.dateRangeMode,
-                                itemValue = String.format(
-                                    "%.1f",
-                                    daysStreamed
+                            val modelProducer = remember { CartesianChartModelProducer() }
+                            LaunchedEffect(statsSeries) {
+                                if (statsSeries.isNotEmpty()) {
+                                    modelProducer.runTransaction {
+                                        lineSeries { series(
+                                            y = statsSeries.map {it.minutes_streamed }
+                                        ) }
+                                    }
+                                }
+                            }
+                            CartesianChartHost(
+                                rememberCartesianChart(
+                                    rememberLineCartesianLayer(
+                                        lineProvider =  LineCartesianLayer.LineProvider
+                                            .series(vicoTheme.lineCartesianLayerColors.map { color ->
+                                                LineCartesianLayer.rememberLine(
+                                                    fill = LineCartesianLayer.LineFill.single(fill(color)),
+                                                    pointConnector = LineCartesianLayer.PointConnector.cubic()
+
+                                                )
+                                            })
+                                    ),
+                                    startAxis = VerticalAxis.rememberStart(),
+                                    bottomAxis = HorizontalAxis.rememberBottom(),
                                 ),
-                                itemText = "Days",
-                                perDayValue = String.format(
-                                    "%.1f",
-                                    percentageOfTime
-                                ) + "% of total time"
+                                modelProducer,
                             )
                         }
+
+
                     }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Collection",
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
-                        )
-                    }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
-                    ) {
-                        Column (
-                            modifier = Modifier.weight(1f),
-                        ) {
-
-                            CollectionStatsItem(
-                                dateRangeMode = state.dateRangeMode,
-                                itemValue = numberFormat.format(homeState.stats.track_count),
-                                itemText = "Tracks"
-                            )
-
-
-                        }
-
-                        Column (
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            CollectionStatsItem(
-                                dateRangeMode = state.dateRangeMode,
-                                itemValue = numberFormat.format(homeState.stats.album_count),
-                                itemText = "Albums"
-                            )
-                        }
-
-                        Column (
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            CollectionStatsItem(
-                                dateRangeMode = state.dateRangeMode,
-                                itemValue = numberFormat.format(homeState.stats.artist_count),
-                                itemText = "Artists"
-                            )
-                        }
-                    }
                 }
 
 

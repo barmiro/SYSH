@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.time.LocalDate
@@ -25,6 +26,7 @@ class StatsRepository @Inject constructor(
     val client = OkHttpClient.Builder()
         .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(JwtInterceptor(userPrefRepo))
+        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
         .build()
 
     val retrofit = Retrofit.Builder()
@@ -50,6 +52,40 @@ class StatsRepository @Inject constructor(
                 } else {
                     statsApi.fetchStatsRange(start, end)
                 }
+                if (response.isSuccessful) {
+                    emit(
+                        Resource.Success(
+                            data = response.body()
+                        )
+                    )
+                } else {
+                    emit(
+                        Error(response.message())
+                    )
+                }
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
+            }
+            emit(Resource.Loading(false))
+
+        }
+    }
+
+    fun getStatsSeries(
+        start: String?,
+        end: String?,
+        step: String?
+    ): Flow<Resource<List<StatsDTO>>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                val response = statsApi.fetchStatsSeries(
+                    start = start,
+                    end = end,
+                    step = step
+                )
                 if (response.isSuccessful) {
                     emit(
                         Resource.Success(

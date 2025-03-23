@@ -20,6 +20,7 @@ hilt = "2.55"
 ksp = "2.1.10-1.0.29"
 kotlin-serialization = "2.1.10"
 converterKotlinxSerialization = "2.11.0"
+vico = "2.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +49,8 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android" , version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler" , version.ref = "hilt" }
+vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

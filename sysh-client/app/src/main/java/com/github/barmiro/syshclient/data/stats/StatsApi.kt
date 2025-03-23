@@ -16,6 +16,13 @@ interface StatsApi {
         @Query("end") end: String? = null
     ): Response<StatsDTO>
 
+    @GET("series")
+    suspend fun fetchStatsSeries(
+        @Query("start") start: String? = null,
+        @Query("end") end: String? = null,
+        @Query("step") step: String? = "day"
+    ): Response<List<StatsDTO>>
+
     @GET("year/{year}")
     suspend fun fetchStatsYear(
         @Path("year") year: Int

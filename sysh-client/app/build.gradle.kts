@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.paging.compose)
+    implementation(libs.vico.compose.m3)
 
     implementation(libs.logging.interceptor)
 
