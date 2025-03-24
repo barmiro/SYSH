@@ -2,14 +2,15 @@ package com.github.barmiro.syshclient.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.barmiro.syshclient.data.common.startup.StartupDataRepository
 import com.github.barmiro.syshclient.data.common.authentication.AuthenticationRepository
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
+import com.github.barmiro.syshclient.data.common.startup.StartupDataRepository
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -104,9 +105,7 @@ class AuthViewModel @Inject constructor(
                                 userPrefRepo.setAuthorizedWithSpotify(true)
                                 userPrefRepo.saveUserDisplayName(it)
                             }
-                            userPrefRepo.isAuthorizedWithSpotify.collect {
-                                _isAuthorizedWithSpotify.value = it
-                            }
+                            _isAuthorizedWithSpotify.value = userPrefRepo.isAuthorizedWithSpotify.first()
                             _responseCode.value = 200
                         }
 

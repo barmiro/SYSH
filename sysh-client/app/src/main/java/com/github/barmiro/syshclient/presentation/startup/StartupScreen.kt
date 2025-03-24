@@ -29,8 +29,15 @@ fun StartupScreen(
 
     val urlInput by startupVM.urlInput.collectAsState()
     val urlValidation by startupVM.urlValidation.collectAsState()
+    val storedUrl by sessionVM.serverUrl.collectAsState()
     val serverResponded by startupVM.serverResponded.collectAsState()
 
+
+    LaunchedEffect(storedUrl) {
+        if (!storedUrl.isNullOrEmpty()) {
+            startupVM.getServerInfo()
+        }
+    }
     LaunchedEffect(serverResponded) {
         if (serverResponded) {
             navController.navigate(Login)

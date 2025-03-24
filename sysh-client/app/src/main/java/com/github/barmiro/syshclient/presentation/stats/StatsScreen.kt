@@ -21,7 +21,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -284,9 +283,7 @@ fun StatsScreen(
                                             .series(vicoTheme.lineCartesianLayerColors.map { color ->
                                                 LineCartesianLayer.rememberLine(
                                                     areaFill = LineCartesianLayer.AreaFill.single(
-                                                        fill(
-                                                            Color(red = color.red, blue = color.blue, green = color.green, alpha = 0.5f)
-                                                        )
+                                                        fill(color.copy(alpha = 0.2f))
                                                     ),
                                                     fill = LineCartesianLayer.LineFill.single(fill(color)),
                                                     pointConnector = PointConnector.Sharp

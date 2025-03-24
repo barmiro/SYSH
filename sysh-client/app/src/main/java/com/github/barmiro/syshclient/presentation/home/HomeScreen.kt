@@ -116,22 +116,6 @@ fun HomeScreen(
                         HomeItem(itemText = "Hours",
                             itemValue = numberFormat.format(state.stats.minutes_streamed / 60))
                     }
-
-
-
-
-//                    HomeItem(
-//                        itemText = "${
-//                            String.format(
-//                                "%.1f",
-//                                state.stats.minutes_streamed / 1440f
-//                            )
-//                        } days"
-//                    )
-//                    HomeItem(itemText = "${state.stats.track_count} tracks")
-//                    HomeItem(itemText = "${state.stats.album_count} albums")
-//                    HomeItem(itemText = "${state.stats.artist_count} artists")
-
                 }
 
                 Row(
@@ -159,29 +143,7 @@ fun HomeScreen(
                                     + numberFormat.format(projectedMinutesWrappedUpper)))
                     }
                 }
-
-
-
             }
-//            Column(
-//                modifier = Modifier.fillMaxSize().padding(16.dp),
-//            ) {
-//                HomeItem(itemText = "Welcome, " + viewModel.userDisplayName.collectAsState().value)
-//                HomeItem(itemText = "${state.stats.stream_count} streams")
-//                HomeItem(itemText = "${state.stats.minutes_streamed} minutes")
-//                HomeItem(itemText = "${state.stats.minutes_streamed / 60} hours")
-//                HomeItem(
-//                    itemText = "${
-//                        String.format(
-//                            "%.1f",
-//                            state.stats.minutes_streamed / 1440f
-//                        )
-//                    } days"
-//                )
-//                HomeItem(itemText = "${state.stats.track_count} tracks")
-//                HomeItem(itemText = "${state.stats.album_count} albums")
-//                HomeItem(itemText = "${state.stats.artist_count} artists")
-//            }
         }
     }
 }
