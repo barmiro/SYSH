@@ -59,7 +59,7 @@ class StatsViewModel @Inject constructor(
                     sort = event.sort
                 )
                 getStats()
-                getStatsSeries(step = "month")
+                getStatsSeries(step = "week")
             }
             is TopScreenEvent.OnDateRangeModeChange -> {
                 stateManager.updateState(
@@ -131,4 +131,9 @@ class StatsViewModel @Inject constructor(
                 }
         }
     }
+}
+
+
+fun statsSeriesStepFromTimespan() {
+
 }

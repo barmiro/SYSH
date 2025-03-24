@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,7 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.compose.common.vicoTheme
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
@@ -44,6 +46,7 @@ import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer.PointConnector
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -261,19 +264,32 @@ fun StatsScreen(
                                 if (statsSeries.isNotEmpty()) {
                                     modelProducer.runTransaction {
                                         lineSeries { series(
-                                            y = statsSeries.map {it.minutes_streamed }
+                                            y = listOf(0) + statsSeries.let { list ->
+                                                list.map { sample ->
+                                                    var sum: Int = 0
+                                                    for (i in 0..list.indexOf(sample)) {
+                                                        sum += list[i].minutes_streamed
+                                                    }
+                                                    sum
+                                                }
+                                            }
                                         ) }
                                     }
                                 }
                             }
                             CartesianChartHost(
-                                rememberCartesianChart(
+                                chart = rememberCartesianChart(
                                     rememberLineCartesianLayer(
                                         lineProvider =  LineCartesianLayer.LineProvider
                                             .series(vicoTheme.lineCartesianLayerColors.map { color ->
                                                 LineCartesianLayer.rememberLine(
+                                                    areaFill = LineCartesianLayer.AreaFill.single(
+                                                        fill(
+                                                            Color(red = color.red, blue = color.blue, green = color.green, alpha = 0.5f)
+                                                        )
+                                                    ),
                                                     fill = LineCartesianLayer.LineFill.single(fill(color)),
-                                                    pointConnector = LineCartesianLayer.PointConnector.cubic()
+                                                    pointConnector = PointConnector.Sharp
 
                                                 )
                                             })
@@ -281,18 +297,12 @@ fun StatsScreen(
                                     startAxis = VerticalAxis.rememberStart(),
                                     bottomAxis = HorizontalAxis.rememberBottom(),
                                 ),
-                                modelProducer,
+                                modelProducer = modelProducer,
+                                scrollState = rememberVicoScrollState(scrollEnabled = false)
                             )
                         }
-
-
                     }
-
-
                 }
-
-
-
             }
         }
         TopScreenBottomBar(
