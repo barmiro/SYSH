@@ -21,16 +21,16 @@ public class RecentController {
 	
 	SpotifyTokenService tkn;
 	RestClient apiClient;
-	StreamRepository streamService;
+	StreamRepository streamRepository;
 	AddToCatalog addToCatalog;
 	
 	public RecentController(SpotifyTokenService tkn,
 			RestClient apiClient,
-			StreamRepository streamService,
+			StreamRepository streamRepository,
 			AddToCatalog addToCatalog) {
 		this.tkn = tkn;
 		this.apiClient = apiClient;
-		this.streamService = streamService;
+		this.streamRepository = streamRepository;
 		this.addToCatalog = addToCatalog;
 	}
 	
@@ -53,7 +53,7 @@ public class RecentController {
 		
 
 		
-		List<SongStream> previous = streamService.find(50, username);
+		List<SongStream> previous = streamRepository.find(50, username);
 		List<SongStream> streams = ConvertDTOs.streamsRecent(username, response, previous);
 
 		String result;
@@ -76,7 +76,7 @@ public class RecentController {
 		
 
 		
-		List<SongStream> previous = streamService.find(50, username);
+		List<SongStream> previous = streamRepository.find(50, username);
 		List<SongStream> streams = ConvertDTOs.streamsRecent(username, response, previous);
 		
 		if (streams.isEmpty()) {

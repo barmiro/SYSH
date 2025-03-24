@@ -1,7 +1,10 @@
 package com.github.barmiro.sysh_server.catalog.artists;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,37 +14,45 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.barmiro.sysh_server.users.SyshUserRepository;
+
 @RequestMapping("/top")
 @RestController
 public class ArtistController {
 	
 	private final ArtistRepository artistRepository;
+	SyshUserRepository userRepository;
 	
-	public ArtistController (ArtistRepository artistRepository) {
+	public ArtistController (ArtistRepository artistRepository, SyshUserRepository userRepository) {
 		this.artistRepository = artistRepository;
+		this.userRepository = userRepository;
 	}
 
+//	TODO: split into separate /all
 
 	@GetMapping("/artists")
 	public List<ArtistStats> topArtists(
 			@RequestParam
 			Optional<String> sort,
 			@RequestParam(required = false)
-			Optional<String> start,
+			Optional<LocalDateTime> start,
 			@RequestParam(required = false)
-			Optional<String> end,
+			Optional<LocalDateTime> end,
 			@RequestParam(required = false)
 			Optional<Integer> offset,
 			@RequestParam(required = false)
 			Optional<String> size) {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
-		Timestamp startDate = Timestamp.valueOf(start
-				.orElse("2000-01-01T00:00:00")
-				.replace("T", " "));
-		Timestamp endDate = Timestamp.valueOf(end
-				.orElse(LocalDateTime.now().toString())
-				.replace("T", " "));
+		
+		ZoneId userTimeZone = userRepository.getUserTimezone(username);
+		OffsetDateTime startDate = start
+				.map(startValue -> startValue.atZone(userTimeZone).toOffsetDateTime())
+				.orElse(ZonedDateTime.of(2006, 1, 1, 0, 0, 0, 0, userTimeZone).toOffsetDateTime());
+		
+		OffsetDateTime endDate = end
+				.map(endValue -> endValue.atZone(userTimeZone).toOffsetDateTime())
+				.orElse(Instant.now().atZone(userTimeZone).toOffsetDateTime());
 		
 		Integer offsetValue = offset.orElse(0);
 		String sizeString = size.orElse("ALL");

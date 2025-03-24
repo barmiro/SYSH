@@ -9,12 +9,13 @@ CREATE TABLE Users (
     token_expires TIMESTAMP,
     role VARCHAR DEFAULT 'USER',
 --    consider handling the default in java
-    display_name VARCHAR DEFAULT 'unknown username'
+    display_name VARCHAR DEFAULT 'unknown username',
+    timezone VARCHAR
 );
 
 CREATE TABLE SongStreams (
     id SERIAL PRIMARY KEY,
-    ts TIMESTAMP NOT NULL,
+    ts TIMESTAMPTZ NOT NULL,
     username VARCHAR REFERENCES Users(username),
     ms_played INTEGER NOT NULL,
     spotify_track_id VARCHAR NOT NULL,

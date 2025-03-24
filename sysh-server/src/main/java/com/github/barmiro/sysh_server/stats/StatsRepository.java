@@ -1,8 +1,9 @@
 package com.github.barmiro.sysh_server.stats;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public class StatsRepository {
 	Logger log = LoggerFactory.getLogger(StatsRepository.class);
 	
 		
-	public StatsForRange streamStats(Timestamp startDate, Timestamp endDate, Boolean checkForCache, String username) {
+	public StatsForRange streamStats(OffsetDateTime startDate, OffsetDateTime endDate, Boolean checkForCache, String username) {
 		
 		if (checkForCache) {
 			Optional<StatsForRange> cached = getCachedStats(startDate, endDate, username);
@@ -74,22 +75,22 @@ public class StatsRepository {
 		
 		StatsDTO statsDTO =  jdbc.sql(sql)
 				.param("username", username, Types.VARCHAR)
-				.param("startDate", startDate, Types.TIMESTAMP)
-				.param("endDate", endDate, Types.TIMESTAMP)
+				.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
 				.query(StatsDTO.class)
 				.single();
 		
 		Integer minutesStreamed = jdbc.sql(minutes)
 				.param("username", username, Types.VARCHAR)
-				.param("startDate", startDate, Types.TIMESTAMP)
-				.param("endDate", endDate, Types.TIMESTAMP)
+				.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
 				.query(Integer.class)
 				.single();
 		
 		Integer artistCount = jdbc.sql(artists)
 				.param("username", username, Types.VARCHAR)
-				.param("startDate", startDate, Types.TIMESTAMP)
-				.param("endDate", endDate, Types.TIMESTAMP)
+				.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
 				.query(Integer.class)
 				.single();
 		
@@ -103,6 +104,8 @@ public class StatsRepository {
 				artistCount);
 		
 	}
+	
+	
 	
 	
 public FullStats streamStats(String username, Boolean checkForCache) {
@@ -176,7 +179,7 @@ public FullStats streamStats(String username, Boolean checkForCache) {
 				.single();
 	}
 	
-	public Optional<StatsForRange> getCachedStats(Timestamp startDate, Timestamp endDate, String username) {
+	public Optional<StatsForRange> getCachedStats(OffsetDateTime startDate, OffsetDateTime endDate, String username) {
 		String sql = ("SELECT * FROM Stats_Cache_Range "
 				+ "WHERE username = :username "
 				+ "AND start_date = :startDate "
@@ -185,8 +188,8 @@ public FullStats streamStats(String username, Boolean checkForCache) {
 		
 		return jdbc.sql(sql)
 				.param("username", username, Types.VARCHAR)
-				.param("startDate", startDate, Types.TIMESTAMP)
-				.param("endDate", endDate, Types.TIMESTAMP)
+				.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
 				.query(StatsForRange.class)
 				.optional();
 	}
@@ -224,7 +227,7 @@ public FullStats streamStats(String username, Boolean checkForCache) {
 	}
 
 	
-	public int addCachedStats(Timestamp startDate, Timestamp endDate, String username
+	public int addCachedStats(OffsetDateTime startDate, OffsetDateTime endDate, String username
 			) throws IllegalAccessException, InvocationTargetException {
 			
 		StatsForRange stats = streamStats(startDate, endDate, false, username);
@@ -262,12 +265,12 @@ public FullStats streamStats(String username, Boolean checkForCache) {
 		return added;
 	}
 	
-	public Optional<Timestamp> getFirstStreamDate(String username) {
-		System.out.println(username);
+	
+	public Optional<Instant> getFirstStreamInstant(String username) {
 		return jdbc.sql("SELECT MIN(ts) FROM SongStreams "
 				+ "WHERE username = :username")
 				.param("username", username, Types.VARCHAR)
-				.query(Timestamp.class)
+				.query(Instant.class)
 				.optional();
 	}
 }

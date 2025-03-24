@@ -1,6 +1,8 @@
 package com.github.barmiro.sysh_server.catalog.tracks;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,14 +12,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.barmiro.sysh_server.users.SyshUserRepository;
+
 @RequestMapping("/top")
 @RestController
 public class TrackController {
 
 	private final TrackRepository trackRepository;
+	SyshUserRepository userRepository;
 	
-	TrackController (TrackRepository trackService) {
-		this.trackRepository = trackService;
+	TrackController (TrackRepository trackRepository, SyshUserRepository userRepository) {
+		this.trackRepository = trackRepository;
+		this.userRepository = userRepository;
 	}
 	@GetMapping("/getTracks")
 	List<Track> getTracks() {
@@ -29,17 +35,18 @@ public class TrackController {
 			@RequestParam
 			Optional<String> sort,
 			@RequestParam
-			String start,
+			LocalDateTime start,
 			@RequestParam
-			String end,
+			LocalDateTime end,
 			@RequestParam(required = false)
 			Optional<Integer> offset,
 			@RequestParam(required = false)
 			Optional<String> size) {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
-		Timestamp startDate = Timestamp.valueOf(start.replace("T", " "));
-		Timestamp endDate = Timestamp.valueOf(end.replace("T", " "));
+		ZoneId userTimeZone = userRepository.getUserTimezone(username);
+		OffsetDateTime startDate = start.atZone(userTimeZone).toOffsetDateTime();
+		OffsetDateTime endDate = end.atZone(userTimeZone).toOffsetDateTime();
 		
 		Integer offsetValue = offset.orElse(0);
 		String sizeString = size.orElse("ALL");

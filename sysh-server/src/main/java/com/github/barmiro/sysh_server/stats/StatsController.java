@@ -1,8 +1,11 @@
 package com.github.barmiro.sysh_server.stats;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.barmiro.sysh_server.common.records.TimestampRange;
+import com.github.barmiro.sysh_server.common.records.OffsetDateTimeRange;
 import com.github.barmiro.sysh_server.common.utils.TimeUtils;
+import com.github.barmiro.sysh_server.users.SyshUserRepository;
 
 @RestController
 @RequestMapping("/stats")
@@ -23,10 +27,14 @@ public class StatsController {
 
 	StatsRepository statsRepo;
 	StatsCache statsCache;
+	SyshUserRepository userRepository;
 	
-	StatsController(StatsRepository statsRepo, StatsCache statsCache) {
+	StatsController(StatsRepository statsRepo,
+			StatsCache statsCache, 
+			SyshUserRepository userRepository) {
 		this.statsRepo = statsRepo;
 		this.statsCache = statsCache;
+		this.userRepository = userRepository;
 	}
 	
 	@GetMapping("/all")
@@ -40,31 +48,32 @@ public class StatsController {
 	@GetMapping("/series")
 	List<StatsForRange> series(
 			@RequestParam(required = false)
-			Optional<String> start,
+			Optional<LocalDateTime> start,
 			@RequestParam(required = false)
-			Optional<String> end,
+			Optional<LocalDateTime> end,
 			@RequestParam
 			String step) {
 		
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
-//		TODO: this is bad, but will have to stay for consistency; I'll have to deal with this when overhauling timezone behaviour
-		LocalDateTime startValue = start
-				.map(startString -> Timestamp.valueOf(startString.replace("T", " ")).toLocalDateTime())
-				.orElse(startup().toLocalDateTime());
+		ZoneId userTimeZone = userRepository.getUserTimezone(username);
 		
-		LocalDateTime endValue = end
-				.map(endString -> Timestamp.valueOf(endString.replace("T", " ")).toLocalDateTime())
-				.orElse(LocalDateTime.now());
+		ZonedDateTime startValue = start
+				.map(startInput -> startInput.atZone(userTimeZone))
+				.orElse(startup());
 		
-		
-		List<TimestampRange> ranges = TimeUtils.generateDateRangeSeries(startValue, endValue, step);
+		ZonedDateTime endValue = end
+				.map(endInput -> endInput.atZone(userTimeZone))
+				.orElse(Instant.now().atZone(userTimeZone));
+	
+		List<OffsetDateTimeRange> ranges = TimeUtils.generateOffsetDateTimeRangeSeries(startValue, endValue, step);
+
 		List<StatsForRange> statsList = new ArrayList<>();
 		
-		for (TimestampRange range:ranges) {
+		for (OffsetDateTimeRange range:ranges) {
 			statsList.add(statsRepo.streamStats(
-					range.startTimestamp(),
-					range.endTimestamp(),
+					range.start(),
+					range.end(),
 					false,
 					username
 				)
@@ -78,19 +87,19 @@ public class StatsController {
 	@GetMapping("/range")
 	StatsForRange stats(
 			@RequestParam
-			String start,
+			LocalDateTime start,
 			@RequestParam
-			String end) throws IllegalAccessException, InvocationTargetException {
+			LocalDateTime end) throws IllegalAccessException, InvocationTargetException {
 		
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-		Timestamp startDate = Timestamp.valueOf(start.replace("T", " "));
-		Timestamp endDate = Timestamp.valueOf(end.replace("T", " "));
 		
+		ZoneId userTimeZone = userRepository.getUserTimezone(username);
+		OffsetDateTime startDate = start.atZone(userTimeZone).toOffsetDateTime();
+		OffsetDateTime endDate = end.atZone(userTimeZone).toOffsetDateTime();
 		
 		statsRepo.addCachedStats(startDate, endDate, username);
 		
-		return statsRepo.streamStats(startDate, endDate, true, username);
+		return statsRepo.streamStats(startDate, endDate, false, username);
 	}
 	
 	@GetMapping("/year/{year}")
@@ -98,18 +107,25 @@ public class StatsController {
 
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		Timestamp startDate = Timestamp.valueOf(year + "-01-01 00:00:00");
-		Timestamp endDate = Timestamp.valueOf(year + "-12-31 23:59:59");
+		ZoneId userTimeZone = userRepository.getUserTimezone(username);
+		
+		
+		OffsetDateTime startDate = ZonedDateTime.of( year , 1, 1, 0, 0, 0, 0, userTimeZone).toOffsetDateTime();
+		OffsetDateTime endDate = ZonedDateTime.of(year + 1, 1, 1, 0, 0, 0, 0, userTimeZone).minusSeconds(1).toOffsetDateTime();
+		
 		return statsRepo.streamStats(startDate, endDate, true, username);
 	}
 	
-//	TODO: This will have to be changed, but this way it'll work for now
+
 	@GetMapping("/startup")
-	Timestamp startup() {
+	ZonedDateTime startup() {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		
+		ZoneId userTimeZone = userRepository.getUserTimezone(username);
 
 //		statsCache.cacheGenerator(username);
-		return statsRepo.getFirstStreamDate(username).orElse(Timestamp.valueOf(LocalDateTime.now()));
+
+		return statsRepo.getFirstStreamInstant(username).orElse(Instant.now()).atZone(userTimeZone);
 	}
 
 }

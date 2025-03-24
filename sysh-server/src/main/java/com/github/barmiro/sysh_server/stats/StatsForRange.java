@@ -1,11 +1,11 @@
 package com.github.barmiro.sysh_server.stats;
 
-import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 
 public record StatsForRange(
 		String username,
-		Timestamp start_date,
-		Timestamp end_date,
+		OffsetDateTime start_date,
+		OffsetDateTime end_date,
 		Integer minutes_streamed,
 		Integer stream_count,
 		Integer track_count,

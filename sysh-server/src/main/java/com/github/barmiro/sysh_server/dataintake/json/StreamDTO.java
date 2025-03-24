@@ -1,9 +1,9 @@
 package com.github.barmiro.sysh_server.dataintake.json;
 
-import java.sql.Timestamp;
+import java.time.OffsetDateTime;
 
 public record StreamDTO(
-		Timestamp ts,
+		OffsetDateTime ts,
 		Integer ms_played,
 		String spotify_track_uri) {
 

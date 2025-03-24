@@ -2,8 +2,10 @@ package com.github.barmiro.sysh_server.users;
 
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,6 +43,17 @@ public class SyshUserRepository {
 				.param("username", user.username(), Types.VARCHAR)
 				.query(String.class)
 				.single();
+	}
+	
+	public ZoneId getUserTimezone(String username) {
+		return jdbc.sql("SELECT timezone FROM Users "
+				+ "WHERE username = :username "
+				+ "LIMIT 1")
+				.param("username", username, Types.VARCHAR)
+				.query(String.class)
+				.optional()
+				.map(timeZoneString -> ZoneId.of(timeZoneString))
+				.orElse(ZoneId.of(TimeZone.getDefault().getID()));
 	}
 	
 	public Optional<SyshUser> findByUsername(String username) {

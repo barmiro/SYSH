@@ -1,7 +1,9 @@
 package com.github.barmiro.sysh_server.catalog.albums;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,14 +13,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.barmiro.sysh_server.users.SyshUserRepository;
+
 @RequestMapping("/top")
 @RestController
 public class AlbumController {
 	
 	private final AlbumRepository albumRepository;
+	SyshUserRepository userRepository;
 	
-	public AlbumController (AlbumRepository albumRepository) {
+	public AlbumController (AlbumRepository albumRepository, SyshUserRepository userRepository) {
 		this.albumRepository = albumRepository;
+		this.userRepository = userRepository;
 	}
 	
 	
@@ -32,17 +38,18 @@ public class AlbumController {
 			@RequestParam(required = false)
 			Optional<String> sort,
 			@RequestParam
-			String start,
+			LocalDateTime start,
 			@RequestParam
-			String end,
+			LocalDateTime end,
 			@RequestParam(required = false)
 			Optional<Integer> offset,
 			@RequestParam(required = false)
 			Optional<String> size) {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
-		Timestamp startDate = Timestamp.valueOf(start.replace("T", " "));
-		Timestamp endDate = Timestamp.valueOf(end.replace("T", " "));
+		ZoneId userTimeZone = userRepository.getUserTimezone(username);
+		OffsetDateTime startDate = start.atZone(userTimeZone).toOffsetDateTime();
+		OffsetDateTime endDate = end.atZone(userTimeZone).toOffsetDateTime();
 		
 		Integer offsetValue = offset.orElse(0);
 		String sizeString = size.orElse("ALL");

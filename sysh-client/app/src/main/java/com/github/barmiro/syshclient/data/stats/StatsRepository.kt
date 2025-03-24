@@ -41,13 +41,17 @@ class StatsRepository @Inject constructor(
 
     fun getStats(
         start: String?,
-        end: String?
+        end: String?,
+        mode: String?,
+        year: Int?
     ): Flow<Resource<StatsDTO>> {
         return flow {
             emit(Resource.Loading(true))
 
             try {
-                val response = if (start.isNullOrEmpty() || end.isNullOrEmpty()) {
+                val response = if (mode == "yearly") {
+                    statsApi.fetchStatsYear(year ?: LocalDate.now().year)
+                } else if (start.isNullOrEmpty() || end.isNullOrEmpty()) {
                     statsApi.fetchStatsAll()
                 } else {
                     statsApi.fetchStatsRange(start, end)

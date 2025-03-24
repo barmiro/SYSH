@@ -1,8 +1,8 @@
 package com.github.barmiro.sysh_server.catalog.tracks;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -136,8 +136,8 @@ public class TrackRepository extends CatalogRepository<Track> {
 	
 	
 	List<TrackStats> topTracks(String sort,
-			Timestamp startDate,
-			Timestamp endDate,
+			OffsetDateTime startDate,
+			OffsetDateTime endDate,
 			Integer offset,
 			String size,
 			String username) {
@@ -179,8 +179,8 @@ public class TrackRepository extends CatalogRepository<Track> {
 		
 		return jdbc.sql(sql)
 				.param("username", username, Types.VARCHAR)
-				.param("startDate", startDate, Types.TIMESTAMP)
-				.param("endDate", endDate, Types.TIMESTAMP)
+				.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
 				.query(TrackStats.class)
 				.list();
 	}

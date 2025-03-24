@@ -1,9 +1,11 @@
 package com.github.barmiro.sysh_server.stats;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,16 +16,21 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
 import com.github.barmiro.sysh_server.catalog.streams.SongStream;
+import com.github.barmiro.sysh_server.common.records.OffsetDateTimeRange;
+import com.github.barmiro.sysh_server.common.utils.TimeUtils;
+import com.github.barmiro.sysh_server.users.SyshUserRepository;
 
 @Service
 public class StatsCache {
 
 	JdbcClient jdbc;
 	StatsRepository statsRepo;
+	SyshUserRepository userRepo;
 	
-	StatsCache(JdbcClient jdbc, StatsRepository statsRepo) {
+	StatsCache(JdbcClient jdbc, StatsRepository statsRepo, SyshUserRepository userRepo) {
 		this.jdbc = jdbc;
 		this.statsRepo = statsRepo;
+		this.userRepo = userRepo;
 	}
 	
 	private static final Logger log = LoggerFactory.getLogger(StatsCache.class);
@@ -38,7 +45,8 @@ public class StatsCache {
 			return;
 		}
 		
-		Optional<Timestamp> oldestStream = statsRepo.getFirstStreamDate(username);
+		Optional<Instant> oldestStream = statsRepo.getFirstStreamInstant(username);
+		ZoneId timeZoneId = userRepo.getUserTimezone(username);
 		
 		if(oldestStream.isEmpty()) {
 			log.error("Cache generator didn't find any streams for user " + username);
@@ -46,10 +54,11 @@ public class StatsCache {
 		}
 		
 		int startYear = oldestStream.get()
-				.toLocalDateTime()
+				.atZone(timeZoneId)
 				.getYear();
 		
-		int endYear = LocalDateTime.now()
+		int endYear = Instant.now()
+				.atZone(timeZoneId)
 				.getYear();
 		
 		int addedYears = 0;
@@ -59,16 +68,23 @@ public class StatsCache {
 		log.info("Done");
 
 		log.info("Generating yearly stats cache for user " + username);
-		for (int i = startYear; i <= endYear; i++) {
-			Timestamp start = Timestamp.valueOf(i + "-01-01 00:00:00");
-			Timestamp end = Timestamp.valueOf(i + "-12-31 23:59:59");
-			addedYears += statsRepo.addCachedStats(start, end, username);
-
+		
+		
+		List<OffsetDateTimeRange> yearRangeList = TimeUtils.generateOffsetDateTimeRangeSeries(
+				ZonedDateTime.of(startYear, 1, 1, 0, 0, 0, 0, timeZoneId),
+				ZonedDateTime.of(endYear + 1, 1, 1, 0, 0, 0, 0, timeZoneId),
+				"year"
+		);
+		
+		for (OffsetDateTimeRange year: yearRangeList) {
+			addedYears += statsRepo.addCachedStats(year.start(), year.end(), username);
 		}
+		
+		
 		log.info("Added " 
 		+ addedYears 
 		+ " years in range " 
-		+ startYear 
+		+ startYear
 		+ " - " 
 		+ endYear
 		+ " for user "
@@ -82,12 +98,12 @@ public class StatsCache {
 	public void updateCache(
 			List<SongStream> streams,
 			String username,
+			ZoneId timeZoneId,
 			int tracksAdded,
 			int albumsAdded,
 			int artistsAdded) throws IllegalAccessException, InvocationTargetException {
 		
 		int baseYear = streams.get(0).ts()
-				.toLocalDateTime()
 				.getYear();
 		
 		
@@ -98,7 +114,6 @@ public class StatsCache {
 		for (SongStream stream:streams) {
 			
 			int streamYear = stream.ts()
-					.toLocalDateTime()
 					.getYear();
 			
 			if (streamYear != baseYear) {
@@ -111,8 +126,11 @@ public class StatsCache {
 		
 		int minutesAdded = milisAdded / 60000;
 		
-		Timestamp start = Timestamp.valueOf(baseYear + "-01-01 00:00:00");
-		Timestamp end = Timestamp.valueOf(baseYear + "-12-31 23:59:59");
+//		Timestamp start = Timestamp.valueOf(baseYear + "-01-01 00:00:00");
+//		Timestamp end = Timestamp.valueOf(baseYear + "-12-31 23:59:59");
+		
+		OffsetDateTime start = ZonedDateTime.of( baseYear , 1, 1, 0, 0, 0, 0, timeZoneId).toOffsetDateTime();
+		OffsetDateTime end = ZonedDateTime.of(baseYear + 1, 1, 1, 0, 0, 0, 0, timeZoneId).minusSeconds(1).toOffsetDateTime();
 		String baseSql =  ("SET "
 				+ "minutes_streamed = minutes_streamed + :minutesAdded,"
 				+ "stream_count = stream_count + :streamsAdded,"
@@ -135,8 +153,8 @@ public class StatsCache {
 		.param("albumsAdded", albumsAdded, Types.INTEGER)
 		.param("artistsAdded", artistsAdded, Types.INTEGER)
 		.param("username", username, Types.VARCHAR)
-		.param("start", start, Types.TIMESTAMP)
-		.param("end", end, Types.TIMESTAMP)
+		.param("start", start, Types.TIMESTAMP_WITH_TIMEZONE)
+		.param("end", end, Types.TIMESTAMP_WITH_TIMEZONE)
 		.update();
 		
 		int updatedFullCache = jdbc.sql("UPDATE Stats_Cache_Full "

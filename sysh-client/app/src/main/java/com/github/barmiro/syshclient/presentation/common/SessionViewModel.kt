@@ -33,13 +33,13 @@ class SessionViewModel @Inject constructor(
             initialValue = false
         )
 
-//    init {
-//        viewModelScope.launch {
-////                !!! DELETE BEFORE PUBLISHING !!!
-//            userPreferencesRepository.clearAllPreferences()
-////          ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-//        }
-//    }
+    init {
+        viewModelScope.launch {
+//                !!! DELETE BEFORE PUBLISHING !!!
+            userPreferencesRepository.clearAllPreferences()
+//          ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+        }
+    }
 
     fun saveServerUrl(serverUrl: String, onComplete: () -> Unit) {
         viewModelScope.launch {

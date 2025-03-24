@@ -2,6 +2,7 @@ package com.github.barmiro.sysh_server.common.utils;
 
 import java.security.Timestamp;
 import java.sql.Types;
+import java.time.OffsetDateTime;
 
 public class SqlType {
 
@@ -13,6 +14,8 @@ public class SqlType {
 			return Types.INTEGER;
 		} else if (type == Timestamp.class) {
 			return Types.TIMESTAMP;
+		} else if (type == OffsetDateTime.class) {
+			return Types.TIMESTAMP_WITH_TIMEZONE;
 		} else {
 			return Types.OTHER;
 		}

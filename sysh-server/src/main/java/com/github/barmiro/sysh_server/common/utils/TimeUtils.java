@@ -2,10 +2,12 @@ package com.github.barmiro.sysh_server.common.utils;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.github.barmiro.sysh_server.common.records.OffsetDateTimeRange;
 import com.github.barmiro.sysh_server.common.records.TimeSeriesStep;
 import com.github.barmiro.sysh_server.common.records.TimestampRange;
 
@@ -26,6 +28,31 @@ public class TimeUtils {
 	    	dateRanges.add(new TimestampRange(
 	    		Timestamp.valueOf(currentStart),
 	    		Timestamp.valueOf(nextStart.minusSeconds(1))
+	    		)
+	    	);
+	    	
+	    	currentStart = nextStart;
+	    }
+	    
+	    return dateRanges; 
+	     
+	     
+	}
+	
+	
+public static List<OffsetDateTimeRange> generateOffsetDateTimeRangeSeries(ZonedDateTime start, ZonedDateTime end, String step) {
+		
+
+	    TimeSeriesStep timeStep = getTimeStep(step);
+	     
+	    List<OffsetDateTimeRange> dateRanges = new ArrayList<>();
+	    ZonedDateTime currentStart = start;
+	    
+	    while (currentStart.isBefore(end)) {
+	    	ZonedDateTime nextStart = currentStart.plus(timeStep.count(), timeStep.unit());
+	    	dateRanges.add(new OffsetDateTimeRange(
+	    		currentStart.toOffsetDateTime(),
+	    		nextStart.minusSeconds(1).toOffsetDateTime()
 	    		)
 	    	);
 	    	

@@ -1,8 +1,8 @@
 package com.github.barmiro.sysh_server.catalog.artists;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -42,8 +42,8 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 	
 	
 public List<ArtistStats> topArtists(String sort,
-		Timestamp startDate,
-		Timestamp endDate,
+		OffsetDateTime startDate,
+		OffsetDateTime endDate,
 		Integer offset,
 		String size,
 		String username) {
@@ -74,8 +74,8 @@ public List<ArtistStats> topArtists(String sort,
 	
 	return jdbc.sql(sql)
 			.param("username", username, Types.VARCHAR)
-			.param("startDate", startDate, Types.TIMESTAMP)
-			.param("endDate", endDate, Types.TIMESTAMP)
+			.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+			.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
 			.query(ArtistStats.class)
 			.list();
 	}

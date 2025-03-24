@@ -76,10 +76,12 @@ class StatsViewModel @Inject constructor(
 
     fun getStats(
         start: String? = state.value.start,
-        end: String? = state.value.end
+        end: String? = state.value.end,
+        mode: String? = state.value.dateRangeMode,
+        year: Int? = state.value.start?.substringBefore('-')?.toInt()
     ) {
         viewModelScope.launch {
-            statsRepository.getStats(start, end)
+            statsRepository.getStats(start, end, mode, year)
                 .collect { result ->
                     when(result) {
                         is Resource.Success -> {

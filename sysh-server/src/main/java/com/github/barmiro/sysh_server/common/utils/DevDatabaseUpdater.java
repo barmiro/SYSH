@@ -22,12 +22,10 @@ public class DevDatabaseUpdater {
 //	public void updateDatabase() {
 ////		this is a dev-environment database updater, so that I don't have to reinitialize the database
 //		if (!isTestEnv) {
-//			String sql = ("ALTER TABLE ONLY Stats_Cache_Full "
-//					+ "ALTER COLUMN minutes_streamed SET DEFAULT 0,"
-//					+ "ALTER COLUMN stream_count SET DEFAULT 0,"
-//					+ "ALTER COLUMN track_count SET DEFAULT 0,"
-//					+ "ALTER COLUMN album_count SET DEFAULT 0,"
-//					+ "ALTER COLUMN artist_count SET DEFAULT 0;"
+//			String sql = ("ALTER TABLE SongStreams "
+//					+ "ALTER COLUMN ts "
+//					+ "TYPE TIMESTAMPTZ "
+//					+ "USING ts AT TIME ZONE 'UTC';"
 //					);
 //			jdbc.sql(sql)
 //			.update();			

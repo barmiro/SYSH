@@ -261,6 +261,9 @@ fun StatsScreen(
                             val modelProducer = remember { CartesianChartModelProducer() }
                             LaunchedEffect(statsSeries) {
                                 if (statsSeries.isNotEmpty()) {
+                                    for (stats in statsSeries) {
+                                        println("${stats.start_date} - ${stats.end_date} - ${stats.minutes_streamed} - ${stats.stream_count}")
+                                    }
                                     modelProducer.runTransaction {
                                         lineSeries { series(
                                             y = listOf(0) + statsSeries.let { list ->

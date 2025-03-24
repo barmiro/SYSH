@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.barmiro.sysh_server.catalog.albums.Album;
 import com.github.barmiro.sysh_server.catalog.albums.spotifyapideprecated.dto.albums.ApiAlbum;
 import com.github.barmiro.sysh_server.catalog.artists.Artist;
@@ -25,7 +26,7 @@ public class ConvertDTOs {
 	
 	static ObjectMapper objectMapper = new ObjectMapper()
 		.configure(DeserializationFeature
-				.FAIL_ON_UNKNOWN_PROPERTIES, false);
+				.FAIL_ON_UNKNOWN_PROPERTIES, false).registerModule(new JavaTimeModule());
 			
 	public static List<SongStream> streamsJson(List<StreamDTO> streamDTOs, String username) {
 		List<SongStream> streams = new ArrayList<>();
