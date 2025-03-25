@@ -17,15 +17,19 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class KeyPairManager {
     private final KeyPair keyPair;
-    private static final String PRIVATE_KEY_PATH = "/keys/private.der";
-    private static final String PUBLIC_KEY_PATH = "/keys/public.der";
+    private final String PRIVATE_KEY_PATH;
+    private final String PUBLIC_KEY_PATH;
     
-    public KeyPairManager() {
+    public KeyPairManager(@Value("${key.store.path:/keys}") String keyStorePath) {
+    	this.PRIVATE_KEY_PATH = keyStorePath + "/private.der";
+    	this.PUBLIC_KEY_PATH = keyStorePath + "/public.der";
+    	
     	if (keysExist()) {
     		this.keyPair = loadExistingKeys();
     	} else {

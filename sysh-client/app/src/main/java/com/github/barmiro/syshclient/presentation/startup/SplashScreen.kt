@@ -22,9 +22,3 @@ fun SplashScreen(
         CircularProgressIndicator(modifier = Modifier.size(48.dp))
     }
 }
-
-
-@Composable
-fun MainScaffold() {
-
-}
