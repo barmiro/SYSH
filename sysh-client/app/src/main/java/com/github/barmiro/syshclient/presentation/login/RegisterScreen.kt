@@ -21,7 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.navigation.NavController
-import com.github.barmiro.syshclient.Login
+import com.github.barmiro.syshclient.presentation.common.Login
 import com.github.barmiro.syshclient.presentation.common.SessionViewModel
 
 @Composable

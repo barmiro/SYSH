@@ -27,13 +27,15 @@ public class GlobalExceptionHandler {
 			String username = auth.getName();
 			
 			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-				return new ResponseEntity<String>("User '"
+				String message = ("User '"
 						+ username 
-						+ "' not authorized with Spotify",
+						+ "' not authorized with Spotify");
+				log.error(message + ": " + e.getMessage());
+				return new ResponseEntity<String>(message,
 						HttpStatus.FORBIDDEN);
 				
 			} else if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
-				
+				log.error(e.getMessage());
 				return new ResponseEntity<String>("The server is making too many calls to Spotify. "
 						+ "If the issue persists, please contact your system administrator",
 						HttpStatus.TOO_MANY_REQUESTS);

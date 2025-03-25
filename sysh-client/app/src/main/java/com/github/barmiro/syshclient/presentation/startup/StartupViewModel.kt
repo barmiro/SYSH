@@ -1,8 +1,10 @@
-package com.github.barmiro.syshclient.data.common.startup
+package com.github.barmiro.syshclient.presentation.startup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
+import com.github.barmiro.syshclient.data.common.startup.StartupDataRepository
+import com.github.barmiro.syshclient.data.common.startup.UrlValidationResult
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,14 +25,11 @@ class StartupViewModel @Inject constructor(
     private val startupDataRepo: StartupDataRepository
 ) : ViewModel() {
 
-//    private val _isLoggedIn = MutableStateFlow<Boolean>(false)
-//    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
-
     private val _urlInput = MutableStateFlow("")
     val urlInput: StateFlow<String> = _urlInput.asStateFlow()
 
-    private val _serverResponded = MutableStateFlow<Boolean>(false)
-    val serverResponded: StateFlow<Boolean> = _serverResponded.asStateFlow()
+    private val _serverResponded = MutableStateFlow<Boolean?>(null)
+    val serverResponded: StateFlow<Boolean?> = _serverResponded.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val urlValidation: StateFlow<UrlValidationResult?> = _urlInput
@@ -73,40 +72,15 @@ class StartupViewModel @Inject constructor(
                         _serverResponded.value = true
                     }
 //                    TODO: complete
+                    is Resource.Error -> {
+                        _serverResponded.value = result.code?.let {
+                            it == 401
+                        } ?: false
+                    }
                     else -> {
-
                     }
                 }
             }
-        }
-    }
-
-
-
-
-
-
-
-
-    val serverUrl: StateFlow<String?> = userPreferencesRepository.serverUrl
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = null
-        )
-
-    val isLoggedIn: StateFlow<Boolean> = userPreferencesRepository.isLoggedIn
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
-        )
-
-
-
-    fun saveServerUrl(serverUrl: String) {
-        viewModelScope.launch {
-            userPreferencesRepository.saveServerUrl(serverUrl)
         }
     }
 }

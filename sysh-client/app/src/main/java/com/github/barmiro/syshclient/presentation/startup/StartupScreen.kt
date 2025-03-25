@@ -16,8 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import com.github.barmiro.syshclient.Login
-import com.github.barmiro.syshclient.data.common.startup.StartupViewModel
+import com.github.barmiro.syshclient.presentation.common.Login
 import com.github.barmiro.syshclient.presentation.common.SessionViewModel
 
 @Composable
@@ -39,8 +38,11 @@ fun StartupScreen(
         }
     }
     LaunchedEffect(serverResponded) {
-        if (serverResponded) {
-            navController.navigate(Login)
+        serverResponded?.let {
+            if (it) {
+                navController.navigate(Login)
+
+            }
         }
     }
 

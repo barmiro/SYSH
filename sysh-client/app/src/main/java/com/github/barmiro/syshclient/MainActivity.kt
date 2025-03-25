@@ -10,62 +10,43 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.github.barmiro.syshclient.data.common.startup.StartupViewModel
+import com.github.barmiro.syshclient.presentation.common.AppNavHost
+import com.github.barmiro.syshclient.presentation.common.BottomNavBar
+import com.github.barmiro.syshclient.presentation.common.Home
+import com.github.barmiro.syshclient.presentation.common.Login
 import com.github.barmiro.syshclient.presentation.common.SessionViewModel
-import com.github.barmiro.syshclient.presentation.home.HomeScreen
+import com.github.barmiro.syshclient.presentation.common.SpotifyAuth
+import com.github.barmiro.syshclient.presentation.common.Startup
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
 import com.github.barmiro.syshclient.presentation.login.AuthViewModel
-import com.github.barmiro.syshclient.presentation.login.LoginScreen
-import com.github.barmiro.syshclient.presentation.login.RegisterScreen
-import com.github.barmiro.syshclient.presentation.login.SpotifyAuthScreen
-import com.github.barmiro.syshclient.presentation.settings.SettingsScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
-import com.github.barmiro.syshclient.presentation.startup.StartupScreen
-import com.github.barmiro.syshclient.presentation.stats.StatsScreen
+import com.github.barmiro.syshclient.presentation.startup.StartupViewModel
 import com.github.barmiro.syshclient.presentation.stats.StatsViewModel
-import com.github.barmiro.syshclient.presentation.top.TopScreen
 import com.github.barmiro.syshclient.presentation.top.TopScreenViewModel
-import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.serialization.Serializable
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-//    @Inject lateinit var statsRepo: StatsRepository
-//    @Inject lateinit var topRepo: TopRepository
 
     private val startupVM: StartupViewModel by viewModels()
     private val homeVM: HomeViewModel by viewModels()
@@ -87,82 +68,113 @@ class MainActivity : ComponentActivity() {
             val isLoggedIn by sessionVM.isLoggedIn.collectAsState()
             val isAuthorizedWithSpotify by authVM.isAuthorizedWithSpotify.collectAsState()
             val navController = rememberNavController()
+            val homeState by homeVM.homeState.collectAsState()
+            val storedUrl by sessionVM.serverUrl.collectAsState()
+            val serverResponded by startupVM.serverResponded.collectAsState()
+            val responseCode by authVM.responseCode.collectAsState()
+
+            val snackbarHostState = remember { SnackbarHostState() }
+            val coroutineScope = rememberCoroutineScope()
+            val errorMessage by authVM.errorMessage.collectAsState()
+
+
+            LaunchedEffect(storedUrl) {
+                if (!storedUrl.isNullOrEmpty()) {
+                    startupVM.getServerInfo()
+                }
+            }
+
+            SideEffect {
+                if (storedUrl.isNullOrEmpty()) {
+                    startupVM.getServerInfo()
+                }
+            }
+
+            LaunchedEffect(serverResponded, isLoggedIn) {
+                serverResponded?.let {
+                    if (it) {
+                        if (isLoggedIn) {
+                            authVM.getUserData()
+                        } else {
+                            navController.navigate(Login) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    } else {
+                        navController.navigate(Startup) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+            }
+
+            LaunchedEffect(responseCode) {
+                when (responseCode) {
+                    200 -> {
+                        navController.navigate(Home)
+                    }
+                    403 -> {
+                        navController.navigate(SpotifyAuth)
+                    }
+//            this means no error was encountered
+                    0 -> {}
+                    401 -> {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = errorMessage.takeIf {
+                                    !it.isNullOrEmpty()
+                                } ?: "You have been logged out",
+                                actionLabel = "Dismiss",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                        navController.navigate(Login) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                    else -> {
+                        navController.navigate(Login) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                        }
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = errorMessage.takeIf {
+                                    !it.isNullOrEmpty()
+                                } ?: "An unknown error occurred",
+                                actionLabel = "Dismiss",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    }
+                }
+            }
+
 
             SyshClientTheme {
-
-
-                val navItems = listOf(
-                    BottomNavigationItem(
-                        title = "Home",
-                        selectedIcon = Icons.Filled.Home,
-                        unselectedIcon = Icons.Outlined.Home,
-                        navigateTo = Home
-                    ),
-                    BottomNavigationItem(
-                        title = "Top",
-                        selectedIcon = Icons.Filled.Star,
-                        unselectedIcon = Icons.Outlined.Star,
-                        navigateTo = Top
-                    ),
-                    BottomNavigationItem(
-                        title = "Stats",
-                        selectedIcon = Icons.Filled.Info,
-                        unselectedIcon = Icons.Outlined.Info,
-                        navigateTo = Stats
-                    ),
-                    BottomNavigationItem(
-                        title = "Settings",
-                        selectedIcon = Icons.Filled.Settings,
-                        unselectedIcon = Icons.Outlined.Settings,
-                        navigateTo = Settings
-                    )
-                )
-
-                var selectedNavItemIndex by rememberSaveable {
-                    mutableIntStateOf(0)
-                }
-
-
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(color = MaterialTheme.colorScheme.background)
                 ) {
                     Scaffold(
+                        snackbarHost = {
+                            SnackbarHost(hostState = snackbarHostState)
+                        },
                         bottomBar = {
                             if (isLoggedIn && isAuthorizedWithSpotify) {
                                 topScreenVM.getOldestStreamDate()
                                 homeVM.getStats()
                                 statsVM.getStats()
-                                NavigationBar {
-                                    navItems.forEachIndexed { index, item ->
-                                        NavigationBarItem(
-                                            selected = selectedNavItemIndex == index,
-                                            onClick = {
-                                                selectedNavItemIndex = index
-                                                navController.navigate(item.navigateTo) {
-                                                    popUpTo(navController.graph.startDestinationId) {
-                                                        inclusive = true
-                                                    }
-                                                }
-                                            },
-                                            icon = {
-                                                Icon(
-                                                    imageVector =
-                                                    if (index == selectedNavItemIndex) {
-                                                        item.selectedIcon
-                                                    } else {
-                                                        item.unselectedIcon
-                                                    },
-                                                    contentDescription = item.title
-
-                                                )
-                                            },
-                                            label = {
-                                                Text(item.title)
-                                            }
-                                        )
-                                    }
+                                if (!homeState.isLoading) {
+                                    BottomNavBar(navController)
                                 }
                             }
                         }
@@ -207,87 +219,3 @@ class MainActivity : ComponentActivity() {
 
 }
 
-data class BottomNavigationItem(
-    val title: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    val navigateTo: Any
-)
-
-@Serializable
-object Startup
-
-@Serializable
-object Home
-
-@Serializable
-object Stats
-
-@Serializable
-object TopAlbums
-
-@Serializable
-object Top
-
-@Serializable
-object Login
-
-@Serializable
-object Register
-
-@Serializable
-object SpotifyAuth
-
-@Serializable
-object Settings
-
-@Composable
-fun AppNavHost(navController: NavHostController,
-               isLoggedIn: Boolean,
-               isAuthorizedWithSpotify: Boolean,
-               startupVM: StartupViewModel,
-               homeVM: HomeViewModel,
-               topScreenVM: TopScreenViewModel,
-               topTracksVM: TopTracksViewModel,
-               topAlbumsVM: TopAlbumsViewModel,
-               topArtistsVM: TopArtistsViewModel,
-               statsVM: StatsViewModel,
-               authVM: AuthViewModel,
-               sessionVM: SessionViewModel,
-               settingsVM: SettingsViewModel,
-               onPickZipFile: () -> Unit) {
-
-    NavHost(
-        navController = navController,
-        startDestination = Startup
-    ) {
-        composable<Startup> {
-            StartupScreen(startupVM, sessionVM, navController)
-        }
-
-        composable<Login> {
-            LoginScreen(authVM, sessionVM, navController)
-        }
-        composable<Register> {
-            RegisterScreen(authVM, sessionVM, navController)
-        }
-        composable<Home> {
-            HomeScreen(homeVM)
-        }
-        composable<Top> {
-            TopScreen(topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM)
-        }
-        composable<Stats> {
-            StatsScreen(statsVM)
-        }
-        composable<TopAlbums> {
-            TopAlbumsScreen(topAlbumsVM)
-        }
-        composable<SpotifyAuth> {
-            SpotifyAuthScreen(authVM)
-        }
-        composable<Settings> {
-            SettingsScreen(settingsVM, onPickZipFile)
-        }
-    }
-}
