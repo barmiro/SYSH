@@ -3,6 +3,8 @@ SYSH (See Your Streaming History) is a self-hosted Spotify streaming history man
 
 At the time of writing, SYSH is composed of a dockerized server, which collects data from Spotify and direct JSON imports, and an android client. A web client is on the roadmap, but not very high up.
 SYSH is under active development and has not yet been published on docker. Contact me for deployment details if you want to run it as-is.
+Short demo of what the client looks like:
+https://youtu.be/1_iDDmWinZM?si=Ui3jm5_HX4qQa-5o
 
 ## SETUP (outdated)
 1. Create a new app in Spotify's developer dashboard.
