@@ -173,6 +173,7 @@ class MainActivity : ComponentActivity() {
                                 topScreenVM.getOldestStreamDate()
                                 homeVM.getStats()
                                 statsVM.getStats()
+                                statsVM.getStatsSeries()
                                 if (!homeState.isLoading) {
                                     BottomNavBar(navController)
                                 }

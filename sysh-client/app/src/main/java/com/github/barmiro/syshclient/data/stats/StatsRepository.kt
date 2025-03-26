@@ -80,7 +80,7 @@ class StatsRepository @Inject constructor(
         start: String?,
         end: String?,
         step: String?
-    ): Flow<Resource<List<StatsDTO>>> {
+    ): Flow<Resource<List<StatsSeriesChunkDTO>>> {
         return flow {
             emit(Resource.Loading(true))
 

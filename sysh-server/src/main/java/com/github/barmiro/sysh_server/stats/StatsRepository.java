@@ -29,6 +29,38 @@ public class StatsRepository {
 	
 	Logger log = LoggerFactory.getLogger(StatsRepository.class);
 	
+	
+	public StatsSeriesChunk streamStatsSeries(OffsetDateTime startDate, OffsetDateTime endDate, String username) {
+		
+		String streamCountSql = ("SELECT "
+				+ "COUNT(id) as stream_count "
+				+ "FROM SongStreams "
+				+ "WHERE ms_played >= 30000 "
+				+ "AND username = :username "
+				+ "AND ts BETWEEN :startDate AND :endDate;");
+		
+		String minutesStreamedSql = ("SELECT "
+				+ "COALESCE(SUM(SongStreams.ms_played), 0) / 60000 AS minutes_played "
+				+ "FROM SongStreams "
+				+ "WHERE username = :username "
+				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate;");
+		
+		Integer streamCount = jdbc.sql(streamCountSql)
+				.param("username", username, Types.VARCHAR)
+				.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.query(Integer.class)
+				.single();
+		
+		Integer minutesStreamed = jdbc.sql(minutesStreamedSql)
+				.param("username", username, Types.VARCHAR)
+				.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.query(Integer.class)
+				.single();
+		
+		return new StatsSeriesChunk(username, startDate, endDate, minutesStreamed, streamCount);
+	}
 		
 	public StatsForRange streamStats(OffsetDateTime startDate, OffsetDateTime endDate, Boolean checkForCache, String username) {
 		

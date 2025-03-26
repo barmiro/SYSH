@@ -52,6 +52,7 @@ public class RecentController {
 				.toEntity(String.class);
 		
 
+
 		
 		List<SongStream> previous = streamRepository.find(50, username);
 		List<SongStream> streams = ConvertDTOs.streamsRecent(username, response, previous);
@@ -73,8 +74,7 @@ public class RecentController {
 				.header("Authorization", "Bearer " + tkn.getToken(username))
 				.retrieve()
 				.toEntity(String.class);
-		
-
+	
 		
 		List<SongStream> previous = streamRepository.find(50, username);
 		List<SongStream> streams = ConvertDTOs.streamsRecent(username, response, previous);

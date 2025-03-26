@@ -31,6 +31,7 @@ fun SpotifyAuthScreen(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(spotifyAuthUrl) {
+        println(spotifyAuthUrl)
         spotifyAuthUrl?.let { url ->
             coroutineScope.launch {
                 openWebsite(context, url)

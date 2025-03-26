@@ -52,6 +52,7 @@ public class ConvertDTOs {
 					.readValue(response.getBody(), SpotifyUserData.class);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
+//			TODO: change this
 			return new SpotifyUserData("to SYSH");
 		}
 		

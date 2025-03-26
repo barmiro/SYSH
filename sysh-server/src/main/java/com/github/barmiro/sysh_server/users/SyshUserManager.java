@@ -3,6 +3,7 @@ package com.github.barmiro.sysh_server.users;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +24,14 @@ private static final Logger log = LoggerFactory.getLogger(SyshUserManager.class)
 	
 	public String getUsernameBySpotifyState(String spotifyState) {
 		
-		String user =  userRepo.findBySpotifyState(spotifyState);
+		Optional<String> user =  userRepo.findBySpotifyState(spotifyState);
 		
-		if (user == null) {
-			throw new RuntimeException("User spotify_state not found");
+		if (user.isEmpty()) {
+			log.error("Spotify state " + spotifyState + " not found in database");
+			return null;
+//			throw new RuntimeException("User spotify_state not found");
 		} else {
-			return user;
+			return user.get();
 		}
 	}
 	

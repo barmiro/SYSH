@@ -65,13 +65,13 @@ public class SyshUserRepository {
 				.optional();
 	}
 	
-	public String findBySpotifyState(String spotifyState) {
+	public Optional<String> findBySpotifyState(String spotifyState) {
 		return jdbc.sql("SELECT username FROM Users "
 				+ "WHERE spotify_state = :spotify_state "
 				+ "LIMIT 1")
 				.param("spotify_state", spotifyState, Types.VARCHAR)
 				.query(String.class)
-				.single();
+				.optional();
 	}
 	
 	public int updateSpotifyAccessToken(String username, String accessToken) {

@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.barmiro.syshclient.data.stats.StatsSeriesChunkDTO
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.components.DateRangePickerModal
 import com.github.barmiro.syshclient.presentation.top.components.StatsScreenTopText
@@ -48,6 +49,8 @@ import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer.PointConnector
 import java.text.NumberFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
@@ -258,48 +261,20 @@ fun StatsScreen(
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
                         ) {
-                            val modelProducer = remember { CartesianChartModelProducer() }
-                            LaunchedEffect(statsSeries) {
-                                if (statsSeries.isNotEmpty()) {
-                                    for (stats in statsSeries) {
-                                        println("${stats.start_date} - ${stats.end_date} - ${stats.minutes_streamed} - ${stats.stream_count}")
-                                    }
-                                    modelProducer.runTransaction {
-                                        lineSeries { series(
-                                            y = listOf(0) + statsSeries.let { list ->
-                                                list.map { sample ->
-                                                    var sum: Int = 0
-                                                    for (i in 0..list.indexOf(sample)) {
-                                                        sum += list[i].minutes_streamed
-                                                    }
-                                                    sum
-                                                }
-                                            }
-                                        ) }
-                                    }
-                                }
+                            if (statsSeries.isEmpty() || (statsSeries.size == 1 && statsSeries[0].minutes_streamed == 0)) {
+                                Text("no data to show")
+                            } else {
+                                StreamingSumChart(statsSeries)
                             }
-                            CartesianChartHost(
-                                chart = rememberCartesianChart(
-                                    rememberLineCartesianLayer(
-                                        lineProvider =  LineCartesianLayer.LineProvider
-                                            .series(vicoTheme.lineCartesianLayerColors.map { color ->
-                                                LineCartesianLayer.rememberLine(
-                                                    areaFill = LineCartesianLayer.AreaFill.single(
-                                                        fill(color.copy(alpha = 0.2f))
-                                                    ),
-                                                    fill = LineCartesianLayer.LineFill.single(fill(color)),
-                                                    pointConnector = PointConnector.Sharp
-
-                                                )
-                                            })
-                                    ),
-                                    startAxis = VerticalAxis.rememberStart(),
-                                    bottomAxis = HorizontalAxis.rememberBottom(),
-                                ),
-                                modelProducer = modelProducer,
-                                scrollState = rememberVicoScrollState(scrollEnabled = false)
-                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
+                        ) {
+                            if (statsSeries.isEmpty() || (statsSeries.size == 1 && statsSeries[0].minutes_streamed == 0)) {
+                                Text("no data to show")
+                            } else {
+                                StreamingValuesChart(statsSeries)
+                            }
                         }
                     }
                 }
@@ -311,4 +286,158 @@ fun StatsScreen(
             onDateRangePageChange = { viewModel.onEvent(it) }
         )
     }
+}
+
+//TODO: this is a complete mess. Fixing this has to be the first order of business tomorrow
+
+@Composable
+fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+    LaunchedEffect(statsSeries) {
+        if (statsSeries.isNotEmpty()) {
+            modelProducer.runTransaction {
+                lineSeries {
+                    series(
+                    y = listOf(0) + statsSeries.let { list ->
+                        list.filter {
+                            LocalDateTime.parse(it.start_date?.substring(0..18), formatter)
+                                .isBefore(LocalDateTime.now())
+                        }.map { sample ->
+                            var sum: Int = 0
+                            for (i in 0..list.indexOf(sample)) {
+                                sum += list[i].minutes_streamed
+                            }
+                            sum
+                        }
+                    }
+                    )
+                    series(
+                        y = listOf(0) + statsSeries.let { list ->
+                            list.filter {
+                                LocalDateTime.parse(it.start_date?.substring(0..18), formatter)
+                                    .isBefore(LocalDateTime.now())
+                            }.map { sample ->
+                                var sum: Int = 0
+                                for (i in 0..list.indexOf(sample)) {
+                                    sum += list[i].stream_count
+                                }
+                                sum
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    CartesianChartHost(
+        chart = rememberCartesianChart(
+            rememberLineCartesianLayer(
+                lineProvider =  LineCartesianLayer.LineProvider
+                    .series(vicoTheme.lineCartesianLayerColors.map { color ->
+                        LineCartesianLayer.rememberLine(
+                            areaFill = LineCartesianLayer.AreaFill.single(
+                                fill(color.copy(alpha = 0.2f))
+                            ),
+                            fill = LineCartesianLayer.LineFill.single(fill(color)),
+                            pointConnector = PointConnector.Sharp
+                        )
+                    })
+            ),
+            startAxis = VerticalAxis.rememberStart(
+                itemPlacer = remember { VerticalAxis.ItemPlacer.count(count = {6}) }
+            ),
+            bottomAxis = HorizontalAxis.rememberBottom(
+                itemPlacer = HorizontalAxis.ItemPlacer.aligned(spacing = {
+                    statsSeries.size / 6 + 1
+                }, addExtremeLabelPadding = false),
+                valueFormatter = { _, value, _ ->
+                    val index = value.toInt() - 1
+                    if (index == -1) {
+                        LocalDateTime.parse(statsSeries[0].start_date?.substring(0..18), formatter).format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                    } else if (statsSeries.isNotEmpty() && index in statsSeries.indices) {
+                        LocalDateTime.parse(statsSeries[value.toInt() - 1].end_date?.substring(0..18), formatter).format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                    } else {
+                        "."
+                    }
+                }
+            ),
+        ),
+        modelProducer = modelProducer,
+        scrollState = rememberVicoScrollState(scrollEnabled = false)
+    )
+}
+
+@Composable
+fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+
+    LaunchedEffect(statsSeries) {
+        if (statsSeries.isNotEmpty()) {
+            modelProducer.runTransaction {
+                lineSeries {
+                    series(
+                        y = statsSeries.let { list ->
+                            list.filter {
+                                LocalDateTime.parse(it.start_date?.substring(0..18), formatter)
+                                    .isBefore(LocalDateTime.now())
+                            }.map { sample ->
+                                sample.minutes_streamed
+                            }
+                        }
+                    )
+                    series(
+                        y = statsSeries.let { list ->
+                            list.filter {
+                                LocalDateTime.parse(it.start_date?.substring(0..18), formatter)
+                                    .isBefore(LocalDateTime.now())
+                            }.map { sample ->
+                                sample.stream_count
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+
+    CartesianChartHost(
+        chart = rememberCartesianChart(
+            rememberLineCartesianLayer(
+                lineProvider =  LineCartesianLayer.LineProvider
+                    .series(vicoTheme.lineCartesianLayerColors.map { color ->
+                        LineCartesianLayer.rememberLine(
+                            areaFill = LineCartesianLayer.AreaFill.single(
+                                fill(color.copy(alpha = 0.2f))
+                            ),
+                            fill = LineCartesianLayer.LineFill.single(fill(color)),
+                            pointConnector = PointConnector.Sharp
+                        )
+                    })
+            ),
+            startAxis = VerticalAxis.rememberStart(
+                itemPlacer = remember { VerticalAxis.ItemPlacer.count(count = {6}) }
+            ),
+            bottomAxis = HorizontalAxis.rememberBottom(
+                itemPlacer = HorizontalAxis.ItemPlacer.aligned(spacing = {
+                    statsSeries.size / 6 + 1
+                }, addExtremeLabelPadding = false),
+                valueFormatter = { _, value, _ ->
+                    val index = value.toInt() - 1
+                    if (index == -1) {
+                        LocalDateTime.parse(statsSeries[0].start_date?.substring(0..18), formatter).format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                    } else if (statsSeries.isNotEmpty() && index in statsSeries.indices) {
+                        LocalDateTime.parse(statsSeries[value.toInt() - 1].end_date?.substring(0..18), formatter).format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                    } else {
+                        "."
+                    }
+                }
+            ),
+        ),
+        modelProducer = modelProducer,
+        scrollState = rememberVicoScrollState(scrollEnabled = false)
+    )
 }

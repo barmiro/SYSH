@@ -20,8 +20,8 @@ interface StatsApi {
     suspend fun fetchStatsSeries(
         @Query("start") start: String? = null,
         @Query("end") end: String? = null,
-        @Query("step") step: String? = "day"
-    ): Response<List<StatsDTO>>
+        @Query("step") step: String? = null
+    ): Response<List<StatsSeriesChunkDTO>>
 
     @GET("year/{year}")
     suspend fun fetchStatsYear(

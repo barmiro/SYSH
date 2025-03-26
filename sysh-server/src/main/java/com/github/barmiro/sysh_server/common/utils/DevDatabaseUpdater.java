@@ -22,10 +22,10 @@ public class DevDatabaseUpdater {
 //	public void updateDatabase() {
 ////		this is a dev-environment database updater, so that I don't have to reinitialize the database
 //		if (!isTestEnv) {
-//			String sql = ("ALTER TABLE SongStreams "
-//					+ "ALTER COLUMN ts "
-//					+ "TYPE TIMESTAMPTZ "
-//					+ "USING ts AT TIME ZONE 'UTC';"
+//			String sql = ("CREATE INDEX idx_songstreams_user_ts ON SongStreams(username, ts DESC);\n"
+//					+ "CREATE INDEX idx_songstreams_user_ms_played ON SongStreams(username, ms_played);\n"
+//					+ "CREATE INDEX idx_songstreams_user_count ON SongStreams(username) WHERE ms_played >= 30000;\n"
+//					+ "CREATE INDEX idx_songstreams_user_ms_played_covering ON SongStreams(username, ts, ms_played);"
 //					);
 //			jdbc.sql(sql)
 //			.update();			

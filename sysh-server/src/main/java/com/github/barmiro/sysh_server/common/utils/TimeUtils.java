@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.github.barmiro.sysh_server.common.records.OffsetDateTimeRange;
 import com.github.barmiro.sysh_server.common.records.TimeSeriesStep;
@@ -40,15 +41,30 @@ public class TimeUtils {
 	}
 	
 	
-public static List<OffsetDateTimeRange> generateOffsetDateTimeRangeSeries(ZonedDateTime start, ZonedDateTime end, String step) {
+	public static List<OffsetDateTimeRange> generateOffsetDateTimeRangeSeries(ZonedDateTime start, ZonedDateTime end, Optional<String> step) {
 		
-
-	    TimeSeriesStep timeStep = getTimeStep(step);
-	     
+		
 	    List<OffsetDateTimeRange> dateRanges = new ArrayList<>();
 	    ZonedDateTime currentStart = start;
 	    
-	    while (currentStart.isBefore(end)) {
+//	    TODO: this is a temporary solution
+	    TimeSeriesStep timeStep;
+	    if (step.isEmpty()) {
+	    	Integer daysBetween = (int) Math.abs(ChronoUnit.DAYS.between(start, end));
+	    	if (daysBetween <= 26) {
+	    		timeStep = getTimeStep("hour");
+	    	} else if (daysBetween <= 366) {
+	    		timeStep = getTimeStep("day");
+	    	} else if (daysBetween <= 366 * 7) {
+	    		timeStep = getTimeStep("week");
+	    	} else {
+	    		timeStep = getTimeStep("month");
+	    	}
+	    } else {
+	    	timeStep = getTimeStep(step.get());
+	    }
+	
+		while (currentStart.isBefore(end)) {
 	    	ZonedDateTime nextStart = currentStart.plus(timeStep.count(), timeStep.unit());
 	    	dateRanges.add(new OffsetDateTimeRange(
 	    		currentStart.toOffsetDateTime(),
@@ -59,9 +75,7 @@ public static List<OffsetDateTimeRange> generateOffsetDateTimeRangeSeries(ZonedD
 	    	currentStart = nextStart;
 	    }
 	    
-	    return dateRanges; 
-	     
-	     
+	    return dateRanges;   
 	}
 	
 	

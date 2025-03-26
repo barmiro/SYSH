@@ -73,7 +73,7 @@ public class StatsCache {
 		List<OffsetDateTimeRange> yearRangeList = TimeUtils.generateOffsetDateTimeRangeSeries(
 				ZonedDateTime.of(startYear, 1, 1, 0, 0, 0, 0, timeZoneId),
 				ZonedDateTime.of(endYear + 1, 1, 1, 0, 0, 0, 0, timeZoneId),
-				"year"
+				Optional.of("year")
 		);
 		
 		for (OffsetDateTimeRange year: yearRangeList) {

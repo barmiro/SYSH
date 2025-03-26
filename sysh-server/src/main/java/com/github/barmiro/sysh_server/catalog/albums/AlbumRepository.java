@@ -84,7 +84,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		String sql = ("SELECT Albums.*,"
 				+ ":username AS username,"
 				+ "COUNT("
-				+ "CASE WHEN SongStreams.ms_played >= 30000 THEN SongStreams.spotify_track_id END"
+				+ "CASE WHEN SongStreams.ms_played >= 30000 THEN 1 END"
 				+ ") AS stream_count,"
 				+ "COALESCE(SUM(SongStreams.ms_played), 0) AS total_ms_played,"
 				+ "(SELECT Artists.name "

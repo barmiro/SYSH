@@ -4,8 +4,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.barmiro.syshclient.data.stats.StatsDTO
 import com.github.barmiro.syshclient.data.stats.StatsRepository
+import com.github.barmiro.syshclient.data.stats.StatsSeriesChunkDTO
 import com.github.barmiro.syshclient.presentation.home.HomeState
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.TopScreenState
@@ -32,8 +32,8 @@ class StatsViewModel @Inject constructor(
     private val _homeState = MutableStateFlow(HomeState())
     val homeState: StateFlow<HomeState> = _homeState
 
-    private val _statsSeries = MutableStateFlow<List<StatsDTO>>(emptyList())
-    val statsSeries: StateFlow<List<StatsDTO>> = _statsSeries
+    private val _statsSeries = MutableStateFlow<List<StatsSeriesChunkDTO>>(emptyList())
+    val statsSeries: StateFlow<List<StatsSeriesChunkDTO>> = _statsSeries
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> get() = _isLoading
@@ -49,7 +49,7 @@ class StatsViewModel @Inject constructor(
     fun onEvent(event: TopScreenEvent) {
         when(event) {
             is TopScreenEvent.Refresh -> {
-                getStatsSeries(step = "month")
+                getStatsSeries()
                 getStats()
             }
             is TopScreenEvent.OnSearchParameterChange -> {
@@ -59,7 +59,7 @@ class StatsViewModel @Inject constructor(
                     sort = event.sort
                 )
                 getStats()
-                getStatsSeries(step = "week")
+                getStatsSeries()
             }
             is TopScreenEvent.OnDateRangeModeChange -> {
                 stateManager.updateState(
@@ -109,7 +109,7 @@ class StatsViewModel @Inject constructor(
     fun getStatsSeries(
         start: String? = state.value.start,
         end: String? = state.value.end,
-        step: String? = "month"
+        step: String? = null
     ) {
         viewModelScope.launch {
             statsRepository.getStatsSeries(start, end, step)

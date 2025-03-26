@@ -46,14 +46,15 @@ public class StatsController {
 	
 	
 	@GetMapping("/series")
-	List<StatsForRange> series(
+	List<StatsSeriesChunk> series(
 			@RequestParam(required = false)
 			Optional<LocalDateTime> start,
 			@RequestParam(required = false)
 			Optional<LocalDateTime> end,
 			@RequestParam
-			String step) {
+			Optional<String> step) {
 		
+		long startTime = System.currentTimeMillis();
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		ZoneId userTimeZone = userRepository.getUserTimezone(username);
@@ -65,20 +66,26 @@ public class StatsController {
 		ZonedDateTime endValue = end
 				.map(endInput -> endInput.atZone(userTimeZone))
 				.orElse(Instant.now().atZone(userTimeZone));
+		
+		System.out.println("START = " + startValue);
+		System.out.println("END = " + endValue);
 	
 		List<OffsetDateTimeRange> ranges = TimeUtils.generateOffsetDateTimeRangeSeries(startValue, endValue, step);
 
-		List<StatsForRange> statsList = new ArrayList<>();
+		List<StatsSeriesChunk> statsList = new ArrayList<>();
 		
 		for (OffsetDateTimeRange range:ranges) {
-			statsList.add(statsRepo.streamStats(
+			statsList.add(statsRepo.streamStatsSeries(
 					range.start(),
 					range.end(),
-					false,
 					username
 				)
 			);
 		}
+		
+		long endTime = System.currentTimeMillis();
+		long time = (endTime - startTime);
+		System.out.println("Time elapsed: " + time);
 		
 		return statsList;
 	}
