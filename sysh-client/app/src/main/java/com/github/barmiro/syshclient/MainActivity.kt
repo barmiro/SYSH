@@ -17,7 +17,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -77,17 +76,12 @@ class MainActivity : ComponentActivity() {
             val coroutineScope = rememberCoroutineScope()
             val errorMessage by authVM.errorMessage.collectAsState()
 
+//            TODO: find out why there's a loop
+            var debuggingBoolean = true
+
 
             LaunchedEffect(storedUrl) {
-                if (!storedUrl.isNullOrEmpty()) {
                     startupVM.getServerInfo()
-                }
-            }
-
-            SideEffect {
-                if (storedUrl.isNullOrEmpty()) {
-                    startupVM.getServerInfo()
-                }
             }
 
             LaunchedEffect(serverResponded, isLoggedIn) {
@@ -170,10 +164,15 @@ class MainActivity : ComponentActivity() {
                         },
                         bottomBar = {
                             if (isLoggedIn && isAuthorizedWithSpotify) {
-                                topScreenVM.getOldestStreamDate()
-                                homeVM.getStats()
-                                statsVM.getStats()
-                                statsVM.getStatsSeries()
+
+                                if (debuggingBoolean) {
+                                    topScreenVM.getOldestStreamDate()
+                                    homeVM.getStats()
+                                    statsVM.getStats()
+                                    statsVM.getStatsSeries()
+                                    debuggingBoolean = false
+                                }
+
                                 if (!homeState.isLoading) {
                                     BottomNavBar(navController)
                                 }

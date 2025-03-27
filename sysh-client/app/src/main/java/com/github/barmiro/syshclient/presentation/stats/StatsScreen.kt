@@ -135,9 +135,10 @@ fun StatsScreen(
                 val daysStreamed = homeState.stats.minutes_streamed / 1440f
                 val percentageOfTime = (daysStreamed / totalDays) * 100
 
+                val bottomPadding = if (state.dateRangeMode.isNullOrEmpty()) 0.dp else 48.dp
 
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 48.dp), verticalArrangement = Arrangement.Top
+                    modifier = Modifier.fillMaxWidth().padding(bottom = bottomPadding), verticalArrangement = Arrangement.Top
                 ) {
                     item() {
                         Row(
