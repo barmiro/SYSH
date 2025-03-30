@@ -16,9 +16,6 @@ class SessionViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository
 ) : ViewModel() {
 
-//    private val _isLoggedIn = MutableStateFlow<Boolean>(false)
-//    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
-
     val serverUrl: StateFlow<String?> = userPreferencesRepository.serverUrl
         .stateIn(
             scope = viewModelScope,

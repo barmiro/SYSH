@@ -36,6 +36,9 @@ fun RegisterScreen(authVM: AuthViewModel,
     val password = remember {
         mutableStateOf(TextFieldValue())
     }
+    val confirmation = remember {
+        mutableStateOf(TextFieldValue())
+    }
 
 
 //    I'll put this here for now, but I'll have to reconsider this
@@ -45,10 +48,6 @@ fun RegisterScreen(authVM: AuthViewModel,
         if (isRegistered) {
             navController.navigate(Login)
         }
-    }
-
-    LaunchedEffect(registerState) {
-        println(registerState)
     }
 
 
@@ -64,10 +63,8 @@ fun RegisterScreen(authVM: AuthViewModel,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Text(text = "Welcome to SYSH!",
-                color = MaterialTheme.colorScheme.onBackground )
 
-            Text(text = "Please log in:",
+            Text(text = "Create an account:",
                 color = MaterialTheme.colorScheme.onBackground )
 
             OutlinedTextField(value = username.value,
@@ -85,14 +82,28 @@ fun RegisterScreen(authVM: AuthViewModel,
                 visualTransformation = PasswordVisualTransformation()
             )
 
+            OutlinedTextField(value = confirmation.value,
+                onValueChange = { confirmation.value = it },
+                label = {
+                    Text("Confirm password")
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                visualTransformation = PasswordVisualTransformation(),
+                isError = password.value.text != confirmation.value.text
+            )
+
+            if (password.value.text != confirmation.value.text) {
+                Text("Passwords do not match")
+            }
+
             Button(
                 onClick = {
                     authVM.register(username.value.text, password.value.text)
-                }
+                },
+                enabled = password.value.text == confirmation.value.text && password.value.text.isNotEmpty()
             ) {
                 Text("Create Account")
             }
-
 
         }
     }

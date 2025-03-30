@@ -49,7 +49,6 @@ fun StartupScreen(
     Surface(
         modifier = Modifier
             .fillMaxSize()
-//            .padding(contentPadding)
             .background(color = MaterialTheme.colorScheme.background)
     ) {
             Column(
@@ -97,7 +96,7 @@ fun StartupScreen(
                     },
                     enabled = urlValidation?.isValidUrl ?: false
                 ) {
-                    Text("log in")
+                    Text("Confirm")
                 }
             }
         }
