@@ -27,8 +27,6 @@ import kotlinx.serialization.Serializable
 
 @Composable
 fun AppNavHost(navController: NavHostController,
-               isLoggedIn: Boolean,
-               isAuthorizedWithSpotify: Boolean,
                startupVM: StartupViewModel,
                homeVM: HomeViewModel,
                topScreenVM: TopScreenViewModel,

@@ -26,8 +26,6 @@ class StatsViewModel @Inject constructor(
 
     val state: StateFlow<TopScreenState> = stateManager.state
 
-    private var isDataLoaded = false
-
 //    TODO: refactor
     private val _homeState = MutableStateFlow(HomeState())
     val homeState: StateFlow<HomeState> = _homeState
@@ -35,13 +33,11 @@ class StatsViewModel @Inject constructor(
     private val _statsSeries = MutableStateFlow<List<StatsSeriesChunkDTO>>(emptyList())
     val statsSeries: StateFlow<List<StatsSeriesChunkDTO>> = _statsSeries
 
-    private val _isLoading = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> get() = _isLoading
-
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
 
     override fun onCreate(owner: LifecycleOwner) {
+        getStatsSeries()
         getStats()
     }
 
@@ -92,7 +88,6 @@ class StatsViewModel @Inject constructor(
                             }
                         }
                         is Resource.Error -> {
-                            println(result)
                             _errorMessage.value = result.message
                         }
                         is Resource.Loading -> {
@@ -122,7 +117,6 @@ class StatsViewModel @Inject constructor(
                         }
 
                         is Resource.Error -> {
-                            println(result)
                             _errorMessage.value = result.message
                         }
 
@@ -133,9 +127,4 @@ class StatsViewModel @Inject constructor(
                 }
         }
     }
-}
-
-
-fun statsSeriesStepFromTimespan() {
-
 }

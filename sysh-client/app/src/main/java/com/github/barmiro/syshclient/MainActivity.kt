@@ -181,8 +181,6 @@ class MainActivity : ComponentActivity() {
                     ) { innerPadding ->
                         Column(modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding(), top = 0.dp)){
                             AppNavHost(navController,
-                                isLoggedIn,
-                                isAuthorizedWithSpotify,
                                 startupVM,
                                 homeVM,
                                 topScreenVM,
@@ -205,7 +203,6 @@ class MainActivity : ComponentActivity() {
 
     private val zipPickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
-            println("zipPickerLauncher")
             settingsVM.handleZipFile(it, applicationContext)
         }
     }

@@ -24,7 +24,7 @@ class AuthViewModel @Inject constructor(
     private val _registerState = MutableStateFlow<String?>(null)
     val registerState: StateFlow<String?> = _registerState.asStateFlow()
 
-    private val _isRegistered = MutableStateFlow<Boolean>(false)
+    private val _isRegistered = MutableStateFlow(false)
     val isRegistered: StateFlow<Boolean> = _isRegistered.asStateFlow()
 
     private val _isLoading = MutableStateFlow(true)
@@ -39,7 +39,7 @@ class AuthViewModel @Inject constructor(
     private val _spotifyAuthUrl: MutableStateFlow<String?> = MutableStateFlow(null)
     val spotifyAuthUrl: StateFlow<String?> = _spotifyAuthUrl
 
-    private val _isAuthorizedWithSpotify = MutableStateFlow<Boolean>(false)
+    private val _isAuthorizedWithSpotify = MutableStateFlow(false)
     val isAuthorizedWithSpotify: StateFlow<Boolean> = _isAuthorizedWithSpotify.asStateFlow()
 
 
@@ -82,7 +82,6 @@ class AuthViewModel @Inject constructor(
                     }
 
                     is Resource.Error -> {
-                        println(result.message)
                         _responseCode.value = result.code
                         _errorMessage.value = result.message
                     }
