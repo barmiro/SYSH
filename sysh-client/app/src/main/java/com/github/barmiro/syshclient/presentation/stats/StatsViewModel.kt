@@ -1,7 +1,6 @@
 package com.github.barmiro.syshclient.presentation.stats
 
 import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.stats.StatsRepository
@@ -35,11 +34,6 @@ class StatsViewModel @Inject constructor(
 
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
-
-    override fun onCreate(owner: LifecycleOwner) {
-        getStatsSeries()
-        getStats()
-    }
 
 
     fun onEvent(event: TopScreenEvent) {

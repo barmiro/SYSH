@@ -29,7 +29,6 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-
             userPreferencesRepository.userDisplayName.collect {
                 _userDisplayName.value = it
             }

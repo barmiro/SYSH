@@ -68,6 +68,11 @@ fun StatsScreen(
 
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        viewModel.getStatsSeries()
+        viewModel.getStats()
+    }
+
     if (isDateRangePickerVisible) {
         DateRangePickerModal(
             onVMSearchParameterChange = { viewModel.onEvent(it) },
