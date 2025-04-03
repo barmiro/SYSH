@@ -33,7 +33,6 @@ import com.github.barmiro.syshclient.presentation.top.components.DateRangePicker
 import com.github.barmiro.syshclient.presentation.top.components.StatsScreenTopText
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenBottomBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopBar
-import com.github.barmiro.syshclient.util.localDateFromTimestampString
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
@@ -51,7 +50,7 @@ import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer.PointConnector
 import java.text.NumberFormat
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
@@ -125,10 +124,10 @@ fun StatsScreen(
             } else {
                 val numberFormat = NumberFormat.getInstance(Locale.US)
 
-                val startDate: LocalDate = localDateFromTimestampString(state.start)
+                val startDate: LocalDate = state.start?.toLocalDate()
                     ?: state.oldestStreamDate
 
-                val endDate: LocalDate = localDateFromTimestampString(state.end)
+                val endDate: LocalDate = state.end?.toLocalDate()
                         ?.takeIf { it.isBefore(LocalDate.now()) }
                     ?: LocalDate.now()
 
@@ -308,8 +307,7 @@ fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
                     series(
                     y = listOf(0) + statsSeries.let { list ->
                         list.filter {
-                            LocalDateTime.parse(it.start_date?.substring(0..18), formatter)
-                                .isBefore(LocalDateTime.now())
+                            it.start_date?.isBefore(OffsetDateTime.now()) ?: false
                         }.map { sample ->
                             var sum: Int = 0
                             for (i in 0..list.indexOf(sample)) {
@@ -322,8 +320,7 @@ fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
                     series(
                         y = listOf(0) + statsSeries.let { list ->
                             list.filter {
-                                LocalDateTime.parse(it.start_date?.substring(0..18), formatter)
-                                    .isBefore(LocalDateTime.now())
+                                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
                             }.map { sample ->
                                 var sum: Int = 0
                                 for (i in 0..list.indexOf(sample)) {
@@ -362,9 +359,9 @@ fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
                 valueFormatter = { _, value, _ ->
                     val index = value.toInt() - 1
                     if (index == -1) {
-                        LocalDateTime.parse(statsSeries[0].start_date?.substring(0..18), formatter).format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                        statsSeries[0].start_date?.format(DateTimeFormatter.ofPattern("yyyy-MM")) ?: "."
                     } else if (statsSeries.isNotEmpty() && index in statsSeries.indices) {
-                        LocalDateTime.parse(statsSeries[value.toInt() - 1].end_date?.substring(0..18), formatter).format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                        statsSeries[value.toInt() - 1].end_date?.format(DateTimeFormatter.ofPattern("yyyy-MM")) ?: "."
                     } else {
                         "."
                     }
@@ -388,8 +385,7 @@ fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
                     series(
                         y = statsSeries.let { list ->
                             list.filter {
-                                LocalDateTime.parse(it.start_date?.substring(0..18), formatter)
-                                    .isBefore(LocalDateTime.now())
+                                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
                             }.map { sample ->
                                 sample.minutes_streamed
                             }
@@ -398,8 +394,7 @@ fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
                     series(
                         y = statsSeries.let { list ->
                             list.filter {
-                                LocalDateTime.parse(it.start_date?.substring(0..18), formatter)
-                                    .isBefore(LocalDateTime.now())
+                                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
                             }.map { sample ->
                                 sample.stream_count
                             }
@@ -435,9 +430,9 @@ fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
                 valueFormatter = { _, value, _ ->
                     val index = value.toInt() - 1
                     if (index == -1) {
-                        LocalDateTime.parse(statsSeries[0].start_date?.substring(0..18), formatter).format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                        statsSeries[0].start_date?.format(DateTimeFormatter.ofPattern("yyyy-MM")) ?: "."
                     } else if (statsSeries.isNotEmpty() && index in statsSeries.indices) {
-                        LocalDateTime.parse(statsSeries[value.toInt() - 1].end_date?.substring(0..18), formatter).format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                        statsSeries[value.toInt() - 1].end_date?.format(DateTimeFormatter.ofPattern("yyyy-MM")) ?: "."
                     } else {
                         "."
                     }

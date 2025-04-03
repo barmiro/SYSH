@@ -15,7 +15,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,8 +40,8 @@ class StatsRepository @Inject constructor(
     val statsApi = retrofit.create(StatsApi::class.java)
 
     fun getStats(
-        start: String?,
-        end: String?,
+        start: LocalDateTime? = null,
+        end: LocalDateTime? = null,
         mode: String?,
         year: Int?
     ): Flow<Resource<StatsDTO>> {
@@ -51,7 +51,7 @@ class StatsRepository @Inject constructor(
             try {
                 val response = if (mode == "yearly") {
                     statsApi.fetchStatsYear(year ?: LocalDate.now().year)
-                } else if (start.isNullOrEmpty() || end.isNullOrEmpty()) {
+                } else if (start == null || end == null) {
                     statsApi.fetchStatsAll()
                 } else {
                     statsApi.fetchStatsRange(start, end)
@@ -77,8 +77,8 @@ class StatsRepository @Inject constructor(
     }
 
     fun getStatsSeries(
-        start: String?,
-        end: String?,
+        start: LocalDateTime? = null,
+        end: LocalDateTime? = null,
         step: String?
     ): Flow<Resource<List<StatsSeriesChunkDTO>>> {
         return flow {
@@ -116,10 +116,7 @@ class StatsRepository @Inject constructor(
             emit(Resource.Loading(true))
             try {
                 statsApi.fetchStartupData().body()?.let {
-                    val oldestStreamDate: LocalDate = LocalDate.parse(
-                        it.substringBefore('T'),
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                    )
+                    val oldestStreamDate: LocalDate = it.toLocalDate()
                     emit(Resource.Success(
                         data = oldestStreamDate
                         )

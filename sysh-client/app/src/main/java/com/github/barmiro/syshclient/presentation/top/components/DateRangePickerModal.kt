@@ -19,8 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.util.setToEndOfDay
-import java.text.SimpleDateFormat
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,19 +39,33 @@ fun DateRangePickerModal(
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (dateRangePickerState.selectedStartDateMillis != null) {
+                    dateRangePickerState.selectedStartDateMillis?.let { startDateMillis ->
+
+                        val endDateMillis = dateRangePickerState.selectedEndDateMillis
+                            ?: LocalDateTime.now()
+                            .atOffset(ZoneOffset.UTC)
+                            .toInstant()
+                            .toEpochMilli()
+
                         if (dateRangePickerState.selectedEndDateMillis == null) {
                             dateRangePickerState.setSelection(
-                                dateRangePickerState.selectedStartDateMillis,
-                                LocalDateTime.now()
-                                    .atOffset(ZoneOffset.UTC)
-                                    .toInstant()
-                                    .toEpochMilli())
+                                startDateMillis,
+                                endDateMillis
+                            )
                         }
 
-                        val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-                        val start = formatter.format(dateRangePickerState.selectedStartDateMillis)
-                        val end = formatter.format(setToEndOfDay(dateRangePickerState.selectedEndDateMillis!!))
+//                        this is all very bad, but the DateRangePicker is forcing my hand
+                        val start = LocalDateTime.ofInstant(
+                            Instant.ofEpochMilli(startDateMillis),
+                            ZoneId.of("UTC")
+                        )
+
+                        val end = setToEndOfDay(LocalDateTime
+                            .ofInstant(
+                            Instant.ofEpochMilli(endDateMillis),
+                            ZoneId.of("UTC")
+                            )
+                        )
 
                         onVMSearchParameterChange(TopScreenEvent.OnSearchParameterChange(null, start, end))
                         onDateRangeModeChange(TopScreenEvent.OnDateRangeModeChange("custom"))

@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
+import java.time.LocalDateTime
 
 @Composable
 fun TopArtistsScreen(
@@ -39,12 +40,13 @@ fun TopArtistsScreen(
 
     val artists = viewModel.artists.collectAsLazyPagingItems()
 
-    var previousValues by remember { mutableStateOf(listOf(state.sort, state.start, state.end)) }
+    var previousValues by remember { mutableStateOf(listOf("", LocalDateTime.MIN, LocalDateTime.MAX)) }
     LaunchedEffect(state.sort, state.start, state.end) {
-        if (listOf(state.sort, state.start, state.end) != previousValues) {
+        val newValues = listOf(state.sort, state.start, state.end)
+        if (newValues != previousValues) {
             viewModel.onEvent(TopScreenEvent.Refresh)
+            previousValues = newValues
         }
-        previousValues = listOf(state.sort, state.start, state.end)
     }
 
     Column(

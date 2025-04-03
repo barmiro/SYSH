@@ -1,67 +1,41 @@
 package com.github.barmiro.syshclient.util
 
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.util.Calendar
-import java.util.Date
+import java.time.temporal.ChronoUnit
 
-fun setToEndOfDay(date: Long): Date {
-    val calendar = Calendar.getInstance()
-    calendar.time = Date(date)
-
-    calendar.set(Calendar.HOUR_OF_DAY, 23)
-    calendar.set(Calendar.MINUTE, 59)
-    calendar.set(Calendar.SECOND, 59)
-
-    return calendar.time
+fun setToEndOfDay(date: LocalDateTime): LocalDateTime {
+    return date
+        .truncatedTo(ChronoUnit.DAYS)
+        .plusDays(1)
+        .minusSeconds(1)
 }
 
-fun monthToStart(yearMonth: YearMonth): String {
-    val year = yearMonth.year
-    val month = when {
-        yearMonth.monthValue < 10 -> "0${yearMonth.monthValue}"
-        else -> yearMonth.monthValue.toString()
-    }
-
-    return "$year-$month-01T00:00:00"
+fun monthToStart(yearMonth: YearMonth): LocalDateTime {
+    return yearMonth
+        .atDay(1)
+        .atStartOfDay()
 }
 
-
-
-fun monthToEnd(yearMonth: YearMonth): String {
-    val year = yearMonth.year
-    val month = when {
-        yearMonth.monthValue < 10 -> "0${yearMonth.monthValue}"
-        else -> yearMonth.monthValue.toString()
-    }
-    val day = yearMonth.lengthOfMonth()
-    return "$year-$month-${day}T23:59:59"
+fun monthToEnd(yearMonth: YearMonth): LocalDateTime {
+//    For consistency and in case I change to minusNanos later
+    return yearMonth
+        .plusMonths(1)
+        .atDay(1)
+        .atStartOfDay()
+        .minusSeconds(1)
 }
 
 
 
-fun yearToStart(year: Int): String {
-    return "$year-01-01T00:00:00"
+fun yearToStart(year: Int): LocalDateTime {
+    return LocalDateTime
+        .of(year, 1, 1, 0, 0)
 
 }
 
-fun yearToEnd(year: Int): String {
-    return "$year-12-31T23:59:59"
-}
-
-fun localDateFromTimestampString(string: String?): LocalDate? {
-    if (string.isNullOrEmpty()) {
-        return null
-    }
-
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
-
-    return try {
-        LocalDateTime.parse(string, formatter).toLocalDate()
-    } catch (e: DateTimeParseException) {
-        null
-    }
+fun yearToEnd(year: Int): LocalDateTime {
+    return LocalDateTime
+        .of(year + 1, 1, 1, 0, 0)
+        .minusSeconds(1)
 }

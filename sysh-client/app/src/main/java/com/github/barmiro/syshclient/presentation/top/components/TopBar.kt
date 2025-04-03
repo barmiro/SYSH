@@ -32,6 +32,7 @@ import com.github.barmiro.syshclient.util.monthToStart
 import com.github.barmiro.syshclient.util.yearToEnd
 import com.github.barmiro.syshclient.util.yearToStart
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,8 +86,8 @@ fun TopScreenTopBar(
                         onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
                         onVMSearchParameterChange(
                             TopScreenEvent.OnSearchParameterChange(
-                                start = "",
-                                end = ""
+                                start = LocalDateTime.MIN,
+                                end = LocalDateTime.MIN
                             )
                         )
                         expanded = false
@@ -119,11 +120,11 @@ fun TopScreenTopBar(
                             onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
                             onVMSearchParameterChange(
                                 TopScreenEvent.OnSearchParameterChange(
-                                    start = monthToStart(month), end = monthToEnd(month)
+                                    start = monthToStart(month),
+                                    end = monthToEnd(month)
                                 )
                             )
                         }
-
                         expanded = false
                     }
                 )

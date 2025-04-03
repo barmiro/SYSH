@@ -7,14 +7,15 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.time.LocalDateTime
 
 interface TopApi {
 
     @GET("tracks{optionalRangePath}")
     suspend fun fetchTopTracks(
         @Path("optionalRangePath", encoded = true) rangePath: String? = "",
-        @Query("start") start: String? = "2000-01-01T00:00:00",
-        @Query("end") end: String? = "2038-01-1T00:00:00",
+        @Query("start") start: LocalDateTime? = LocalDateTime.of(2000, 1, 1, 0, 0),
+        @Query("end") end: LocalDateTime? = LocalDateTime.of(2038, 1, 1, 0, 0),
         @Query("sort") sort: String? = null,
         @Query("offset") offset: Int,
         @Query("size") size: Int
@@ -23,8 +24,8 @@ interface TopApi {
     @GET("albums{optionalRangePath}")
     suspend fun fetchTopAlbums(
         @Path("optionalRangePath", encoded = true) rangePath: String? = "",
-        @Query("start") start: String? = "2000-01-01T00:00:00",
-        @Query("end") end: String? = "2038-01-01T00:00:00",
+        @Query("start") start: LocalDateTime? = LocalDateTime.of(2000, 1, 1, 0, 0),
+        @Query("end") end: LocalDateTime? = LocalDateTime.of(2038, 1, 1, 0, 0),
         @Query("sort") sort: String? = null,
         @Query("offset") offset: Int,
         @Query("size") size: Int
@@ -32,8 +33,8 @@ interface TopApi {
 
     @GET("artists")
     suspend fun fetchTopArtists(
-        @Query("start") start: String? = null,
-        @Query("end") end: String? = null,
+        @Query("start") start: LocalDateTime? = null,
+        @Query("end") end: LocalDateTime? = null,
         @Query("sort") sort: String? = null,
         @Query("offset") offset: Int,
         @Query("size") size: Int

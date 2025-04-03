@@ -39,13 +39,11 @@ import com.github.barmiro.syshclient.util.monthToEnd
 import com.github.barmiro.syshclient.util.monthToStart
 import com.github.barmiro.syshclient.util.yearToEnd
 import com.github.barmiro.syshclient.util.yearToStart
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Locale
 
 @Composable
 fun TopScreenBottomBar(
@@ -103,7 +101,6 @@ fun TopScreenBottomBar(
                         .toString()
                 }
 
-//                onDateRangeChange(yearToDateRange(year))
                 onVMSearchParameterChange(
                     TopScreenEvent.OnSearchParameterChange(
                         start = yearToStart(year),
@@ -245,32 +242,11 @@ fun pageNumberToMonth(page: Int, pageCount: Int): YearMonth {
 }
 
 @Composable
-fun BottomBarNewCustomText(start: String?, end:String?) {
+fun BottomBarNewCustomText(start: LocalDateTime?, end: LocalDateTime?) {
     if (start != null && end != null) {
-        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
-        val startDateTime = LocalDateTime.parse(start, inputFormatter)
-        val endDateTime = LocalDateTime.parse(end, inputFormatter)
-
-        val outputFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
-        val formattedStart = startDateTime.format(outputFormatter)
-        val formattedEnd = endDateTime.format(outputFormatter)
-
-        Text("$formattedStart - $formattedEnd")
-    }
-}
-
-@Composable
-fun BottomBarCustomRangeText(dateRange: Pair<Long?, Long?>?) {
-    if (dateRange != null) {
-        val formattedStart = SimpleDateFormat(
-            "MMM dd, yyyy",
-            Locale.getDefault()
-        ).format(dateRange.first)
-
-        val formattedEnd = SimpleDateFormat(
-            "MMM dd, yyyy",
-            Locale.getDefault()
-        ).format(dateRange.second)
+        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+        val formattedStart = start.format(formatter)
+        val formattedEnd = end.format(formatter)
 
         Text("$formattedStart - $formattedEnd")
     }

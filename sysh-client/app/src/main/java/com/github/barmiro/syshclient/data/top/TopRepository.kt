@@ -15,6 +15,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,8 +41,8 @@ class TopRepository @Inject constructor(
 
 
     fun getTopTracks(
-        start: String? = null,
-        end: String? = null,
+        start: LocalDateTime? = null,
+        end: LocalDateTime? = null,
         sort: String? = null
     ): Flow<PagingData<TopTrack>> {
         var rangePath= ""
@@ -72,8 +73,8 @@ class TopRepository @Inject constructor(
     }
 
     fun getTopAlbums(
-        start: String? = null,
-        end: String? = null,
+        start: LocalDateTime? = null,
+        end: LocalDateTime? = null,
         sort: String? = null
     ): Flow<PagingData<TopAlbum>> {
         var rangePath= ""
@@ -104,8 +105,8 @@ class TopRepository @Inject constructor(
     }
 
     fun getTopArtists(
-        start: String? = null,
-        end: String? = null,
+        start: LocalDateTime? = null,
+        end: LocalDateTime? = null,
         sort: String? = null
     ): Flow<PagingData<TopArtist>> {
         var rangePath= ""

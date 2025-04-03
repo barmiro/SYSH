@@ -6,13 +6,14 @@ import com.github.barmiro.syshclient.domain.top.TopAlbum
 import com.github.barmiro.syshclient.domain.top.TopArtist
 import com.github.barmiro.syshclient.domain.top.TopTrack
 import retrofit2.HttpException
+import java.time.LocalDateTime
 
 
 class TrackPagingSource(
     private val topApi: TopApi,
     private val rangePath: String,
-    private val start: String?,
-    private val end: String?,
+    private val start: LocalDateTime?,
+    private val end: LocalDateTime?,
     private val sort: String?
 ) : PagingSource<Int, TopTrack>() {
 
@@ -62,8 +63,8 @@ class TrackPagingSource(
 class AlbumPagingSource(
     private val topApi: TopApi,
     private val rangePath: String,
-    private val start: String?,
-    private val end: String?,
+    private val start: LocalDateTime?,
+    private val end: LocalDateTime?,
     private val sort: String?
 ) : PagingSource<Int, TopAlbum>() {
 
@@ -114,8 +115,8 @@ class AlbumPagingSource(
 
 class ArtistPagingSource(
     private val topApi: TopApi,
-    private val start: String?,
-    private val end: String?,
+    private val start: LocalDateTime?,
+    private val end: LocalDateTime?,
     private val sort: String?
 ) : PagingSource<Int, TopArtist>() {
 

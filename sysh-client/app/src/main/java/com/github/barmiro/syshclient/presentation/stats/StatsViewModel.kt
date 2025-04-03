@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -65,10 +66,10 @@ class StatsViewModel @Inject constructor(
     }
 
     fun getStats(
-        start: String? = state.value.start,
-        end: String? = state.value.end,
+        start: LocalDateTime? = state.value.start,
+        end: LocalDateTime? = state.value.end,
         mode: String? = state.value.dateRangeMode,
-        year: Int? = state.value.start?.substringBefore('-')?.toInt()
+        year: Int? = state.value.start?.year
     ) {
         viewModelScope.launch {
             statsRepository.getStats(start, end, mode, year)
@@ -96,8 +97,8 @@ class StatsViewModel @Inject constructor(
     }
 
     fun getStatsSeries(
-        start: String? = state.value.start,
-        end: String? = state.value.end,
+        start: LocalDateTime? = state.value.start,
+        end: LocalDateTime? = state.value.end,
         step: String? = null
     ) {
         viewModelScope.launch {

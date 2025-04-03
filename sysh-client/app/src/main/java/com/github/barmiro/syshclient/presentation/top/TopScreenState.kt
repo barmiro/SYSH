@@ -3,6 +3,7 @@ package com.github.barmiro.syshclient.presentation.top
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,8 +12,8 @@ data class TopScreenState(
     val isRefreshing: Boolean = false,
     val oldestStreamDate: LocalDate = LocalDate.of(2006, 1, 1),
     val sort: String? = null,
-    val start: String? = null,
-    val end: String? = null,
+    val start: LocalDateTime? = null,
+    val end: LocalDateTime? = null,
     val dateRangeMode: String? = null,
     val dateRangePageNumber: Int? = null
 )
@@ -27,8 +28,8 @@ class TopScreenStateManager @Inject constructor() {
         isRefreshing: Boolean? = null,
         oldestStreamDate: LocalDate? = null,
         sort: String? = null,
-        start: String? = null,
-        end: String? = null,
+        start: LocalDateTime? = null,
+        end: LocalDateTime? = null,
         dateRangeMode: String? = null,
         dateRangePageNumber: Int? = null
     ) {
@@ -37,14 +38,23 @@ class TopScreenStateManager @Inject constructor() {
             isRefreshing = isRefreshing ?: _state.value.isRefreshing,
             oldestStreamDate = oldestStreamDate ?: _state.value.oldestStreamDate,
             sort = handleNullOrEmptyString(sort, _state.value.sort),
-            start = handleNullOrEmptyString(start, _state.value.start),
-            end = handleNullOrEmptyString(end, _state.value.end),
+            start = handleNullOrMinLocalDateTime(start, _state.value.start),
+            end = handleNullOrMinLocalDateTime(end, _state.value.end),
             dateRangeMode = handleNullOrEmptyString(dateRangeMode, _state.value.dateRangeMode),
             dateRangePageNumber = handleNullOrNegativeInt(dateRangePageNumber, _state.value.dateRangePageNumber)
         )
     }
 }
 
+//These are for explicitly resetting values to null. More elegant way?
+
+private fun handleNullOrMinLocalDateTime(newValue: LocalDateTime?, currentValue: LocalDateTime?): LocalDateTime? {
+    return when {
+        newValue == null -> currentValue
+        newValue.isEqual(LocalDateTime.MIN) -> null
+        else -> newValue
+    }
+}
 
 private fun handleNullOrEmptyString(newValue: String?, currentValue: String?): String? {
     return when {
