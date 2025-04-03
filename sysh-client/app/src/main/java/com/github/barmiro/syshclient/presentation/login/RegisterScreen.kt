@@ -22,11 +22,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.navigation.NavController
 import com.github.barmiro.syshclient.presentation.common.Login
-import com.github.barmiro.syshclient.presentation.common.SessionViewModel
 
 @Composable
-fun RegisterScreen(authVM: AuthViewModel,
-                   sessionVM: SessionViewModel,
+fun RegisterScreen(sessionVM: SessionViewModel,
                    navController: NavController
 ) {
 
@@ -42,8 +40,8 @@ fun RegisterScreen(authVM: AuthViewModel,
 
 
 //    I'll put this here for now, but I'll have to reconsider this
-    val isRegistered = authVM.isRegistered.collectAsState().value
-    val registerState = authVM.registerState.collectAsState().value
+    val isRegistered = sessionVM.isRegistered.collectAsState().value
+    val registerState = sessionVM.registerState.collectAsState().value
     LaunchedEffect(isRegistered) {
         if (isRegistered) {
             navController.navigate(Login)
@@ -98,7 +96,7 @@ fun RegisterScreen(authVM: AuthViewModel,
 
             Button(
                 onClick = {
-                    authVM.register(username.value.text, password.value.text)
+                    sessionVM.register(username.value.text, password.value.text)
                 },
                 enabled = password.value.text == confirmation.value.text && password.value.text.isNotEmpty()
             ) {

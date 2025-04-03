@@ -61,7 +61,7 @@ public class StatsController {
 		
 		ZonedDateTime startValue = start
 				.map(startInput -> startInput.atZone(userTimeZone))
-				.orElse(startup());
+				.orElse(startup().firstStreamDate());
 		
 		ZonedDateTime endValue = end
 				.map(endInput -> endInput.atZone(userTimeZone))
@@ -125,14 +125,17 @@ public class StatsController {
 	
 
 	@GetMapping("/startup")
-	ZonedDateTime startup() {
+	FirstStreamDateDTO startup() {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		ZoneId userTimeZone = userRepository.getUserTimezone(username);
 
 //		statsCache.cacheGenerator(username);
 
-		return statsRepo.getFirstStreamInstant(username).orElse(Instant.now()).atZone(userTimeZone);
+		return new FirstStreamDateDTO(
+				statsRepo.getFirstStreamInstant(username)
+				.orElse(Instant.now())
+				.atZone(userTimeZone));
 	}
 
 }

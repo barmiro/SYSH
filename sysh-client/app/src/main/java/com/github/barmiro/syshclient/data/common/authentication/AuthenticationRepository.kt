@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient.data.common.authentication
 
+import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.handleNetworkException
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
@@ -25,6 +26,7 @@ class AuthenticationRepository @Inject constructor(
     val client = OkHttpClient.Builder()
         .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
+        .addInterceptor(ServerErrorInterceptor(userPrefRepo))
         .build()
 
     val retrofit = Retrofit.Builder()

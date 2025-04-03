@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient.data.stats
 
+import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.handleNetworkException
@@ -27,6 +28,7 @@ class StatsRepository @Inject constructor(
         .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(JwtInterceptor(userPrefRepo))
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
+        .addInterceptor(ServerErrorInterceptor(userPrefRepo))
         .build()
 
     val retrofit = Retrofit.Builder()
@@ -116,7 +118,7 @@ class StatsRepository @Inject constructor(
             emit(Resource.Loading(true))
             try {
                 statsApi.fetchStartupData().body()?.let {
-                    val oldestStreamDate: LocalDate = it.toLocalDate()
+                    val oldestStreamDate: LocalDate = it.firstStreamDate.toLocalDate()
                     emit(Resource.Success(
                         data = oldestStreamDate
                         )

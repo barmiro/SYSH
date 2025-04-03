@@ -8,6 +8,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 private val localDateTimeFormatter = DateTimeFormatter
@@ -15,6 +16,9 @@ private val localDateTimeFormatter = DateTimeFormatter
 
 private val offsetDateTimeFormatter = DateTimeFormatter
     .ISO_OFFSET_DATE_TIME
+
+private val zonedDateTimeFormatter = DateTimeFormatter
+    .ISO_ZONED_DATE_TIME
 
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
 
@@ -48,4 +52,21 @@ object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
     }
 
 }
+
+object ZonedDateTimeSerializer : KSerializer<ZonedDateTime> {
+
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
+        "ZonedDateTime", PrimitiveKind.STRING
+    )
+
+    override fun serialize(encoder: Encoder, value: ZonedDateTime) {
+        encoder.encodeString(value.format(offsetDateTimeFormatter))
+    }
+
+    override fun deserialize(decoder: Decoder): ZonedDateTime {
+        return ZonedDateTime.parse(decoder.decodeString(), zonedDateTimeFormatter)
+    }
+
+}
+
 

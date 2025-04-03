@@ -6,9 +6,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.github.barmiro.syshclient.presentation.home.HomeScreen
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
-import com.github.barmiro.syshclient.presentation.login.AuthViewModel
 import com.github.barmiro.syshclient.presentation.login.LoginScreen
 import com.github.barmiro.syshclient.presentation.login.RegisterScreen
+import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 import com.github.barmiro.syshclient.presentation.login.SpotifyAuthScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
@@ -34,7 +34,6 @@ fun AppNavHost(navController: NavHostController,
                topAlbumsVM: TopAlbumsViewModel,
                topArtistsVM: TopArtistsViewModel,
                statsVM: StatsViewModel,
-               authVM: AuthViewModel,
                sessionVM: SessionViewModel,
                settingsVM: SettingsViewModel,
                onPickZipFile: () -> Unit) {
@@ -52,10 +51,10 @@ fun AppNavHost(navController: NavHostController,
         }
 
         composable<Login> {
-            LoginScreen(authVM, navController)
+            LoginScreen(sessionVM, navController)
         }
         composable<Register> {
-            RegisterScreen(authVM, sessionVM, navController)
+            RegisterScreen(sessionVM, navController)
         }
         composable<Home> {
             HomeScreen(homeVM)
@@ -70,10 +69,10 @@ fun AppNavHost(navController: NavHostController,
             TopAlbumsScreen(topAlbumsVM)
         }
         composable<SpotifyAuth> {
-            SpotifyAuthScreen(authVM)
+            SpotifyAuthScreen(sessionVM)
         }
         composable<Settings> {
-            SettingsScreen(settingsVM, onPickZipFile)
+            SettingsScreen(settingsVM, sessionVM, onPickZipFile)
         }
     }
 }

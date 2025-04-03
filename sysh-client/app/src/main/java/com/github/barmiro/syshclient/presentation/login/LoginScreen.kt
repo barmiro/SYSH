@@ -25,7 +25,7 @@ import com.github.barmiro.syshclient.presentation.common.Register
 import com.github.barmiro.syshclient.presentation.common.Splash
 
 @Composable
-fun LoginScreen(authVM: AuthViewModel,
+fun LoginScreen(sessionVM: SessionViewModel,
                 navController: NavHostController
 ) {
     Surface(
@@ -70,7 +70,7 @@ fun LoginScreen(authVM: AuthViewModel,
 
             Button(
                 onClick = {
-                    authVM.getToken(username.value.text, password.value.text)
+                    sessionVM.getToken(username.value.text, password.value.text)
                     navController.navigate(Splash)
                 }
             ) {

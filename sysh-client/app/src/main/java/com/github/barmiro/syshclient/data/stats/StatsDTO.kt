@@ -1,8 +1,10 @@
 package com.github.barmiro.syshclient.data.stats
 
 import com.github.barmiro.syshclient.util.OffsetDateTimeSerializer
+import com.github.barmiro.syshclient.util.ZonedDateTimeSerializer
 import kotlinx.serialization.Serializable
 import java.time.OffsetDateTime
+import java.time.ZonedDateTime
 
 @Serializable
 data class StatsDTO(
@@ -30,4 +32,8 @@ data class StatsSeriesChunkDTO(
     val stream_count: Int = 0
 )
 
-
+@Serializable
+data class FirstStreamDateDTO(
+    @Serializable(with = ZonedDateTimeSerializer::class)
+    val firstStreamDate: ZonedDateTime
+)

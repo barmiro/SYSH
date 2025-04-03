@@ -23,10 +23,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SpotifyAuthScreen(
-    authVM: AuthViewModel
+    sessionVM: SessionViewModel
 ) {
 
-    val spotifyAuthUrl by authVM.spotifyAuthUrl.collectAsState()
+    val spotifyAuthUrl by sessionVM.spotifyAuthUrl.collectAsState()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -58,7 +58,7 @@ fun SpotifyAuthScreen(
 
             Button(
                 onClick = {
-                    authVM.spotifyAuthorization()
+                    sessionVM.spotifyAuthorization()
                 }
             ) {
                 Text("Authorize")

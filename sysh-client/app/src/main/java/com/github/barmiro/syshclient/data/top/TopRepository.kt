@@ -3,6 +3,7 @@ package com.github.barmiro.syshclient.data.top
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
@@ -27,6 +28,7 @@ class TopRepository @Inject constructor(
     val client = OkHttpClient.Builder()
         .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(JwtInterceptor(userPrefRepo))
+        .addInterceptor(ServerErrorInterceptor(userPrefRepo))
         .build()
 
     val retrofit = Retrofit.Builder()

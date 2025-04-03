@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -109,5 +110,15 @@ class UserPreferencesRepository @Inject constructor(
 
     suspend fun clearAllPreferences() {
         dataStore.edit { it.clear() }
+    }
+
+    suspend fun logout() {
+        val currentServerUrl: String? = serverUrl.first()
+        dataStore.edit { data ->
+            data.clear()
+            currentServerUrl?.let {
+                data[PreferencesKeys.SERVER_URL] = it
+            }
+        }
     }
 }

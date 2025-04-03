@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient.data.common.dataimport
 
+import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.handleNetworkException
@@ -29,6 +30,7 @@ class ImportRepository @Inject constructor(
         .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(JwtInterceptor(userPrefRepo))
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
+        .addInterceptor(ServerErrorInterceptor(userPrefRepo))
         .writeTimeout(60, TimeUnit.SECONDS)
         .readTimeout(300, TimeUnit.SECONDS)
         .build()

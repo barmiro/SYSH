@@ -28,11 +28,10 @@ import com.github.barmiro.syshclient.presentation.common.AppNavHost
 import com.github.barmiro.syshclient.presentation.common.BottomNavBar
 import com.github.barmiro.syshclient.presentation.common.Home
 import com.github.barmiro.syshclient.presentation.common.Login
-import com.github.barmiro.syshclient.presentation.common.SessionViewModel
 import com.github.barmiro.syshclient.presentation.common.SpotifyAuth
 import com.github.barmiro.syshclient.presentation.common.Startup
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
-import com.github.barmiro.syshclient.presentation.login.AuthViewModel
+import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
 import com.github.barmiro.syshclient.presentation.startup.StartupViewModel
 import com.github.barmiro.syshclient.presentation.stats.StatsViewModel
@@ -54,9 +53,8 @@ class MainActivity : ComponentActivity() {
     private val topAlbumsVM: TopAlbumsViewModel by viewModels()
     private val topArtistsVM: TopArtistsViewModel by viewModels()
     private val statsVM: StatsViewModel by viewModels()
-    private val authVM: AuthViewModel by viewModels()
-    private val settingsVM: SettingsViewModel by viewModels()
     private val sessionVM: SessionViewModel by viewModels()
+    private val settingsVM: SettingsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,35 +63,46 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val isLoggedIn by sessionVM.isLoggedIn.collectAsState()
-            val isAuthorizedWithSpotify by authVM.isAuthorizedWithSpotify.collectAsState()
+            val isAuthorizedWithSpotify by sessionVM.isAuthorizedWithSpotify.collectAsState()
             val navController = rememberNavController()
             val homeState by homeVM.homeState.collectAsState()
             val storedUrl by sessionVM.serverUrl.collectAsState()
             val serverResponded by startupVM.serverResponded.collectAsState()
-            val responseCode by authVM.responseCode.collectAsState()
+            val responseCode by sessionVM.responseCode.collectAsState()
 
             val snackbarHostState = remember { SnackbarHostState() }
             val coroutineScope = rememberCoroutineScope()
-            val errorMessage by authVM.errorMessage.collectAsState()
+            val errorMessage by sessionVM.errorMessage.collectAsState()
 
 //            TODO: find out why there's a loop
             var debuggingBoolean = true
 
 
             LaunchedEffect(storedUrl) {
+                if (storedUrl != null) {
                     startupVM.getServerInfo()
+                }
             }
 
             LaunchedEffect(serverResponded, isLoggedIn) {
                 serverResponded?.let {
                     if (it) {
                         if (isLoggedIn) {
-                            authVM.getUserData()
+                            sessionVM.getUserData()
                         } else {
                             navController.navigate(Login) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     inclusive = true
                                 }
+                            }
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = errorMessage.takeIf { message ->
+                                        !message.isNullOrEmpty()
+                                    } ?: "You have been logged out",
+                                    actionLabel = "Dismiss",
+                                    duration = SnackbarDuration.Short
+                                )
                             }
                         }
                     } else {
@@ -151,7 +160,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-
             SyshClientTheme {
                 Surface(
                     modifier = Modifier
@@ -168,11 +176,8 @@ class MainActivity : ComponentActivity() {
                                 if (debuggingBoolean) {
                                     topScreenVM.getOldestStreamDate()
                                     homeVM.getStats()
-                                    statsVM.getStats()
-                                    statsVM.getStatsSeries()
                                     debuggingBoolean = false
                                 }
-
                                 if (!homeState.isLoading) {
                                     BottomNavBar(navController)
                                 }
@@ -188,7 +193,6 @@ class MainActivity : ComponentActivity() {
                                 topAlbumsVM,
                                 topArtistsVM,
                                 statsVM,
-                                authVM,
                                 sessionVM,
                                 settingsVM,
                                 onPickZipFile = { pickZipFile() }

@@ -20,11 +20,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 import com.github.barmiro.syshclient.presentation.top.components.SettingsScreenTopBar
 
 @Composable
 fun SettingsScreen(
     settingsVM: SettingsViewModel,
+    sessionVM: SessionViewModel,
     onPickZipFile: () -> Unit
 ) {
 
@@ -51,6 +53,20 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                item() {
+                    Row() {
+                        Button(
+                            onClick = {
+                                sessionVM.logout()
+                            }
+                        ) {
+                            Text(
+                                text = "Log out"
+                            )
+                        }
+                    }
+                }
+
                 item() {
                     Row() {
                         Button(

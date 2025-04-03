@@ -3,7 +3,9 @@ package com.github.barmiro.sysh_server.common.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -20,7 +22,7 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.albu
 import com.github.barmiro.sysh_server.dataintake.json.StreamDTO;
 import com.github.barmiro.sysh_server.dataintake.recent.dto.ItemsWrapper;
 import com.github.barmiro.sysh_server.dataintake.recent.dto.recentstream.RecentStream;
-import com.github.barmiro.sysh_server.users.SpotifyUserData;
+import com.github.barmiro.sysh_server.users.SpotifyUserDataDTO;
 
 public class ConvertDTOs {
 	
@@ -44,16 +46,15 @@ public class ConvertDTOs {
 		return streams;
 	}
 	
-	public static SpotifyUserData userData(ResponseEntity<String> response) {
+	public static SpotifyUserDataDTO userData(ResponseEntity<String> response) {
 		
-		SpotifyUserData data;
+		SpotifyUserDataDTO data;
 		try {
 			data = objectMapper
-					.readValue(response.getBody(), SpotifyUserData.class);
+					.readValue(response.getBody(), SpotifyUserDataDTO.class);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-//			TODO: change this
-			return new SpotifyUserData("to SYSH");
+			throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
 		}
 		
 		return data;

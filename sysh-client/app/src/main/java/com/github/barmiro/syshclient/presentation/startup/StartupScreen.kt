@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import com.github.barmiro.syshclient.presentation.common.Login
-import com.github.barmiro.syshclient.presentation.common.SessionViewModel
+import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 
 @Composable
 fun StartupScreen(
@@ -32,11 +32,11 @@ fun StartupScreen(
     val serverResponded by startupVM.serverResponded.collectAsState()
 
 
-    LaunchedEffect(storedUrl) {
-        if (!storedUrl.isNullOrEmpty()) {
-            startupVM.getServerInfo()
-        }
-    }
+//    LaunchedEffect(storedUrl) {
+//        if (!storedUrl.isNullOrEmpty()) {
+//            startupVM.getServerInfo()
+//        }
+//    }
     LaunchedEffect(serverResponded) {
         serverResponded?.let {
             if (it) {

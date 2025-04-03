@@ -8,14 +8,16 @@ import com.github.barmiro.syshclient.data.common.startup.StartupDataRepository
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(
+class SessionViewModel @Inject constructor(
     private val authRepo: AuthenticationRepository,
     private val userPrefRepo: UserPreferencesRepository,
     private val startupDataRepository: StartupDataRepository
@@ -38,9 +40,6 @@ class AuthViewModel @Inject constructor(
 
     private val _spotifyAuthUrl: MutableStateFlow<String?> = MutableStateFlow(null)
     val spotifyAuthUrl: StateFlow<String?> = _spotifyAuthUrl
-
-    private val _isAuthorizedWithSpotify = MutableStateFlow(false)
-    val isAuthorizedWithSpotify: StateFlow<Boolean> = _isAuthorizedWithSpotify.asStateFlow()
 
 
 
@@ -104,7 +103,6 @@ class AuthViewModel @Inject constructor(
                                 userPrefRepo.setAuthorizedWithSpotify(true)
                                 userPrefRepo.saveUserDisplayName(it)
                             }
-                            _isAuthorizedWithSpotify.value = userPrefRepo.isAuthorizedWithSpotify.first()
                             _responseCode.value = 200
                         }
 
@@ -141,4 +139,53 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
+
+    fun logout() {
+        viewModelScope.launch {
+            userPrefRepo.logout()
+        }
+    }
+
+
+    val isAuthorizedWithSpotify: StateFlow<Boolean> = userPrefRepo.isAuthorizedWithSpotify
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val serverUrl: StateFlow<String?> = userPrefRepo.serverUrl
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    val isLoggedIn: StateFlow<Boolean> = userPrefRepo.isLoggedIn
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+//    init {
+//        viewModelScope.launch {
+////                !!! DELETE BEFORE PUBLISHING !!!
+//            userPreferencesRepository.clearAllPreferences()
+////          ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+//        }
+//    }
+
+    fun saveServerUrl(serverUrl: String, onComplete: () -> Unit) {
+        viewModelScope.launch {
+            userPrefRepo.saveServerUrl(serverUrl)
+            userPrefRepo.serverUrl.first()
+            onComplete()
+        }
+    }
+
+
+
+
+
 }

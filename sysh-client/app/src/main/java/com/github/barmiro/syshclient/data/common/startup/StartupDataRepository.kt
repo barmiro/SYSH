@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient.data.common.startup
 
+import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.handleNetworkException
@@ -26,6 +27,7 @@ class StartupDataRepository @Inject constructor(
         .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
         .addInterceptor(JwtInterceptor(userPrefRepo))
+        .addInterceptor(ServerErrorInterceptor(userPrefRepo))
         .build()
 
 

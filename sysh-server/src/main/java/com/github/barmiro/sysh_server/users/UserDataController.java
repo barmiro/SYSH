@@ -45,7 +45,7 @@ public class UserDataController {
 				.retrieve()
 				.toEntity(String.class);
 		
-		SpotifyUserData userData = ConvertDTOs.userData(response);
+		SpotifyUserDataDTO userData = ConvertDTOs.userData(response);
 		
 		int updated = userDataRepository.addUserDisplayName(username, userData.display_name());
 		
