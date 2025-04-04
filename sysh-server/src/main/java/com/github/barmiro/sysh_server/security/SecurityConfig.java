@@ -28,12 +28,12 @@ import com.nimbusds.jose.proc.SecurityContext;
 @EnableWebSecurity
 public class SecurityConfig {
 	private KeyPairManager keyPairManager;
-	private SyshUserDetailsService userDetailsManager;
+	private SyshUserDetailsService userDetailsService;
 	
 	public SecurityConfig(KeyPairManager keyPairManager,
-			SyshUserDetailsService userDetailsManager) {
+			SyshUserDetailsService userDetailsService) {
 		this.keyPairManager = keyPairManager;
-		this.userDetailsManager = userDetailsManager;
+		this.userDetailsService = userDetailsService;
 	}
 	
 	@Bean
@@ -61,7 +61,7 @@ public class SecurityConfig {
 	AuthenticationManager authenticationManager() {
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 		provider.setPasswordEncoder(passwordEncoder());
-		provider.setUserDetailsService(userDetailsManager);
+		provider.setUserDetailsService(userDetailsService);
 		return new ProviderManager(provider);
 	}
 	

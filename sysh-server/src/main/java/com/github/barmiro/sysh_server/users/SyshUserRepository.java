@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.TimeZone;
 
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
@@ -146,24 +145,27 @@ public class SyshUserRepository {
 	}
 	
 	
-	public int createUser(UserDetails userDetails) {
+	public int createUser(SyshUser user) {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 		
-		String passwordHash = passwordEncoder.encode(userDetails.getPassword());
+		String passwordHash = passwordEncoder.encode(user.password());
 		String spotifyState = GetRandom.alphaNumeric(32);
 		
 		return jdbc.sql("INSERT INTO Users ("
 				+ "username,"
 				+ "password,"
+				+ "timezone,"
 				+ "spotify_state"
 				+ ") VALUES ("
 				+ ":username,"
 				+ ":password,"
+				+ ":timezone,"
 				+ ":spotify_state"
 				+ ") ON CONFLICT (username) "
 				+ "DO NOTHING")
-				.param("username", userDetails.getUsername(), Types.VARCHAR)
+				.param("username", user.username(), Types.VARCHAR)
 				.param("password", passwordHash, Types.VARCHAR)
+				.param("timezone", user.timezone())
 				.param("spotify_state", spotifyState, Types.VARCHAR)
 				.update();
 	}

@@ -46,7 +46,6 @@ import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
 import com.github.barmiro.sysh_server.security.SyshUser;
-import com.github.barmiro.sysh_server.security.SyshUserDetails;
 import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 import com.github.barmiro.sysh_server.stats.StatsCache;
 import com.github.barmiro.sysh_server.stats.StatsRepository;
@@ -129,8 +128,7 @@ class IntegrationTest {
 	@Order(1)
 	void recentTest() throws JsonProcessingException, ClassCastException, IllegalAccessException, InvocationTargetException {
 		
-		userManager.createUser(new SyshUserDetails(
-				new SyshUser("user", "password")));
+		userManager.createUser(new SyshUser("user", "password", "UTC"));
 		
 		userManager.updateUserSpotifyRefreshToken("user", "refresh");
 		userManager.updateUserTokenExpirationTime("user", Timestamp.valueOf(LocalDateTime.now().plusHours(1)));

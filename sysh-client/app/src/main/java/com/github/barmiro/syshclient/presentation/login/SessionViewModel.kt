@@ -7,6 +7,7 @@ import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepo
 import com.github.barmiro.syshclient.data.common.startup.StartupDataRepository
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,15 +43,19 @@ class SessionViewModel @Inject constructor(
     private val _spotifyAuthUrl: MutableStateFlow<String?> = MutableStateFlow(null)
     val spotifyAuthUrl: StateFlow<String?> = _spotifyAuthUrl
 
+    private val timezone: String = ZoneId.systemDefault().id
 
 
 
     fun register(username: String, password: String) {
         viewModelScope.launch {
-            authRepo.register(username, password).collect { result ->
+            authRepo.register(username, password, timezone).collect { result ->
                 when (result) {
                     is Resource.Success -> {
                         _isRegistered.value = true
+//                        this is the simplest workaround for resetting the value
+                        delay(200)
+                        _isRegistered.value = false
                     }
 
                     is Resource.Error -> {

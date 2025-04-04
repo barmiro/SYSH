@@ -21,7 +21,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
 import com.github.barmiro.sysh_server.security.SyshUser;
-import com.github.barmiro.sysh_server.security.SyshUserDetails;
 import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 import com.github.barmiro.sysh_server.users.SyshUserManager;
 
@@ -50,8 +49,7 @@ class AuthTests {
 	@Test
 	void tokenTest() {
 		
-		userManager.createUser(new SyshUserDetails(
-				new SyshUser("user", "password")));
+		userManager.createUser(new SyshUser("user", "password", "UTC"));
 		
 		MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
 		RestClient.Builder builder = RestClient.builder()

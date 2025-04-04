@@ -78,13 +78,13 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
-    fun register(username: String, password: String): Flow<Resource<String>> {
+    fun register(username: String, password: String, timezone: String): Flow<Resource<String>> {
         return flow {
             emit(Resource.Loading(true))
 
             try {
                 val response = authApi.register(
-                    CreateUserDTO(username, password))
+                    CreateUserDTO(username, password, timezone))
 
                 if (response.isSuccessful) {
                     response.body()?.takeIf {

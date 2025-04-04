@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateUserDTO(
     val username: String,
-    val password: String
+    val password: String,
+    val timezone: String
 )

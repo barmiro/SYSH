@@ -34,6 +34,5 @@ public class SyshUserDetails implements UserDetails {
 	public String getUsername() {
 		return user.username();
 	}
-	
 
 }

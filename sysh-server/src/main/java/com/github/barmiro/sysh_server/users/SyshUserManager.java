@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.github.barmiro.sysh_server.security.SyshUserDetails;
+import com.github.barmiro.sysh_server.security.SyshUser;
 
 @Service
 public class SyshUserManager {
@@ -88,12 +88,13 @@ private static final Logger log = LoggerFactory.getLogger(SyshUserManager.class)
 		return userRepo.findByUsername(username).isPresent();
 	}
 	
-	public void createUser(SyshUserDetails user) {
+	public void createUser(SyshUser user) {
 		int created = userRepo.createUser(user);
 		if (created == 0) {
-			log.error("User creation for " + user.getUsername() + " failed");
+			log.error("User creation for " + user.username() + " failed");
 		} else if (created == 1) {
-			log.info("User " + user.getUsername() + " created succcessfully");
+			log.info("User " + user.username() + " created succcessfully");
+			log.info(userRepo.findByUsername(user.username()).get().toString());
 		}
 	}
 	
