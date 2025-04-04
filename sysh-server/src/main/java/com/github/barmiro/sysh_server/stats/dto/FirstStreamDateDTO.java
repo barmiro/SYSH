@@ -1,4 +1,4 @@
-package com.github.barmiro.sysh_server.stats;
+package com.github.barmiro.sysh_server.stats.dto;
 
 import java.time.ZonedDateTime;
 

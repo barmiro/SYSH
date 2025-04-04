@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.barmiro.syshclient.R
+import com.github.barmiro.syshclient.data.stats.HourlyStatsDTO
 import com.github.barmiro.syshclient.data.stats.StatsSeriesChunkDTO
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
@@ -223,6 +224,89 @@ fun StreamingStatsChartScaffold(
                     textAlign = TextAlign.Center
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun HourlyStatsChart(hourlyStats: List<HourlyStatsDTO>) {
+    val modelProducer = remember { CartesianChartModelProducer() }
+
+    LaunchedEffect(hourlyStats) {
+        if (hourlyStats.isNotEmpty()) {
+            modelProducer.runTransaction {
+                lineSeries {
+                    series(
+                        y = hourlyStats.map { item -> item.minutes_streamed }
+                    )
+                }
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Row {
+            Column() {
+                Text(
+                    text = "Minutes Streamed by Time of Day",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center
+                )
+
+            }
+        }
+        Row {
+            CartesianChartHost(
+                chart = rememberCartesianChart(
+                    rememberLineCartesianLayer(
+                        lineProvider = LineCartesianLayer.LineProvider
+                            .series(vicoTheme.lineCartesianLayerColors.map { color ->
+                                LineCartesianLayer.rememberLine(
+                                    areaFill = LineCartesianLayer.AreaFill.single(
+                                        fill(color.copy(alpha = 0.2f))
+                                    ),
+                                    fill = LineCartesianLayer.LineFill.single(fill(color)),
+                                    pointConnector = PointConnector.Sharp
+                                )
+                            })
+                    ),
+                    startAxis = VerticalAxis.rememberStart(
+                        itemPlacer = remember { VerticalAxis.ItemPlacer.count(count = { 6 }) }
+                    ),
+                    bottomAxis = HorizontalAxis.rememberBottom(
+                        itemPlacer = HorizontalAxis.ItemPlacer.aligned(
+                            spacing = { 12 },
+                            addExtremeLabelPadding = false),
+                        valueFormatter = { _, value, _ -> (value / 4).toInt().toString() }
+//                        valueFormatter = { _, value, _ ->
+//                            val index = value.toInt() - 1
+//                            if (index == -1) {
+//                                statsSeries[0].start_date?.format(DateTimeFormatter.ofPattern("yyyy-MM"))
+//                                    ?: "."
+//                            } else if (statsSeries.isNotEmpty() && index in statsSeries.indices) {
+//                                statsSeries[value.toInt() - 1].end_date?.format(
+//                                    DateTimeFormatter.ofPattern(
+//                                        "yyyy-MM"
+//                                    )
+//                                ) ?: "."
+//                            } else {
+//                                "."
+//                            }
+//                        }
+                    ),
+                ),
+                modelProducer = modelProducer,
+                scrollState = rememberVicoScrollState(scrollEnabled = false)
+            )
         }
     }
 }

@@ -37,3 +37,9 @@ data class FirstStreamDateDTO(
     @Serializable(with = ZonedDateTimeSerializer::class)
     val firstStreamDate: ZonedDateTime
 )
+
+@Serializable
+data class HourlyStatsDTO(
+    val hour: Int,
+    val minutes_streamed: Int = 0,
+)

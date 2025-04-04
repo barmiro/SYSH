@@ -172,15 +172,14 @@ class MainActivity : ComponentActivity() {
                         },
                         bottomBar = {
                             if (isLoggedIn && isAuthorizedWithSpotify) {
-
                                 if (debuggingBoolean) {
                                     topScreenVM.getOldestStreamDate()
                                     homeVM.getStats()
                                     debuggingBoolean = false
                                 }
-                                if (!homeState.isLoading) {
-                                    BottomNavBar(navController)
-                                }
+                            }
+                            if (!debuggingBoolean) {
+                                BottomNavBar(navController)
                             }
                         }
                     ) { innerPadding ->

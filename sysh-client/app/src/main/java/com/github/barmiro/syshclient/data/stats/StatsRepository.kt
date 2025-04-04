@@ -112,6 +112,40 @@ class StatsRepository @Inject constructor(
         }
     }
 
+
+    fun getHourlyStats(
+        start: LocalDateTime? = null,
+        end: LocalDateTime? = null
+    ): Flow<Resource<List<HourlyStatsDTO>>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                val response = statsApi.fetchHourlyStats(
+                    start = start,
+                    end = end
+                )
+                if (response.isSuccessful) {
+                    emit(
+                        Resource.Success(
+                            data = response.body()
+                        )
+                    )
+                } else {
+                    emit(
+                        Error(response.message())
+                    )
+                }
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
+            }
+            emit(Resource.Loading(false))
+
+        }
+    }
+
+
 //TODO: move to a common repo
     fun getOldestStreamDate(): Flow<Resource<LocalDate>> {
         return flow {

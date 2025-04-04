@@ -24,6 +24,12 @@ interface StatsApi {
         @Query("step") step: String? = null
     ): Response<List<StatsSeriesChunkDTO>>
 
+    @GET("hourly")
+    suspend fun fetchHourlyStats(
+        @Query("start") start: LocalDateTime? = null,
+        @Query("end") end: LocalDateTime? = null
+    ): Response<List<HourlyStatsDTO>>
+
     @GET("year/{year}")
     suspend fun fetchStatsYear(
         @Path("year") year: Int

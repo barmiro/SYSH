@@ -15,15 +15,14 @@ public class DevDatabaseUpdater {
 	}
 	
 	
-	@Value("${test.env:false}")
-	private boolean isTestEnv;
-	
+//	@Value("${test.env:false}")
+//	private boolean isTestEnv;
+//	
 //	@PostConstruct
 //	public void updateDatabase() {
 ////		this is a dev-environment database updater, so that I don't have to reinitialize the database
 //		if (!isTestEnv) {
-//			String sql = ("ALTER TABLE Users ADD COLUMN timezone VARCHAR; UPDATE Users SET timezone='Europe/Warsaw' WHERE username='barmiro'; "
-//					+ "ALTER TABLE SongStreams ALTER COLUMN ts TYPE TIMESTAMPTZ USING ts AT TIME ZONE 'UTC';"
+//			String sql = ("UPDATE Users SET timezone='Europe/Warsaw' WHERE username='user2'; "
 //					);
 //			jdbc.sql(sql)
 //			.update();			

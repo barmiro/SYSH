@@ -49,8 +49,8 @@ import com.github.barmiro.sysh_server.security.SyshUser;
 import com.github.barmiro.sysh_server.security.SyshUserDetails;
 import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 import com.github.barmiro.sysh_server.stats.StatsCache;
-import com.github.barmiro.sysh_server.stats.StatsForRange;
 import com.github.barmiro.sysh_server.stats.StatsRepository;
+import com.github.barmiro.sysh_server.stats.dto.StatsForRange;
 import com.github.barmiro.sysh_server.users.SyshUserManager;
 
 @Testcontainers

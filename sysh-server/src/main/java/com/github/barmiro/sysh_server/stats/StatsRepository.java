@@ -17,6 +17,11 @@ import org.springframework.stereotype.Repository;
 import com.github.barmiro.sysh_server.common.records.RecordCompInfo;
 import com.github.barmiro.sysh_server.common.utils.CompInfo;
 import com.github.barmiro.sysh_server.common.utils.CompListToSql;
+import com.github.barmiro.sysh_server.stats.dto.FullStats;
+import com.github.barmiro.sysh_server.stats.dto.HourlyStatsDTO;
+import com.github.barmiro.sysh_server.stats.dto.StatsDTO;
+import com.github.barmiro.sysh_server.stats.dto.StatsForRange;
+import com.github.barmiro.sysh_server.stats.dto.StatsSeriesChunk;
 
 @Repository
 public class StatsRepository {
@@ -304,5 +309,35 @@ public FullStats streamStats(String username, Boolean checkForCache) {
 				.param("username", username, Types.VARCHAR)
 				.query(Instant.class)
 				.optional();
+	}
+	
+	
+	public List<HourlyStatsDTO> getStatsByHour(OffsetDateTime startDate, OffsetDateTime endDate, String username) {
+
+		String sql = ("WITH user_tz AS ("
+				+ "SELECT timezone FROM Users WHERE username = :username), "
+				+ "hours AS (SELECT "
+				+ "generate_series(0, 95) AS hour), "
+				+ "hourly_data AS (SELECT "
+				+ "FLOOR(EXTRACT(HOUR FROM ts AT TIME ZONE user_tz.timezone) * 4 "
+				+ "+ EXTRACT(MINUTE FROM ts AT TIME ZONE user_tz.timezone) / 15)::int AS hour,"
+				+ "COALESCE(SUM(ms_played) / 60000, 0) AS minutes_streamed "
+				+ "FROM SongStreams,"
+				+ "user_tz "
+				+ "WHERE SongStreams.username = :username "
+				+ "AND ts BETWEEN :startDate AND :endDate "
+				+ "GROUP BY hour) "
+				+ "SELECT hours.hour, "
+				+ "COALESCE (hourly_data.minutes_streamed, 0) AS minutes_streamed "
+				+ "FROM hours "
+				+ "LEFT JOIN hourly_data ON hours.hour = hourly_data.hour "
+				+ "ORDER BY hours.hour;");
+		
+		return jdbc.sql(sql)
+				.param("username", username, Types.VARCHAR)
+				.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.query(HourlyStatsDTO.class)
+				.list();
 	}
 }

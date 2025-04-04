@@ -46,12 +46,14 @@ fun StatsScreen(
     val homeState by viewModel.homeState.collectAsState()
     val state by viewModel.state.collectAsState()
     val statsSeries by viewModel.statsSeries.collectAsState()
+    val hourlyStats by viewModel.hourlyStats.collectAsState()
 
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.getStatsSeries()
         viewModel.getStats()
+        viewModel.getHourlyStats()
     }
 
     if (isDateRangePickerVisible) {
@@ -271,6 +273,13 @@ fun StatsScreen(
                                     .padding(top = 16.dp, bottom = 8.dp),
                                 horizontalArrangement = Arrangement.Center
                             ) {
+                                HourlyStatsChart(hourlyStats)
+                            }
+                            Row(
+                                modifier = Modifier.fillMaxWidth()
+                                    .padding(top = 16.dp, bottom = 8.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
                                 AverageStreamLengthChart(statsSeries)
                             }
                         }
@@ -285,9 +294,3 @@ fun StatsScreen(
         )
     }
 }
-
-//TODO: this is a complete mess. Fixing this has to be the first order of business tomorrow
-
-
-
-

@@ -19,6 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.barmiro.sysh_server.common.records.OffsetDateTimeRange;
 import com.github.barmiro.sysh_server.common.utils.TimeUtils;
+import com.github.barmiro.sysh_server.stats.dto.FirstStreamDateDTO;
+import com.github.barmiro.sysh_server.stats.dto.FullStats;
+import com.github.barmiro.sysh_server.stats.dto.HourlyStatsDTO;
+import com.github.barmiro.sysh_server.stats.dto.StatsForRange;
+import com.github.barmiro.sysh_server.stats.dto.StatsSeriesChunk;
 import com.github.barmiro.sysh_server.users.SyshUserRepository;
 
 @RestController
@@ -42,6 +47,33 @@ public class StatsController {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		return statsRepo.streamStats(username, true);
+	}
+	
+	@GetMapping("/hourly")
+	List<HourlyStatsDTO> hourly(
+			@RequestParam(required = false)
+			Optional<LocalDateTime> start,
+			@RequestParam(required = false)
+			Optional<LocalDateTime> end) {
+		
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		
+		ZoneId userTimeZone = userRepository.getUserTimezone(username);
+		
+		OffsetDateTime startDate = start
+				.map(startInput -> startInput.atZone(userTimeZone))
+				.orElse(startup().firstStreamDate())
+				.toOffsetDateTime();
+		
+		OffsetDateTime endDate = end
+				.map(endInput -> endInput.atZone(userTimeZone))
+				.orElse(Instant.now().atZone(userTimeZone))
+				.toOffsetDateTime();
+		
+		List<HourlyStatsDTO> hourlyStats = statsRepo.getStatsByHour(startDate, endDate, username);
+//		System.out.println(hourlyStats);
+		return hourlyStats;
+		
 	}
 	
 	

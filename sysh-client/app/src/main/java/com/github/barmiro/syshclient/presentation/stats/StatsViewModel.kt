@@ -3,6 +3,7 @@ package com.github.barmiro.syshclient.presentation.stats
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.barmiro.syshclient.data.stats.HourlyStatsDTO
 import com.github.barmiro.syshclient.data.stats.StatsRepository
 import com.github.barmiro.syshclient.data.stats.StatsSeriesChunkDTO
 import com.github.barmiro.syshclient.presentation.home.HomeState
@@ -33,6 +34,9 @@ class StatsViewModel @Inject constructor(
     private val _statsSeries = MutableStateFlow<List<StatsSeriesChunkDTO>>(emptyList())
     val statsSeries: StateFlow<List<StatsSeriesChunkDTO>> = _statsSeries
 
+    private val _hourlyStats = MutableStateFlow<List<HourlyStatsDTO>>(emptyList())
+    val hourlyStats: StateFlow<List<HourlyStatsDTO>> = _hourlyStats
+
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
 
@@ -42,6 +46,7 @@ class StatsViewModel @Inject constructor(
             is TopScreenEvent.Refresh -> {
                 getStatsSeries()
                 getStats()
+                getHourlyStats()
             }
             is TopScreenEvent.OnSearchParameterChange -> {
                 stateManager.updateState(
@@ -51,6 +56,7 @@ class StatsViewModel @Inject constructor(
                 )
                 getStats()
                 getStatsSeries()
+                getHourlyStats()
             }
             is TopScreenEvent.OnDateRangeModeChange -> {
                 stateManager.updateState(
@@ -117,9 +123,34 @@ class StatsViewModel @Inject constructor(
 
                         is Resource.Loading -> {
                         }
-
                     }
                 }
         }
     }
+
+    fun getHourlyStats(
+        start: LocalDateTime? = state.value.start,
+        end: LocalDateTime? = state.value.end
+    ) {
+        viewModelScope.launch {
+            statsRepository.getHourlyStats(start, end)
+                .collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            result.data?.let { statsResult ->
+                                _hourlyStats.value = statsResult
+                            }
+                        }
+
+                        is Resource.Error -> {
+                            _errorMessage.value = result.message
+                        }
+
+                        is Resource.Loading -> {
+                        }
+                    }
+                }
+        }
+    }
+
 }
