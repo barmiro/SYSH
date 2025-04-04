@@ -82,7 +82,7 @@ fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
             }
         }
     }
-    StreamingStatsChartScaffold(modelProducer, statsSeries, "Cumulative")
+    StreamingStatsChartScaffold(modelProducer, statsSeries, "Streamed in total")
 }
 
 
@@ -116,7 +116,7 @@ fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
             }
         }
     }
-    StreamingStatsChartScaffold(modelProducer, statsSeries, "By Period")
+    StreamingStatsChartScaffold(modelProducer, statsSeries, "Streamed by period")
 }
 
 
@@ -253,7 +253,7 @@ fun HourlyStatsChart(hourlyStats: List<HourlyStatsDTO>) {
         Row {
             Column() {
                 Text(
-                    text = "Minutes Streamed by Time of Day",
+                    text = "Minutes streamed by time of day",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground,
@@ -286,7 +286,7 @@ fun HourlyStatsChart(hourlyStats: List<HourlyStatsDTO>) {
                         itemPlacer = HorizontalAxis.ItemPlacer.aligned(
                             spacing = { 12 },
                             addExtremeLabelPadding = false),
-                        valueFormatter = { _, value, _ -> (value / 4).toInt().toString() }
+                        valueFormatter = { _, value, _ -> (value / 4).toInt().toString() + ":00" }
 //                        valueFormatter = { _, value, _ ->
 //                            val index = value.toInt() - 1
 //                            if (index == -1) {
@@ -344,7 +344,7 @@ fun AverageStreamLengthChart(statsSeries: List<StatsSeriesChunkDTO>) {
         Row {
             Column() {
                 Text(
-                    text = "Average Stream Length",
+                    text = "Average stream duration",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground,

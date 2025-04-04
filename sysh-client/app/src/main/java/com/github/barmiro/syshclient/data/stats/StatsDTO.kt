@@ -1,5 +1,8 @@
 package com.github.barmiro.syshclient.data.stats
 
+import com.github.barmiro.syshclient.data.top.dto.AlbumDTO
+import com.github.barmiro.syshclient.data.top.dto.ArtistDTO
+import com.github.barmiro.syshclient.data.top.dto.TrackDTO
 import com.github.barmiro.syshclient.util.OffsetDateTimeSerializer
 import com.github.barmiro.syshclient.util.ZonedDateTimeSerializer
 import kotlinx.serialization.Serializable
@@ -18,6 +21,15 @@ data class StatsDTO(
     val track_count: Int = 0,
     val album_count: Int = 0,
     val artist_count: Int = 0
+)
+
+@Serializable
+data class HomeStatsDTO(
+    val minutes_streamed: Int = 0,
+    val stream_count: Int = 0,
+    val top_artist: ArtistDTO? = null,
+    val top_album: AlbumDTO? = null,
+    val top_track: TrackDTO? = null
 )
 
 

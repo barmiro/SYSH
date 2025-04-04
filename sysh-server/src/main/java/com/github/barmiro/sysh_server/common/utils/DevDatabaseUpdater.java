@@ -22,7 +22,7 @@ public class DevDatabaseUpdater {
 //	public void updateDatabase() {
 ////		this is a dev-environment database updater, so that I don't have to reinitialize the database
 //		if (!isTestEnv) {
-//			String sql = ("UPDATE Users SET timezone='Europe/Warsaw' WHERE username='user2'; "
+//			String sql = ("ALTER TABLE Top_Albums_Cache ADD COLUMN image_url VARCHAR; ALTER TABLE Top_Tracks_Cache ADD COLUMN image_url VARCHAR;"
 //					);
 //			jdbc.sql(sql)
 //			.update();			

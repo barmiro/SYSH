@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.stats.HourlyStatsDTO
 import com.github.barmiro.syshclient.data.stats.StatsRepository
 import com.github.barmiro.syshclient.data.stats.StatsSeriesChunkDTO
-import com.github.barmiro.syshclient.presentation.home.HomeState
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.TopScreenState
 import com.github.barmiro.syshclient.presentation.top.TopScreenStateManager
@@ -28,8 +27,8 @@ class StatsViewModel @Inject constructor(
     val state: StateFlow<TopScreenState> = stateManager.state
 
 //    TODO: refactor
-    private val _homeState = MutableStateFlow(HomeState())
-    val homeState: StateFlow<HomeState> = _homeState
+    private val _statsState = MutableStateFlow(StatsState())
+    val statsState: StateFlow<StatsState> = _statsState
 
     private val _statsSeries = MutableStateFlow<List<StatsSeriesChunkDTO>>(emptyList())
     val statsSeries: StateFlow<List<StatsSeriesChunkDTO>> = _statsSeries
@@ -39,7 +38,6 @@ class StatsViewModel @Inject constructor(
 
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
-
 
     fun onEvent(event: TopScreenEvent) {
         when(event) {
@@ -83,7 +81,7 @@ class StatsViewModel @Inject constructor(
                     when(result) {
                         is Resource.Success -> {
                             result.data?.let { statsResult ->
-                                _homeState.update {
+                                _statsState.update {
                                     it.copy(stats = statsResult)
                                 }
                             }
@@ -92,7 +90,7 @@ class StatsViewModel @Inject constructor(
                             _errorMessage.value = result.message
                         }
                         is Resource.Loading -> {
-                            _homeState.update {
+                            _statsState.update {
                                 it.copy(isLoading = result.isLoading)
                             }
                         }

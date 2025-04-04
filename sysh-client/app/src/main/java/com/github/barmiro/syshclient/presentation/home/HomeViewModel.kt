@@ -38,10 +38,7 @@ class HomeViewModel @Inject constructor(
     fun getStats() {
         viewModelScope.launch {
             val year = LocalDate.now().year
-            statsRepository.getStats(
-                start = null,
-                end = null,
-                mode = "yearly",
+            statsRepository.getHomeStats(
                 year = year
             )
                 .collect { result ->

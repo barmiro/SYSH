@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -76,6 +77,15 @@ fun TopScreen(
         )
     }
 
+
+//    workaround for the refresh indicator not disappearing
+    var isRefreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(isRefreshing) {
+        if (isRefreshing) {
+            isRefreshing = false
+        }
+    }
+
     LaunchedEffect(tabIndex) {
         tabPagerState.animateScrollToPage(page = tabIndex,
             animationSpec = spring(stiffness = 500f)
@@ -129,7 +139,17 @@ fun TopScreen(
         }
     ) { innerPadding ->
 
-        Row(modifier = Modifier.fillMaxWidth().padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp)) {
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                isRefreshing = true
+                topAlbumsVM.onEvent(TopScreenEvent.Refresh)
+                topTracksVM.onEvent(TopScreenEvent.Refresh)
+                topArtistsVM.onEvent(TopScreenEvent.Refresh)
+            },
+            modifier = Modifier.padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp)
+        ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 TabRow(selectedTabIndex = tabIndex,
                     indicator = { tabPositions ->
@@ -170,6 +190,7 @@ fun TopScreen(
                     }
                 }
             }
+        }
         }
         TopScreenBottomBar(
             state = state,

@@ -6,6 +6,7 @@ public record TrackStats(
 		String name,
 		String album_name,
 		String thumbnail_url,
+		String image_url,
 		String primary_artist_name,
 		Integer stream_count,
 		Integer total_ms_played) {

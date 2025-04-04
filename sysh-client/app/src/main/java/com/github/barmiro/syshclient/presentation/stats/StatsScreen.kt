@@ -4,16 +4,14 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,13 +34,14 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("DefaultLocale")
 @Composable
 fun StatsScreen(
     viewModel: StatsViewModel
 ) {
 
-    val homeState by viewModel.homeState.collectAsState()
+    val statsState by viewModel.statsState.collectAsState()
     val state by viewModel.state.collectAsState()
     val statsSeries by viewModel.statsSeries.collectAsState()
     val hourlyStats by viewModel.hourlyStats.collectAsState()
@@ -66,6 +64,14 @@ fun StatsScreen(
         )
     }
 
+    //    workaround for the refresh indicator not disappearing
+    var isRefreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(isRefreshing) {
+        if (isRefreshing) {
+            isRefreshing = false
+        }
+    }
+
     Scaffold(
         topBar = {
             TopScreenTopBar(
@@ -86,26 +92,36 @@ fun StatsScreen(
             )
         }
     ) { innerPadding ->
-        Row(modifier = Modifier.fillMaxWidth().padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp, start = 8.dp, end = 8.dp)) {
-            if (homeState.isLoading) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
-                }
-            }  else if (!viewModel.errorMessage.collectAsState().value.isNullOrEmpty()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = viewModel.errorMessage.collectAsState().value!!,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center)
-                }
-            } else {
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                isRefreshing = true
+                viewModel.onEvent(TopScreenEvent.Refresh)
+                        },
+            modifier = Modifier.padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp, start = 8.dp, end = 8.dp)
+        ) {
+
+
+        Row(modifier = Modifier.fillMaxWidth()) {
+//            if (homeState.isLoading) {
+//                Column(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    verticalArrangement = Arrangement.Center,
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+//                }
+//            }  else if (!viewModel.errorMessage.collectAsState().value.isNullOrEmpty()) {
+//                Column(
+//                    modifier = Modifier.fillMaxSize(),
+//                    verticalArrangement = Arrangement.Center,
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    Text(text = viewModel.errorMessage.collectAsState().value!!,
+//                        color = MaterialTheme.colorScheme.onBackground,
+//                        textAlign = TextAlign.Center)
+//                }
+//            } else {
                 val numberFormat = NumberFormat.getInstance(Locale.US)
 
                 val startDate: LocalDate = state.start?.toLocalDate()
@@ -117,11 +133,11 @@ fun StatsScreen(
 
                 val totalDays = ChronoUnit.DAYS.between(startDate, endDate) + 1
 
-                val minutesPerDay = homeState.stats.minutes_streamed / totalDays
-                val hoursStreamed = homeState.stats.minutes_streamed / 60f
+                val minutesPerDay = statsState.stats.minutes_streamed / totalDays
+                val hoursStreamed = statsState.stats.minutes_streamed / 60f
                 val hoursPerDay = (hoursStreamed / totalDays).toInt()
                 val minutesMod = String.format("%02d", minutesPerDay % 60)
-                val daysStreamed = homeState.stats.minutes_streamed / 1440f
+                val daysStreamed = statsState.stats.minutes_streamed / 1440f
                 val percentageOfTime = (daysStreamed / totalDays) * 100
 
                 val bottomPadding = if (state.dateRangeMode.isNullOrEmpty()) 0.dp else 48.dp
@@ -148,9 +164,9 @@ fun StatsScreen(
                             ) {
                                 GeneralStatsItem(
                                     dateRangeMode = state.dateRangeMode,
-                                    itemValue = numberFormat.format(homeState.stats.stream_count),
+                                    itemValue = numberFormat.format(statsState.stats.stream_count),
                                     itemText = "Streams",
-                                    perDayValue = (homeState.stats.stream_count / totalDays).toString() + " a day"
+                                    perDayValue = (statsState.stats.stream_count / totalDays).toString() + " a day"
                                 )
                                 GeneralStatsItem(
                                     dateRangeMode = state.dateRangeMode,
@@ -165,7 +181,7 @@ fun StatsScreen(
                             ) {
                                 GeneralStatsItem(
                                     dateRangeMode = state.dateRangeMode,
-                                    itemValue = numberFormat.format(homeState.stats.minutes_streamed),
+                                    itemValue = numberFormat.format(statsState.stats.minutes_streamed),
                                     itemText = "Minutes",
                                     perDayValue = (minutesPerDay).toString() + " a day"
                                 )
@@ -206,7 +222,7 @@ fun StatsScreen(
 
                                 CollectionStatsItem(
                                     dateRangeMode = state.dateRangeMode,
-                                    itemValue = numberFormat.format(homeState.stats.track_count),
+                                    itemValue = numberFormat.format(statsState.stats.track_count),
                                     itemText = "Tracks"
                                 )
 
@@ -218,7 +234,7 @@ fun StatsScreen(
                             ) {
                                 CollectionStatsItem(
                                     dateRangeMode = state.dateRangeMode,
-                                    itemValue = numberFormat.format(homeState.stats.album_count),
+                                    itemValue = numberFormat.format(statsState.stats.album_count),
                                     itemText = "Albums"
                                 )
                             }
@@ -228,7 +244,7 @@ fun StatsScreen(
                             ) {
                                 CollectionStatsItem(
                                     dateRangeMode = state.dateRangeMode,
-                                    itemValue = numberFormat.format(homeState.stats.artist_count),
+                                    itemValue = numberFormat.format(statsState.stats.artist_count),
                                     itemText = "Artists"
                                 )
                             }

@@ -65,7 +65,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 		return added;
 	}
 	
-	List<AlbumStats> topAlbums(String sort,
+	public List<AlbumStats> topAlbums(String sort,
 			OffsetDateTime startDate,
 			OffsetDateTime endDate,
 			Integer offset,
@@ -102,6 +102,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 				+ "Albums.id,"
 				+ "Albums.name,"
 				+ "Albums.thumbnail_url,"
+				+ "Albums.image_url,"
 				+ "primary_artist_name "
 				+ listSpec);
 		return jdbc.sql(sql)
@@ -136,6 +137,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 					+ "id,"
 					+ "name,"
 					+ "thumbnail_url,"
+					+ "image_url,"
 //					TODO: figure out why a null happened here
 					+ "COALESCE(primary_artist_name, 'Unknown Artist') AS primary_artist_name,"
 					+ "COALESCE(stream_count, 0) AS stream_count, "
@@ -164,6 +166,7 @@ public class AlbumRepository extends CatalogRepository<Album> {
 					+ "Albums.id,"
 					+ "Albums.name,"
 					+ "Albums.thumbnail_url,"
+					+ "Albums.image_url,"
 					+ "primary_artist_name "
 					+ listSpec);
 		}

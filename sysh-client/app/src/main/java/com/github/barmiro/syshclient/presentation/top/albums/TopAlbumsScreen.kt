@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +31,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import java.time.LocalDateTime
 
+
 @Composable
 fun TopAlbumsScreen(
     viewModel: TopAlbumsViewModel
@@ -49,51 +51,57 @@ fun TopAlbumsScreen(
         }
     }
 
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (val loadState = albums.loadState.refresh) {
-            is LoadState.Loading -> {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
+            when (val loadState = albums.loadState.refresh) {
+                is LoadState.Loading -> {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(48.dp))
+                    }
                 }
-            }
-            is LoadState.Error -> {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = loadState.error.message ?: "Encountered unknown error",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center)
+
+                is LoadState.Error -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = loadState.error.message ?: "Encountered unknown error",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
-            }
-            else -> {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(albums.itemCount) { i ->
-                        albums[i]?.let { album ->
-                            AlbumItem(
-                                index = i + 1,
-                                album = album,
-                                sort = state.sort,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp)
-                            )
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(albums.itemCount) { i ->
+                            albums[i]?.let { album ->
+                                AlbumItem(
+                                    index = i + 1,
+                                    album = album,
+                                    sort = state.sort,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
+
     }
 }
 

@@ -69,7 +69,8 @@ public List<ArtistStats> topArtists(String sort,
 			+ "GROUP By "
 			+ "Artists.id,"
 			+ "Artists.name,"
-			+ "Artists.thumbnail_url "
+			+ "Artists.thumbnail_url, "
+			+ "Artists.image_url "
 			+ listSpec);
 	
 	return jdbc.sql(sql)

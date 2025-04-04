@@ -22,6 +22,7 @@ import com.github.barmiro.sysh_server.stats.dto.HourlyStatsDTO;
 import com.github.barmiro.sysh_server.stats.dto.StatsDTO;
 import com.github.barmiro.sysh_server.stats.dto.StatsForRange;
 import com.github.barmiro.sysh_server.stats.dto.StatsSeriesChunk;
+import com.github.barmiro.sysh_server.stats.dto.StreamsMinutesPair;
 
 @Repository
 public class StatsRepository {
@@ -66,6 +67,40 @@ public class StatsRepository {
 		
 		return new StatsSeriesChunk(username, startDate, endDate, minutesStreamed, streamCount);
 	}
+	
+	
+	public StreamsMinutesPair homeStats(OffsetDateTime startDate, OffsetDateTime endDate, String username) {
+		String streams = ("SELECT "
+				+ "COUNT(SongStreams.*) "
+				+ "AS stream_count "
+				+ "FROM SongStreams "
+				+ "WHERE SongStreams.ms_played > 30000 "
+				+ "AND SongStreams.username = :username "
+				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate;");
+		
+		String minutes = ("SELECT "
+				+ "COALESCE(SUM(ms_played) / 60000, 0) AS minutes_streamed "
+				+ "FROM SongStreams "
+				+ "WHERE SongStreams.username = :username "
+				+ "AND SongStreams.ts BETWEEN :startDate AND :endDate;");
+		
+		Integer streamCount = jdbc.sql(streams)
+				.param("username", username, Types.VARCHAR)
+				.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.query(Integer.class)
+				.single();
+		
+		Integer minutesStreamed = jdbc.sql(minutes)
+				.param("username", username, Types.VARCHAR)
+				.param("startDate", startDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.param("endDate", endDate, Types.TIMESTAMP_WITH_TIMEZONE)
+				.query(Integer.class)
+				.single();
+		
+		return new StreamsMinutesPair(streamCount, minutesStreamed);
+	}
+	
 		
 	public StatsForRange streamStats(OffsetDateTime startDate, OffsetDateTime endDate, Boolean checkForCache, String username) {
 		

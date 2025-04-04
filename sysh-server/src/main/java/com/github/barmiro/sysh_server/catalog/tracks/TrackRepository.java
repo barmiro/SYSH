@@ -135,7 +135,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 	}
 	
 	
-	List<TrackStats> topTracks(String sort,
+	public List<TrackStats> topTracks(String sort,
 			OffsetDateTime startDate,
 			OffsetDateTime endDate,
 			Integer offset,
@@ -158,6 +158,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 				+ "COALESCE(SUM(SongStreams.ms_played), 0) AS total_ms_played,"
 				+ "Albums.name AS album_name,"
 				+ "Albums.thumbnail_url,"
+				+ "Albums.image_url,"
 				+ "Artists.name AS primary_artist_name "
 				+ "FROM Tracks t "
 				+ "LEFT JOIN Track_Duplicates ON Track_Duplicates.secondary_id = t.spotify_track_id "
@@ -174,6 +175,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 				+ "t2.name,"
 				+ "album_name,"
 				+ "Albums.thumbnail_url,"
+				+ "Albums.image_url,"
 				+ "primary_artist_name "
 				+ listSpec);
 		
@@ -206,6 +208,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 					+ "name,"
 					+ "album_name,"
 					+ "thumbnail_url,"
+					+ "image_url,"
 					+ "primary_artist_name,"
 					+ "username,"
 					+ "COALESCE(stream_count, 0) AS stream_count, "
@@ -222,6 +225,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 					+ "SUM(SongStreams.ms_played) AS total_ms_played,"
 					+ "Albums.name AS album_name,"
 					+ "Albums.thumbnail_url,"
+					+ "Albums.image_url,"
 					+ "Artists.name AS primary_artist_name "
 					+ "FROM Tracks t "
 					+ "LEFT JOIN Track_Duplicates ON Track_Duplicates.secondary_id = t.spotify_track_id "
@@ -237,6 +241,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 					+ "t2.name,"
 					+ "album_name,"
 					+ "Albums.thumbnail_url,"
+					+ "Albums.image_url,"
 					+ "primary_artist_name "
 					+ listSpec);
 		}

@@ -17,13 +17,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
+import com.github.barmiro.sysh_server.catalog.albums.AlbumStats;
+import com.github.barmiro.sysh_server.catalog.artists.ArtistRepository;
+import com.github.barmiro.sysh_server.catalog.artists.ArtistStats;
+import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
+import com.github.barmiro.sysh_server.catalog.tracks.TrackStats;
 import com.github.barmiro.sysh_server.common.records.OffsetDateTimeRange;
 import com.github.barmiro.sysh_server.common.utils.TimeUtils;
 import com.github.barmiro.sysh_server.stats.dto.FirstStreamDateDTO;
 import com.github.barmiro.sysh_server.stats.dto.FullStats;
+import com.github.barmiro.sysh_server.stats.dto.HomeStats;
 import com.github.barmiro.sysh_server.stats.dto.HourlyStatsDTO;
 import com.github.barmiro.sysh_server.stats.dto.StatsForRange;
 import com.github.barmiro.sysh_server.stats.dto.StatsSeriesChunk;
+import com.github.barmiro.sysh_server.stats.dto.StreamsMinutesPair;
 import com.github.barmiro.sysh_server.users.SyshUserRepository;
 
 @RestController
@@ -31,13 +39,22 @@ import com.github.barmiro.sysh_server.users.SyshUserRepository;
 public class StatsController {
 
 	StatsRepository statsRepo;
+	ArtistRepository artistRepo;
+	AlbumRepository albumRepo;
+	TrackRepository trackRepo;
 	StatsCache statsCache;
 	SyshUserRepository userRepository;
 	
 	StatsController(StatsRepository statsRepo,
+			ArtistRepository artistRepo,
+			AlbumRepository albumRepo,
+			TrackRepository trackRepo,
 			StatsCache statsCache, 
 			SyshUserRepository userRepository) {
 		this.statsRepo = statsRepo;
+		this.artistRepo = artistRepo;
+		this.albumRepo = albumRepo;
+		this.trackRepo = trackRepo;
 		this.statsCache = statsCache;
 		this.userRepository = userRepository;
 	}
@@ -153,6 +170,29 @@ public class StatsController {
 		OffsetDateTime endDate = ZonedDateTime.of(year + 1, 1, 1, 0, 0, 0, 0, userTimeZone).minusSeconds(1).toOffsetDateTime();
 		
 		return statsRepo.streamStats(startDate, endDate, true, username);
+	}
+	
+	@GetMapping("/home/{year}")
+	HomeStats homeStats(@PathVariable Integer year,
+			@RequestParam(required = false)
+			Optional<String> sort
+			) {
+
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+		ZoneId userTimeZone = userRepository.getUserTimezone(username);
+		
+		String sortBy = sort.orElse("stream_count");
+		OffsetDateTime startDate = ZonedDateTime.of( year , 1, 1, 0, 0, 0, 0, userTimeZone).toOffsetDateTime();
+		OffsetDateTime endDate = ZonedDateTime.of(year + 1, 1, 1, 0, 0, 0, 0, userTimeZone).minusSeconds(1).toOffsetDateTime();
+		
+		StreamsMinutesPair streamsMinutes = statsRepo.homeStats(startDate, endDate, username);
+		
+		ArtistStats topArtist = artistRepo.topArtists(sortBy, startDate, endDate, 0, "1", username).getFirst();
+		AlbumStats topAlbum = albumRepo.topAlbums(sortBy, startDate, endDate, 0, "1", username).getFirst();
+		TrackStats topTrack = trackRepo.topTracks(sortBy, startDate, endDate, 0, "1", username).getFirst();
+		
+		return new HomeStats(streamsMinutes.minutes(), streamsMinutes.streams(), topArtist, topAlbum, topTrack);
 	}
 	
 

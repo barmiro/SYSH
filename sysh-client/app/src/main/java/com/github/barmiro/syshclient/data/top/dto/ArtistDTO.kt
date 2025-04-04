@@ -7,6 +7,7 @@ data class ArtistDTO(
     val id: String,
     val name: String,
     val thumbnail_url: String,
+    val image_url: String,
     val total_ms_played: Int,
     val stream_count: Int
 )

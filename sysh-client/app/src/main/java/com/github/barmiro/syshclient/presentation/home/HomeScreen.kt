@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -82,65 +83,100 @@ fun HomeScreen(
 
             val numberFormat = NumberFormat.getInstance(Locale.US)
 
-            Column(
+            LazyColumn(
                 modifier = Modifier.fillMaxSize(),
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "${today.year} at a glance",
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
-                    )
+                item() {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "${today.year} at a glance",
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            HomeItem(itemText = "Streams",
+                                itemValue = numberFormat.format(state.stats.stream_count))
+                        }
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            HomeItem(itemText = "Minutes",
+                                itemValue = numberFormat.format(state.stats.minutes_streamed))
+                        }
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            HomeItem(itemText = "Hours",
+                                itemValue = numberFormat.format(state.stats.minutes_streamed / 60))
+                        }
+                    }
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
-                ) {
-                    Column (
-                        modifier = Modifier.weight(1f),
+                item() {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 5.dp), horizontalArrangement = Arrangement.Center
                     ) {
-                        HomeItem(itemText = "Streams",
-                            itemValue = numberFormat.format(state.stats.stream_count))
+                        HomeTopItem(itemLabel = "Top Track",
+                            itemName = state.stats.top_track?.name ?: "No tracks found",
+                            imageUrl = state.stats.top_track?.image_url,
+                            streamCount = state.stats.top_track?.stream_count,
+                            minutesStreamed = state.stats.top_track?.total_ms_played?.div(60000)
+                        )
                     }
-                    Column (
-                        modifier = Modifier.weight(1f),
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 5.dp), horizontalArrangement = Arrangement.Center
                     ) {
-                        HomeItem(itemText = "Minutes",
-                            itemValue = numberFormat.format(state.stats.minutes_streamed))
+                        HomeTopItem(itemLabel = "Top Album",
+                            itemName = state.stats.top_album?.name ?: "No albums found",
+                            imageUrl = state.stats.top_album?.image_url,
+                            streamCount = state.stats.top_album?.stream_count,
+                            minutesStreamed = state.stats.top_album?.total_ms_played?.div(60000)
+                        )
                     }
-                    Column (
-                        modifier = Modifier.weight(1f),
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 5.dp), horizontalArrangement = Arrangement.Center
                     ) {
-                        HomeItem(itemText = "Hours",
-                            itemValue = numberFormat.format(state.stats.minutes_streamed / 60))
+                        HomeTopItem(itemLabel = "Top Artist",
+                            itemName = state.stats.top_artist?.name ?: "No artists found",
+                            imageUrl = state.stats.top_artist?.image_url,
+                            streamCount = state.stats.top_artist?.stream_count,
+                            minutesStreamed = state.stats.top_artist?.total_ms_played?.div(60000)
+                        )
                     }
                 }
+                item() {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Projections",
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        )
+                    }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Projections",
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
-                ) {
-                    Column (
-                        modifier = Modifier.weight(1f),
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                     ) {
-                        HomeItem(itemText = "Minutes by end of year",
-                            itemValue = numberFormat.format(projectedMinutesYear))
-                        HomeItem(itemText = "Minutes on Spotify Wrapped",
-                            itemValue = (numberFormat.format(projectedMinutesWrappedLower)
-                                    + " - "
-                                    + numberFormat.format(projectedMinutesWrappedUpper)))
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            HomeItem(itemText = "Minutes by end of year",
+                                itemValue = numberFormat.format(projectedMinutesYear))
+                            HomeItem(itemText = "Minutes on Spotify Wrapped",
+                                itemValue = (numberFormat.format(projectedMinutesWrappedLower)
+                                        + " - "
+                                        + numberFormat.format(projectedMinutesWrappedUpper)))
+                        }
                     }
                 }
             }

@@ -78,6 +78,34 @@ class StatsRepository @Inject constructor(
         }
     }
 
+    fun getHomeStats(
+        year: Int?
+    ): Flow<Resource<HomeStatsDTO>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                val response = statsApi.fetchHomeStats(year ?: LocalDate.now().year)
+                if (response.isSuccessful) {
+                    emit(
+                        Resource.Success(
+                            data = response.body()
+                        )
+                    )
+                } else {
+                    emit(
+                        Error(response.message())
+                    )
+                }
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
+            }
+            emit(Resource.Loading(false))
+
+        }
+    }
+
     fun getStatsSeries(
         start: LocalDateTime? = null,
         end: LocalDateTime? = null,

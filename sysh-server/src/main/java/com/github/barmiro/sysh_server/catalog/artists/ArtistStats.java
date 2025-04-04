@@ -4,6 +4,7 @@ public record ArtistStats(
 		String id,
 		String name,
 		String thumbnail_url,
+		String image_url,
 		Integer total_ms_played,
 		Integer stream_count)  {
 
