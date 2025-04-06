@@ -90,7 +90,7 @@ fun TopArtistsScreen(
                                     .clickable {
                                         //TODO
                                     }
-                                    .padding(12.dp)
+                                    .padding(10.dp)
                             )
                         }
                     }

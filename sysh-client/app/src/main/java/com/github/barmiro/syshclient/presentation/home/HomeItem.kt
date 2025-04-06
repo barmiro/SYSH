@@ -102,7 +102,7 @@ fun HomeTopItem(
 
     Surface(
         modifier = Modifier.padding(5.dp),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(6.dp),
         color = NavigationBarDefaults.containerColor
     ) {
         Row() {
@@ -166,7 +166,7 @@ fun HomeTopItem(
                     model = imageUrl,
                     contentDescription = "thumbnail for $itemName",
                     modifier = Modifier.height(100.dp).width(100.dp)
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(RoundedCornerShape(5.dp))
                 )
             }
         }

@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -40,7 +41,7 @@ fun ArtistItem(
 ) {
     Surface(
         modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(6.dp),
         color = NavigationBarDefaults.containerColor
     ) {
         Row(
@@ -59,6 +60,7 @@ fun ArtistItem(
             ) {
                 AsyncImage(
                     model = artist.thumbnailUrl,
+                    contentScale = ContentScale.Crop,
                     contentDescription = "thumbnail for artist " + artist.name,
                     modifier = Modifier.height(50.dp).width(50.dp)
                         .clip(RoundedCornerShape(2.dp))

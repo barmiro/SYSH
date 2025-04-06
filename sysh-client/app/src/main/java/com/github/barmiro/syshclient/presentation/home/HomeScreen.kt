@@ -88,7 +88,7 @@ fun HomeScreen(
             ) {
                 item() {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
                             text = "${today.year} at a glance",
@@ -121,9 +121,7 @@ fun HomeScreen(
                     }
                 }
                 item() {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 5.dp), horizontalArrangement = Arrangement.Center
-                    ) {
+                    Row() {
                         HomeTopItem(itemLabel = "Top Track",
                             itemName = state.stats.top_track?.name ?: "No tracks found",
                             imageUrl = state.stats.top_track?.image_url,
@@ -131,9 +129,7 @@ fun HomeScreen(
                             minutesStreamed = state.stats.top_track?.total_ms_played?.div(60000)
                         )
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 5.dp), horizontalArrangement = Arrangement.Center
-                    ) {
+                    Row() {
                         HomeTopItem(itemLabel = "Top Album",
                             itemName = state.stats.top_album?.name ?: "No albums found",
                             imageUrl = state.stats.top_album?.image_url,
@@ -141,9 +137,7 @@ fun HomeScreen(
                             minutesStreamed = state.stats.top_album?.total_ms_played?.div(60000)
                         )
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(top = 5.dp), horizontalArrangement = Arrangement.Center
-                    ) {
+                    Row() {
                         HomeTopItem(itemLabel = "Top Artist",
                             itemName = state.stats.top_artist?.name ?: "No artists found",
                             imageUrl = state.stats.top_artist?.image_url,
