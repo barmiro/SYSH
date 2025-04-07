@@ -172,9 +172,8 @@ public class StatsController {
 		return statsRepo.streamStats(startDate, endDate, true, username);
 	}
 	
-	@GetMapping("/home/{year}")
-	HomeStats homeStats(@PathVariable Integer year,
-			@RequestParam(required = false)
+	@GetMapping("/home")
+	HomeStats homeStats(@RequestParam(required = false)
 			Optional<String> sort
 			) {
 
@@ -182,17 +181,32 @@ public class StatsController {
 
 		ZoneId userTimeZone = userRepository.getUserTimezone(username);
 		
+		ZonedDateTime userDateTime = ZonedDateTime.now(userTimeZone);
+		Integer year = userDateTime.getYear();
+		
 		String sortBy = sort.orElse("stream_count");
-		OffsetDateTime startDate = ZonedDateTime.of( year , 1, 1, 0, 0, 0, 0, userTimeZone).toOffsetDateTime();
-		OffsetDateTime endDate = ZonedDateTime.of(year + 1, 1, 1, 0, 0, 0, 0, userTimeZone).minusSeconds(1).toOffsetDateTime();
 		
-		StreamsMinutesPair streamsMinutes = statsRepo.homeStats(startDate, endDate, username);
+		OffsetDateTime dayStart = userDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0).toOffsetDateTime();
+//		could be simpler, but would introduce bugs on daylight savings days
+		OffsetDateTime dayEnd = userDateTime.withHour(23).withMinute(59).withSecond(59).withNano(0).toOffsetDateTime();
 		
-		ArtistStats topArtist = artistRepo.topArtists(sortBy, startDate, endDate, 0, "1", username).getFirst();
-		AlbumStats topAlbum = albumRepo.topAlbums(sortBy, startDate, endDate, 0, "1", username).getFirst();
-		TrackStats topTrack = trackRepo.topTracks(sortBy, startDate, endDate, 0, "1", username).getFirst();
+		OffsetDateTime yearStart = ZonedDateTime.of( year , 1, 1, 0, 0, 0, 0, userTimeZone).toOffsetDateTime();
+		OffsetDateTime yearEnd = ZonedDateTime.of(year + 1, 1, 1, 0, 0, 0, 0, userTimeZone).minusSeconds(1).toOffsetDateTime();
 		
-		return new HomeStats(streamsMinutes.minutes(), streamsMinutes.streams(), topArtist, topAlbum, topTrack);
+		StreamsMinutesPair streamsMinutesDay = statsRepo.homeStats(dayStart, dayEnd, username);
+		StreamsMinutesPair streamsMinutesYear = statsRepo.homeStats(yearStart, yearEnd, username);
+		
+		ArtistStats topArtist = artistRepo.topArtists(sortBy, yearStart, yearEnd, 0, "1", username).getFirst();
+		AlbumStats topAlbum = albumRepo.topAlbums(sortBy, yearStart, yearEnd, 0, "1", username).getFirst();
+		TrackStats topTrack = trackRepo.topTracks(sortBy, yearStart, yearEnd, 0, "1", username).getFirst();
+		
+		return new HomeStats(streamsMinutesDay.minutes(),
+				streamsMinutesDay.streams(),
+				streamsMinutesYear.minutes(),
+				streamsMinutesYear.streams(),
+				topArtist,
+				topAlbum,
+				topTrack);
 	}
 	
 

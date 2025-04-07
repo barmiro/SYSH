@@ -25,6 +25,8 @@ data class StatsDTO(
 
 @Serializable
 data class HomeStatsDTO(
+    val day_minutes: Int = 0,
+    val day_streams: Int = 0,
     val minutes_streamed: Int = 0,
     val stream_count: Int = 0,
     val top_artist: ArtistDTO? = null,

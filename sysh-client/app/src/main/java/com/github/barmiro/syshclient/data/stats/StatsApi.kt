@@ -30,9 +30,8 @@ interface StatsApi {
         @Query("end") end: LocalDateTime? = null
     ): Response<List<HourlyStatsDTO>>
 
-    @GET("home/{year}")
+    @GET("home")
     suspend fun fetchHomeStats(
-        @Path("year") year: Int
     ): Response<HomeStatsDTO>
 
     @GET("year/{year}")

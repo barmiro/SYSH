@@ -79,13 +79,12 @@ class StatsRepository @Inject constructor(
     }
 
     fun getHomeStats(
-        year: Int?
     ): Flow<Resource<HomeStatsDTO>> {
         return flow {
             emit(Resource.Loading(true))
 
             try {
-                val response = statsApi.fetchHomeStats(year ?: LocalDate.now().year)
+                val response = statsApi.fetchHomeStats()
                 if (response.isSuccessful) {
                     emit(
                         Resource.Success(

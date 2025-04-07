@@ -5,6 +5,8 @@ import com.github.barmiro.sysh_server.catalog.artists.ArtistStats;
 import com.github.barmiro.sysh_server.catalog.tracks.TrackStats;
 
 public record HomeStats(
+			Integer day_minutes,
+			Integer day_streams,
 			Integer minutes_streamed,
 			Integer stream_count,
 			ArtistStats top_artist,

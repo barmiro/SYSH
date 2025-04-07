@@ -23,6 +23,7 @@ import com.github.barmiro.syshclient.presentation.top.components.HomeScreenTopBa
 import com.github.barmiro.syshclient.presentation.top.components.HomeScreenTopText
 import java.text.NumberFormat
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
@@ -82,10 +83,24 @@ fun HomeScreen(
                     ).toInt() / 100) * 100
 
             val numberFormat = NumberFormat.getInstance(Locale.US)
+            val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd")
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
             ) {
+                item() {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        HomeItem(
+                            itemText = LocalDate.now().format(dateFormatter),
+                            itemValue = "${numberFormat.format(state.stats.day_minutes)} minutes • ${numberFormat.format(state.stats.day_streams)} streams"
+                        )
+                    }
+                }
+
+
                 item() {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.Center
