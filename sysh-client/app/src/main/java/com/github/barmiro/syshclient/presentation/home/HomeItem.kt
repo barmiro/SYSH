@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import java.text.NumberFormat
+import java.time.LocalDateTime
 import java.util.Locale
 
 @Composable
@@ -86,6 +87,65 @@ fun HomeItem(
                 }
             }
 
+        }
+    }
+}
+
+
+@Composable
+fun HomeDayItem(
+    itemText: String,
+    itemValue: String,
+    itemPercent: Int?
+) {
+    val year: Int = LocalDateTime.now().year
+    Surface(
+        modifier = Modifier.padding(5.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = NavigationBarDefaults.containerColor
+    ) {
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Row {
+                Text(
+                    text = itemText,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Row {
+
+                Text(
+                    text = itemValue,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 28.sp,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Row {
+                Text(
+                    text = "$itemPercent% of $year average",
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.alpha(0.5f)
+                )
+            }
         }
     }
 }

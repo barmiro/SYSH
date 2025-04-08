@@ -90,13 +90,51 @@ fun HomeScreen(
             ) {
                 item() {
                     Row(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = LocalDate.now().format(dateFormatter),
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        )
+                    }
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        HomeItem(
-                            itemText = LocalDate.now().format(dateFormatter),
-                            itemValue = "${numberFormat.format(state.stats.day_minutes)} minutes • ${numberFormat.format(state.stats.day_streams)} streams"
-                        )
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            val streamsString = numberFormat.format(state.stats.day_streams)
+                            val averageStreams = state.stats.stream_count / daysPassed
+//                            this obviously shouldn't happen, but just in case
+                            val streamsPercent: Int? = if (averageStreams == 0.0) null else {
+                                (state.stats.day_streams / averageStreams * 100).toInt()
+                            }
+                            HomeDayItem(
+                                itemText = "Streams",
+                                itemValue = streamsString,
+                                itemPercent = streamsPercent
+                            )
+                        }
+                        Column (
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            val minutesString = numberFormat.format(state.stats.day_minutes)
+                            val averageMinutes = state.stats.minutes_streamed / daysPassed
+//                            this obviously shouldn't happen, but just in case
+                            val minutesPercent: Int? = if (averageMinutes == 0.0) null else {
+                                (state.stats.day_minutes / averageMinutes * 100).toInt()
+                            }
+                            HomeDayItem(
+                                itemText = "Minutes",
+                                itemValue = minutesString,
+                                itemPercent = minutesPercent
+                            )
+                        }
+
+
                     }
                 }
 
