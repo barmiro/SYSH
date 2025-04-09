@@ -18,9 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +30,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
-import java.time.LocalDateTime
 
 @Composable
 fun TopArtistsScreen(
@@ -44,12 +41,11 @@ fun TopArtistsScreen(
     val artists = viewModel.artists.collectAsLazyPagingItems()
     val dominantColors = remember { mutableStateMapOf<Int, Color>() }
 
-    var previousValues by remember { mutableStateOf(listOf("", LocalDateTime.MIN, LocalDateTime.MAX)) }
     LaunchedEffect(state.sort, state.start, state.end) {
         val newValues = listOf(state.sort, state.start, state.end)
-        if (newValues != previousValues) {
+        if (newValues != viewModel.previousValues) {
             viewModel.onEvent(TopScreenEvent.Refresh)
-            previousValues = newValues
+            viewModel.previousValues = newValues
         }
     }
 

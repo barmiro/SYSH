@@ -28,6 +28,8 @@ class TopTracksViewModel @Inject constructor(
     private val _tracks = MutableStateFlow<PagingData<TopTrack>>(PagingData.empty())
     val tracks: StateFlow<PagingData<TopTrack>> = _tracks
 
+    var previousValues = listOf("", LocalDateTime.MIN, LocalDateTime.MAX)
+
     fun onEvent(event: TopScreenEvent) {
         when(event) {
             is TopScreenEvent.Refresh -> {

@@ -28,6 +28,7 @@ class TopAlbumsViewModel @Inject constructor(
     private val _albums = MutableStateFlow<PagingData<TopAlbum>>(PagingData.empty())
     val albums: StateFlow<PagingData<TopAlbum>> = _albums
 
+    var previousValues = listOf("", LocalDateTime.MIN, LocalDateTime.MAX)
 
     fun onEvent(event: TopScreenEvent) {
         when(event) {
