@@ -19,8 +19,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
@@ -65,7 +67,6 @@ class MainActivity : ComponentActivity() {
             val isLoggedIn by sessionVM.isLoggedIn.collectAsState()
             val isAuthorizedWithSpotify by sessionVM.isAuthorizedWithSpotify.collectAsState()
             val navController = rememberNavController()
-            val homeState by homeVM.homeState.collectAsState()
             val storedUrl by sessionVM.serverUrl.collectAsState()
             val serverResponded by startupVM.serverResponded.collectAsState()
             val responseCode by sessionVM.responseCode.collectAsState()
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
             val errorMessage by sessionVM.errorMessage.collectAsState()
 
 //            TODO: find out why there's a loop
-            var debuggingBoolean = true
+            var loginSuccessful by remember { mutableStateOf(false) }
 
 
             LaunchedEffect(storedUrl) {
@@ -90,6 +91,7 @@ class MainActivity : ComponentActivity() {
                         if (isLoggedIn) {
                             sessionVM.getUserData()
                         } else {
+                            loginSuccessful = false
                             navController.navigate(Login) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     inclusive = true
@@ -106,6 +108,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     } else {
+                        loginSuccessful = false
                         navController.navigate(Startup) {
                             popUpTo(navController.graph.startDestinationId) {
                                 inclusive = true
@@ -171,14 +174,14 @@ class MainActivity : ComponentActivity() {
                             SnackbarHost(hostState = snackbarHostState)
                         },
                         bottomBar = {
-                            if (isLoggedIn && isAuthorizedWithSpotify) {
-                                if (debuggingBoolean) {
+                            if (serverResponded == true && isLoggedIn && isAuthorizedWithSpotify) {
+                                if (!loginSuccessful) {
                                     topScreenVM.getOldestStreamDate()
                                     homeVM.getStats()
-                                    debuggingBoolean = false
+                                    loginSuccessful = true
                                 }
                             }
-                            if (!debuggingBoolean) {
+                            if (loginSuccessful) {
                                 BottomNavBar(navController)
                             }
                         }

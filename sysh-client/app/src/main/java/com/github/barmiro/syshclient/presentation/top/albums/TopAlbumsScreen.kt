@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,11 +15,13 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -40,7 +41,7 @@ fun TopAlbumsScreen(
     viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
 
     val albums = viewModel.albums.collectAsLazyPagingItems()
-
+    val dominantColors = remember { mutableStateMapOf<Int, Color>() }
 
     var previousValues by remember { mutableStateOf(listOf("", LocalDateTime.MIN, LocalDateTime.MAX)) }
     LaunchedEffect(state.sort, state.start, state.end) {
@@ -94,7 +95,13 @@ fun TopAlbumsScreen(
                                     sort = state.sort,
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(12.dp)
+                                        .padding(vertical = 12.dp, horizontal = 10.dp),
+                                    onColorExtracted = { color: Color ->
+                                        if (dominantColors[i] != color) {
+                                            dominantColors[i] = color
+                                        }
+                                    },
+                                    startColor = dominantColors[i] ?: Color.Transparent
                                 )
                             }
                         }
