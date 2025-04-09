@@ -29,6 +29,7 @@ import com.github.barmiro.syshclient.presentation.top.components.DateRangePicker
 import com.github.barmiro.syshclient.presentation.top.components.StatsScreenTopText
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenBottomBar
 import com.github.barmiro.syshclient.presentation.top.components.TopScreenTopBar
+import com.patrykandpatrick.vico.compose.common.vicoTheme
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -166,7 +167,8 @@ fun StatsScreen(
                                     dateRangeMode = state.dateRangeMode,
                                     itemValue = numberFormat.format(statsState.stats.stream_count),
                                     itemText = "Streams",
-                                    perDayValue = (statsState.stats.stream_count / totalDays).toString() + " a day"
+                                    perDayValue = (statsState.stats.stream_count / totalDays).toString() + " a day",
+                                    color = vicoTheme.lineCartesianLayerColors[1]
                                 )
                                 GeneralStatsItem(
                                     dateRangeMode = state.dateRangeMode,
@@ -183,7 +185,8 @@ fun StatsScreen(
                                     dateRangeMode = state.dateRangeMode,
                                     itemValue = numberFormat.format(statsState.stats.minutes_streamed),
                                     itemText = "Minutes",
-                                    perDayValue = (minutesPerDay).toString() + " a day"
+                                    perDayValue = (minutesPerDay).toString() + " a day",
+                                    color = vicoTheme.lineCartesianLayerColors[0]
                                 )
                                 GeneralStatsItem(
                                     dateRangeMode = state.dateRangeMode,

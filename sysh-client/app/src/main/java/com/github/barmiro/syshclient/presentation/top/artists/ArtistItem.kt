@@ -28,10 +28,15 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.ImageShader
+import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,6 +47,7 @@ import coil3.asDrawable
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
+import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.domain.top.TopArtist
 import com.github.barmiro.syshclient.presentation.top.components.TopItemSortParamDisplay
 import com.github.barmiro.syshclient.presentation.top.components.TopListIndexText
@@ -64,6 +70,15 @@ fun ArtistItem(
         animationSpec = tween(durationMillis = 400)
     )
 
+    val imageBrush = ShaderBrush(
+        ImageShader(
+            image = ImageBitmap.imageResource(
+                id = R.drawable.noise_128x128),
+            tileModeX = TileMode.Repeated,
+            tileModeY = TileMode.Repeated
+        )
+    )
+
     Surface(
         modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
         shape = RoundedCornerShape(6.dp),
@@ -72,14 +87,20 @@ fun ArtistItem(
         Box(
             modifier = Modifier
                 .background(
+                    brush = imageBrush,
+                    alpha = 0.01f
+                )
+                .background(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
-                            Color.Transparent,
+                            NavigationBarDefaults.containerColor,
                             animatedColor.value
-                        )
+                        ),
+                        startX = 50f
                     )
                 )
         ) {
+
             Row(
                 modifier = modifier,
                 verticalAlignment = Alignment.CenterVertically
@@ -106,7 +127,7 @@ fun ArtistItem(
                                         dominantColor.value = tintFromColor(
                                             Color(
                                                 pal.getDominantColor(
-                                                    Color.Transparent.toArgb()
+                                                    tintFromColor(Color.Gray).toArgb()
                                                 )
                                             )
                                         )

@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
+import com.github.barmiro.syshclient.util.tintFromColor
 
 
 @Composable
@@ -98,7 +99,7 @@ fun TopAlbumsScreen(
                                             dominantColors[i] = color
                                         }
                                     },
-                                    startColor = dominantColors[i] ?: Color.Transparent
+                                    startColor = dominantColors[i] ?: tintFromColor(Color.Gray)
                                 )
                             }
                         }
