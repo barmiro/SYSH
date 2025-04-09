@@ -96,7 +96,7 @@ fun AlbumItem(
                             NavigationBarDefaults.containerColor,
                             animatedColor.value
                         ),
-                        startX = 50f
+                        startX = 80f
                     )
                 )
         ) {
@@ -125,9 +125,12 @@ fun AlbumItem(
                                     palette?.let { pal ->
                                         dominantColor.value = tintFromColor(
                                             Color(
-                                                pal.getDominantColor(
-                                                    tintFromColor(Color.Gray).toArgb()
+                                                pal.getVibrantColor(
+                                                    pal.getDominantColor(
+                                                        tintFromColor(Color.Gray).toArgb()
+                                                    )
                                                 )
+
                                             )
                                         )
                                         onColorExtracted(dominantColor.value)

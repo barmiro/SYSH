@@ -45,7 +45,7 @@ fun GeneralStatsItem(
                             color.copy(alpha = 0.2f),
                             Color.Transparent
                         ),
-                        radius = 250f
+                        radius = 400f
                     )
                 )
         ) {

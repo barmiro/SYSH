@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -174,7 +175,8 @@ fun StatsScreen(
                                     dateRangeMode = state.dateRangeMode,
                                     itemValue = numberFormat.format(hoursStreamed.toInt()),
                                     itemText = "Hours",
-                                    perDayValue = "$hoursPerDay:$minutesMod a day"
+                                    perDayValue = "$hoursPerDay:$minutesMod a day",
+                                    color = Color(153, 76, 155)
                                 )
                             }
 
@@ -187,6 +189,7 @@ fun StatsScreen(
                                     itemText = "Minutes",
                                     perDayValue = (minutesPerDay).toString() + " a day",
                                     color = vicoTheme.lineCartesianLayerColors[0]
+
                                 )
                                 GeneralStatsItem(
                                     dateRangeMode = state.dateRangeMode,
@@ -198,7 +201,8 @@ fun StatsScreen(
                                     perDayValue = String.format(
                                         "%.1f",
                                         percentageOfTime
-                                    ) + "% of total time"
+                                    ) + "% of total time",
+                                    color = Color(249, 45, 95)
                                 )
                             }
                         }
