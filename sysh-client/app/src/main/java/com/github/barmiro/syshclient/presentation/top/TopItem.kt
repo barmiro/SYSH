@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.presentation.top.tracks
+package com.github.barmiro.syshclient.presentation.top
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -48,16 +48,16 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import com.github.barmiro.syshclient.R
-import com.github.barmiro.syshclient.domain.top.TopTrack
+import com.github.barmiro.syshclient.domain.top.TopItemData
 import com.github.barmiro.syshclient.presentation.top.components.TopItemSortParamDisplay
 import com.github.barmiro.syshclient.presentation.top.components.TopListIndexText
 import com.github.barmiro.syshclient.util.drawMarqueeTextFadedEdge
 import com.github.barmiro.syshclient.util.tintFromColor
 
 @Composable
-fun TrackItem(
+fun TopItem(
     index: Int,
-    track: TopTrack,
+    itemData: TopItemData,
     sort: String?,
     modifier: Modifier = Modifier,
     onColorExtracted: (Color) -> Unit,
@@ -116,7 +116,7 @@ fun TrackItem(
                 ) {
                     val context = LocalContext.current
                     val request = ImageRequest.Builder(context)
-                        .data(track.thumbnailUrl)
+                        .data(itemData.thumbnailUrl)
                         .allowHardware(false)
                         .listener(
                             onSuccess = { _, result ->
@@ -140,7 +140,7 @@ fun TrackItem(
                         .build()
                     AsyncImage(
                         model = request,
-                        contentDescription = "thumbnail for track " + track.name,
+                        contentDescription = "thumbnail for track " + itemData.name,
                         modifier = Modifier.height(50.dp).width(50.dp)
                             .clip(RoundedCornerShape(2.dp))
                     )
@@ -159,8 +159,8 @@ fun TrackItem(
                     ) {
                         Text(
                             text = when{
-                                track.name.isEmpty() -> "[ Deleted track ]"
-                                else -> track.name
+                                itemData.name.isEmpty() -> "[ Deleted track ]"
+                                else -> itemData.name
                             },
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
@@ -178,32 +178,36 @@ fun TrackItem(
                                 .padding(start = 8.dp)
                         )
                     }
-                    Text(
-                        text = track.primaryArtistName,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        lineHeight = 14.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                        modifier = Modifier.alpha(0.5F)
-                            .padding(start = 8.dp)
-                    )
-                    Text(
-                        text = track.albumName,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 12.sp,
-                        lineHeight = 14.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                        modifier = Modifier.alpha(0.5F)
-                            .padding(start = 8.dp)
-                    )
+                    itemData.primaryArtistName?.let {
+                        Text(
+                            text = itemData.primaryArtistName,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            lineHeight = 14.sp,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            modifier = Modifier.alpha(0.5F)
+                                .padding(start = 8.dp)
+                        )
+                    }
+                    itemData.albumName?.let {
+                        Text(
+                            text = itemData.albumName,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 12.sp,
+                            lineHeight = 14.sp,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            modifier = Modifier.alpha(0.5F)
+                                .padding(start = 8.dp)
+                        )
+                    }
                 }
                 TopItemSortParamDisplay(
                     sort = sort,
-                    minutesPlayed = track.minutesPlayed,
-                    streamCount = track.streamCount
+                    minutesPlayed = itemData.minutesPlayed,
+                    streamCount = itemData.streamCount
                 )
             }
         }

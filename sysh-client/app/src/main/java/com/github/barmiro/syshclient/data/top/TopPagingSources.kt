@@ -2,9 +2,7 @@ package com.github.barmiro.syshclient.data.top
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.github.barmiro.syshclient.domain.top.TopAlbum
-import com.github.barmiro.syshclient.domain.top.TopArtist
-import com.github.barmiro.syshclient.domain.top.TopTrack
+import com.github.barmiro.syshclient.domain.top.TopItemData
 import retrofit2.HttpException
 import java.time.LocalDateTime
 
@@ -15,9 +13,9 @@ class TrackPagingSource(
     private val start: LocalDateTime?,
     private val end: LocalDateTime?,
     private val sort: String?
-) : PagingSource<Int, TopTrack>() {
+) : PagingSource<Int, TopItemData>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TopTrack> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TopItemData> {
         return try {
             val offset = params.key ?: 0
             val size = params.loadSize
@@ -40,7 +38,7 @@ class TrackPagingSource(
 
                 LoadResult.Page(
                     data = list.map{ trackDTO ->
-                        trackDTO.toTopTrack()
+                        trackDTO.toTopItemData()
                     },
                     prevKey = if (offset == 0) null else offset - size,
                     nextKey = if (list.isEmpty()) null else offset + size
@@ -53,7 +51,7 @@ class TrackPagingSource(
             LoadResult.Error(e)
         }
     }
-    override fun getRefreshKey(state: PagingState<Int, TopTrack>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, TopItemData>): Int? {
 //        go back to top on refresh
         return null
     }
@@ -66,9 +64,9 @@ class AlbumPagingSource(
     private val start: LocalDateTime?,
     private val end: LocalDateTime?,
     private val sort: String?
-) : PagingSource<Int, TopAlbum>() {
+) : PagingSource<Int, TopItemData>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TopAlbum> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TopItemData> {
         return try {
             val offset = params.key ?: 0
             val size = params.loadSize
@@ -91,7 +89,7 @@ class AlbumPagingSource(
 
                 LoadResult.Page(
                     data = list.map{ albumDTO ->
-                        albumDTO.toTopAlbum()
+                        albumDTO.toTopItemData()
                     },
                     prevKey = if (offset == 0) null else offset - size,
                     nextKey = if (list.isEmpty()) null else offset + size
@@ -104,7 +102,7 @@ class AlbumPagingSource(
             LoadResult.Error(e)
         }
     }
-    override fun getRefreshKey(state: PagingState<Int, TopAlbum>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, TopItemData>): Int? {
 //        go back to top on refresh
         return null
     }
@@ -118,9 +116,9 @@ class ArtistPagingSource(
     private val start: LocalDateTime?,
     private val end: LocalDateTime?,
     private val sort: String?
-) : PagingSource<Int, TopArtist>() {
+) : PagingSource<Int, TopItemData>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TopArtist> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TopItemData> {
         return try {
             val offset = params.key ?: 0
             val size = params.loadSize
@@ -142,7 +140,7 @@ class ArtistPagingSource(
 
                 LoadResult.Page(
                     data = list.map{ artistDTO ->
-                        artistDTO.toTopArtist()
+                        artistDTO.toTopItemData()
                     },
                     prevKey = if (offset == 0) null else offset - size,
                     nextKey = if (list.isEmpty()) null else offset + size
@@ -155,7 +153,7 @@ class ArtistPagingSource(
             LoadResult.Error(e)
         }
     }
-    override fun getRefreshKey(state: PagingState<Int, TopArtist>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, TopItemData>): Int? {
 //        go back to top on refresh
         return null
     }

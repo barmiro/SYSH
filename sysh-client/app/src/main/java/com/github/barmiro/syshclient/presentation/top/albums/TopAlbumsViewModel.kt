@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.github.barmiro.syshclient.data.top.TopRepository
-import com.github.barmiro.syshclient.domain.top.TopAlbum
+import com.github.barmiro.syshclient.domain.top.TopItemData
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.TopScreenState
 import com.github.barmiro.syshclient.presentation.top.TopScreenStateManager
@@ -25,8 +25,8 @@ class TopAlbumsViewModel @Inject constructor(
 
     val state: StateFlow<TopScreenState> = stateManager.state
 
-    private val _albums = MutableStateFlow<PagingData<TopAlbum>>(PagingData.empty())
-    val albums: StateFlow<PagingData<TopAlbum>> = _albums
+    private val _albums = MutableStateFlow<PagingData<TopItemData>>(PagingData.empty())
+    val albums: StateFlow<PagingData<TopItemData>> = _albums
 
     var previousValues = listOf("", LocalDateTime.MIN, LocalDateTime.MAX)
 

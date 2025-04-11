@@ -28,6 +28,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.github.barmiro.syshclient.presentation.top.TopItem
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.util.tintFromColor
 
@@ -82,9 +83,9 @@ fun TopTracksScreen(
                 ) {
                     items(tracks.itemCount) { i ->
                         tracks[i]?.let { track ->
-                            TrackItem(
+                            TopItem(
                                 index = i + 1,
-                                track = track,
+                                itemData = track,
                                 sort = state.sort,
                                 modifier = Modifier
                                     .fillMaxWidth()

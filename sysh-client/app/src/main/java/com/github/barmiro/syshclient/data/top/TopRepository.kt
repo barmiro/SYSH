@@ -7,9 +7,7 @@ import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
-import com.github.barmiro.syshclient.domain.top.TopAlbum
-import com.github.barmiro.syshclient.domain.top.TopArtist
-import com.github.barmiro.syshclient.domain.top.TopTrack
+import com.github.barmiro.syshclient.domain.top.TopItemData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -46,7 +44,7 @@ class TopRepository @Inject constructor(
         start: LocalDateTime? = null,
         end: LocalDateTime? = null,
         sort: String? = null
-    ): Flow<PagingData<TopTrack>> {
+    ): Flow<PagingData<TopItemData>> {
         var rangePath= ""
         var startValue = start
         var endValue = end
@@ -78,7 +76,7 @@ class TopRepository @Inject constructor(
         start: LocalDateTime? = null,
         end: LocalDateTime? = null,
         sort: String? = null
-    ): Flow<PagingData<TopAlbum>> {
+    ): Flow<PagingData<TopItemData>> {
         var rangePath= ""
         var startValue = start
         var endValue = end
@@ -110,7 +108,7 @@ class TopRepository @Inject constructor(
         start: LocalDateTime? = null,
         end: LocalDateTime? = null,
         sort: String? = null
-    ): Flow<PagingData<TopArtist>> {
+    ): Flow<PagingData<TopItemData>> {
         var rangePath= ""
         var startValue = start
         var endValue = end

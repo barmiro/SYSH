@@ -27,6 +27,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.github.barmiro.syshclient.presentation.top.TopItem
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.util.tintFromColor
 
@@ -87,9 +88,9 @@ fun TopAlbumsScreen(
                     ) {
                         items(albums.itemCount) { i ->
                             albums[i]?.let { album ->
-                                AlbumItem(
+                                TopItem(
                                     index = i + 1,
-                                    album = album,
+                                    itemData = album,
                                     sort = state.sort,
                                     modifier = Modifier
                                         .fillMaxWidth()
