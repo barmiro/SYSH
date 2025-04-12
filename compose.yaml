@@ -11,9 +11,9 @@ services:
       - POSTGRES_USER:${POSTGRES_USER}
       - POSTGRES_PASSWORD:${POSTGRES_PASSWORD}
       - SPOTIFY_CLIENT_ID:${SPOTIFY_CLIENT_ID}
-      - TZ=Europe/Warsaw
+      - TZ=${SYSH_TZ:-UTC}
     ports:
-      - '${SYSH_SERVER_PORT}:${SYSH_SERVER_PORT}'
+      - '${SYSH_SERVER_PORT:-5754}:${SYSH_SERVER_PORT:-5754}'
     depends_on:
       - postgres
 
