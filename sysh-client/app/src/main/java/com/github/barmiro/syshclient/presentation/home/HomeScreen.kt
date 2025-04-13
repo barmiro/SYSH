@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,16 +37,8 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             HomeScreenTopBar(
-                state = state,
                 titleText = "Home",
-                animatedText = { HomeScreenTopText(viewModel.userDisplayName.collectAsState()) },
-                actions = {
-                    IconButton(
-                        onClick = {
-                        }
-                    ) {
-                    }
-                }
+                animatedText = { HomeScreenTopText(viewModel.userDisplayName.collectAsState()) }
             )
         }
     ) { innerPadding ->

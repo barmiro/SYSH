@@ -24,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import com.github.barmiro.syshclient.presentation.home.HomeState
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.TopScreenState
 import com.github.barmiro.syshclient.util.monthToEnd
@@ -145,12 +144,9 @@ fun TopScreenTopBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenTopBar(
-    state: HomeState,
     titleText: String,
-    animatedText: @Composable (RowScope.() -> Unit),
-    actions: @Composable (RowScope.() -> Unit)
+    animatedText: @Composable (RowScope.() -> Unit)
 ) {
-    var expanded by remember { mutableStateOf(false) }
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
@@ -173,13 +169,7 @@ fun HomeScreenTopBar(
                     content = animatedText
                 )
             }
-        },
-        navigationIcon = {
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(Icons.Default.DateRange, contentDescription = "Date range options")
-            }
-        },
-        actions = actions
+        }
     )
 }
 @OptIn(ExperimentalMaterial3Api::class)
