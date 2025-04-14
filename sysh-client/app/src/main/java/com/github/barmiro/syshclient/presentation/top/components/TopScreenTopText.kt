@@ -75,11 +75,34 @@ fun TopScreenTopText(
 
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text(text = targetRangeText, fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.padding(0.dp)
-                .animateContentSize(spring(1f, 3000f)))
-            Text(text = " • ", fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.padding(0.dp))
-            Text(text = targetSortText, fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.alpha(0.5f).padding(0.dp)
-                .animateContentSize(spring(1f, 3000f)))
+            Text(
+                text = targetRangeText,
+                fontSize = 14.sp,
+                lineHeight = 14.sp,
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(0.dp)
+                    .animateContentSize(spring(1f, 3000f))
+            )
+
+            Text(
+                text = " • ",
+                fontSize = 14.sp,
+                lineHeight = 14.sp,
+                maxLines = 1,
+                modifier = Modifier.padding(0.dp)
+            )
+
+            Text(
+                text = targetSortText,
+                fontSize = 14.sp,
+                lineHeight = 14.sp,
+                maxLines = 1,
+                modifier = Modifier
+                    .alpha(0.5f)
+                    .padding(0.dp)
+                    .animateContentSize(spring(1f, 3000f))
+            )
         }
     }
 }
@@ -99,7 +122,6 @@ fun StatsScreenTopText(
         else -> "Invalid date range mode"
     }
 
-
     LaunchedEffect(rangeText) {
         targetRangeText = oldRangeText
         for(i in 1..targetRangeText.length) {
@@ -116,8 +138,15 @@ fun StatsScreenTopText(
 
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text(text = targetRangeText, fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.padding(0.dp)
-                .animateContentSize(spring(1f, 3000f)))
+            Text(
+                text = targetRangeText,
+                fontSize = 14.sp,
+                lineHeight = 14.sp,
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(0.dp)
+                    .animateContentSize(spring(1f, 3000f))
+            )
         }
     }
 }
@@ -149,8 +178,15 @@ fun HomeScreenTopText(
 
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text(text = targetRangeText, fontSize = 14.sp, lineHeight = 14.sp, maxLines = 1, modifier = Modifier.padding(0.dp)
-                .animateContentSize(spring(1f, 3000f)))
+            Text(
+                text = targetRangeText,
+                fontSize = 14.sp,
+                lineHeight = 14.sp,
+                maxLines = 1,
+                modifier = Modifier
+                    .padding(0.dp)
+                    .animateContentSize(spring(1f, 3000f))
+            )
         }
     }
 }

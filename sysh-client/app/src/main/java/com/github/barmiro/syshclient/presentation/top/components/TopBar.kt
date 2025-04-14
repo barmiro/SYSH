@@ -82,7 +82,9 @@ fun TopScreenTopBar(
                     text = { Text("All time") },
                     onClick = {
                         onDateRangeModeChange("")
-                        onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
+                        onDateRangePageChange(
+                            TopScreenEvent.OnDateRangePageChange(-1)
+                        )
                         onVMSearchParameterChange(
                             TopScreenEvent.OnSearchParameterChange(
                                 start = LocalDateTime.MIN,
@@ -98,7 +100,9 @@ fun TopScreenTopBar(
                         if (state.dateRangeMode != "yearly") {
                             val year: Int = LocalDate.now().year
                             onDateRangeModeChange("yearly")
-                            onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
+                            onDateRangePageChange(
+                                TopScreenEvent.OnDateRangePageChange(-1)
+                            )
                             onVMSearchParameterChange(
                                 TopScreenEvent.OnSearchParameterChange(
                                     start = yearToStart(year),
@@ -116,7 +120,9 @@ fun TopScreenTopBar(
                         if (state.dateRangeMode != "monthly") {
                             val month: YearMonth = YearMonth.now()
                             onDateRangeModeChange("monthly")
-                            onDateRangePageChange(TopScreenEvent.OnDateRangePageChange(-1))
+                            onDateRangePageChange(
+                                TopScreenEvent.OnDateRangePageChange(-1)
+                            )
                             onVMSearchParameterChange(
                                 TopScreenEvent.OnSearchParameterChange(
                                     start = monthToStart(month),
@@ -159,7 +165,8 @@ fun HomeScreenTopBar(
                 Row(
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(text = titleText,
+                    Text(
+                        text = titleText,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth())
@@ -176,9 +183,7 @@ fun HomeScreenTopBar(
 @Composable
 fun SettingsScreenTopBar(
     titleText: String,
-    actions: @Composable (RowScope.() -> Unit)
 ) {
-    var expanded by remember { mutableStateOf(false) }
     CenterAlignedTopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.background,
@@ -191,19 +196,14 @@ fun SettingsScreenTopBar(
                 Row(
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(text = titleText,
+                    Text(
+                        text = titleText,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth())
 
                 }
             }
-        },
-        navigationIcon = {
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(Icons.Default.DateRange, contentDescription = "Date range options")
-            }
-        },
-        actions = actions
+        }
     )
 }
