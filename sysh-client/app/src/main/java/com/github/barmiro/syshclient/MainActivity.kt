@@ -80,9 +80,9 @@ class MainActivity : ComponentActivity() {
 
 
             LaunchedEffect(storedUrl) {
-                if (storedUrl != null) {
+//                if (storedUrl != null) {
                     startupVM.getServerInfo()
-                }
+//                }
             }
 
             LaunchedEffect(serverResponded, isLoggedIn) {
