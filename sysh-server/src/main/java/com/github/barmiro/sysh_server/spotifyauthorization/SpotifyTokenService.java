@@ -16,6 +16,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -82,19 +83,18 @@ public class SpotifyTokenService {
 			return false;
 		}
 	}
-
 	
 	private final String serverUrl = System.getenv("SYSH_SERVER_URL");
 	private final String serverPort = System.getenv("SYSH_SERVER_PORT");
 	
-	
-	
-	
-	
     @Retryable(
-            value = { HttpServerErrorException.class },
+            value = { 
+        		HttpServerErrorException.class,
+        		ResourceAccessException.class
+            },
             maxAttempts = 5,
-            backoff = @Backoff(delay = 2000, multiplier = 2)
+            backoff = @Backoff(delay = 2000, multiplier = 2),
+            label = "SpotifyTokenService.getNewToken"
         )
 	public void getNewToken(String code, String username) {
 		SpotifyAuthorizationResponseDTO responseBody;
@@ -118,10 +118,7 @@ public class SpotifyTokenService {
 			setToken(username, responseBody.access_token());
 			expTimeFromExpiresIn(username, responseBody.expires_in());
 			setRefreshToken(username, responseBody.refresh_token());
-			log.info("Set token for user " + username 
-					+ ": access " + responseBody.access_token()
-					+ ", refresh " + responseBody.refresh_token()
-					+ ", expires in " + responseBody.expires_in());
+			log.info("Set token for user " + username);
 			return;
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -132,9 +129,13 @@ public class SpotifyTokenService {
     
     
     @Retryable(
-            value = { HttpServerErrorException.class },
+            value = { 
+        		HttpServerErrorException.class,
+        		ResourceAccessException.class
+            },
             maxAttempts = 5,
-            backoff = @Backoff(delay = 2000, multiplier = 2)
+            backoff = @Backoff(delay = 2000, multiplier = 2),
+            label = "SpotifyTokenService.refresh"
         )
 	public boolean refresh(String username) {
 		
@@ -164,14 +165,14 @@ public class SpotifyTokenService {
 				.retrieve()
 				.toEntity(String.class);
 		
-		
 		try {
 			responseBody = objectMapper.readValue(newEntity.getBody(), SpotifyAuthorizationResponseDTO.class);
 			setToken(username, responseBody.access_token());
 			expTimeFromExpiresIn(username, responseBody.expires_in());
 			if (responseBody.refresh_token() != null) {
-				setRefreshToken(username, responseBody.refresh_token());				
+				setRefreshToken(username, responseBody.refresh_token());
 			}
+			log.info("Received new token for user " + username);
 			return true;
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();

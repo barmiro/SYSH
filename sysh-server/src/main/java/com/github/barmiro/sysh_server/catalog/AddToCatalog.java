@@ -62,7 +62,7 @@ public class AddToCatalog {
 	}
 
 	@Transactional
-	public String adder(List<SongStream> streams, String username) throws JsonProcessingException, ClassCastException, IllegalAccessException, InvocationTargetException {
+	public Integer adder(List<SongStream> streams, String username) throws JsonProcessingException, ClassCastException, IllegalAccessException, InvocationTargetException {
 		
 		tkn.refresh(username);
 		
@@ -128,7 +128,7 @@ public class AddToCatalog {
 			
 		}
 		
-		return (streamsAdded.toString());
+		return streamsAdded;
 	}
 	
 }

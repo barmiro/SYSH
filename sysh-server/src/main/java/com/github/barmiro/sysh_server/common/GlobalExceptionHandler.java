@@ -1,4 +1,7 @@
-package com.github.barmiro.sysh_server.spotifyauthorization;
+package com.github.barmiro.sysh_server.common;
+
+import java.nio.channels.UnresolvedAddressException;
+import java.util.NoSuchElementException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,11 +13,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 	
-
 	Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 	
 	@ExceptionHandler(HttpClientErrorException.class)
@@ -42,7 +45,7 @@ public class GlobalExceptionHandler {
 			}
 		}
 		
-		System.out.println("Encountered error: "
+		log.error("Encountered error: "
 				+ e.getStatusCode()
 				+ "\nAll changes rolled back.");
 		
@@ -51,10 +54,26 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(HttpServerErrorException.class)
 	public ResponseEntity<String> handleHttpServerError(HttpServerErrorException e) {
+		e.printStackTrace();
 		return new ResponseEntity<String>("Spotify is having some issues. Please try again later.", HttpStatus.BAD_GATEWAY);
 	}
 	
+	@ExceptionHandler(ResourceAccessException.class)
+	public ResponseEntity<String> handleResourceAccessError(ResourceAccessException e) {
+		e.printStackTrace();
+		return new ResponseEntity<String>("Spotify is having some issues. Please try again later.", HttpStatus.BAD_GATEWAY);
+	}
 	
+	@ExceptionHandler(NoSuchElementException.class)
+	public ResponseEntity<String> handleNoSuchElement(NoSuchElementException e) {
+		return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@ExceptionHandler(UnresolvedAddressException.class)
+	public ResponseEntity<String> handleUnresolvedAddress(UnresolvedAddressException e) {
+		log.error("Encountered error: " + e.getMessage() + "\nAll changes rolled back.");
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	
 }
 

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
@@ -57,7 +58,10 @@ fun BottomNavBar(navController: NavHostController) {
     }
 
 
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+    ) {
         navItems.forEachIndexed { index, item ->
             NavigationBarItem(
                 selected = selectedNavItemIndex == index,

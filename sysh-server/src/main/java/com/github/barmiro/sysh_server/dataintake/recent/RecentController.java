@@ -3,6 +3,8 @@ package com.github.barmiro.sysh_server.dataintake.recent;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,12 +36,15 @@ public class RecentController {
 		this.addToCatalog = addToCatalog;
 	}
 	
-
+	private static final Logger log = LoggerFactory.getLogger(RecentController.class);
 
 	@GetMapping("/recent")
-	public String recent(
-			) throws JsonProcessingException, ClassCastException, IllegalAccessException, InvocationTargetException {
-		
+	public String recent()
+			throws JsonProcessingException,
+			ClassCastException,
+			IllegalAccessException,
+			InvocationTargetException
+	{
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		tkn.refresh(username);
@@ -59,13 +64,19 @@ public class RecentController {
 
 		String result;
 
-		result = addToCatalog.adder(streams, username);
+//		I'll leave it as a string for now, this will be an endpoint and I'll have to decide what it returns later
+		result = addToCatalog.adder(streams, username).toString();
 
 		return result;
 	}
 	
-	public String recentByUsername(String username) throws JsonProcessingException, ClassCastException, IllegalAccessException, InvocationTargetException {
-		
+	public Integer recentByUsername(String username)
+			throws JsonProcessingException,
+			ClassCastException,
+			IllegalAccessException,
+			InvocationTargetException
+	{
+		log.info("Fetching recent streams for user " + username);
 		tkn.refresh(username);
 		
 		ResponseEntity<String> response = apiClient
@@ -80,15 +91,14 @@ public class RecentController {
 		List<SongStream> streams = ConvertDTOs.streamsRecent(username, response, previous);
 		
 		if (streams.isEmpty()) {
-			return "No new streams found";
+			log.info("No new streams found");
+			return 0;
 		}
 
-		String result;
+		Integer result;
 
 		result = addToCatalog.adder(streams, username);
 		
-		
-
 		return result;
 	}
 }

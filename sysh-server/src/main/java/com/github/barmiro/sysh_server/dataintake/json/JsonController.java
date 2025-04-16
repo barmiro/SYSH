@@ -27,19 +27,24 @@ public class JsonController {
 	private static final Logger log = LoggerFactory.getLogger(JsonController.class);
 	
 	@PostMapping("/addJson")
-	String addJson(@RequestBody List<StreamDTO> streamDTOs) throws JsonProcessingException, ClassCastException, IllegalAccessException, InvocationTargetException {
-		
-		log.info("Adding json file...");
-		long start = System.currentTimeMillis();
+	Integer addJson(@RequestBody List<StreamDTO> streamDTOs)
+			throws JsonProcessingException,
+			ClassCastException,
+			IllegalAccessException,
+			InvocationTargetException
+	{
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("Adding json file for user " + username);
+		long start = System.currentTimeMillis();
 
+		List<SongStream> streams = ConvertDTOs.streamsJson(streamDTOs, username);
 		
-
-		List<SongStream> streams = ConvertDTOs.streamsJson(streamDTOs, username);  // null?
 		if (streams.isEmpty()) {
-			return "No streams found";
+			log.info("No new streams found");
+			return 0;
 		}
-		String result = addToCatalog.adder(streams, username);
+		
+		Integer result = addToCatalog.adder(streams, username);
 		
 		long end = System.currentTimeMillis();
 		long time = (end - start) / 1000;

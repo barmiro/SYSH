@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +34,7 @@ fun GeneralStatsItem(
     Surface(
         modifier = Modifier.padding(6.dp),
         shape = RoundedCornerShape(16.dp),
-        color = NavigationBarDefaults.containerColor
+        color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Box(
             modifier = Modifier
@@ -112,7 +111,7 @@ fun CollectionStatsItem(
     Surface(
         modifier = Modifier.padding(6.dp),
         shape = RoundedCornerShape(16.dp),
-        color = NavigationBarDefaults.containerColor
+        color = MaterialTheme.colorScheme.secondaryContainer
     ) {
 
         Column(

@@ -40,8 +40,7 @@ fun JsonFileUploadItem(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
-//        TODO: change the color
-        color = NavigationBarDefaults.containerColor
+        color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Row(
             modifier = Modifier.padding(8.dp),

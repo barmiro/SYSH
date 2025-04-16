@@ -152,6 +152,8 @@ fun TopScreen(
         Row(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 TabRow(selectedTabIndex = tabIndex,
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground,
                     indicator = { tabPositions ->
                         TopScreenTopIndicator(
                             tabPositions,
@@ -164,7 +166,9 @@ fun TopScreen(
                                 fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.alpha(
-                                    (1 - tabPagerState.getOffsetDistanceInPages(index).absoluteValue / 2).coerceAtLeast(0.5f)
+                                    (1 - tabPagerState.getOffsetDistanceInPages(index)
+                                        .absoluteValue / 2)
+                                        .coerceAtLeast(0.5f)
                                 )
                             ) },
                                 selected = tabIndex == index,

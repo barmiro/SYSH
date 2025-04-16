@@ -140,7 +140,7 @@ fun urlInfoItem(
     text: String
     ) {
     Surface(
-        color = NavigationBarDefaults.containerColor,
+        color = MaterialTheme.colorScheme.secondaryContainer,
         modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp).fillMaxWidth(),
         shape = RoundedCornerShape(8.dp)
     ) {

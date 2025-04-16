@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -82,7 +81,7 @@ fun TopItem(
     Surface(
         modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
         shape = RoundedCornerShape(8.dp),
-        color = NavigationBarDefaults.containerColor
+        color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Box(
             modifier = Modifier
@@ -93,7 +92,7 @@ fun TopItem(
                 .background(
                     brush = Brush.horizontalGradient(
                         colors = listOf(
-                            NavigationBarDefaults.containerColor,
+                            MaterialTheme.colorScheme.secondaryContainer,
                             animatedColor.value
                         ),
                         startX = 80f
