@@ -55,7 +55,7 @@ fun TopScreenTopIndicator(tabPositions: List<TabPosition>, animationOffset: Floa
         Color(153, 76, 155),
         Color(200, 60, 125),
         Color(249, 45, 95),
-        Color.Green
+        Color(249, 45, 95),
     )
 
     val animatedColor by transition.animateColor {
@@ -64,8 +64,10 @@ fun TopScreenTopIndicator(tabPositions: List<TabPosition>, animationOffset: Floa
             .copy(alpha = floor + 1 - it)
             .compositeOver(
                 colors[floor + 1])
-            .copy(alpha = 0.2f)
-            .compositeOver(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.15f))
+            .copy(alpha = 0.25f)
+            .compositeOver(
+                MaterialTheme.colorScheme.onBackground
+                    .copy(alpha = 0.12f))
     }
 
     Box(
