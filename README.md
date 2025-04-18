@@ -8,7 +8,7 @@ Short demo of what the client looks like:
 https://youtu.be/1_iDDmWinZM?si=Ui3jm5_HX4qQa-5o
 
 ## SETUP
-1. Create a new app in Spotify's developer dashboard.
+1. Create a new app in Spotify's developer dashboard and add http://127.0.0.1:5754/callback as a redirect URI.
 2. Find your app's Client ID and Client secret and add them to your .env file (detailed environment variable list coming soon).
 3. Launch your application using Docker Compose (the only officially supported way to run SYSH at the moment).
 4. Install the Android client and follow the instructions to create an account and authorize SYSH to make API calls to Spotify.
@@ -29,9 +29,13 @@ It doesn't have to. On import, all streams for the detected timestamp range are 
 
 When an account is created, SYSH saves the user's timezone and saves it to the database. Every time a user logs in, if the detected timezone differs from what's saved in the database, the user will be prompted whether they want to change their timezone. This change is completely non-destructive and only changes how the data is displayed. After a timezone change, some data might take longer to load until all caches are re-generated.
 
-> Why does my server need to use HTTPS?
+> Does SYSH need to use HTTPS?
 
-This is a change very recently implemented by Spotify. If you have an app created before April 2025 in your Spotify Developer Dashboard, you can use it for your SYSH instance to use plain HTTP until November 2025.
+No. Even though Spotify introduced an HTTPS requirement for redirect URIs in April of 2025, you can run SYSH over plain HTTP. The Android client uses a built-in transparent proxy to handle Spotify's redirects using 127.0.0.1 - a loopback address which is exempt from the requirement. That's why, regardless of your server's protocol, address or port number, you have to set http://127.0.0.1:5754/callback as the redirect URI in your Spotify Developer Dashboard.
+
+> Is using HTTP secure?
+
+All communication with Spotify takes place over HTTPS, regardless of your setup. Even though the redirect URI uses HTTP, it only sends data from your browser to the local proxy. The credentials are then, however, sent from your device to your server - it's up to you to secure all traffic between the server and the Android client. Traffic over HTTP can be secure if you're using a mesh VPN like Tailscale or connect on a trusted private network (e.g. your home Wi-Fi).
 
 > How many users does SYSH support?
 
