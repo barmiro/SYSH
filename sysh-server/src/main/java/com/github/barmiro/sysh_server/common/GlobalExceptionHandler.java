@@ -30,6 +30,7 @@ public class GlobalExceptionHandler {
 			String username = auth.getName();
 			
 			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+				e.printStackTrace();
 				String message = ("User '"
 						+ username 
 						+ "' not authorized with Spotify");
@@ -44,7 +45,7 @@ public class GlobalExceptionHandler {
 						HttpStatus.TOO_MANY_REQUESTS);
 			}
 		}
-		
+		e.printStackTrace();
 		log.error("Encountered error: "
 				+ e.getStatusCode()
 				+ "\nAll changes rolled back.");

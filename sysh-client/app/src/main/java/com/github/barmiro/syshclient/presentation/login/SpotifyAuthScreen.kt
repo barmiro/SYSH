@@ -35,9 +35,9 @@ fun SpotifyAuthScreen(
             coroutineScope.launch {
                 openWebsite(context, url)
             }
+            sessionVM.startRedirectServer()
         }
     }
-
 
     Surface(
         modifier = Modifier

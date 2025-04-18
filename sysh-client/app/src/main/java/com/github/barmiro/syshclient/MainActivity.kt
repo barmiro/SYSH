@@ -119,6 +119,9 @@ class MainActivity : ComponentActivity() {
             }
 
             LaunchedEffect(responseCode) {
+//                no better idea where to stop it for now
+                sessionVM.stopRedirectServer()
+
                 when (responseCode) {
                     200 -> {
                         navController.navigate(Home)
@@ -216,9 +219,5 @@ class MainActivity : ComponentActivity() {
     private fun pickZipFile() {
         zipPickerLauncher.launch(arrayOf("application/zip"))
     }
-
-
-
-
 }
 

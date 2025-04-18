@@ -9,11 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -135,6 +135,67 @@ fun JsonFileUploadItem(
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun SettingsItem(
+    itemText: String,
+    icon: @Composable () -> Unit,
+    modifier: Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer
+    ) {
+        Row(
+            modifier = Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                icon()
+            }
+            VerticalDivider(
+                Modifier.height(48.dp).padding(horizontal = 8.dp)
+            )
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Row(
+                ) {
+                    Text(
+                        text = itemText,
+//                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                }
+            }
+            Column(
+                modifier = Modifier.weight(0.15f),
+                horizontalAlignment = Alignment.End
+            ) {
+                Row(
+                    modifier = Modifier.animateContentSize(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = "Go",
+                        modifier = Modifier.size(24.dp).alpha(0.8f)
+
+                    )
                 }
             }
         }

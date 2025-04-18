@@ -7,6 +7,8 @@ import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepo
 import com.github.barmiro.syshclient.data.common.startup.StartupDataRepository
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import fi.iki.elonen.NanoHTTPD
+import fi.iki.elonen.NanoHTTPD.SOCKET_READ_TIMEOUT
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,6 +17,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import java.time.ZoneId
 import javax.inject.Inject
 
@@ -145,6 +149,80 @@ class SessionViewModel @Inject constructor(
             }
         }
     }
+
+
+    private var server: NanoHTTPD? = null
+
+    fun startRedirectServer() {
+        if (server == null) {
+            server = object: NanoHTTPD("127.0.0.1", 5754) {
+                override fun serve(session: IHTTPSession?): Response {
+                    if (session?.method == Method.GET
+                        && session.uri == "/callback") {
+                        val params = session.parameters
+                        val code = params["code"]?.get(0)
+                        val state = params["state"]?.get(0)
+
+
+                        if (code != null && state != null) {
+                            var responseCode: Int
+
+//                            this will only ever run while the user is in the browser,
+//                            only blocks the server thread, which is synchronous anyway
+                            runBlocking {
+                                withTimeout(15000L) {
+                                    responseCode = authRepo.callback(state, code)
+                                }
+                            }
+
+                            return if (responseCode in 200..399) {
+                                newFixedLengthResponse(
+                                    Response.Status.REDIRECT_SEE_OTHER,
+                                    "text/plain",
+                                    "Received response from server, opening app..."
+                                ).apply {
+                                    addHeader("Location", "sysh://open")
+                                }
+                            } else {
+                                newFixedLengthResponse(
+                                    Response.Status.INTERNAL_ERROR,
+                                    "text/plain",
+                                    "Server error: $responseCode"
+                                )
+                            }
+                        } else {
+                            return newFixedLengthResponse(
+                                Response.Status.BAD_REQUEST,
+                                "text/plain",
+                                "Spotify responded with invalid data. Please try again later"
+                            )
+                        }
+                    } else {
+                        return newFixedLengthResponse(
+                            Response.Status.BAD_REQUEST,
+                            "text/plain",
+                            "Spotify responded in an unexpected way. Please try again later"
+                        )
+                    }
+                }
+            }.apply {
+                start(SOCKET_READ_TIMEOUT, false)
+            }
+        }
+    }
+
+    fun stopRedirectServer() {
+        server?.stop()
+        server = null
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopRedirectServer()
+    }
+
+
+
 
     fun logout() {
         viewModelScope.launch {

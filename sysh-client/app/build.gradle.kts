@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.converter.kotlinx.serialization)
+    implementation(libs.nanohttpd)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
     implementation(libs.androidx.datastore.preferences)

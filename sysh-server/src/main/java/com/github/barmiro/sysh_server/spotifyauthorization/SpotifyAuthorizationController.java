@@ -40,7 +40,8 @@ public class SpotifyAuthorizationController {
 				+ "user-read-currently-playing%20"
 				+ "user-read-playback-state%20"
 				+ "user-modify-playback-state&"
-				+ "redirect_uri=http://" + serverUrl + ":" + serverPort + "/callback&"
+//				TODO: IF THIS STOPS WORKING, ROLL BACK
+				+ "redirect_uri=http://127.0.0.1:5754/callback&"
 				+ "state=" + state;
 		return url;
 	}
@@ -67,7 +68,7 @@ public class SpotifyAuthorizationController {
 		String redirectUrl = "sysh://open";
 		
 		return ResponseEntity
-				.status(HttpStatus.FOUND)
+				.status(HttpStatus.SEE_OTHER)
 				.header(HttpHeaders.LOCATION, redirectUrl)
 				.build();
 		

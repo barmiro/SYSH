@@ -116,4 +116,15 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
+    suspend fun callback(state: String, code: String): Int {
+        try {
+            val response = authApi.callback(state, code)
+            return response.code()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return 600
+        }
+
+    }
+
 }
