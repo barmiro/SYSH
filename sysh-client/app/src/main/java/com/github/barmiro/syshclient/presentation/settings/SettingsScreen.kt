@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.barmiro.syshclient.data.common.dataimport.UploadStatus
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 import com.github.barmiro.syshclient.presentation.top.components.SettingsScreenTopBar
 
@@ -73,8 +74,15 @@ fun SettingsScreen(
                 zipFileStatus?.let {
                     item() {
                         Row() {
+                            val archiveText: String
+                            archiveText = when (it.status) {
+                                is UploadStatus.Waiting -> "Processing archive: ${it.file.name}"
+                                is UploadStatus.Processing -> "Finalizing..."
+                                is UploadStatus.Success -> "${it.file.name} imported successfully"
+                                is UploadStatus.Failed -> "Something went wrong"
+                            }
                             Text(
-                                text = "Processing archive: ${it.file.name}"
+                                text = archiveText
                             )
                         }
                     }

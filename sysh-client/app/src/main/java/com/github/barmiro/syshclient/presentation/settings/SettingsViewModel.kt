@@ -74,6 +74,7 @@ class SettingsViewModel @Inject constructor(
                     importRepo.extractJsonFiles(tempFile)
                 )
 
+//                so that all files don't appear in a single frame
                 viewModelScope.launch {
                     for (file:File in extractedFiles) {
                         _fileStatusList.update {
@@ -105,10 +106,31 @@ class SettingsViewModel @Inject constructor(
                                     )
                                 }
                             }
+                        }
                     }
                 }
 
+                importRepo.recent().collect { result ->
+                    when (result) {
+                        is Resource.Success -> _zipFileStatus.value = FileStatus(
+                            tempFile,
+                            UploadStatus.Success(
+                                message = "Processed"
+                            )
+                        )
+                        is Resource.Loading -> _zipFileStatus.value = FileStatus(
+                            tempFile,
+                            UploadStatus.Processing
+                        )
+                        is Resource.Error -> _zipFileStatus.value = FileStatus(
+                            tempFile,
+                            UploadStatus.Failed(
+                                message = result.message
+                            )
+                        )
+                    }
                 }
+
             }
         }
     }

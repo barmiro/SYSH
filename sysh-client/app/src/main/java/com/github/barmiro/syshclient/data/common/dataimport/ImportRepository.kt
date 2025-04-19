@@ -88,6 +88,23 @@ class ImportRepository @Inject constructor(
             }
         }
     }
+
+
+    fun recent(): Flow<Resource<String>> {
+        return flow{
+            emit(Resource.Loading(true))
+            try {
+                val response = importApi.recent()
+
+                if (response.isSuccessful) {
+                    emit(Resource.Success(""))
+                }
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
+            }
+        }
+    }
 }
 
 data class FileStatus(
