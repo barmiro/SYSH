@@ -55,10 +55,7 @@ public class RecentController {
 				.header("Authorization", "Bearer " + tkn.getToken(username))
 				.retrieve()
 				.toEntity(String.class);
-		
 
-
-		
 		List<SongStream> previous = streamRepository.find(50, username);
 		List<SongStream> streams = ConvertDTOs.streamsRecent(username, response, previous);
 
@@ -66,6 +63,11 @@ public class RecentController {
 
 //		I'll leave it as a string for now, this will be an endpoint and I'll have to decide what it returns later
 		result = addToCatalog.adder(streams, username).toString();
+		
+//		to make sure cache is always regenerated on manual call
+		if (streams.size() == 0) {
+			addToCatalog.updateCache(username);
+		}
 
 		return result;
 	}

@@ -62,7 +62,14 @@ public class AddToCatalog {
 	}
 
 	@Transactional
-	public Integer adder(List<SongStream> streams, String username) throws JsonProcessingException, ClassCastException, IllegalAccessException, InvocationTargetException {
+	public Integer adder(
+			List<SongStream> streams,
+			String username
+			) throws 
+	JsonProcessingException,
+	ClassCastException,
+	IllegalAccessException,
+	InvocationTargetException {
 		
 		tkn.refresh(username);
 		
@@ -122,13 +129,24 @@ public class AddToCatalog {
 				&& streams.size() <= 50
 				) {
 //			statsCache.updateCache(streams, username, tracksAdded, albumsAdded, artistsAdded);
-			statsCache.cacheGenerator(username);
-			trackRepository.updateTopTracksCache(username);
-			albumRepository.updateTopAlbumsCache(username);
-			
+			updateCache(username);
 		}
 		
 		return streamsAdded;
+	}
+	
+//	this gives me more granular control over forced refreshes
+//	without injecting additional beans;
+//	should probably be in its own class some day
+	public void updateCache(
+			String username
+			) throws 
+	IllegalAccessException,
+	InvocationTargetException {
+		
+		statsCache.cacheGenerator(username);
+		trackRepository.updateTopTracksCache(username);
+		albumRepository.updateTopAlbumsCache(username);
 	}
 	
 }
