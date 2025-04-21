@@ -124,7 +124,11 @@ class MainActivity : ComponentActivity() {
 
                 when (responseCode) {
                     200 -> {
-                        navController.navigate(Home)
+                        navController.navigate(Home) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                        }
                     }
                     403 -> {
                         navController.navigate(SpotifyAuth)

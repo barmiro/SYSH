@@ -20,7 +20,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 @Composable
 fun BottomNavBar(navController: NavHostController) {
@@ -57,19 +60,22 @@ fun BottomNavBar(navController: NavHostController) {
         mutableIntStateOf(0)
     }
 
-
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.secondaryContainer,
         contentColor = MaterialTheme.colorScheme.onSecondaryContainer
     ) {
         navItems.forEachIndexed { index, item ->
+            val isSelected = currentDestination?.route?.substringAfterLast('.') == item.title
             NavigationBarItem(
-                selected = selectedNavItemIndex == index,
+                selected = isSelected,
                 onClick = {
                     selectedNavItemIndex = index
                     navController.navigate(item.navigateTo) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = false
+                        popUpTo(currentDestination?.id ?: 0) {
+                            inclusive = true
+                            saveState = true
                         }
                         launchSingleTop = true
                         restoreState = true
@@ -78,7 +84,7 @@ fun BottomNavBar(navController: NavHostController) {
                 icon = {
                     Icon(
                         imageVector =
-                        if (index == selectedNavItemIndex) {
+                        if (isSelected) {
                             item.selectedIcon
                         } else {
                             item.unselectedIcon
