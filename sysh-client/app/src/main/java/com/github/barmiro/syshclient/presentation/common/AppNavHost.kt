@@ -10,6 +10,7 @@ import com.github.barmiro.syshclient.presentation.login.LoginScreen
 import com.github.barmiro.syshclient.presentation.login.RegisterScreen
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 import com.github.barmiro.syshclient.presentation.login.SpotifyAuthScreen
+import com.github.barmiro.syshclient.presentation.settings.ImportScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
 import com.github.barmiro.syshclient.presentation.startup.SplashScreen
@@ -72,7 +73,10 @@ fun AppNavHost(navController: NavHostController,
             SpotifyAuthScreen(sessionVM)
         }
         composable<Settings> {
-            SettingsScreen(settingsVM, sessionVM, onPickZipFile)
+            SettingsScreen(settingsVM, sessionVM, onPickZipFile, navController)
+        }
+        composable<Import> {
+            ImportScreen(settingsVM, sessionVM, onPickZipFile)
         }
     }
 }
@@ -106,3 +110,6 @@ object SpotifyAuth
 
 @Serializable
 object Settings
+
+@Serializable
+object Import
