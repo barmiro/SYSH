@@ -77,7 +77,7 @@ class StartupDataRepository @Inject constructor(
 
     }
 
-    fun getUserDisplayName(): Flow<Resource<String>> {
+    fun getUserData(): Flow<Resource<UserDataDTO>> {
         return flow {
             emit(Resource.Loading(true))
 
@@ -87,7 +87,7 @@ class StartupDataRepository @Inject constructor(
                     response.body()?.let {
                         emit(
                             Resource.Success(
-                                data = it.string()
+                                data = it
                             )
                         )
                     } ?: emit(

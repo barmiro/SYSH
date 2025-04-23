@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -102,7 +101,7 @@ fun StartupScreen(
                 urlValidation?.let {
                     if (it.isValidUrl) {
                         if (!it.hasScheme) {
-                            urlInfoItem(
+                            UrlInfoItem(
                                 icon = {
                                     Icon(imageVector = Icons.Default.Info,
                                         contentDescription = "Info")
@@ -111,7 +110,7 @@ fun StartupScreen(
                             )
                         }
                         if (!it.hasPort) {
-                            urlInfoItem(
+                            UrlInfoItem(
                                 icon = {
                                     Icon(imageVector = Icons.Default.Info,
                                         contentDescription = "Info")
@@ -120,7 +119,7 @@ fun StartupScreen(
                             )
                         }
                     } else {
-                        urlInfoItem(
+                        UrlInfoItem(
                             icon = {
                                 Icon(imageVector = Icons.Default.Close,
                                     contentDescription = "Error")
@@ -135,7 +134,7 @@ fun StartupScreen(
 
 
 @Composable
-fun urlInfoItem(
+fun UrlInfoItem(
     icon: @Composable () -> Unit,
     text: String
     ) {
@@ -155,7 +154,6 @@ fun urlInfoItem(
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = text,
-                    maxLines = 2,
                     textAlign = TextAlign.Center
                 )
 

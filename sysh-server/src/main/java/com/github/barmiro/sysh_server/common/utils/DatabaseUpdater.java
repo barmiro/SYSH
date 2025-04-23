@@ -14,14 +14,14 @@ import jakarta.annotation.PostConstruct;
 
 @Service
 @Transactional
-public class DevDatabaseUpdater {
+public class DatabaseUpdater {
 
 	JdbcClient jdbc;
-	public DevDatabaseUpdater(JdbcClient jdbc) {
+	public DatabaseUpdater(JdbcClient jdbc) {
 		this.jdbc = jdbc;
 	}
 	
-	private static final Logger log = LoggerFactory.getLogger(DevDatabaseUpdater.class);
+	private static final Logger log = LoggerFactory.getLogger(DatabaseUpdater.class);
 	
 	
 	@Value("${test.env:false}")

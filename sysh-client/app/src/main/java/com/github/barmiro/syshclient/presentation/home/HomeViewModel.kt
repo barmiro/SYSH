@@ -26,10 +26,18 @@ class HomeViewModel @Inject constructor(
     private val _userDisplayName = MutableStateFlow<String?>(null)
     val userDisplayName: StateFlow<String?> = _userDisplayName
 
+    private val _showImportAlert = MutableStateFlow<Boolean>(false)
+    val showImportAlert: StateFlow<Boolean> = _showImportAlert
+
     init {
         viewModelScope.launch {
             userPreferencesRepository.userDisplayName.collect {
                 _userDisplayName.value = it
+            }
+        }
+        viewModelScope.launch {
+            userPreferencesRepository.showImportAlert.collect {
+                _showImportAlert.value = it
             }
         }
     }

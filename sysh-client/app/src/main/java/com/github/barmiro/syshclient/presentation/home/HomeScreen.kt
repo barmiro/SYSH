@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.barmiro.syshclient.presentation.startup.UrlInfoItem
 import com.github.barmiro.syshclient.presentation.top.components.HomeScreenTopBar
 import com.github.barmiro.syshclient.presentation.top.components.HomeScreenTopText
 import java.text.NumberFormat
@@ -79,6 +83,17 @@ fun HomeScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
             ) {
+                if (viewModel.showImportAlert.value) {
+                    item() {
+                        UrlInfoItem(
+                            icon = {
+                                Icon(imageVector = Icons.Default.Info,
+                                    contentDescription = "Info")
+                            },
+                            text = "For the best experience, please import streaming data in the Settings tab"
+                        )
+                    }
+                }
                 item() {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalArrangement = Arrangement.Center

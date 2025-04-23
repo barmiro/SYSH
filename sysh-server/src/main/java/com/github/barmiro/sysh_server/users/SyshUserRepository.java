@@ -199,5 +199,13 @@ public class SyshUserRepository {
 				.single();
 	}
 
+	public int setHasImportedData(String username, Boolean value) {
+		return jdbc.sql("UPDATE Users SET "
+				+ "has_imported_data = :value "
+				+ "WHERE username = :username;")
+				.param("value", value, Types.BOOLEAN)
+				.param("username", username, Types.VARCHAR)
+				.update();
+	}
 	
 }

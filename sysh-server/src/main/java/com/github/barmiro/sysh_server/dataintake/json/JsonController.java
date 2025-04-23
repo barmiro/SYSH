@@ -14,14 +14,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.barmiro.sysh_server.catalog.AddToCatalog;
 import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
+import com.github.barmiro.sysh_server.users.SyshUserRepository;
 
 @RestController
 public class JsonController {
 	
 	private final AddToCatalog addToCatalog;
+	private final SyshUserRepository userRepo;
 	
-	JsonController(AddToCatalog addToCatalog) {
+	JsonController(
+			AddToCatalog addToCatalog,
+			SyshUserRepository userRepo
+			) {
 		this.addToCatalog = addToCatalog;
+		this.userRepo = userRepo;
 	}
 	
 	private static final Logger log = LoggerFactory.getLogger(JsonController.class);
@@ -45,6 +51,7 @@ public class JsonController {
 		}
 		
 		Integer result = addToCatalog.adder(streams, username);
+		userRepo.setHasImportedData(username, true);
 		
 		long end = System.currentTimeMillis();
 		long time = (end - start) / 1000;

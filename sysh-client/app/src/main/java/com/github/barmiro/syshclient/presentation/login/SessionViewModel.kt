@@ -105,13 +105,14 @@ class SessionViewModel @Inject constructor(
 
     fun getUserData() {
         viewModelScope.launch {
-            startupDataRepository.getUserDisplayName()
+            startupDataRepository.getUserData()
                 .collect { result ->
                     when(result) {
                         is Resource.Success -> {
                             result.data?.let {
                                 userPrefRepo.setAuthorizedWithSpotify(true)
-                                userPrefRepo.saveUserDisplayName(it)
+                                userPrefRepo.saveUserDisplayName(it.display_name)
+                                userPrefRepo.setImportAlert(!it.has_imported_data)
                             }
                             _responseCode.value = 200
                         }
