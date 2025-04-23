@@ -27,7 +27,7 @@ public class SampleResponseBodies {
 		body.add("grant_type", "authorization_code");
 		body.add("code", "randomcode");
 //		this is null because the corresponding env vars are not set in a test
-		body.add("redirect_uri", "http://null:null/callback");
+		body.add("redirect_uri", "http://127.0.0.1:5754/callback");
 		
 		return body;
 	}

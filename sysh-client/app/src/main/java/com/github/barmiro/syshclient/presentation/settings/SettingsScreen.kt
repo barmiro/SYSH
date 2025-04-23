@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,7 +41,6 @@ import com.github.barmiro.syshclient.presentation.top.components.SettingsScreenT
 fun SettingsScreen(
     settingsVM: SettingsViewModel,
     sessionVM: SessionViewModel,
-    onPickZipFile: () -> Unit,
     navController: NavHostController
 ) {
 
@@ -140,11 +140,15 @@ fun ImportScreen(
                         content = {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                tint = MaterialTheme.colorScheme.onBackground,
                                 contentDescription = "Go back")
                         }
                     )
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
+                ),
             )
         }
     ) { innerPadding ->

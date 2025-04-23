@@ -17,6 +17,7 @@ import com.github.barmiro.sysh_server.catalog.streams.SongStream;
 import com.github.barmiro.sysh_server.catalog.streams.StreamRepository;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
 import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
+import com.github.barmiro.sysh_server.stats.CacheService;
 
 @RestController
 public class RecentController {
@@ -25,15 +26,18 @@ public class RecentController {
 	RestClient apiClient;
 	StreamRepository streamRepository;
 	AddToCatalog addToCatalog;
+	CacheService cacheService;
 	
 	public RecentController(SpotifyTokenService tkn,
 			RestClient apiClient,
 			StreamRepository streamRepository,
-			AddToCatalog addToCatalog) {
+			AddToCatalog addToCatalog,
+			CacheService cacheService) {
 		this.tkn = tkn;
-		this.apiClient = apiClient;
+		this.apiClient = apiClient;	
 		this.streamRepository = streamRepository;
 		this.addToCatalog = addToCatalog;
+		this.cacheService = cacheService;
 	}
 	
 	private static final Logger log = LoggerFactory.getLogger(RecentController.class);
@@ -66,7 +70,7 @@ public class RecentController {
 		
 //		to make sure cache is always regenerated on manual call
 		if (streams.size() == 0) {
-			addToCatalog.updateCache(username);
+			cacheService.cacheGenerator(username);
 		}
 
 		return result;

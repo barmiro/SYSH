@@ -24,7 +24,7 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.albu
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.dto.tracks.artists.ApiTrackArtist;
 import com.github.barmiro.sysh_server.common.utils.ConvertDTOs;
 import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
-import com.github.barmiro.sysh_server.stats.StatsCache;
+import com.github.barmiro.sysh_server.stats.CacheService;
 
 @Repository
 public class AddToCatalog {
@@ -38,7 +38,7 @@ public class AddToCatalog {
 	AlbumsTracks albumsTracks;
 	TracksArtists tracksArtists;
 	SpotifyTokenService tkn;
-	StatsCache statsCache;
+	CacheService statsCache;
 	
 	public AddToCatalog(
 			TrackRepository trackRepository,
@@ -49,7 +49,7 @@ public class AddToCatalog {
 			AlbumsTracks albumsTracks,
 			TracksArtists tracksArtists,
 			SpotifyTokenService tkn,
-			StatsCache statsCache) {
+			CacheService statsCache) {
 		this.trackRepository = trackRepository;
 		this.trackApiRepository = trackApiRepository;
 		this.albumRepository = albumRepository;
@@ -129,7 +129,7 @@ public class AddToCatalog {
 				&& streams.size() <= 50
 				) {
 //			statsCache.updateCache(streams, username, tracksAdded, albumsAdded, artistsAdded);
-			updateCache(username);
+			statsCache.cacheGenerator(username);
 		}
 		
 		return streamsAdded;
@@ -138,15 +138,15 @@ public class AddToCatalog {
 //	this gives me more granular control over forced refreshes
 //	without injecting additional beans;
 //	should probably be in its own class some day
-	public void updateCache(
-			String username
-			) throws 
-	IllegalAccessException,
-	InvocationTargetException {
-		
-		statsCache.cacheGenerator(username);
-		trackRepository.updateTopTracksCache(username);
-		albumRepository.updateTopAlbumsCache(username);
-	}
+//	public void updateCache(
+//			String username
+//			) throws 
+//	IllegalAccessException,
+//	InvocationTargetException {
+//		
+//		statsCache.cacheGenerator(username);
+//		trackRepository.updateTopTracksCache(username);
+//		albumRepository.updateTopAlbumsCache(username);
+//	}
 	
 }

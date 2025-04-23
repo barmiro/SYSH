@@ -42,14 +42,14 @@ public class StatsController {
 	ArtistRepository artistRepo;
 	AlbumRepository albumRepo;
 	TrackRepository trackRepo;
-	StatsCache statsCache;
+	CacheService statsCache;
 	SyshUserRepository userRepository;
 	
 	StatsController(StatsRepository statsRepo,
 			ArtistRepository artistRepo,
 			AlbumRepository albumRepo,
 			TrackRepository trackRepo,
-			StatsCache statsCache, 
+			CacheService statsCache, 
 			SyshUserRepository userRepository) {
 		this.statsRepo = statsRepo;
 		this.artistRepo = artistRepo;

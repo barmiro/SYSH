@@ -187,7 +187,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 				.list();
 	}
 	
-	List<TrackStats> topTracks(String sort,
+	public List<TrackStats> topTracks(String sort,
 			String username,
 			Integer offset,
 			String size,

@@ -186,6 +186,18 @@ public class SyshUserRepository {
 				.query(String.class)
 				.single();
 	}
+	
+	public AppUserData getAppUserData(String username) {
+		return jdbc.sql("SELECT username,"
+				+ "display_name,"
+				+ "timezone,"
+				+ "has_imported_data "
+				+ "FROM Users "
+				+ "WHERE username = :username")
+				.param("username", username, Types.VARCHAR)
+				.query(AppUserData.class)
+				.single();
+	}
 
 	
 }

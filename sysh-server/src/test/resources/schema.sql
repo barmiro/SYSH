@@ -1,5 +1,12 @@
 --CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
 
+CREATE TABLE db_info (
+    id BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (id),
+    version VARCHAR NOT NULL
+);
+
+INSERT INTO db_info (version) VALUES ('0.0.1');
+
 CREATE TABLE Users (
     username VARCHAR(64) PRIMARY KEY,
     password VARCHAR NOT NULL,
@@ -10,7 +17,8 @@ CREATE TABLE Users (
     role VARCHAR DEFAULT 'USER',
 --    consider handling the default in java
     display_name VARCHAR DEFAULT 'unknown username',
-    timezone VARCHAR
+    timezone VARCHAR NOT NULL,
+    has_imported_data BOOLEAN DEFAULT false
 );
 
 CREATE TABLE SongStreams (
@@ -171,8 +179,3 @@ CREATE TABLE Top_Tracks_Cache (
 
 CREATE INDEX tracks_by_time ON Top_Tracks_Cache (username, total_ms_played DESC);
 CREATE INDEX tracks_by_count ON Top_Tracks_Cache (username, stream_count DESC);
-
-
-
-
-

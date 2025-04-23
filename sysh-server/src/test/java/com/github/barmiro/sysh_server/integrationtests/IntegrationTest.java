@@ -47,7 +47,7 @@ import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiReposit
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
 import com.github.barmiro.sysh_server.security.SyshUser;
 import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
-import com.github.barmiro.sysh_server.stats.StatsCache;
+import com.github.barmiro.sysh_server.stats.CacheService;
 import com.github.barmiro.sysh_server.stats.StatsRepository;
 import com.github.barmiro.sysh_server.stats.dto.StatsForRange;
 import com.github.barmiro.sysh_server.users.SyshUserManager;
@@ -97,7 +97,7 @@ class IntegrationTest {
 	private StatsRepository stats;
 	
 	@Autowired
-	private StatsCache statsCache;
+	private CacheService statsCache;
 	
 	@Autowired
 	SyshUserManager userManager;
@@ -145,7 +145,7 @@ class IntegrationTest {
 		TrackApiRepository trApi = new TrackApiRepository(jdbc, builder.build(), tkn, trackRepo);
 		ArtistApiRepository arApi = new ArtistApiRepository(jdbc, builder.build(), tkn, artistRepo);
 		AddToCatalog add = new AddToCatalog(trackRepo, trApi, albumRepo, arApi, sr, albTra, traArt, tkn, statsCache);
-		RecentController rc = new RecentController(tkn, builder.build(), sr, add);
+		RecentController rc = new RecentController(tkn, builder.build(), sr, add, statsCache);
 		
 		
 		customizer.getServer().expect(requestTo("https://api.spotify.com/v1/me/player/recently-played?limit=50"))

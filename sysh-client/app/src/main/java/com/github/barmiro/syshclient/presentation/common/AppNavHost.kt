@@ -73,7 +73,7 @@ fun AppNavHost(navController: NavHostController,
             SpotifyAuthScreen(sessionVM)
         }
         composable<Settings> {
-            SettingsScreen(settingsVM, sessionVM, onPickZipFile, navController)
+            SettingsScreen(settingsVM, sessionVM, navController)
         }
         composable<Import> {
             ImportScreen(settingsVM, sessionVM, onPickZipFile)

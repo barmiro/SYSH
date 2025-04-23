@@ -15,25 +15,36 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
+import com.github.barmiro.sysh_server.catalog.albums.AlbumRepository;
 import com.github.barmiro.sysh_server.catalog.streams.SongStream;
+import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.common.records.OffsetDateTimeRange;
 import com.github.barmiro.sysh_server.common.utils.TimeUtils;
 import com.github.barmiro.sysh_server.users.SyshUserRepository;
 
 @Service
-public class StatsCache {
+public class CacheService {
 
 	JdbcClient jdbc;
 	StatsRepository statsRepo;
+	TrackRepository trackRepo;
+	AlbumRepository albumRepo;
 	SyshUserRepository userRepo;
 	
-	StatsCache(JdbcClient jdbc, StatsRepository statsRepo, SyshUserRepository userRepo) {
+	CacheService(
+			JdbcClient jdbc,
+			StatsRepository statsRepo,
+			TrackRepository trackRepo,
+			AlbumRepository albumRepo,
+			SyshUserRepository userRepo) {
 		this.jdbc = jdbc;
 		this.statsRepo = statsRepo;
+		this.trackRepo = trackRepo;
+		this.albumRepo = albumRepo;
 		this.userRepo = userRepo;
 	}
 	
-	private static final Logger log = LoggerFactory.getLogger(StatsCache.class);
+	private static final Logger log = LoggerFactory.getLogger(CacheService.class);
 	
 	@Value("${test.env:false}")
 	private boolean isTestEnv;
@@ -90,10 +101,12 @@ public class StatsCache {
 		+ " for user "
 		+ username);
 		
+
+		trackRepo.updateTopTracksCache(username);
+		albumRepo.updateTopAlbumsCache(username);
+		
 	}
 	
-	
-
 	
 	public void updateCache(
 			List<SongStream> streams,

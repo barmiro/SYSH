@@ -46,7 +46,7 @@ public class ConvertDTOs {
 		return streams;
 	}
 	
-	public static SpotifyUserDataDTO userData(ResponseEntity<String> response) {
+	public static SpotifyUserDataDTO spotifyUserData(ResponseEntity<String> response) {
 		
 		SpotifyUserDataDTO data;
 		try {

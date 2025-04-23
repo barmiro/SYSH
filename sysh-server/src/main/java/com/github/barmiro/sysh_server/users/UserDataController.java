@@ -30,7 +30,7 @@ public class UserDataController {
 
 
 	@GetMapping("/userData")
-	public String getUserData() throws HttpClientErrorException {
+	public AppUserData getUserData() throws HttpClientErrorException {
 		
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -45,18 +45,18 @@ public class UserDataController {
 				.retrieve()
 				.toEntity(String.class);
 		
-		SpotifyUserDataDTO userData = ConvertDTOs.userData(response);
+		SpotifyUserDataDTO spotifyUserData = ConvertDTOs.spotifyUserData(response);
 		
-		int updated = userDataRepository.addUserDisplayName(username, userData.display_name());
+		int updated = userDataRepository.addUserDisplayName(username, spotifyUserData.display_name());
 		
 		if (updated == 1) {
-			return userData.display_name();			
+//			return userData.display_name();			
 		} else {
 			log.error("Couldn't add display name for " + username + " to database");
 		}
 
 		
-		return userDataRepository.getUserDisplayName(username);
+		return userDataRepository.getAppUserData(username);
 	
 	}
 }

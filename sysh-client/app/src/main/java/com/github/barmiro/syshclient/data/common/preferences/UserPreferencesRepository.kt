@@ -62,6 +62,12 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun setImportAlert(showImportAlert: Boolean) {
+        dataStore.edit {
+            it[PreferencesKeys.SHOW_IMPORT_ALERT] = showImportAlert
+        }
+    }
+
     suspend fun setFreshInstall(isFreshInstall: Boolean) {
         dataStore.edit {
             it[PreferencesKeys.IS_FRESH_INSTALL] = isFreshInstall
@@ -94,6 +100,10 @@ class UserPreferencesRepository @Inject constructor(
 
     val isLoggedIn: Flow<Boolean> = dataStore.data.map {
         it[PreferencesKeys.IS_LOGGED_IN] ?: false
+    }
+
+    val showImportAlert: Flow<Boolean> = dataStore.data.map {
+        it[PreferencesKeys.SHOW_IMPORT_ALERT] ?: false
     }
 
     val isFreshInstall: Flow<Boolean> = dataStore.data.map {
