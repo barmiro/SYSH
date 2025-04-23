@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.annotation.PostConstruct;
 
 @Service
+@Transactional
 public class DevDatabaseUpdater {
 
 	JdbcClient jdbc;
@@ -27,7 +28,6 @@ public class DevDatabaseUpdater {
 	private boolean isTestEnv;
 	
 	@PostConstruct
-	@Transactional
 	public void updateDatabase() {
 		if (!isTestEnv) {
 			
@@ -62,9 +62,14 @@ public class DevDatabaseUpdater {
 						+ "ALTER COLUMN timezone "
 						+ "SET NOT NULL;", 
 					// verificationSql
-					"SELECT has_imported_data FROM Users LIMIT 1;",
+					"SELECT 1 "
+					+ "FROM information_schema.columns "
+					+ "WHERE table_name = 'users' "
+					+ "AND column_name = 'has_imported_data' "
+					+ "AND data_type = 'boolean' "
+					+ "LIMIT 1;",
 					// verificationType
-					Boolean.class
+					Integer.class
 				);
 				
 				
@@ -144,8 +149,6 @@ public class DevDatabaseUpdater {
 		
 		if (updated > 0) {
 			log.info("Updated database from legacy to numbered versioning system");
-		} else {
-			log.info("Legacy database updater returned " + updated);
 		}
 	}
 }
