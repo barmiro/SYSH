@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.data.stats.HourlyStatsDTO
 import com.github.barmiro.syshclient.data.stats.StatsSeriesChunkDTO
+import com.github.barmiro.syshclient.util.averageStreamLengthInterpolator
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
@@ -89,7 +90,7 @@ fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
     var filteredStats = statsSeries.filter { it.start_date?.isBefore(OffsetDateTime.now()) ?: false }
     LaunchedEffect(statsSeries) {
         filteredStats = statsSeries.filter { it.start_date?.isBefore(OffsetDateTime.now()) ?: false }
-        if (statsSeries.isNotEmpty()) {
+        if (filteredStats.isNotEmpty()) {
             modelProducer.runTransaction {
                 lineSeries {
                     series(
@@ -308,16 +309,24 @@ fun HourlyStatsChart(hourlyStats: List<HourlyStatsDTO>) {
 @Composable
 fun AverageStreamLengthChart(statsSeries: List<StatsSeriesChunkDTO>) {
     val modelProducer = remember { CartesianChartModelProducer() }
+    var filteredStats = averageStreamLengthInterpolator(
+        statsSeries.filter {
+            it.start_date?.isBefore(OffsetDateTime.now()) ?: false
+        }
+    )
 
     LaunchedEffect(statsSeries) {
-        if (statsSeries.isNotEmpty()) {
+        filteredStats = averageStreamLengthInterpolator(
+            statsSeries.filter {
+                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
+            }
+        )
+        if (filteredStats.isNotEmpty()) {
             modelProducer.runTransaction {
                 lineSeries {
                     series(
-                        y = statsSeries.let { list ->
-                            list.filter {
-                                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
-                            }.map { sample ->
+                        y = filteredStats.let { list ->
+                            list.map { sample ->
                                 if (sample.stream_count > 0) {
                                     1f * sample.minutes_streamed / sample.stream_count
                                 } else 0
@@ -366,16 +375,12 @@ fun AverageStreamLengthChart(statsSeries: List<StatsSeriesChunkDTO>) {
                                 )
                             ),
                         rangeProvider = CartesianLayerRangeProvider.fixed(
-                            minY = (floor((statsSeries.filter {
-                                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
-                            }.mapNotNull { sample ->
+                            minY = (floor((filteredStats.mapNotNull { sample ->
                                 if (sample.stream_count > 0) {
                                     1.0 * sample.minutes_streamed / sample.stream_count
                                 } else null
                             }.filter { it > 0 }.minOrNull() ?: 0.0) * 0.9 * 2)) / 2,
-                            maxY = (ceil((statsSeries.filter {
-                                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
-                            }.mapNotNull { sample ->
+                            maxY = (ceil((filteredStats.mapNotNull { sample ->
                                 if (sample.stream_count > 0) {
                                     1.0 * sample.minutes_streamed / sample.stream_count
                                 } else null
@@ -391,15 +396,15 @@ fun AverageStreamLengthChart(statsSeries: List<StatsSeriesChunkDTO>) {
                     ),
                     bottomAxis = HorizontalAxis.rememberBottom(
                         itemPlacer = HorizontalAxis.ItemPlacer.aligned(spacing = {
-                            statsSeries.size / 6 + 1
+                            filteredStats.size / 6 + 1
                         }, addExtremeLabelPadding = false),
                         valueFormatter = { _, value, _ ->
                             val index = value.toInt() - 1
                             if (index == -1) {
-                                statsSeries[0].start_date?.format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                                filteredStats[0].start_date?.format(DateTimeFormatter.ofPattern("yyyy-MM"))
                                     ?: "."
-                            } else if (statsSeries.isNotEmpty() && index in statsSeries.indices) {
-                                statsSeries[value.toInt() - 1].end_date?.format(
+                            } else if (filteredStats.isNotEmpty() && index in filteredStats.indices) {
+                                filteredStats[value.toInt() - 1].end_date?.format(
                                     DateTimeFormatter.ofPattern(
                                         "yyyy-MM"
                                     )
