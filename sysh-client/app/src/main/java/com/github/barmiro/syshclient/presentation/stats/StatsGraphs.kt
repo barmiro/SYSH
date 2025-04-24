@@ -47,16 +47,15 @@ import kotlin.math.floor
 @Composable
 fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
     val modelProducer = remember { CartesianChartModelProducer() }
-
+    var filteredStats = statsSeries.filter { it.start_date?.isBefore(OffsetDateTime.now()) ?: false }
     LaunchedEffect(statsSeries) {
-        if (statsSeries.isNotEmpty()) {
+        filteredStats = statsSeries.filter { it.start_date?.isBefore(OffsetDateTime.now()) ?: false }
+        if (filteredStats.isNotEmpty()) {
             modelProducer.runTransaction {
                 lineSeries {
                     series(
-                        y = listOf(0) + statsSeries.let { list ->
-                            list.filter {
-                                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
-                            }.map { sample ->
+                        y = listOf(0) + filteredStats.let { list ->
+                            list.map { sample ->
                                 var sum: Int = 0
                                 for (i in 0..list.indexOf(sample)) {
                                     sum += list[i].minutes_streamed
@@ -66,10 +65,8 @@ fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
                         }
                     )
                     series(
-                        y = listOf(0) + statsSeries.let { list ->
-                            list.filter {
-                                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
-                            }.map { sample ->
+                        y = listOf(0) + filteredStats.let { list ->
+                            list.map { sample ->
                                 var sum: Int = 0
                                 for (i in 0..list.indexOf(sample)) {
                                     sum += list[i].stream_count
@@ -82,32 +79,29 @@ fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
             }
         }
     }
-    StreamingStatsChartScaffold(modelProducer, statsSeries, "Streamed in total")
+    StreamingStatsChartScaffold(modelProducer, filteredStats, "Streamed in total")
 }
 
 
 @Composable
 fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
     val modelProducer = remember { CartesianChartModelProducer() }
-
+    var filteredStats = statsSeries.filter { it.start_date?.isBefore(OffsetDateTime.now()) ?: false }
     LaunchedEffect(statsSeries) {
+        filteredStats = statsSeries.filter { it.start_date?.isBefore(OffsetDateTime.now()) ?: false }
         if (statsSeries.isNotEmpty()) {
             modelProducer.runTransaction {
                 lineSeries {
                     series(
-                        y = statsSeries.let { list ->
-                            list.filter {
-                                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
-                            }.map { sample ->
+                        y = filteredStats.let { list ->
+                            list.map { sample ->
                                 sample.minutes_streamed
                             }
                         }
                     )
                     series(
-                        y = statsSeries.let { list ->
-                            list.filter {
-                                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
-                            }.map { sample ->
+                        y = filteredStats.let { list ->
+                            list.map { sample ->
                                 sample.stream_count
                             }
                         }
@@ -116,7 +110,7 @@ fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
             }
         }
     }
-    StreamingStatsChartScaffold(modelProducer, statsSeries, "Streamed by period")
+    StreamingStatsChartScaffold(modelProducer, filteredStats, "Streamed by period")
 }
 
 
