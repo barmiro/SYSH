@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -81,7 +82,14 @@ fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
             }
         }
     }
-    StreamingStatsChartScaffold(modelProducer, filteredStats, "Streamed in total")
+    StreamingStatsChartScaffold(
+        modelProducer = modelProducer,
+        statsSeries = filteredStats,
+        topText = "Streamed in total",
+        colors = vicoTheme.lineCartesianLayerColors,
+        rangeProvider = CartesianLayerRangeProvider.auto(),
+        showLegend = true
+    )
 }
 
 
@@ -123,7 +131,14 @@ fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
             }
         }
     }
-    StreamingStatsChartScaffold(modelProducer, filteredStats, "Streamed by period")
+    StreamingStatsChartScaffold(
+        modelProducer = modelProducer,
+        statsSeries = filteredStats,
+        topText = "Streamed by period",
+        colors = vicoTheme.lineCartesianLayerColors,
+        rangeProvider = CartesianLayerRangeProvider.auto(),
+        showLegend = true
+    )
 }
 
 
@@ -131,7 +146,10 @@ fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
 fun StreamingStatsChartScaffold(
     modelProducer: CartesianChartModelProducer,
     statsSeries: List<StatsSeriesChunkDTO>,
-    topText: String) {
+    topText: String,
+    colors: List<Color>,
+    rangeProvider: CartesianLayerRangeProvider,
+    showLegend: Boolean = false) {
     Column(
         modifier = Modifier
             .fillMaxWidth(),
@@ -173,15 +191,15 @@ fun StreamingStatsChartScaffold(
                 pattern = "yyyy-MM"
                 spacing = statsSeries.size / 6 + 1
             }
-    }
+        }
         val formatter = DateTimeFormatter.ofPattern(pattern)
 
         Row {
             CartesianChartHost(
                 chart = rememberCartesianChart(
                     rememberLineCartesianLayer(
-                        lineProvider =  LineCartesianLayer.LineProvider
-                            .series(vicoTheme.lineCartesianLayerColors.map { color ->
+                        lineProvider = LineCartesianLayer.LineProvider.series(
+                            colors.map { color ->
                                 LineCartesianLayer.rememberLine(
                                     areaFill = LineCartesianLayer.AreaFill.single(
                                         fill(color.copy(alpha = 0.2f))
@@ -189,7 +207,9 @@ fun StreamingStatsChartScaffold(
                                     fill = LineCartesianLayer.LineFill.single(fill(color)),
                                     pointConnector = PointConnector.Sharp
                                 )
-                            })
+                            }
+                        ),
+                        rangeProvider = rangeProvider
                     ),
                     startAxis = VerticalAxis.rememberStart(
                         itemPlacer = remember { VerticalAxis.ItemPlacer.count(count = { 6 }) }
@@ -213,45 +233,109 @@ fun StreamingStatsChartScaffold(
                 scrollState = rememberVicoScrollState(scrollEnabled = false)
             )
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Icon(
-                    painter = painterResource(id = R.drawable.horizontal_rule_16dp),
-                    tint = vicoTheme.lineCartesianLayerColors[0],
-                    contentDescription = "Line"
-                )
-            }
-            Column {
-                Text(
-                    text = "Minutes",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    textAlign = TextAlign.Center
-                )
-            }
-            Spacer(Modifier.width(24.dp))
-            Column {
-                Icon(
-                    painter = painterResource(id = R.drawable.horizontal_rule_16dp),
-                    tint = vicoTheme.lineCartesianLayerColors[1],
-                    contentDescription = "Line"
-                )
-            }
-            Column {
-                Text(
-                    text = "Streams",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    textAlign = TextAlign.Center
-                )
+        if (showLegend) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column {
+                    Icon(
+                        painter = painterResource(id = R.drawable.horizontal_rule_16dp),
+                        tint = vicoTheme.lineCartesianLayerColors[0],
+                        contentDescription = "Line"
+                    )
+                }
+                Column {
+                    Text(
+                        text = "Minutes",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center
+                    )
+                }
+                Spacer(Modifier.width(24.dp))
+                Column {
+                    Icon(
+                        painter = painterResource(id = R.drawable.horizontal_rule_16dp),
+                        tint = vicoTheme.lineCartesianLayerColors[1],
+                        contentDescription = "Line"
+                    )
+                }
+                Column {
+                    Text(
+                        text = "Streams",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }
 }
+
+
+@Composable
+fun AverageStreamLengthChart(statsSeries: List<StatsSeriesChunkDTO>) {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    var filteredStats = averageStreamLengthInterpolator(
+        filterBeforeEndOfDay(statsSeries)
+    )
+
+    LaunchedEffect(statsSeries) {
+        filteredStats = averageStreamLengthInterpolator(
+            filterBeforeEndOfDay(statsSeries)
+        )
+        if (filteredStats.isNotEmpty()) {
+            modelProducer.runTransaction {
+                lineSeries {
+                    series(
+                        y = filteredStats.let { list ->
+                            list.map { sample ->
+                                if (sample.stream_count > 0) {
+                                    1f * sample.minutes_streamed / sample.stream_count
+                                } else 0
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    val validValues = filteredStats
+        .mapNotNull { sample ->
+            if (sample.stream_count > 0) {
+                1.0 * sample.minutes_streamed / sample.stream_count
+            } else null
+        }
+        .filter { it > 0 }
+        .takeIf { it.isNotEmpty() }
+
+    var minY: Double? = null
+    var maxY: Double? = null
+
+    validValues?.let { list ->
+        minY = list.minOrNull()
+            ?.let { floor(it * 0.9 * 2) / 2 }
+        maxY = list.maxOrNull()
+            ?.let { ceil(it * 1.1 * 2) / 2 }
+    }
+
+    StreamingStatsChartScaffold(
+        modelProducer = modelProducer,
+        statsSeries = filteredStats,
+        topText = "Average stream duration",
+        colors = listOf(vicoTheme.lineCartesianLayerColors[2]),
+        rangeProvider = CartesianLayerRangeProvider.fixed(
+            minY = minY,
+            maxY = maxY
+        ),
+        showLegend = false
+    )
+}
+
 
 @Composable
 fun HourlyStatsChart(hourlyStats: List<HourlyStatsDTO>) {
@@ -312,149 +396,6 @@ fun HourlyStatsChart(hourlyStats: List<HourlyStatsDTO>) {
                             spacing = { 12 },
                             addExtremeLabelPadding = false),
                         valueFormatter = { _, value, _ -> (value / 4).toInt().toString() + ":00" }
-//                        valueFormatter = { _, value, _ ->
-//                            val index = value.toInt() - 1
-//                            if (index == -1) {
-//                                statsSeries[0].start_date?.format(DateTimeFormatter.ofPattern("yyyy-MM"))
-//                                    ?: "."
-//                            } else if (statsSeries.isNotEmpty() && index in statsSeries.indices) {
-//                                statsSeries[value.toInt() - 1].end_date?.format(
-//                                    DateTimeFormatter.ofPattern(
-//                                        "yyyy-MM"
-//                                    )
-//                                ) ?: "."
-//                            } else {
-//                                "."
-//                            }
-//                        }
-                    ),
-                ),
-                modelProducer = modelProducer,
-                scrollState = rememberVicoScrollState(scrollEnabled = false)
-            )
-        }
-    }
-}
-
-@Composable
-fun AverageStreamLengthChart(statsSeries: List<StatsSeriesChunkDTO>) {
-    val modelProducer = remember { CartesianChartModelProducer() }
-    var filteredStats = averageStreamLengthInterpolator(
-        statsSeries.filter {
-            it.start_date?.isBefore(OffsetDateTime.now()) ?: false
-        }
-    )
-
-    LaunchedEffect(statsSeries) {
-        filteredStats = averageStreamLengthInterpolator(
-            statsSeries.filter {
-                it.start_date?.isBefore(OffsetDateTime.now()) ?: false
-            }
-        )
-        if (filteredStats.isNotEmpty()) {
-            modelProducer.runTransaction {
-                lineSeries {
-                    series(
-                        y = filteredStats.let { list ->
-                            list.map { sample ->
-                                if (sample.stream_count > 0) {
-                                    1f * sample.minutes_streamed / sample.stream_count
-                                } else 0
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Row {
-            Column() {
-                Text(
-                    text = "Average stream duration",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    textAlign = TextAlign.Center
-                )
-
-            }
-        }
-
-        val color = vicoTheme.lineCartesianLayerColors[2]
-
-        val validValues = filteredStats
-            .mapNotNull { sample ->
-                if (sample.stream_count > 0) {
-                    1.0 * sample.minutes_streamed / sample.stream_count
-                } else null
-            }
-            .filter { it > 0 }
-            .takeIf { it.isNotEmpty() }
-
-        var minY: Double? = null
-        var maxY: Double? = null
-
-        validValues?.let { list ->
-            minY = list.minOrNull()
-                ?.let { floor(it * 0.9 * 2) / 2 }
-            maxY = list.maxOrNull()
-                ?.let { ceil(it * 1.1 * 2) / 2 }
-        }
-
-        Row {
-            CartesianChartHost(
-                chart = rememberCartesianChart(
-                    rememberLineCartesianLayer(
-                        lineProvider = LineCartesianLayer.LineProvider
-                            .series(
-                                LineCartesianLayer.rememberLine(
-                                    areaFill = LineCartesianLayer.AreaFill.single(
-                                        fill(color.copy(alpha = 0.2f))
-                                    ),
-                                    fill = LineCartesianLayer.LineFill.single(fill(color)),
-                                    pointConnector = PointConnector.Sharp
-                                )
-                            ),
-                        rangeProvider = CartesianLayerRangeProvider.fixed(
-                            minY = minY,
-                            maxY = maxY
-                        )
-                    ),
-                    startAxis = VerticalAxis.rememberStart(
-                        itemPlacer = remember {
-                            VerticalAxis.ItemPlacer
-                                .count(count = { 6 })
-
-                        }
-                    ),
-                    bottomAxis = HorizontalAxis.rememberBottom(
-                        itemPlacer = HorizontalAxis.ItemPlacer.aligned(spacing = {
-                            filteredStats.size / 6 + 1
-                        }, addExtremeLabelPadding = false),
-                        valueFormatter = { _, value, _ ->
-                            val index = value.toInt() - 1
-                            if (index == -1) {
-                                filteredStats[0].start_date?.format(DateTimeFormatter.ofPattern("yyyy-MM"))
-                                    ?: "."
-                            } else if (filteredStats.isNotEmpty() && index in filteredStats.indices) {
-                                filteredStats[value.toInt() - 1].end_date?.format(
-                                    DateTimeFormatter.ofPattern(
-                                        "yyyy-MM"
-                                    )
-                                ) ?: "."
-                            } else {
-                                "."
-                            }
-                        }
                     ),
                 ),
                 modelProducer = modelProducer,

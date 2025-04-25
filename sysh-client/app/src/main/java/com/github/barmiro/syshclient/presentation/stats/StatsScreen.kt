@@ -296,14 +296,14 @@ fun StatsScreen(
                                     .padding(top = 16.dp, bottom = 8.dp),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                HourlyStatsChart(hourlyStats)
+                                AverageStreamLengthChart(statsSeries)
                             }
                             Row(
                                 modifier = Modifier.fillMaxWidth()
                                     .padding(top = 16.dp, bottom = 8.dp),
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                AverageStreamLengthChart(statsSeries)
+                                HourlyStatsChart(hourlyStats)
                             }
                         }
                     }
