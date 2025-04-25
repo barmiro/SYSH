@@ -176,7 +176,7 @@ fun StreamingStatsChartScaffold(
         val spacing: Int
         when {
             timeSpan <= 2 -> {
-                pattern = "HH:mm"
+                pattern = "H:mm"
                 spacing = 3
             }
             timeSpan <= 32 -> {
@@ -279,38 +279,25 @@ fun StreamingStatsChartScaffold(
 @Composable
 fun AverageStreamLengthChart(statsSeries: List<StatsSeriesChunkDTO>) {
     val modelProducer = remember { CartesianChartModelProducer() }
-    var filteredStats = averageStreamLengthInterpolator(
-        filterBeforeEndOfDay(statsSeries)
-    )
+    var filteredStats = filterBeforeEndOfDay(statsSeries)
+    var values = averageStreamLengthInterpolator(filteredStats)
 
     LaunchedEffect(statsSeries) {
-        filteredStats = averageStreamLengthInterpolator(
-            filterBeforeEndOfDay(statsSeries)
-        )
-        if (filteredStats.isNotEmpty()) {
+        filteredStats = filterBeforeEndOfDay(statsSeries)
+        values = averageStreamLengthInterpolator(filteredStats)
+        if (values.isNotEmpty()) {
             modelProducer.runTransaction {
                 lineSeries {
                     series(
-                        y = filteredStats.let { list ->
-                            list.map { sample ->
-                                if (sample.stream_count > 0) {
-                                    1f * sample.minutes_streamed / sample.stream_count
-                                } else 0
-                            }
-                        }
+                        y = values
                     )
                 }
             }
         }
     }
 
-    val validValues = filteredStats
-        .mapNotNull { sample ->
-            if (sample.stream_count > 0) {
-                1.0 * sample.minutes_streamed / sample.stream_count
-            } else null
-        }
-        .filter { it > 0 }
+    val validValues = values
+        .filter { it.isFinite() && it > 0.1 } // isFinite mainly for making it NaN-safe
         .takeIf { it.isNotEmpty() }
 
     var minY: Double? = null
