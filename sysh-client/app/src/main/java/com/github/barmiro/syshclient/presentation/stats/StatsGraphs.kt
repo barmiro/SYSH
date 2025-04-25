@@ -360,6 +360,25 @@ fun AverageStreamLengthChart(statsSeries: List<StatsSeriesChunkDTO>) {
         }
 
         val color = vicoTheme.lineCartesianLayerColors[2]
+
+        val validValues = filteredStats.mapNotNull { sample ->
+            if (sample.stream_count > 0) {
+                1.0 * sample.minutes_streamed / sample.stream_count
+            } else null
+        }.filter { it > 0 }
+
+        var minY: Double? = null
+        var maxY: Double? = null
+
+        validValues.takeIf {
+            it.isNotEmpty()
+        }?.let { list ->
+            minY = list.minOrNull()
+                ?.let { floor(it * 0.9 * 2) / 2 }
+            maxY = list.maxOrNull()
+                ?.let { ceil(it * 1.1 * 2) / 2 }
+        }
+
         Row {
             CartesianChartHost(
                 chart = rememberCartesianChart(
@@ -375,16 +394,8 @@ fun AverageStreamLengthChart(statsSeries: List<StatsSeriesChunkDTO>) {
                                 )
                             ),
                         rangeProvider = CartesianLayerRangeProvider.fixed(
-                            minY = (floor((filteredStats.mapNotNull { sample ->
-                                if (sample.stream_count > 0) {
-                                    1.0 * sample.minutes_streamed / sample.stream_count
-                                } else null
-                            }.filter { it > 0 }.minOrNull() ?: 0.0) * 0.9 * 2)) / 2,
-                            maxY = (ceil((filteredStats.mapNotNull { sample ->
-                                if (sample.stream_count > 0) {
-                                    1.0 * sample.minutes_streamed / sample.stream_count
-                                } else null
-                            }.filter { it > 0 }.maxOrNull() ?: 0.0) * 1.1 * 2)) / 2
+                            minY = minY,
+                            maxY = maxY
                         )
                     ),
                     startAxis = VerticalAxis.rememberStart(
