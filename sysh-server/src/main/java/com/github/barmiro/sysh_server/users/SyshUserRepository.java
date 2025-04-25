@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.github.barmiro.sysh_server.common.utils.GetRandom;
 import com.github.barmiro.sysh_server.security.SyshUser;
+import com.github.barmiro.sysh_server.security.UserRole;
 
 @Repository
 public class SyshUserRepository {
@@ -23,24 +24,25 @@ public class SyshUserRepository {
 		this.jdbc = jdbc;
 	}
 
-	public Boolean usersExist() {
-		int userCount = jdbc.sql("SELECT COUNT(username) FROM Users")
+	public Integer userCount() {
+		return jdbc.sql("SELECT COUNT(username) FROM Users")
 			.query(Integer.class)
 			.single();
-		
-		if (userCount == 0) {
-			return false;
-		} else {
-			return true;
-		}
 	}
 	
-	public String getRole(SyshUser user) {
+	public Integer adminCount() {
+		return jdbc.sql("SELECT COUNT(username) FROM Users WHERE role = :role")
+				.param("role", UserRole.ADMIN, Types.OTHER)
+				.query(Integer.class)
+				.single();
+	}
+	
+	public UserRole getRole(SyshUser user) {
 		return jdbc.sql("SELECT role FROM Users "
 				+ "WHERE username = :username "
 				+ "LIMIT 1")
 				.param("username", user.username(), Types.VARCHAR)
-				.query(String.class)
+				.query(UserRole.class)
 				.single();
 	}
 	
@@ -63,6 +65,7 @@ public class SyshUserRepository {
 				.query(SyshUser.class)
 				.optional();
 	}
+
 	
 	public Optional<String> findBySpotifyState(String spotifyState) {
 		return jdbc.sql("SELECT username FROM Users "
@@ -154,17 +157,20 @@ public class SyshUserRepository {
 		return jdbc.sql("INSERT INTO Users ("
 				+ "username,"
 				+ "password,"
+				+ "role,"
 				+ "timezone,"
 				+ "spotify_state"
 				+ ") VALUES ("
 				+ ":username,"
 				+ ":password,"
+				+ ":role,"
 				+ ":timezone,"
 				+ ":spotify_state"
 				+ ") ON CONFLICT (username) "
 				+ "DO NOTHING")
 				.param("username", user.username(), Types.VARCHAR)
 				.param("password", passwordHash, Types.VARCHAR)
+				.param("role", user.role(), Types.OTHER)
 				.param("timezone", user.timezone())
 				.param("spotify_state", spotifyState, Types.VARCHAR)
 				.update();

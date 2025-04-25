@@ -1,11 +1,11 @@
---CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
+CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
 
 CREATE TABLE db_info (
     id BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (id),
     version VARCHAR NOT NULL
 );
 
-INSERT INTO db_info (version) VALUES ('0.0.1');
+INSERT INTO db_info (version) VALUES ('0.0.2');
 
 CREATE TABLE Users (
     username VARCHAR(64) PRIMARY KEY,
@@ -14,7 +14,7 @@ CREATE TABLE Users (
     access_token VARCHAR,
     refresh_token VARCHAR,
     token_expires TIMESTAMP,
-    role VARCHAR DEFAULT 'USER',
+    role user_role NOT NULL DEFAULT 'USER',
 --    consider handling the default in java
     display_name VARCHAR DEFAULT 'unknown username',
     timezone VARCHAR NOT NULL,

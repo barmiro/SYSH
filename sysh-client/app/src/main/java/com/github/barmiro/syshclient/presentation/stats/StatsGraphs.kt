@@ -361,18 +361,19 @@ fun AverageStreamLengthChart(statsSeries: List<StatsSeriesChunkDTO>) {
 
         val color = vicoTheme.lineCartesianLayerColors[2]
 
-        val validValues = filteredStats.mapNotNull { sample ->
-            if (sample.stream_count > 0) {
-                1.0 * sample.minutes_streamed / sample.stream_count
-            } else null
-        }.filter { it > 0 }
+        val validValues = filteredStats
+            .mapNotNull { sample ->
+                if (sample.stream_count > 0) {
+                    1.0 * sample.minutes_streamed / sample.stream_count
+                } else null
+            }
+            .filter { it > 0 }
+            .takeIf { it.isNotEmpty() }
 
         var minY: Double? = null
         var maxY: Double? = null
 
-        validValues.takeIf {
-            it.isNotEmpty()
-        }?.let { list ->
+        validValues?.let { list ->
             minY = list.minOrNull()
                 ?.let { floor(it * 0.9 * 2) / 2 }
             maxY = list.maxOrNull()

@@ -32,7 +32,7 @@ public class ArtistRepository extends CatalogRepository<Artist> {
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				log.error(e.getMessage());
 				e.printStackTrace();
-				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+				throw new RuntimeException(e);
 			}
 		}
 		log.info("Added " + added + " new artists");

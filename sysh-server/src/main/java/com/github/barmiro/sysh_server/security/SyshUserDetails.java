@@ -19,14 +19,12 @@ public class SyshUserDetails implements UserDetails {
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-//		TODO: change this
-		String role = "USER";
-		return Collections.singleton(new SimpleGrantedAuthority(role));
+		String roleString = "ROLE_" + user.role();
+		return Collections.singleton(new SimpleGrantedAuthority(roleString));
 	}
 
 	@Override
 	public String getPassword() {
-
 		return user.password();
 	}
 

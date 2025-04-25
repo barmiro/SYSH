@@ -32,7 +32,7 @@ public class DatabaseUpdater {
 		if (!isTestEnv) {
 			
 //			!!! CHANGE THIS WHEN ADDING A NEW UPDATE !!!
-			final String TARGET_DATABASE_VERSION = "0.0.1";
+			final String TARGET_DATABASE_VERSION = "0.0.2";
 			
 			updateLegacyDatabase();
 			
@@ -68,6 +68,37 @@ public class DatabaseUpdater {
 					+ "AND column_name = 'has_imported_data' "
 					+ "AND data_type = 'boolean' "
 					+ "LIMIT 1;",
+					// verificationType
+					Integer.class
+				);
+				
+				updater(
+					// expectedVersion
+					"0.0.1",
+					// targetVersion 
+					"0.0.2",
+					// updateSql
+					"CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');"
+					+ "UPDATE Users "
+						+ "SET role = 'USER';"
+					+ "ALTER TABLE Users "
+						+ "ALTER COLUMN role "
+						+ "DROP DEFAULT;"
+					+ "ALTER TABLE Users "
+						+ "ALTER COLUMN role "
+						+ "TYPE user_role USING role::user_role;"
+					+ "ALTER TABLE Users "
+						+ "ALTER COLUMN role "
+						+ "SET NOT NULL, "
+						+ "ALTER COLUMN role "
+						+ "SET DEFAULT 'USER';",
+					// verificationSql
+					"SELECT 1 "
+					+ "FROM information_schema.columns "
+					+ "WHERE table_name = 'users' "
+					+ "AND column_name = 'role' "
+					+ "AND udt_name = 'user_role' "
+					+ "LIMIT 1",
 					// verificationType
 					Integer.class
 				);

@@ -46,6 +46,7 @@ import com.github.barmiro.sysh_server.catalog.tracks.TrackRepository;
 import com.github.barmiro.sysh_server.catalog.tracks.spotify_api.TrackApiRepository;
 import com.github.barmiro.sysh_server.dataintake.recent.RecentController;
 import com.github.barmiro.sysh_server.security.SyshUser;
+import com.github.barmiro.sysh_server.security.UserRole;
 import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 import com.github.barmiro.sysh_server.stats.CacheService;
 import com.github.barmiro.sysh_server.stats.StatsRepository;

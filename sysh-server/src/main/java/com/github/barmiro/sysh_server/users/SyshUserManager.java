@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.github.barmiro.sysh_server.security.SyshUser;
+import com.github.barmiro.sysh_server.security.UserRole;
 
 @Service
 public class SyshUserManager {
@@ -88,13 +89,19 @@ private static final Logger log = LoggerFactory.getLogger(SyshUserManager.class)
 		return userRepo.findByUsername(username).isPresent();
 	}
 	
-	public void createUser(SyshUser user) {
+	public Boolean adminExists() {
+		return userRepo.adminCount() > 0;
+	}
+	
+	
+	public SyshUser createUser(SyshUser user) {
 		int created = userRepo.createUser(user);
-		if (created == 0) {
-			log.error("User creation for " + user.username() + " failed");
-		} else if (created == 1) {
-			log.info("User " + user.username() + " created succcessfully");
-			log.info(userRepo.findByUsername(user.username()).get().toString());
+		if (created == 1) {
+			log.info("User " + user.username() + " with role " + user.role() +  " created succcessfully");
+			return user;
+		} else {
+			log.error("User creation for " + user.username() + " failed: " + created);
+			return null;
 		}
 	}
 	

@@ -21,6 +21,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
 import com.github.barmiro.sysh_server.security.SyshUser;
+import com.github.barmiro.sysh_server.security.UserRole;
 import com.github.barmiro.sysh_server.spotifyauthorization.SpotifyTokenService;
 import com.github.barmiro.sysh_server.users.SyshUserManager;
 

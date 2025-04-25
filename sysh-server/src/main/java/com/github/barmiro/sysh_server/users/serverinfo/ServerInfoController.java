@@ -17,7 +17,7 @@ public class ServerInfoController {
 	@GetMapping("/info")
 	public ServerInfo info() {
 		
-		Boolean usersExist = userRepo.usersExist();
+		Boolean usersExist = userRepo.userCount() > 0;
 		
 		return new ServerInfo(usersExist);
 	}

@@ -90,6 +90,7 @@ class AuthenticationRepository @Inject constructor(
                     response.body()?.takeIf {
                         it.username == username
                     } ?.let {
+                        println(it)
                         emit(
                             Resource.Success(
                                 data = it.username
