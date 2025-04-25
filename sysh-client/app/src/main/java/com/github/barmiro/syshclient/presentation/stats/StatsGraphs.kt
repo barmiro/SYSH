@@ -42,15 +42,16 @@ import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer.PointConnector
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import kotlin.math.ceil
 import kotlin.math.floor
 
 @Composable
 fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
     val modelProducer = remember { CartesianChartModelProducer() }
-    var filteredStats = statsSeries.filter { it.start_date?.isBefore(OffsetDateTime.now()) ?: false }
+    var filteredStats = filterBeforeEndOfDay(statsSeries)
     LaunchedEffect(statsSeries) {
-        filteredStats = statsSeries.filter { it.start_date?.isBefore(OffsetDateTime.now()) ?: false }
+        filteredStats = filterBeforeEndOfDay(statsSeries)
         if (filteredStats.isNotEmpty()) {
             modelProducer.runTransaction {
                 lineSeries {
@@ -84,12 +85,23 @@ fun StreamingSumChart(statsSeries: List<StatsSeriesChunkDTO>) {
 }
 
 
+fun filterBeforeEndOfDay(statsSeries: List<StatsSeriesChunkDTO>): List<StatsSeriesChunkDTO> {
+    return statsSeries
+        .filter {
+            it.start_date?.isBefore(
+                OffsetDateTime.now()
+                    .withHour(23)
+                    .withMinute(59)
+                    .withSecond(59)
+            ) ?: false }
+}
+
 @Composable
 fun StreamingValuesChart(statsSeries: List<StatsSeriesChunkDTO>) {
     val modelProducer = remember { CartesianChartModelProducer() }
-    var filteredStats = statsSeries.filter { it.start_date?.isBefore(OffsetDateTime.now()) ?: false }
+    var filteredStats = filterBeforeEndOfDay(statsSeries)
     LaunchedEffect(statsSeries) {
-        filteredStats = statsSeries.filter { it.start_date?.isBefore(OffsetDateTime.now()) ?: false }
+        filteredStats = filterBeforeEndOfDay(statsSeries)
         if (filteredStats.isNotEmpty()) {
             modelProducer.runTransaction {
                 lineSeries {
@@ -140,6 +152,30 @@ fun StreamingStatsChartScaffold(
 
             }
         }
+
+        val timeSpan = ChronoUnit.DAYS.between(statsSeries.first().start_date, statsSeries.last().end_date)
+        val pattern: String
+        val spacing: Int
+        when {
+            timeSpan <= 2 -> {
+                pattern = "HH:mm"
+                spacing = 3
+            }
+            timeSpan <= 32 -> {
+                pattern = "EEE dd"
+                spacing = 7
+            }
+            timeSpan <= 367 -> {
+                pattern = "dd MMM"
+                spacing = statsSeries.size / 6 + 1
+            }
+            else -> {
+                pattern = "yyyy-MM"
+                spacing = statsSeries.size / 6 + 1
+            }
+    }
+        val formatter = DateTimeFormatter.ofPattern(pattern)
+
         Row {
             CartesianChartHost(
                 chart = rememberCartesianChart(
@@ -160,19 +196,13 @@ fun StreamingStatsChartScaffold(
                     ),
                     bottomAxis = HorizontalAxis.rememberBottom(
                         itemPlacer = HorizontalAxis.ItemPlacer.aligned(spacing = {
-                            statsSeries.size / 6 + 1
+                            spacing
                         }, addExtremeLabelPadding = false),
                         valueFormatter = { _, value, _ ->
-                            val index = value.toInt() - 1
-                            if (index == -1) {
-                                statsSeries[0].start_date?.format(DateTimeFormatter.ofPattern("yyyy-MM"))
+                            val index = value.toInt()
+                            if (statsSeries.isNotEmpty() && index in statsSeries.indices) {
+                                statsSeries[index].start_date?.format(formatter)
                                     ?: "."
-                            } else if (statsSeries.isNotEmpty() && index in statsSeries.indices) {
-                                statsSeries[value.toInt() - 1].end_date?.format(
-                                    DateTimeFormatter.ofPattern(
-                                        "yyyy-MM"
-                                    )
-                                ) ?: "."
                             } else {
                                 "."
                             }
