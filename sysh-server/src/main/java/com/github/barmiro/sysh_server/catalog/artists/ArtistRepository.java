@@ -7,10 +7,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.client.HttpServerErrorException;
 
 import com.github.barmiro.sysh_server.catalog.interfaces.CatalogRepository;
 

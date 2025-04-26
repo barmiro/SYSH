@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.github.barmiro.sysh_server.security.SyshUser;
-import com.github.barmiro.sysh_server.security.UserRole;
 
 @Service
 public class SyshUserManager {

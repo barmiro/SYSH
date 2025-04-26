@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app
+    env_file:
+      - .env
+    ports:
+      - '${SYSH_SERVER_PORT:-57540}:${SYSH_SERVER_PORT:-57540}'
