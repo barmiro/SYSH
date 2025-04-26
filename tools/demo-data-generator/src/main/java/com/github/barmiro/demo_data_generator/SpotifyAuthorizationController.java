@@ -24,27 +24,19 @@ public class SpotifyAuthorizationController {
 	private final String state = GetRandom.alphaNumeric(32);
 	
 	@GetMapping("/authorize")
-	public String authorize() {
-		
-		System.out.println("STATE: " + this.state);
+	public RedirectView authorize() {
 		String url = "https://accounts.spotify.com/authorize?"
 				+ "response_type=code&"
 				+ "client_id=" + clientId + "&"
 				+ "redirect_uri=http://" + serverUrl + ":" + serverPort + "/callback&"
 				+ "state=" + state;
-		return url;
+		return new RedirectView(url);
 	}
 	
-	
-	@GetMapping("/error")
-	public String error(@RequestParam(required=false) String message) {
-		return "There was an error. \n" + message;
-	}
 	
 	
 	@GetMapping("/callback")
-
-	public RedirectView callback(
+	public String callback(
 			@RequestParam(required=false) Optional<String> code,
 			@RequestParam String state) {
 		
@@ -54,11 +46,9 @@ public class SpotifyAuthorizationController {
 		tkn.getNewToken(codeValue);
 
 		if (!state.equals(this.state)) {
-			RedirectView stateMismatch = new RedirectView("/error");
-			stateMismatch.addStaticAttribute("message", "The state returned by Spotify was wrong");
-			return stateMismatch;
+			return "Expected state: " + this.state + " but was: " + state;
 		}
 
-		return new RedirectView("/userData");	
+		return codeValue;	
 	};
 }
