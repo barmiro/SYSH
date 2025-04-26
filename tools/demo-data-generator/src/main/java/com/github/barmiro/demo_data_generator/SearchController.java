@@ -45,14 +45,14 @@ public class SearchController {
 	@Scheduled(fixedRate = 30000)
 	void processIdsCron() throws JsonMappingException, JsonProcessingException {
 		if (!albumStore.isEmpty()) {
-			System.out.println("Adding");
+			System.out.println(albumStore.size() + " albums left, adding...");
 			List<SampleAlbum> albums = new ArrayList<>();
 			for (int i = 0; i < 20; i++) {
 				if (!albumStore.isEmpty()) {
 					albums.add(albumStore.removeFirst());				
 				}
 			}
-			System.out.println(albums);
+			System.out.println(albums.getFirst());
 			trackIDStore.addAll(getTrackIds(albums));
 		} else {
 			System.out.println("albumStore is empty");
