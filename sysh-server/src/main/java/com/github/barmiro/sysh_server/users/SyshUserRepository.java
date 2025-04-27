@@ -194,10 +194,7 @@ public class SyshUserRepository {
 	}
 	
 	public AppUserData getAppUserData(String username) {
-		return jdbc.sql("SELECT username,"
-				+ "display_name,"
-				+ "timezone,"
-				+ "has_imported_data "
+		return jdbc.sql("SELECT * "
 				+ "FROM Users "
 				+ "WHERE username = :username")
 				.param("username", username, Types.VARCHAR)
