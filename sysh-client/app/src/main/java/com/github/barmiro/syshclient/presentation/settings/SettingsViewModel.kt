@@ -91,7 +91,7 @@ class SettingsViewModel @Inject constructor(
                             is Resource.Success -> updateFileStatus(
                                 jsonFile,
                                 UploadStatus.Success(
-                                    message = result.data ?: "an unknown number of"))
+                                    message = result.data ?: -1))
                             is Resource.Error -> updateFileStatus(
                                 jsonFile,
                                 UploadStatus.Failed(
@@ -115,7 +115,7 @@ class SettingsViewModel @Inject constructor(
                         is Resource.Success -> _zipFileStatus.value = FileStatus(
                             tempFile,
                             UploadStatus.Success(
-                                message = "Processed"
+                                message = 1
                             )
                         )
                         is Resource.Loading -> _zipFileStatus.value = FileStatus(

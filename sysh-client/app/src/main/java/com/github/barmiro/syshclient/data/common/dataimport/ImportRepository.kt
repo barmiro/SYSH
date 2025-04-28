@@ -68,7 +68,7 @@ class ImportRepository @Inject constructor(
     }
 
 
-    fun uploadJsonFile(jsonFile: File): Flow<Resource<String>> {
+    fun uploadJsonFile(jsonFile: File): Flow<Resource<Int>> {
         return flow {
             emit(Resource.Loading(true))
             try {
@@ -80,7 +80,7 @@ class ImportRepository @Inject constructor(
                 val response = importApi.addJson(requestBody)
 
                 if (response.isSuccessful) {
-                    emit(Resource.Success(response.body()?.string()))
+                    emit(Resource.Success(response.body()?.string()?.toInt())) //TODO: make int native
                 }
             } catch (e: Exception) {
                 val errorValues = handleNetworkException(e)
@@ -115,6 +115,6 @@ data class FileStatus(
 sealed class UploadStatus {
     object Waiting : UploadStatus()
     object Processing : UploadStatus()
-    data class Success(val message: String?) : UploadStatus()
+    data class Success(val message: Int) : UploadStatus()
     data class Failed(val message: String?) : UploadStatus()
 }
