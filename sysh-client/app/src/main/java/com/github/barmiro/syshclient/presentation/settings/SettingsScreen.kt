@@ -30,15 +30,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.github.barmiro.syshclient.data.common.dataimport.FileStatus
 import com.github.barmiro.syshclient.data.common.dataimport.UploadStatus
 import com.github.barmiro.syshclient.presentation.common.Import
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
@@ -184,7 +182,7 @@ fun ImportScreen(
                         )
                     }
                 }
-                var totalStreams by mutableIntStateOf(0)
+
 
 
                 zipFileStatus?.let {
@@ -194,7 +192,7 @@ fun ImportScreen(
                         val archiveText: String = when (it.status) {
                             is UploadStatus.Waiting -> "Processing... "
                             is UploadStatus.Processing -> "Finalizing..."
-                            is UploadStatus.Success -> "Imported $totalStreams streams"
+                            is UploadStatus.Success -> "Imported ${totalStreams(statusList)} streams"
                             is UploadStatus.Failed -> "Something went wrong"
                         }
 
@@ -233,12 +231,6 @@ fun ImportScreen(
                         Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp).animateItem(
                             placementSpec = spring(Spring.StiffnessLow)
                         ))
-//                    FIXME
-                    LaunchedEffect(item.status) {
-                        if (item.status is UploadStatus.Success) {
-                            totalStreams += item.status.message
-                        }
-                    }
                 }
 //                items(statusList.size) { i ->
 //                    JsonFileUploadItem(
@@ -255,5 +247,14 @@ fun ImportScreen(
     }
 }
 
+fun totalStreams(statusList: List<FileStatus>): Int {
+    var sum = 0
+    for (item in statusList) {
+        if (item.status is UploadStatus.Success) {
+            sum += item.status.message
+        }
+    }
+    return sum
+}
 
 
