@@ -1,7 +1,8 @@
 package com.github.barmiro.syshclient.presentation.settings
 
+import android.content.Context
+import android.content.Intent
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,6 +42,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -54,6 +57,7 @@ import com.github.barmiro.syshclient.data.common.dataimport.FileStatus
 import com.github.barmiro.syshclient.data.common.dataimport.UploadStatus
 import com.github.barmiro.syshclient.presentation.common.Import
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
+import com.github.barmiro.syshclient.presentation.startup.InfoItem
 import com.github.barmiro.syshclient.presentation.top.components.SettingsScreenTopBar
 
 @Composable
@@ -232,7 +236,8 @@ fun SettingsScreenUserItem(username: String?,
 fun ImportScreen(
     settingsVM: SettingsViewModel,
     sessionVM: SessionViewModel,
-    onPickZipFile: () -> Unit
+    onPickZipFile: () -> Unit,
+    restartApp: () -> Unit
 ) {
 
     val statusList by settingsVM.fileStatusList.collectAsState()
@@ -294,7 +299,7 @@ fun ImportScreen(
                         val archiveText: String = when (it.status) {
                             is UploadStatus.Waiting -> "Processing... "
                             is UploadStatus.Processing -> "Finalizing..."
-                            is UploadStatus.Success -> "Imported ${totalStreams(statusList)} streams"
+                            is UploadStatus.Success -> "Imported ${totalStreams(statusList)} entries"
                             is UploadStatus.Failed -> "Something went wrong"
                         }
 
@@ -321,8 +326,28 @@ fun ImportScreen(
                                         text = archiveText
                                     )
                                 }
+                                if (it.status is UploadStatus.Success) {
+                                    Row(
+                                        modifier = Modifier.padding(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Button(onClick = { restartApp() }) {
+                                            Text("Reload app")
+                                        }
+                                    }
+                                }
+
                             }
                         }
+                        InfoItem(
+                            icon = {
+                                Icon(imageVector = Icons.Default.Info,
+                                    contentDescription = "Info",
+                                    modifier = Modifier.alpha(0.8f))
+                            },
+                            title = "Each entry is a valid play event.",
+                            text = "Plays shorter than 30 seconds don't count as streams, but are included in other statistics."
+                        )
                     }
                 }
                 items(items = statusList, key = { it.file.name }) { item ->
@@ -331,7 +356,7 @@ fun ImportScreen(
                         index + 1,
                         statusList[index],
                         Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp).animateItem(
-                            placementSpec = spring(Spring.StiffnessLow)
+                            placementSpec = spring()
                         ))
                 }
 //                items(statusList.size) { i ->
@@ -359,4 +384,10 @@ fun totalStreams(statusList: List<FileStatus>): Int {
     return sum
 }
 
+fun restartApp(context: Context) {
+    val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+    intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+    context.startActivity(intent)
+    Runtime.getRuntime().exit(0) // kill the current process
+}
 

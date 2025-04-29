@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.common.dataimport.FileStatus
 import com.github.barmiro.syshclient.data.common.dataimport.ImportRepository
 import com.github.barmiro.syshclient.data.common.dataimport.UploadStatus
+import com.github.barmiro.syshclient.data.stats.StatsRepository
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val importRepo: ImportRepository
+    private val importRepo: ImportRepository,
+    private val statsRepo: StatsRepository
 ) : ViewModel() {
 
 
@@ -112,12 +114,14 @@ class SettingsViewModel @Inject constructor(
 
                 importRepo.recent().collect { result ->
                     when (result) {
-                        is Resource.Success -> _zipFileStatus.value = FileStatus(
-                            tempFile,
-                            UploadStatus.Success(
-                                message = 1
+                        is Resource.Success -> {
+                            _zipFileStatus.value = FileStatus(
+                                tempFile,
+                                UploadStatus.Success(
+                                    message = 1
+                                )
                             )
-                        )
+                        }
                         is Resource.Loading -> _zipFileStatus.value = FileStatus(
                             tempFile,
                             UploadStatus.Processing
@@ -134,6 +138,9 @@ class SettingsViewModel @Inject constructor(
             }
         }
     }
+
+
+
 }
 
 

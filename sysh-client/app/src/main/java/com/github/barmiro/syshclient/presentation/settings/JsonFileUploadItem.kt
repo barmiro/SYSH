@@ -51,7 +51,8 @@ fun JsonFileUploadItem(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "File $index"
+                    text = "File $index",
+                    modifier = Modifier.alpha(0.5f)
                 )
             }
             VerticalDivider(
@@ -106,7 +107,7 @@ fun JsonFileUploadItem(
                         is UploadStatus.Success -> {
                             Text(
                                 text = fileStatus.status.message?.let{ streams ->
-                                    "$streams streams"
+                                    "$streams entries"
                                 } ?: "File processed, but no message from server",
                                 color = MaterialTheme.colorScheme.onBackground,
                                 fontSize = 16.sp,

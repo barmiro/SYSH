@@ -37,7 +37,8 @@ fun AppNavHost(navController: NavHostController,
                statsVM: StatsViewModel,
                sessionVM: SessionViewModel,
                settingsVM: SettingsViewModel,
-               onPickZipFile: () -> Unit) {
+               onPickZipFile: () -> Unit,
+               restartApp: () -> Unit) {
 
     NavHost(
         navController = navController,
@@ -76,7 +77,7 @@ fun AppNavHost(navController: NavHostController,
             SettingsScreen(settingsVM, sessionVM, navController)
         }
         composable<Import> {
-            ImportScreen(settingsVM, sessionVM, onPickZipFile)
+            ImportScreen(settingsVM, sessionVM, onPickZipFile, restartApp)
         }
     }
 }

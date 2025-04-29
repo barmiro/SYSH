@@ -22,6 +22,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -160,5 +162,50 @@ fun UrlInfoItem(
             }
 
         }
+    }
+}
+
+@Composable
+fun InfoItem(
+    icon: @Composable () -> Unit,
+    title: String,
+    text: String
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp).fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier.padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    icon()
+                }
+                Column(modifier = Modifier.padding(8.dp).fillMaxWidth(),
+//                horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row() {
+                        Text(
+                            text = title,
+//                    textAlign = TextAlign.Center
+                        )
+                    }
+                    Row() {
+                        Text(
+                            text = text,
+                            lineHeight = 14.sp,
+                            fontSize = 14.sp,
+                            fontStyle = FontStyle.Italic,
+                            modifier = Modifier.alpha(0.5f)
+//                    textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+
     }
 }

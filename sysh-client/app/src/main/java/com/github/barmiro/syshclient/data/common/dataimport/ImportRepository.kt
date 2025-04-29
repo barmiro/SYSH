@@ -118,3 +118,4 @@ sealed class UploadStatus {
     data class Success(val message: Int) : UploadStatus()
     data class Failed(val message: String?) : UploadStatus()
 }
+

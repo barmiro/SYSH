@@ -35,6 +35,7 @@ import com.github.barmiro.syshclient.presentation.common.Startup
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
+import com.github.barmiro.syshclient.presentation.settings.restartApp
 import com.github.barmiro.syshclient.presentation.startup.StartupViewModel
 import com.github.barmiro.syshclient.presentation.stats.StatsViewModel
 import com.github.barmiro.syshclient.presentation.top.TopScreenViewModel
@@ -204,7 +205,8 @@ class MainActivity : ComponentActivity() {
                                 statsVM,
                                 sessionVM,
                                 settingsVM,
-                                onPickZipFile = { pickZipFile() }
+                                onPickZipFile = { pickZipFile() },
+                                restartApp = { restartApp(applicationContext) }
                             )
                         }
 
@@ -222,6 +224,12 @@ class MainActivity : ComponentActivity() {
 
     private fun pickZipFile() {
         zipPickerLauncher.launch(arrayOf("application/zip"))
+    }
+
+    private fun finalizeImport() {
+        topScreenVM.getOldestStreamDate()
+        homeVM.getStats()
+
     }
 }
 
