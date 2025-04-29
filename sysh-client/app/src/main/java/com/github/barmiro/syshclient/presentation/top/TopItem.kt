@@ -33,25 +33,17 @@ import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.drawable.toBitmap
-import androidx.palette.graphics.Palette
-import coil3.asDrawable
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.allowHardware
 import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.domain.top.TopItemData
+import com.github.barmiro.syshclient.presentation.common.LoadImageWithGradient
 import com.github.barmiro.syshclient.presentation.top.components.TopItemSortParamDisplay
 import com.github.barmiro.syshclient.presentation.top.components.TopListIndexText
 import com.github.barmiro.syshclient.util.drawMarqueeTextFadedEdge
-import com.github.barmiro.syshclient.util.tintFromColor
 
 @Composable
 fun TopItem(
@@ -60,10 +52,10 @@ fun TopItem(
     sort: String?,
     modifier: Modifier = Modifier,
     onColorExtracted: (Color) -> Unit,
-    startColor: Color
+    startColor: Color,
+    placeholderID: Int
 ) {
     val dominantColor = remember { mutableStateOf(startColor) }
-
     val animatedColor = animateColorAsState(
         targetValue = dominantColor.value,
         animationSpec = tween(durationMillis = 400)
@@ -113,36 +105,18 @@ fun TopItem(
                 }
                 Column(
                 ) {
-                    val context = LocalContext.current
-                    val request = ImageRequest.Builder(context)
-                        .data(itemData.thumbnailUrl)
-                        .allowHardware(false)
-                        .listener(
-                            onSuccess = { _, result ->
-                                val bitmap = result.image.asDrawable(context.resources).toBitmap()
-                                Palette.Builder(bitmap).generate { palette ->
-                                    palette?.let { pal ->
-                                        dominantColor.value = tintFromColor(
-                                            Color(
-                                                pal.getVibrantColor(
-                                                    pal.getDominantColor(
-                                                        tintFromColor(Color.Gray).toArgb()
-                                                    )
-                                                )
-                                            )
-                                        )
-                                        onColorExtracted(dominantColor.value)
-                                    }
-                                }
-                            }
-                        )
-                        .build()
-                    AsyncImage(
-                        model = request,
-                        contentDescription = "thumbnail for track " + itemData.name,
+                    LoadImageWithGradient(
+                        itemName = itemData.name,
+                        imageUrl = itemData.thumbnailUrl,
+                        placeholderID = placeholderID,
+                        onGradientColorChange = {
+                            dominantColor.value = it
+                            onColorExtracted(it)
+                        },
                         modifier = Modifier.height(50.dp).width(50.dp)
                             .clip(RoundedCornerShape(2.dp))
                     )
+
                 }
                 Column(
                     modifier = Modifier.weight(5f)

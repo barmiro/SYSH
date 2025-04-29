@@ -27,6 +27,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.top.TopItem
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.util.tintFromColor
@@ -100,7 +101,8 @@ fun TopAlbumsScreen(
                                             dominantColors[i] = color
                                         }
                                     },
-                                    startColor = dominantColors[i] ?: tintFromColor(Color.Gray)
+                                    startColor = dominantColors[i] ?: tintFromColor(Color.Gray),
+                                    placeholderID = R.drawable.album_24dp
                                 )
                             }
                         }

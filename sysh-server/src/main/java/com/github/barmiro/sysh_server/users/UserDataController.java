@@ -47,7 +47,7 @@ public class UserDataController {
 		
 		SpotifyUserDataDTO spotifyUserData = ConvertDTOs.spotifyUserData(response);
 		
-		int updated = userDataRepository.addUserDisplayName(username, spotifyUserData.display_name());
+		int updated = userDataRepository.addSpotifyUserData(username, spotifyUserData);
 		
 		if (updated == 1) {
 //			return userData.display_name();			

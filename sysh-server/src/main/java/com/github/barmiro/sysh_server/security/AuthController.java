@@ -25,7 +25,7 @@ public class AuthController {
 		String token = jwtService.generateToken(authentication);
 		log.info("Token granted: {}", token);
 		
-		TokenResponse response = new TokenResponse(token);
+		TokenResponse response = new TokenResponse(authentication.getName(), token);
 		
 		return response;
 	}

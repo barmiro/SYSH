@@ -32,7 +32,6 @@ public class SpotifyAuthorizationController {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		String state = userManager.getUserSpotifyState(username);
-		System.out.println("STATE: " + state);
 		String url = "https://accounts.spotify.com/authorize?"
 				+ "response_type=code&"
 				+ "client_id=" + clientId + "&"

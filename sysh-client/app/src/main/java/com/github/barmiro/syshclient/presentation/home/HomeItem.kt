@@ -28,22 +28,14 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.drawable.toBitmap
-import androidx.palette.graphics.Palette
-import coil3.asDrawable
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.allowHardware
 import com.github.barmiro.syshclient.R
-import com.github.barmiro.syshclient.util.tintFromColor
+import com.github.barmiro.syshclient.presentation.common.LoadImageWithGradient
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.util.Locale
@@ -156,16 +148,18 @@ fun HomeDayItem(
                     textAlign = TextAlign.Center
                 )
             }
-            Row {
-                Text(
-                    text = "$itemPercent% of $year average",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.alpha(0.5f)
-                )
+            itemPercent?.let {
+                Row {
+                    Text(
+                        text = "$it% of $year average",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.alpha(0.5f)
+                    )
+                }
             }
         }
     }
@@ -177,7 +171,8 @@ fun HomeTopItem(
     itemName: String,
     imageUrl: String?,
     streamCount: Int?,
-    minutesStreamed: Int?
+    minutesStreamed: Int?,
+    placeholderID: Int
 ) {
 
     val dominantColor = remember { mutableStateOf(Color.Transparent) }
@@ -274,33 +269,13 @@ fun HomeTopItem(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    val context = LocalContext.current
-                    val request = ImageRequest.Builder(context)
-                        .data(imageUrl)
-                        .allowHardware(false)
-                        .listener(
-                            onSuccess = { _, result ->
-                                val bitmap = result.image.asDrawable(context.resources).toBitmap()
-                                Palette.Builder(bitmap).generate { palette ->
-                                    palette?.let { pal ->
-                                        dominantColor.value = tintFromColor(
-                                            Color(
-                                                pal.getVibrantColor(
-                                                    pal.getDominantColor(
-                                                        tintFromColor(Color.Gray).toArgb()
-                                                    )
-                                                )
-                                            )
-                                        )
-                                    }
-                                }
-                            }
-                        )
-                        .build()
-
-                    AsyncImage(
-                        model = request,
-                        contentDescription = "thumbnail for $itemName",
+                    LoadImageWithGradient(
+                        itemName = itemName,
+                        imageUrl = imageUrl,
+                        placeholderID = placeholderID,
+                        onGradientColorChange = {
+                            dominantColor.value = it
+                        },
                         modifier = Modifier.height(100.dp).width(100.dp)
                             .clip(RoundedCornerShape(5.dp))
                     )
@@ -310,3 +285,4 @@ fun HomeTopItem(
         }
     }
 }
+

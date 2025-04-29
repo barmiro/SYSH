@@ -32,7 +32,7 @@ public class DatabaseUpdater {
 		if (!isTestEnv) {
 			
 //			!!! CHANGE THIS WHEN ADDING A NEW UPDATE !!!
-			final String TARGET_DATABASE_VERSION = "0.0.2";
+			final String TARGET_DATABASE_VERSION = "0.0.3";
 			
 			updateLegacyDatabase();
 			
@@ -102,6 +102,24 @@ public class DatabaseUpdater {
 					// verificationType
 					Integer.class
 				);
+				
+				updater(
+						// expectedVersion
+						"0.0.2",
+						// targetVersion 
+						"0.0.3",
+						// updateSql
+						"ALTER TABLE Users "
+							+ "ADD COLUMN image_url VARCHAR;",
+						// verificationSql
+						"SELECT 1 "
+						+ "FROM information_schema.columns "
+						+ "WHERE table_name = 'users' "
+						+ "AND column_name = 'image_url' "
+						+ "LIMIT 1",
+						// verificationType
+						Integer.class
+					);
 				
 				
 			} else {

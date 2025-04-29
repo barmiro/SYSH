@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.startup.UrlInfoItem
 import com.github.barmiro.syshclient.presentation.top.components.HomeScreenTopBar
 import com.github.barmiro.syshclient.presentation.top.components.HomeScreenTopText
@@ -185,7 +186,8 @@ fun HomeScreen(
                             itemName = state.stats.top_track?.name ?: "No tracks found",
                             imageUrl = state.stats.top_track?.image_url,
                             streamCount = state.stats.top_track?.stream_count,
-                            minutesStreamed = state.stats.top_track?.total_ms_played?.div(60000)
+                            minutesStreamed = state.stats.top_track?.total_ms_played?.div(60000),
+                            placeholderID = R.drawable.music_note_24dp
                         )
                     }
                     Row() {
@@ -193,7 +195,8 @@ fun HomeScreen(
                             itemName = state.stats.top_album?.name ?: "No albums found",
                             imageUrl = state.stats.top_album?.image_url,
                             streamCount = state.stats.top_album?.stream_count,
-                            minutesStreamed = state.stats.top_album?.total_ms_played?.div(60000)
+                            minutesStreamed = state.stats.top_album?.total_ms_played?.div(60000),
+                            placeholderID = R.drawable.album_24dp
                         )
                     }
                     Row() {
@@ -201,7 +204,8 @@ fun HomeScreen(
                             itemName = state.stats.top_artist?.name ?: "No artists found",
                             imageUrl = state.stats.top_artist?.image_url,
                             streamCount = state.stats.top_artist?.stream_count,
-                            minutesStreamed = state.stats.top_artist?.total_ms_played?.div(60000)
+                            minutesStreamed = state.stats.top_artist?.total_ms_played?.div(60000),
+                            placeholderID = R.drawable.artist_24dp
                         )
                     }
                 }

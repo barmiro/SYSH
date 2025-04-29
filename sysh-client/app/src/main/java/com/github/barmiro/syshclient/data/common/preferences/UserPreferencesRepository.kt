@@ -85,6 +85,13 @@ class UserPreferencesRepository @Inject constructor(
             it[PreferencesKeys.USER_DISPLAY_NAME] = displayName
         }
     }
+    suspend fun saveImageUrl(imageUrl: String?) {
+        imageUrl?.let { url ->
+            dataStore.edit {
+                it[PreferencesKeys.USER_IMAGE_URL] = url
+            }
+        }
+    }
 
     val serverUrl: Flow<String?> = dataStore.data.map {
         it[PreferencesKeys.SERVER_URL]
@@ -116,6 +123,10 @@ class UserPreferencesRepository @Inject constructor(
 
     val userDisplayName: Flow<String?> = dataStore.data.map {
         it[PreferencesKeys.USER_DISPLAY_NAME]
+    }
+
+    val userImageUrl: Flow<String?> = dataStore.data.map {
+        it[PreferencesKeys.USER_IMAGE_URL]
     }
 
     suspend fun clearAllPreferences() {

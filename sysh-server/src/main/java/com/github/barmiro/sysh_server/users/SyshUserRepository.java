@@ -176,11 +176,17 @@ public class SyshUserRepository {
 				.update();
 	}
 	
-	public int addUserDisplayName(String username, String displayName) {
+	public int addSpotifyUserData(String username, SpotifyUserDataDTO userData) {
+		String imageUrl = null;
+		if (!userData.images().isEmpty()) {
+			imageUrl = userData.images().getFirst().url();
+		}
 		return jdbc.sql("UPDATE Users SET "
-				+ "display_name = :display_name "
+				+ "display_name = :display_name, "
+				+ "image_url = :image_url "
 				+ "WHERE username = :username")
-				.param("display_name", displayName, Types.VARCHAR)
+				.param("display_name", userData.display_name(), Types.VARCHAR)
+				.param("image_url", imageUrl, Types.VARCHAR)
 				.param("username", username, Types.VARCHAR)
 				.update();
 	}

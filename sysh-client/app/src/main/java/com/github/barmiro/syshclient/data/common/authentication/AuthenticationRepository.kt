@@ -41,7 +41,7 @@ class AuthenticationRepository @Inject constructor(
     val authApi = retrofit.create(AuthenticationApi::class.java)
 
 
-    fun getToken(username: String, password: String): Flow<Resource<String>> {
+    fun getToken(username: String, password: String): Flow<Resource<TokenResponse>> {
         return flow {
             emit(Resource.Loading(true))
 
@@ -54,7 +54,7 @@ class AuthenticationRepository @Inject constructor(
                     } ?.let {
                         emit(
                             Resource.Success(
-                                data = it.token
+                                data = it
                             )
                         )
                     } ?: emit(

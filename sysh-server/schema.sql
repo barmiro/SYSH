@@ -5,7 +5,7 @@ CREATE TABLE db_info (
     version VARCHAR NOT NULL
 );
 
-INSERT INTO db_info (version) VALUES ('0.0.2');
+INSERT INTO db_info (version) VALUES ('0.0.3');
 
 CREATE TABLE Users (
     username VARCHAR(64) PRIMARY KEY,
@@ -17,6 +17,7 @@ CREATE TABLE Users (
     role user_role NOT NULL DEFAULT 'USER',
 --    consider handling the default in java
     display_name VARCHAR DEFAULT 'unknown username',
+    image_url VARCHAR,
     timezone VARCHAR NOT NULL,
     has_imported_data BOOLEAN DEFAULT false
 );

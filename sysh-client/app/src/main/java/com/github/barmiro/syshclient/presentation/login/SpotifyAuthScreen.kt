@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -51,7 +52,7 @@ fun SpotifyAuthScreen(
         ) {
 
             Text(
-                text = "You're not authorized with Spotify",
+                text = "To use SYSH, you need to link your Spotify account",
                 color = MaterialTheme.colorScheme.onBackground
             )
 
@@ -61,13 +62,16 @@ fun SpotifyAuthScreen(
                     sessionVM.spotifyAuthorization()
                 }
             ) {
-                Text("Authorize")
+                Text("Open browser")
             }
 
-            Text(
-                text = "(opens a browser window)",
-                color = MaterialTheme.colorScheme.onBackground
-            )
+            TextButton(
+                onClick = {
+                    sessionVM.logout()
+                }
+            ) {
+                Text("Return to login screen")
+            }
         }
     }
 }

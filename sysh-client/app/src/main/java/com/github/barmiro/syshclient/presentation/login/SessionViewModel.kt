@@ -85,7 +85,8 @@ class SessionViewModel @Inject constructor(
                 when (result) {
                     is Resource.Success -> {
                         result.data?.let {
-                            userPrefRepo.saveToken(it)
+                            userPrefRepo.saveToken(it.token)
+                            userPrefRepo.saveUsername(it.username)
                             userPrefRepo.setLoggedIn(true)
                         }
                     }
@@ -112,6 +113,7 @@ class SessionViewModel @Inject constructor(
                             result.data?.let {
                                 userPrefRepo.setAuthorizedWithSpotify(true)
                                 userPrefRepo.saveUserDisplayName(it.display_name)
+                                userPrefRepo.saveImageUrl(it.image_url)
                                 userPrefRepo.setImportAlert(!it.has_imported_data)
                             }
                             _responseCode.value = 200
@@ -251,6 +253,27 @@ class SessionViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
+        )
+
+    val username: StateFlow<String?> = userPrefRepo.username
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    val userDisplayName: StateFlow<String?> = userPrefRepo.userDisplayName
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    val userImageUrl: StateFlow<String?> = userPrefRepo.userImageUrl
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
         )
 
 //    init {
