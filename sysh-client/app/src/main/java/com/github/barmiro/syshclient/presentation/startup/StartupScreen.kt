@@ -56,14 +56,13 @@ fun StartupScreen(
     Surface(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 96.dp)
             .background(color = MaterialTheme.colorScheme.background)
     ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row {
+                Row(modifier = Modifier.padding(top = 96.dp)) {
                     Text(text = "Welcome to SYSH!",
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 24.sp,
