@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.barmiro.syshclient.presentation.common.AppNavHost
 import com.github.barmiro.syshclient.presentation.common.BottomNavBar
+import com.github.barmiro.syshclient.presentation.common.ConnectionError
 import com.github.barmiro.syshclient.presentation.common.Home
 import com.github.barmiro.syshclient.presentation.common.Login
 import com.github.barmiro.syshclient.presentation.common.SpotifyAuth
@@ -110,11 +111,27 @@ class MainActivity : ComponentActivity() {
                         }
                     } else {
                         loginSuccessful = false
-                        navController.navigate(Startup) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                inclusive = true
+                        if (!isLoggedIn) {
+                            navController.navigate(Startup) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
+                            if (!storedUrl.isNullOrEmpty()){
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = "Couldn't connect to the server"
+                                    )
+                                }
+                            }
+                        } else {
+                            navController.navigate(ConnectionError) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
                             }
                         }
+
                     }
                 }
             }

@@ -65,6 +65,7 @@ class StartupViewModel @Inject constructor(
     }
 
     fun getServerInfo() {
+        _serverResponded.value = null
         viewModelScope.launch {
             startupDataRepo.getServerInfo().collect { result ->
                 when (result) {

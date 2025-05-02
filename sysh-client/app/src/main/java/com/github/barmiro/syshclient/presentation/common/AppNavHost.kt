@@ -13,6 +13,7 @@ import com.github.barmiro.syshclient.presentation.login.SpotifyAuthScreen
 import com.github.barmiro.syshclient.presentation.settings.ImportScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
+import com.github.barmiro.syshclient.presentation.startup.ConnectionErrorScreen
 import com.github.barmiro.syshclient.presentation.startup.SplashScreen
 import com.github.barmiro.syshclient.presentation.startup.StartupScreen
 import com.github.barmiro.syshclient.presentation.startup.StartupViewModel
@@ -79,6 +80,9 @@ fun AppNavHost(navController: NavHostController,
         composable<Import> {
             ImportScreen(settingsVM, sessionVM, onPickZipFile, restartApp)
         }
+        composable<ConnectionError> {
+            ConnectionErrorScreen(navController)
+        }
     }
 }
 
@@ -114,3 +118,6 @@ object Settings
 
 @Serializable
 object Import
+
+@Serializable
+object ConnectionError

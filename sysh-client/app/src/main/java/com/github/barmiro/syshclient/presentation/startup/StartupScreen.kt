@@ -88,15 +88,17 @@ fun StartupScreen(
                 Button(
                     onClick = {
                         urlValidation?.let {
+                            startupVM.serverResponded
                             val url = if (it.hasScheme) urlInput else "http://$urlInput"
                             sessionVM.saveServerUrl(url) {
                                 startupVM.getServerInfo()
                             }
                         }
                     },
-                    enabled = urlValidation?.isValidUrl ?: false
+                    enabled = (urlValidation?.isValidUrl ?: false) && (serverResponded != null)
                 ) {
-                    Text("Confirm")
+                    val buttonText = if (serverResponded == null) "Connecting..." else "Confirm"
+                    Text(buttonText)
                 }
 
                 urlValidation?.let {
