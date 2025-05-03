@@ -37,47 +37,49 @@ fun LoadImageWithGradient(
 ) {
     var isImageEmpty by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val request = ImageRequest.Builder(context)
-        .data(imageUrl)
-        .allowHardware(false)
-        .listener(
-            onSuccess = { _, result ->
-                val bitmap = result.image.asDrawable(context.resources).toBitmap()
-                Palette.Builder(bitmap).generate { palette ->
-                    palette?.let { pal ->
-                        onGradientColorChange(
-                            tintFromColor(
-                                Color(
-                                    pal.getVibrantColor(
-                                        pal.getDominantColor(
-                                            tintFromColor(Color.Gray).toArgb()
+    val request = imageUrl?.let { url ->
+        ImageRequest.Builder(context)
+            .data(url)
+            .allowHardware(false)
+            .listener(
+                onSuccess = { _, result ->
+                    isImageEmpty = false
+                    val bitmap = result.image.asDrawable(context.resources).toBitmap()
+                    Palette.Builder(bitmap).generate { palette ->
+                        palette?.let { pal ->
+                            onGradientColorChange(
+                                tintFromColor(
+                                    Color(
+                                        pal.getVibrantColor(
+                                            pal.getDominantColor(
+                                                tintFromColor(Color.Gray).toArgb()
+                                            )
                                         )
                                     )
                                 )
                             )
-                        )
+                        }
                     }
+                },
+                onError = { _, _ ->
+                    isImageEmpty = true
+                    onGradientColorChange(tintFromColor(Color.Gray))
                 }
-            },
-            onError = { _, _ ->
-                isImageEmpty = true
-                onGradientColorChange(tintFromColor(Color.Gray))
-            }
-        )
-        .build()
-
-    if(!isImageEmpty) {
-        AsyncImage(
-            model = request,
-            contentScale = ContentScale.Crop,
-            contentDescription = "Thumbnail for item $itemName",
-            modifier = modifier
-        )
-    } else {
-        Box(
-            modifier = modifier
-                .background(Color.Gray.copy(alpha = 0.1f)),
-            contentAlignment = Alignment.Center) {
+            )
+            .build()
+    }
+    Box(
+        modifier = modifier
+            .background(Color.Gray.copy(alpha = 0.1f)),
+        contentAlignment = Alignment.Center) {
+        if(!isImageEmpty) {
+            AsyncImage(
+                model = request,
+                contentScale = ContentScale.Crop,
+                contentDescription = "Thumbnail for item $itemName",
+                modifier = modifier,
+            )
+        } else {
             Icon(
                 painter = painterResource(id = placeholderID),
                 tint = IconButtonDefaults.iconButtonColors().contentColor,
