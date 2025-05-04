@@ -62,6 +62,12 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun saveUserRole(userRole: String) {
+        dataStore.edit {
+            it[PreferencesKeys.USER_ROLE] = userRole
+        }
+    }
+
     suspend fun setImportAlert(showImportAlert: Boolean) {
         dataStore.edit {
             it[PreferencesKeys.SHOW_IMPORT_ALERT] = showImportAlert
@@ -123,6 +129,10 @@ class UserPreferencesRepository @Inject constructor(
 
     val userDisplayName: Flow<String?> = dataStore.data.map {
         it[PreferencesKeys.USER_DISPLAY_NAME]
+    }
+
+    val userRole: Flow<String?> = dataStore.data.map {
+        it[PreferencesKeys.USER_ROLE]
     }
 
     val userImageUrl: Flow<String?> = dataStore.data.map {

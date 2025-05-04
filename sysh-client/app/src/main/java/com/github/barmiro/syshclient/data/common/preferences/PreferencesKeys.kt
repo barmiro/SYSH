@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 object PreferencesKeys {
     val USERNAME = stringPreferencesKey("username")
     val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
+    val USER_ROLE = stringPreferencesKey("user_role")
     val SERVER_URL = stringPreferencesKey("server_url")
     val IS_FRESH_INSTALL = booleanPreferencesKey("is_fresh_install")
     val TOKEN = stringPreferencesKey("jwt_token")

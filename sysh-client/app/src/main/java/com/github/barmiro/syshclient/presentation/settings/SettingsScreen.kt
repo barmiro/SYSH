@@ -10,9 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,7 +23,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.barmiro.syshclient.presentation.common.Import
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
@@ -38,6 +42,7 @@ fun SettingsScreen(
     val username by sessionVM.username.collectAsState()
     val displayName by sessionVM.userDisplayName.collectAsState()
     val userImageUrl by sessionVM.userImageUrl.collectAsState()
+    val userRole by sessionVM.userRole.collectAsState()
 
     Scaffold(
         topBar = {
@@ -98,13 +103,56 @@ fun SettingsScreen(
                                 }
                             )
                         )
-                        Button(
-                            onClick = {
-                                sessionVM.logout()
-                            }
-                        ) {
+                    }
+                }
+
+                if(userRole == "ADMIN") {
+                    item() {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Row() {
                             Text(
-                                text = "Log out"
+                                text = "Admin panel",
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 24.sp
+                            )
+                        }
+                        Row() {
+                            SettingsItem(
+                                itemText = "Manage users",
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.AccountBox,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        contentDescription = "Manage users"
+                                    )
+                                },
+                                modifier = Modifier
+                                    .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+                                    .clickable(
+                                        onClick = {
+//                                        TODO
+                                        }
+                                    )
+                            )
+                        }
+                        Row() {
+                            SettingsItem(
+                                itemText = "About server",
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        contentDescription = "About server"
+                                    )
+                                },
+                                modifier = Modifier
+                                    .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+                                    .clickable(
+                                        onClick = {
+//                                        TODO
+                                        }
+                                    )
                             )
                         }
                     }

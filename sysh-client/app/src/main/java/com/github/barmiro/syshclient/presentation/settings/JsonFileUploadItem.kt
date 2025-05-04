@@ -262,8 +262,9 @@ fun SettingsScreenUserItem(username: String?,
 
                 }
                 VerticalDivider(
-                    Modifier.height(48.dp).padding(horizontal = 8.dp)
+                    Modifier.height(72.dp).padding(horizontal = 10.dp)
                 )
+//                Spacer(Modifier.width(16.dp))
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {

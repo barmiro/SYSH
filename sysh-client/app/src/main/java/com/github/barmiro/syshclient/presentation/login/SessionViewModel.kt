@@ -113,6 +113,7 @@ class SessionViewModel @Inject constructor(
                             result.data?.let {
                                 userPrefRepo.setAuthorizedWithSpotify(true)
                                 userPrefRepo.saveUserDisplayName(it.display_name)
+                                userPrefRepo.saveUserRole(it.role)
                                 userPrefRepo.saveImageUrl(it.image_url)
                                 userPrefRepo.setImportAlert(!it.has_imported_data)
                             }
@@ -256,6 +257,13 @@ class SessionViewModel @Inject constructor(
         )
 
     val username: StateFlow<String?> = userPrefRepo.username
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    val userRole: StateFlow<String?> = userPrefRepo.userRole
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
