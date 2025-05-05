@@ -14,6 +14,6 @@ interface AdminApi {
 
     @POST("admin/users/delete")
     suspend fun deleteUser(
-        @Body username: String
+        @Body deleteUserBody: DeleteUserDTO
     ) : Response<Int>
 }

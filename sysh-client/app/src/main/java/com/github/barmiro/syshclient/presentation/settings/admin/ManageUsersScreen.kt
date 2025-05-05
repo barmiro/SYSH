@@ -82,7 +82,7 @@ fun ManageUsersScreen(
                                 .padding(top = 8.dp, start = 8.dp, end = 8.dp)
                                 .clickable(
                                     onClick = {
-//                                        TODO
+                                        adminVM.deleteUser(it[index].username)
                                     }
                                 )
                             )

@@ -25,8 +25,8 @@ public class AdminController {
 	}
 	
 	@PostMapping("/users/delete")
-	Integer deleteUser(@RequestBody String username) {
-		return userManager.deleteUser(username);
+	Integer deleteUser(@RequestBody UsernameWrapper user) {
+		return userManager.deleteUser(user.username());
 	}
 	
 }

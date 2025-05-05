@@ -58,4 +58,23 @@ class AdminRepository @Inject constructor(
             }
         }
     }
+
+
+    fun deleteUser(username: String): Flow<Resource<Int>> {
+        return flow {
+            emit(Resource.Loading(true))
+            try {
+                val response = adminApi.deleteUser(DeleteUserDTO(username))
+
+                if (response.isSuccessful) {
+                    emit(Resource.Success(response.body()))
+                } else {
+                    emit(Resource.Error(response.message()))
+                }
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
+            }
+        }
+    }
 }

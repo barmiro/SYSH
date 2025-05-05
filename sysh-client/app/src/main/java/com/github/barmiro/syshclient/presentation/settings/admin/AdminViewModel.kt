@@ -35,4 +35,20 @@ class AdminViewModel @Inject constructor(
         }
     }
 
+    fun deleteUser(username: String) {
+        viewModelScope.launch {
+            adminRepo.deleteUser(username).collect { result ->
+                when(result) {
+                    is Resource.Success -> {
+                        println("Deleted user $username")
+                        getUsers()
+                    }
+                    else -> {
+                        println(result.message)
+                    }
+                }
+            }
+        }
+    }
+
 }
