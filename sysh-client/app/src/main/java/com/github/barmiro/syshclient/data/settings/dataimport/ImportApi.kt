@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.data.common.dataimport
+package com.github.barmiro.syshclient.data.settings.dataimport
 
 import okhttp3.RequestBody
 import okhttp3.ResponseBody

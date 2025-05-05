@@ -29,12 +29,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.github.barmiro.syshclient.presentation.common.Import
+import com.github.barmiro.syshclient.presentation.common.ManageUsers
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
+import com.github.barmiro.syshclient.presentation.settings.import.SettingsItem
+import com.github.barmiro.syshclient.presentation.settings.import.SettingsScreenUserItem
 import com.github.barmiro.syshclient.presentation.top.components.SettingsScreenTopBar
 
 @Composable
 fun SettingsScreen(
-    settingsVM: SettingsViewModel,
     sessionVM: SessionViewModel,
     navController: NavHostController
 ) {
@@ -131,7 +133,7 @@ fun SettingsScreen(
                                     .padding(top = 8.dp, start = 8.dp, end = 8.dp)
                                     .clickable(
                                         onClick = {
-//                                        TODO
+                                            navController.navigate(ManageUsers)
                                         }
                                     )
                             )

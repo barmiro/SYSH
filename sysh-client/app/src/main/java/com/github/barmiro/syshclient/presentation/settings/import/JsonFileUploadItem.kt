@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.presentation.settings
+package com.github.barmiro.syshclient.presentation.settings.import
 
 import android.content.Context
 import android.content.Intent
@@ -42,8 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.github.barmiro.syshclient.R
-import com.github.barmiro.syshclient.data.common.dataimport.FileStatus
-import com.github.barmiro.syshclient.data.common.dataimport.UploadStatus
+import com.github.barmiro.syshclient.data.settings.dataimport.FileStatus
+import com.github.barmiro.syshclient.data.settings.dataimport.UploadStatus
 
 @Composable
 fun JsonFileUploadItem(

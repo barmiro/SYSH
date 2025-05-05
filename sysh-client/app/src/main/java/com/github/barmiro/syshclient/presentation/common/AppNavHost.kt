@@ -10,9 +10,11 @@ import com.github.barmiro.syshclient.presentation.login.LoginScreen
 import com.github.barmiro.syshclient.presentation.login.RegisterScreen
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 import com.github.barmiro.syshclient.presentation.login.SpotifyAuthScreen
-import com.github.barmiro.syshclient.presentation.settings.ImportScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsScreen
-import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
+import com.github.barmiro.syshclient.presentation.settings.admin.AdminViewModel
+import com.github.barmiro.syshclient.presentation.settings.admin.ManageUsersScreen
+import com.github.barmiro.syshclient.presentation.settings.import.ImportScreen
+import com.github.barmiro.syshclient.presentation.settings.ImportViewModel
 import com.github.barmiro.syshclient.presentation.startup.ConnectionErrorScreen
 import com.github.barmiro.syshclient.presentation.startup.SplashScreen
 import com.github.barmiro.syshclient.presentation.startup.StartupScreen
@@ -37,7 +39,8 @@ fun AppNavHost(navController: NavHostController,
                topArtistsVM: TopArtistsViewModel,
                statsVM: StatsViewModel,
                sessionVM: SessionViewModel,
-               settingsVM: SettingsViewModel,
+               importVM: ImportViewModel,
+               adminVM: AdminViewModel,
                onPickZipFile: () -> Unit,
                restartApp: () -> Unit) {
 
@@ -75,13 +78,16 @@ fun AppNavHost(navController: NavHostController,
             SpotifyAuthScreen(sessionVM)
         }
         composable<Settings> {
-            SettingsScreen(settingsVM, sessionVM, navController)
+            SettingsScreen(sessionVM, navController)
         }
         composable<Import> {
-            ImportScreen(settingsVM, sessionVM, onPickZipFile, restartApp)
+            ImportScreen(importVM, onPickZipFile, restartApp)
         }
         composable<ConnectionError> {
             ConnectionErrorScreen(navController)
+        }
+        composable<ManageUsers> {
+            ManageUsersScreen(adminVM)
         }
     }
 }
@@ -121,3 +127,6 @@ object Import
 
 @Serializable
 object ConnectionError
+
+@Serializable
+object ManageUsers

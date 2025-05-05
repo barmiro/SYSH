@@ -5,10 +5,9 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.barmiro.syshclient.data.common.dataimport.FileStatus
-import com.github.barmiro.syshclient.data.common.dataimport.ImportRepository
-import com.github.barmiro.syshclient.data.common.dataimport.UploadStatus
-import com.github.barmiro.syshclient.data.stats.StatsRepository
+import com.github.barmiro.syshclient.data.settings.dataimport.FileStatus
+import com.github.barmiro.syshclient.data.settings.dataimport.ImportRepository
+import com.github.barmiro.syshclient.data.settings.dataimport.UploadStatus
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,11 +21,9 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
-    private val importRepo: ImportRepository,
-    private val statsRepo: StatsRepository
+class ImportViewModel @Inject constructor(
+    private val importRepo: ImportRepository
 ) : ViewModel() {
-
 
     private val _fileStatusList = MutableStateFlow<List<FileStatus>>(emptyList())
     val fileStatusList: StateFlow<List<FileStatus>> = _fileStatusList.asStateFlow()

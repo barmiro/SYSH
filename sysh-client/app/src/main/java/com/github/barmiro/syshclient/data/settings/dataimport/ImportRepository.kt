@@ -1,4 +1,4 @@
-package com.github.barmiro.syshclient.data.common.dataimport
+package com.github.barmiro.syshclient.data.settings.dataimport
 
 import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
@@ -38,10 +38,6 @@ class ImportRepository @Inject constructor(
 
     val retrofit = Retrofit.Builder()
         .baseUrl("http://localhost/")
-        .client(client)
-//        .addConverterFactory(
-//            Json.asConverterFactory(
-//                "application/json; charset=UTF8".toMediaType()))
         .build()
 
     val importApi = retrofit.create(ImportApi::class.java)
@@ -81,6 +77,8 @@ class ImportRepository @Inject constructor(
 
                 if (response.isSuccessful) {
                     emit(Resource.Success(response.body()?.string()?.toInt())) //TODO: make int native
+                } else {
+                    emit(Resource.Error(response.message()))
                 }
             } catch (e: Exception) {
                 val errorValues = handleNetworkException(e)

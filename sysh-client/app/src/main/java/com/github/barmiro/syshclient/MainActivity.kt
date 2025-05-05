@@ -35,8 +35,9 @@ import com.github.barmiro.syshclient.presentation.common.SpotifyAuth
 import com.github.barmiro.syshclient.presentation.common.Startup
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
-import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
-import com.github.barmiro.syshclient.presentation.settings.restartApp
+import com.github.barmiro.syshclient.presentation.settings.ImportViewModel
+import com.github.barmiro.syshclient.presentation.settings.admin.AdminViewModel
+import com.github.barmiro.syshclient.presentation.settings.import.restartApp
 import com.github.barmiro.syshclient.presentation.startup.StartupViewModel
 import com.github.barmiro.syshclient.presentation.stats.StatsViewModel
 import com.github.barmiro.syshclient.presentation.top.TopScreenViewModel
@@ -58,7 +59,8 @@ class MainActivity : ComponentActivity() {
     private val topArtistsVM: TopArtistsViewModel by viewModels()
     private val statsVM: StatsViewModel by viewModels()
     private val sessionVM: SessionViewModel by viewModels()
-    private val settingsVM: SettingsViewModel by viewModels()
+    private val importVM: ImportViewModel by viewModels()
+    private val adminVM: AdminViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -221,7 +223,8 @@ class MainActivity : ComponentActivity() {
                                 topArtistsVM,
                                 statsVM,
                                 sessionVM,
-                                settingsVM,
+                                importVM,
+                                adminVM,
                                 onPickZipFile = { pickZipFile() },
                                 restartApp = { restartApp(applicationContext) }
                             )
@@ -235,7 +238,7 @@ class MainActivity : ComponentActivity() {
 
     private val zipPickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
-            settingsVM.handleZipFile(it, applicationContext)
+            importVM.handleZipFile(it, applicationContext)
         }
     }
 
