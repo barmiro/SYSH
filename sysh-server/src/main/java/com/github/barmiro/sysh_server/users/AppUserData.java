@@ -10,5 +10,4 @@ public record AppUserData(
 		Boolean has_imported_data,
 		UserRole role
 		) {
-
 }

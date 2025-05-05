@@ -5,7 +5,7 @@ CREATE TABLE db_info (
     version VARCHAR NOT NULL
 );
 
-INSERT INTO db_info (version) VALUES ('0.0.2');
+INSERT INTO db_info (version) VALUES ('0.0.4');
 
 CREATE TABLE Users (
     username VARCHAR(64) PRIMARY KEY,
@@ -17,6 +17,7 @@ CREATE TABLE Users (
     role user_role NOT NULL DEFAULT 'USER',
 --    consider handling the default in java
     display_name VARCHAR DEFAULT 'unknown username',
+    image_url VARCHAR,
     timezone VARCHAR NOT NULL,
     has_imported_data BOOLEAN DEFAULT false
 );
@@ -24,12 +25,14 @@ CREATE TABLE Users (
 CREATE TABLE SongStreams (
     id SERIAL PRIMARY KEY,
     ts TIMESTAMPTZ NOT NULL,
-    username VARCHAR REFERENCES Users(username),
+    username VARCHAR,
     ms_played INTEGER NOT NULL,
     spotify_track_id VARCHAR NOT NULL,
+    FOREIGN KEY (username) REFERENCES Users(username) ON DELETE CASCADE,
     CONSTRAINT no_duplicates UNIQUE (ts, spotify_track_id, username)
 );
 
+CREATE INDEX songstreams_username ON SongStreams(username);
 
 CREATE TABLE Tracks (
     spotify_track_id VARCHAR PRIMARY KEY,

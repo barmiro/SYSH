@@ -84,6 +84,10 @@ private static final Logger log = LoggerFactory.getLogger(SyshUserManager.class)
 		return userRepo.findAllUsernames();
 	}
 	
+	public List<AppUserData> getAllUserData() {
+		return userRepo.getAllUserData();
+	}
+	
 	public Boolean isUsernameTaken(String username) {
 		return userRepo.findByUsername(username).isPresent();
 	}
@@ -102,6 +106,17 @@ private static final Logger log = LoggerFactory.getLogger(SyshUserManager.class)
 			log.error("User creation for " + user.username() + " failed: " + created);
 			return null;
 		}
+	}
+	
+	public int deleteUser(String username) {
+		int deleted = userRepo.deleteUser(username);
+		if (deleted == 1) {
+			log.info("User " + username + " deleted succcessfully");
+		} else {
+			log.error("User delete operation for " + username + " failed: " + deleted);
+			throw new RuntimeException("User deletion failed");
+		}
+		return deleted;
 	}
 	
 }

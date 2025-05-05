@@ -32,7 +32,7 @@ public class DatabaseUpdater {
 		if (!isTestEnv) {
 			
 //			!!! CHANGE THIS WHEN ADDING A NEW UPDATE !!!
-			final String TARGET_DATABASE_VERSION = "0.0.3";
+			final String TARGET_DATABASE_VERSION = "0.0.4";
 			
 			updateLegacyDatabase();
 			
@@ -121,6 +121,36 @@ public class DatabaseUpdater {
 						Integer.class
 					);
 				
+				updater(
+						// expectedVersion
+						"0.0.3",
+						// targetVersion 
+						"0.0.4",
+						// updateSql
+						"ALTER TABLE SongStreams "
+							+ "DROP CONSTRAINT " + getSongStreamsUsernameConstraintName() + ";"
+						+ "ALTER TABLE SongStreams "
+							+ "ADD FOREIGN KEY (username) "
+							+ "REFERENCES Users(username) "
+							+ "ON DELETE CASCADE;"
+						+ "CREATE INDEX songstreams_username ON SongStreams(username);",
+						// verificationSql
+						"SELECT 1 "
+						+ "FROM pg_constraint "
+						+ "WHERE conrelid = 'songstreams'::regclass "
+						+ "AND contype = 'f' "
+						+ "AND confdeltype = 'c' "
+						+ "AND conkey @> ("
+							+ "SELECT array_agg(attnum) "
+							+ "FROM pg_attribute "
+							+ "WHERE attrelid = 'songstreams'::regclass "
+							+ "AND attname = 'username' "
+						+ ")"
+						+ "LIMIT 1;",
+						// verificationType
+						Integer.class
+					);
+				
 				
 			} else {
 				log.info(
@@ -199,5 +229,21 @@ public class DatabaseUpdater {
 		if (updated > 0) {
 			log.info("Updated database from legacy to numbered versioning system");
 		}
+	}
+	
+	private String getSongStreamsUsernameConstraintName() {
+		return jdbc.sql("SELECT conname "
+				+ "FROM pg_constraint "
+				+ "WHERE conrelid = 'songstreams'::regclass "
+				+ "AND contype = 'f' "
+				+ "AND conkey @> ( "
+					+ "SELECT array_agg(attnum) "
+					+ "FROM pg_attribute "
+					+ "WHERE attrelid = 'songstreams'::regclass "
+					+ "AND attname = 'username' "
+					+ ")"
+				+ "LIMIT 1;")
+				.query(String.class)
+				.single();
 	}
 }

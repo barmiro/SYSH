@@ -176,6 +176,12 @@ public class SyshUserRepository {
 				.update();
 	}
 	
+	public int deleteUser(String username) {
+		return jdbc.sql("DELETE FROM Users WHERE username = :username;")
+				.param("username", username, Types.VARCHAR)
+				.update();
+	}
+	
 	public int addSpotifyUserData(String username, SpotifyUserDataDTO userData) {
 		String imageUrl = null;
 		if (!userData.images().isEmpty()) {
@@ -206,6 +212,13 @@ public class SyshUserRepository {
 				.param("username", username, Types.VARCHAR)
 				.query(AppUserData.class)
 				.single();
+	}
+	
+	public List<AppUserData> getAllUserData() {
+		return jdbc.sql("SELECT * "
+				+ "FROM Users;")
+				.query(AppUserData.class)
+				.list();
 	}
 
 	public int setHasImportedData(String username, Boolean value) {
