@@ -21,7 +21,7 @@ public class AuthController {
 	
 	@PostMapping("/token")
 	public TokenResponse token(Authentication authentication) {
-		log.info("Token requested tor user: '{}'", authentication.getName());
+		log.info("Token requested tor user: '{}' with role '{}'", authentication.getName(), authentication.getAuthorities());
 		String token = jwtService.generateToken(authentication);
 		log.info("Token granted: {}", token);
 		

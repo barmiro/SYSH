@@ -16,10 +16,7 @@ import javax.inject.Inject
 class AdminViewModel @Inject constructor(
     private val adminRepo: AdminRepository
 ) : ViewModel() {
-
-    init {
-        getUsers()
-    }
+    
 
     private val _usernameList = MutableStateFlow<List<UserDataDTO>?>(emptyList())
     val usernameList: StateFlow<List<UserDataDTO>?> = _usernameList.asStateFlow()

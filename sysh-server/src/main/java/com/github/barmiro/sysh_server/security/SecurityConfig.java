@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.nimbusds.jose.jwk.JWK;
@@ -44,14 +46,27 @@ public class SecurityConfig {
 						.requestMatchers("/info").permitAll()
 						.requestMatchers("/register").permitAll()
 						.requestMatchers("/callback").permitAll()
-						.requestMatchers("/admin").hasRole("ADMIN")
+						.requestMatchers("/admin/**").hasRole("ADMIN")
 						.anyRequest().authenticated())
-				.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+				.oauth2ResourceServer(oauth2 -> oauth2
+			            .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+			        )
 				.sessionManagement(session -> session
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.httpBasic(Customizer.withDefaults())
 				.build();
 	}
+	
+	private JwtAuthenticationConverter jwtAuthenticationConverter() {
+		JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+		grantedAuthoritiesConverter.setAuthorityPrefix("");
+		grantedAuthoritiesConverter.setAuthoritiesClaimName("scope");
+		
+		JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+		converter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+		return converter;
+	}
+	
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {
