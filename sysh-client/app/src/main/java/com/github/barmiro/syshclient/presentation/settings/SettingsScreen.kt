@@ -108,7 +108,7 @@ fun SettingsScreen(
                     }
                 }
 
-                if(userRole != "TEST") {
+                if(userRole == "ADMIN") {
                     item() {
                         Spacer(modifier = Modifier.height(16.dp))
                         Row() {

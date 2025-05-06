@@ -30,8 +30,7 @@ services:
       - POSTGRES_PASSWORD:${POSTGRES_PASSWORD}
     volumes:
       - syshdb:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
+    ports: []
       
 volumes:
   syshdb:

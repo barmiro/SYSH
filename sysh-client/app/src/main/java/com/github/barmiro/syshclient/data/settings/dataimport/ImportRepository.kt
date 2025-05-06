@@ -38,6 +38,7 @@ class ImportRepository @Inject constructor(
 
     val retrofit = Retrofit.Builder()
         .baseUrl("http://localhost/")
+        .client(client)
         .build()
 
     val importApi = retrofit.create(ImportApi::class.java)
