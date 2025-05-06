@@ -284,6 +284,13 @@ class SessionViewModel @Inject constructor(
             initialValue = null
         )
 
+    val isDemoVersion: StateFlow<Boolean?> = userPrefRepo.isDemoVersion
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
 //    init {
 //        viewModelScope.launch {
 ////                !!! DELETE BEFORE PUBLISHING !!!
@@ -292,16 +299,30 @@ class SessionViewModel @Inject constructor(
 //        }
 //    }
 
+    fun clearAllPreferences() {
+        viewModelScope.launch {
+            userPrefRepo.clearAllPreferences()
+        }
+    }
     fun saveServerUrl(serverUrl: String, onComplete: () -> Unit) {
         viewModelScope.launch {
+            userPrefRepo.setDemoVersion(false)
+            userPrefRepo.isDemoVersion.first()
             userPrefRepo.saveServerUrl(serverUrl)
             userPrefRepo.serverUrl.first()
             onComplete()
         }
     }
 
-
-
+    fun startDemo() {
+        viewModelScope.launch {
+            userPrefRepo.setDemoVersion(true)
+            userPrefRepo.isDemoVersion.first()
+            userPrefRepo.saveServerUrl("http://192.168.0.147:5755")
+            userPrefRepo.serverUrl.first()
+            getToken("demo-user", "password")
+        }
+    }
 
 
 }

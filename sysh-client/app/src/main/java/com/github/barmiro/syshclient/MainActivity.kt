@@ -31,6 +31,7 @@ import com.github.barmiro.syshclient.presentation.common.BottomNavBar
 import com.github.barmiro.syshclient.presentation.common.ConnectionError
 import com.github.barmiro.syshclient.presentation.common.Home
 import com.github.barmiro.syshclient.presentation.common.Login
+import com.github.barmiro.syshclient.presentation.common.Splash
 import com.github.barmiro.syshclient.presentation.common.SpotifyAuth
 import com.github.barmiro.syshclient.presentation.common.Startup
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
@@ -74,6 +75,7 @@ class MainActivity : ComponentActivity() {
             val storedUrl by sessionVM.serverUrl.collectAsState()
             val serverResponded by startupVM.serverResponded.collectAsState()
             val responseCode by sessionVM.responseCode.collectAsState()
+            val isDemoVersion by sessionVM.isDemoVersion.collectAsState()
 
             val snackbarHostState = remember { SnackbarHostState() }
             val coroutineScope = rememberCoroutineScope()
@@ -89,12 +91,13 @@ class MainActivity : ComponentActivity() {
 //                }
             }
 
+
             LaunchedEffect(serverResponded, isLoggedIn) {
                 serverResponded?.let {
                     if (it) {
                         if (isLoggedIn) {
                             sessionVM.getUserData()
-                        } else {
+                        } else if (isDemoVersion != true) {
                             loginSuccessful = false
                             navController.navigate(Login) {
                                 popUpTo(navController.graph.startDestinationId) {
@@ -109,6 +112,12 @@ class MainActivity : ComponentActivity() {
                                     actionLabel = "Dismiss",
                                     duration = SnackbarDuration.Short
                                 )
+                            }
+                        } else {
+                            navController.navigate(Splash) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
                             }
                         }
                     } else {
@@ -133,7 +142,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
-
                     }
                 }
             }
@@ -141,7 +149,6 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(responseCode) {
 //                no better idea where to stop it for now
                 sessionVM.stopRedirectServer()
-
                 when (responseCode) {
                     200 -> {
                         navController.navigate(Home) {
@@ -186,6 +193,7 @@ class MainActivity : ComponentActivity() {
                                 duration = SnackbarDuration.Short
                             )
                         }
+
                     }
                 }
             }

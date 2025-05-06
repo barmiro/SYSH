@@ -74,6 +74,12 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun setDemoVersion(isDemoVersion: Boolean) {
+        dataStore.edit {
+            it[PreferencesKeys.IS_DEMO_VERSION] = isDemoVersion
+        }
+    }
+
     suspend fun setFreshInstall(isFreshInstall: Boolean) {
         dataStore.edit {
             it[PreferencesKeys.IS_FRESH_INSTALL] = isFreshInstall
@@ -121,6 +127,10 @@ class UserPreferencesRepository @Inject constructor(
 
     val isFreshInstall: Flow<Boolean> = dataStore.data.map {
         it[PreferencesKeys.IS_FRESH_INSTALL] ?: true
+    }
+
+    val isDemoVersion: Flow<Boolean?> = dataStore.data.map {
+        it[PreferencesKeys.IS_DEMO_VERSION]
     }
 
     val isAuthorizedWithSpotify: Flow<Boolean> = dataStore.data.map {
