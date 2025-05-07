@@ -40,6 +40,8 @@ fun HomeScreen(
 ) {
 
     val state by viewModel.homeState.collectAsState()
+    val showImportAlert by viewModel.showImportAlert.collectAsState()
+    val isDemoVersion by viewModel.isDemoVersion.collectAsState()
 
     Scaffold(
         topBar = {
@@ -86,7 +88,7 @@ fun HomeScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
             ) {
-                if (viewModel.showImportAlert.value) {
+                if (showImportAlert) {
                     item() {
                         UrlInfoItem(
                             icon = {
@@ -94,6 +96,17 @@ fun HomeScreen(
                                     contentDescription = "Info")
                             },
                             text = "For the best experience, please import streaming data in the Settings tab"
+                        )
+                    }
+                }
+                if (isDemoVersion == true) {
+                    item() {
+                        UrlInfoItem(
+                            icon = {
+                                Icon(imageVector = Icons.Default.Info,
+                                    contentDescription = "Info")
+                            },
+                            text = "You're now connected to a demo server, serving generated sample data. Feel free to look around and explore all features of SYSH. When you're ready to set up your own account and start using SYSH, you can exit the demo mode in the Settings tab"
                         )
                     }
                 }

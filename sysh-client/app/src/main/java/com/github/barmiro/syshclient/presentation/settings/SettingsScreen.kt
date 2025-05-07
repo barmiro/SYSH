@@ -99,6 +99,7 @@ fun SettingsScreen(
                                         .padding(top = 8.dp, start = 8.dp, end = 8.dp)
                                         .clickable(
                                             onClick = {
+                                                isLoading = true
                                                 sessionVM.clearAllPreferences()
                                             }
                                         )

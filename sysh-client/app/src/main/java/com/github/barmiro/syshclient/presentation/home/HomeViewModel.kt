@@ -29,6 +29,9 @@ class HomeViewModel @Inject constructor(
     private val _showImportAlert = MutableStateFlow<Boolean>(false)
     val showImportAlert: StateFlow<Boolean> = _showImportAlert
 
+    private val _isDemoVersion = MutableStateFlow<Boolean?>(false)
+    val isDemoVersion: StateFlow<Boolean?> = _isDemoVersion
+
     init {
         viewModelScope.launch {
             userPreferencesRepository.userDisplayName.collect {
@@ -38,6 +41,11 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             userPreferencesRepository.showImportAlert.collect {
                 _showImportAlert.value = it
+            }
+        }
+        viewModelScope.launch {
+            userPreferencesRepository.isDemoVersion.collect {
+                _isDemoVersion.value = it
             }
         }
     }
