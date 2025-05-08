@@ -2,19 +2,72 @@
 SYSH (See Your Streaming History) is a self-hosted Spotify streaming history manager, focused on deliberate data collection rules and accuracy over feature count. The goal is to do one thing and do it well, and any additional features must not interfere with data collection.
 
 At the time of writing, SYSH is composed of a dockerized server, which collects data from Spotify and direct JSON imports, and an android client. A web client is on the roadmap, but not very high up.
-SYSH is under active development and has not yet been published on docker. Contact me for deployment details if you want to run it as-is.
 
 Short demo of what the client looks like:
 https://youtu.be/1_iDDmWinZM?si=Ui3jm5_HX4qQa-5o
 
-## SETUP
+## Setup
 1. Create a new app in Spotify's developer dashboard and add http://127.0.0.1:5754/callback as a redirect URI.
 2. Find your app's Client ID and Client secret and add them to your .env file (detailed environment variable list coming soon).
 3. Launch your application using Docker Compose (the only officially supported way to run SYSH at the moment).
 4. Install the Android client and follow the instructions to create an account and authorize SYSH to make API calls to Spotify.
 5. SYSH will automatically fetch and save your streaming data, but you'll need to get your streaming history from Spotify directly; these days it's a button in your Spotify account dashboard and the turnaround rarely exceeds 2-3 days, so it's a good idea to ask for the files after you've set up your SYSH server to avoid gaps in your streaming data.
 
+## Installation
+To launch the server, run the command 'docker compose up' in a directory with compose.yaml and .env files created using these templates:
 
+### compose.yaml
+
+```yml
+services:
+  app:
+    container_name: sysh-server
+    image: barmiro/sysh-server:latest
+    environment:
+      - POSTGRES_DB:${POSTGRES_DB}
+      - POSTGRES_USER:${POSTGRES_USER}
+      - POSTGRES_PASSWORD:${POSTGRES_PASSWORD}
+      - SPOTIFY_CLIENT_ID:${SPOTIFY_CLIENT_ID}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
+      - TZ=${SYSH_TZ:-UTC}
+    ports:
+      - '${SYSH_SERVER_PORT:-5754}:${SYSH_SERVER_PORT:-5754}'
+    depends_on:
+      - postgres
+    restart: always
+
+  postgres:
+    container_name: sysh-postgres
+    image: barmiro/sysh-postgres:latest
+    environment:
+      - POSTGRES_DB:${POSTGRES_DB}
+      - POSTGRES_USER:${POSTGRES_USER}
+      - POSTGRES_PASSWORD:${POSTGRES_PASSWORD}
+    volumes:
+      - syshdb:/var/lib/postgresql/data
+    ports: []
+    restart: always
+
+volumes:
+  syshdb:
+
+```
+
+### .env
+
+```env
+# required
+POSTGRES_DB=sysh_db
+POSTGRES_USER=yourusername
+POSTGRES_PASSWORD=yourpassword
+SPOTIFY_CLIENT_ID=yourclientid
+SPOTIFY_CLIENT_SECRET=yourclientsecret
+SYSH_SERVER_URL=yoururl.com # soon to be deprecated
+
+# optional
+# SYSH_SERVER_PORT=0000 # if you want to override the default 5754 port
+# SYSH_TZ=Your/Timezone # mainly for server logs, each user has their own streaming data timezone
+```
 
 ## FAQ
 > How often should I do a manual import?
