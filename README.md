@@ -23,6 +23,8 @@ services:
   app:
     container_name: sysh-server
     image: barmiro/sysh-server:latest
+    env_file:
+      - .env
     environment:
       - POSTGRES_DB:${POSTGRES_DB}
       - POSTGRES_USER:${POSTGRES_USER}
@@ -39,6 +41,8 @@ services:
   postgres:
     container_name: sysh-postgres
     image: barmiro/sysh-postgres:latest
+    env_file:
+      - .env
     environment:
       - POSTGRES_DB:${POSTGRES_DB}
       - POSTGRES_USER:${POSTGRES_USER}
