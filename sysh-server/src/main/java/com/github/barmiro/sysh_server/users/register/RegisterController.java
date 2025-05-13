@@ -47,7 +47,8 @@ public class RegisterController {
 									user.password(),
 									UserRole.USER,
 									user.timezone(),
-									user.spotify_state()
+									user.spotify_state(),
+									false
 							)
 					)
 			);
@@ -59,7 +60,8 @@ public class RegisterController {
 									user.password(),
 									UserRole.ADMIN,
 									user.timezone(),
-									user.spotify_state()
+									user.spotify_state(),
+									false
 							)
 					)
 			);
