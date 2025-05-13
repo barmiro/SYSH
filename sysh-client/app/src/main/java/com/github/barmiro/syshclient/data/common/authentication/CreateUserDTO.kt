@@ -8,3 +8,11 @@ data class CreateUserDTO(
     val password: String,
     val timezone: String
 )
+
+@Serializable
+data class AdminCreateUserDTO(
+    val username: String,
+    val password: String,
+    val timezone: String,
+    val role: String
+)

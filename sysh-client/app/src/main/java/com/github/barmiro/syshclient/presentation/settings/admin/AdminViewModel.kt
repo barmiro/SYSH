@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,6 +22,14 @@ class AdminViewModel @Inject constructor(
     private val _usernameList = MutableStateFlow<List<UserDataDTO>?>(emptyList())
     val usernameList: StateFlow<List<UserDataDTO>?> = _usernameList.asStateFlow()
 
+    private val _isCreateUserLoading = MutableStateFlow(false)
+    val isCreateUserLoading: StateFlow<Boolean> = _isCreateUserLoading.asStateFlow()
+
+    private val _userCreationString = MutableStateFlow<String?>(null)
+    val userCreationString: StateFlow<String?> = _userCreationString.asStateFlow()
+
+    private val timezone: String = ZoneId.systemDefault().id
+
     fun getUsers() {
         viewModelScope.launch {
             adminRepo.getUsers().collect { result ->
@@ -31,6 +40,28 @@ class AdminViewModel @Inject constructor(
             }
         }
     }
+
+    fun createUser(username: String, password: String, role: String) {
+        viewModelScope.launch {
+            adminRepo.createUser(username, password, timezone, role).collect { result ->
+                val privilegesString = if (role == "ADMIN") " with admin privileges" else ""
+                when (result) {
+                    is Resource.Success -> {
+                                _userCreationString.value = "User $username$privilegesString created successfully."
+                    }
+
+                    is Resource.Error -> {
+                        _userCreationString.value = "Failed to create user $username$privilegesString."
+                    }
+
+                    is Resource.Loading -> {
+                        _isCreateUserLoading.value = result.isLoading
+                    }
+                }
+            }
+        }
+    }
+
 
     fun deleteUser(username: String) {
         viewModelScope.launch {

@@ -2,6 +2,7 @@ package com.github.barmiro.sysh_server.users.register;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,9 +21,19 @@ public class RegisterController {
 	public RegisterController(SyshUserManager manager) {
 		this.manager = manager;
 	}
+	
+	@Value("${SYSH_RESTRICTED_MODE:false}")
+	private boolean isRestrictedMode;
 
 	@PostMapping("/register")
 	public RegisterResponse registerUser(@RequestBody SyshUser user) {
+		
+		
+//		not handled in security config
+//		because I want this route to be completely disabled in restricted mode
+		if (isRestrictedMode) {
+			throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+		}
 		
 		Optional<SyshUser> createdUserOptional;
 		

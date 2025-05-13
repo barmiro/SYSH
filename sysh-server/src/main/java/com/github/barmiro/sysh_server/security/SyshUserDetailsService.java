@@ -21,7 +21,18 @@ public class SyshUserDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 	
 		SyshUser user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+		
+		if (user.must_change_password()) {
+			user = new SyshUser(
+					user.username(),
+					user.password(),
+					UserRole.RESTRICTED,
+					user.timezone(),
+					user.spotify_state(),
+					user.must_change_password()
+					);
+		}
+		
 		return new SyshUserDetails(user);			
 	}
 	

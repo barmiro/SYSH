@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.github.barmiro.syshclient.presentation.settings.import.CreateUserItem
 import com.github.barmiro.syshclient.presentation.settings.import.SettingsItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +42,8 @@ fun ManageUsersScreen(
     }
 
     val usernameList by adminVM.usernameList.collectAsState()
+    val userCreationString by adminVM.userCreationString.collectAsState()
+
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
     Scaffold(
@@ -72,6 +76,26 @@ fun ManageUsersScreen(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                item() {
+                    CreateUserItem(
+                        itemText = "Create User",
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                tint = MaterialTheme.colorScheme.primary,
+                                contentDescription = "Create User"
+                            )
+                        },
+                        onCreateUser = { username, password, role ->
+                            adminVM.createUser(username, password, role)
+                        },
+                        modifier = Modifier
+                            .padding(top = 8.dp, start = 8.dp, end = 8.dp),
+                        resultString = userCreationString
+                    )
+                }
+
+
                 usernameList?.let {
                     items(it.size) { index ->
                         SettingsItem(

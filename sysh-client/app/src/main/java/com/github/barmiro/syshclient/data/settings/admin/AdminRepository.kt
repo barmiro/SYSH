@@ -2,6 +2,7 @@ package com.github.barmiro.syshclient.data.settings.admin
 
 import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
+import com.github.barmiro.syshclient.data.common.authentication.AdminCreateUserDTO
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.handleNetworkException
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
@@ -59,6 +60,48 @@ class AdminRepository @Inject constructor(
         }
     }
 
+    fun createUser(username: String,
+                   password: String,
+                   timezone: String,
+                   role: String): Flow<Resource<String>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                val response = adminApi.createUser(
+                    AdminCreateUserDTO(username, password, timezone, role)
+                )
+
+                if (response.isSuccessful) {
+                    response.body()?.takeIf {
+                        it.username == username
+                    }?.let {
+                        println(it)
+                        emit(
+                            Resource.Success(
+                                data = it.username
+                            )
+                        )
+                    } ?: emit(
+                        Error(
+                            message = "User creation failed"
+                        )
+                    )
+                } else {
+                    emit(
+                        Error(
+                            message = response.message(),
+                            code = response.code()
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
+            }
+            emit(Resource.Loading(false))
+        }
+    }
 
     fun deleteUser(username: String): Flow<Resource<Int>> {
         return flow {

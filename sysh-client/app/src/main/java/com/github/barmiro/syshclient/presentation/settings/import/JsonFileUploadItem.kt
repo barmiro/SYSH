@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CheckCircle
@@ -23,10 +25,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -37,6 +45,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -215,6 +226,150 @@ fun SettingsItem(
         }
     }
 }
+
+@Composable
+fun CreateUserItem(
+    itemText: String,
+    icon: @Composable () -> Unit,
+    onCreateUser: (String, String, String) -> Unit,
+    modifier: Modifier,
+    resultString: String?
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+
+    Surface(
+        modifier = modifier.animateContentSize(),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer
+    ) {
+        Column() {
+            Box(modifier = Modifier.clickable(onClick = {
+                isExpanded = !isExpanded
+            })) {
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        icon()
+                    }
+                    VerticalDivider(
+                        Modifier.height(48.dp).padding(horizontal = 8.dp)
+                    )
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Row(
+                        ) {
+                            Text(
+                                text = itemText,
+//                        fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1
+                            )
+                        }
+                    }
+                    Column(
+                        modifier = Modifier.weight(0.15f),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Row(
+                            modifier = Modifier.animateContentSize(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = "Go",
+                                modifier = Modifier.size(24.dp).alpha(0.8f)
+
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (isExpanded) {
+                val username = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+                val password = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(value = username.value,
+                        onValueChange = { username.value = it },
+                        label = {
+                            Text("Username")
+                        }
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(value = password.value,
+                        onValueChange = { password.value = it },
+                        label = {
+                            Text("Password")
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        visualTransformation = PasswordVisualTransformation()
+                    )
+
+                }
+
+                var userRole by remember { mutableStateOf("USER") }
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Make admin ")
+                    Switch(
+                        checked = userRole == "ADMIN",
+                        onCheckedChange = {
+                            userRole = when {
+                                userRole == "USER" -> "ADMIN"
+                                else -> "USER"
+                            }
+                        }
+                    )
+                }
+
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = {
+                            onCreateUser(username.value.text, password.value.text, userRole)
+                        },
+                        enabled = username.value.text.isNotEmpty() && password.value.text.isNotEmpty()
+                    ) {
+                        Text("Create User")
+                    }
+                    resultString?.let {
+                        Text(it)
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 
 @Composable
