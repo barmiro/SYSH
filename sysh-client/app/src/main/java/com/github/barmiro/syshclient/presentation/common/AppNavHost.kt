@@ -7,14 +7,16 @@ import androidx.navigation.compose.composable
 import com.github.barmiro.syshclient.presentation.home.HomeScreen
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
 import com.github.barmiro.syshclient.presentation.login.LoginScreen
+import com.github.barmiro.syshclient.presentation.login.PasswordChangeScreen
 import com.github.barmiro.syshclient.presentation.login.RegisterScreen
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 import com.github.barmiro.syshclient.presentation.login.SpotifyAuthScreen
+import com.github.barmiro.syshclient.presentation.settings.ImportViewModel
 import com.github.barmiro.syshclient.presentation.settings.SettingsScreen
+import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
 import com.github.barmiro.syshclient.presentation.settings.admin.AdminViewModel
 import com.github.barmiro.syshclient.presentation.settings.admin.ManageUsersScreen
 import com.github.barmiro.syshclient.presentation.settings.import.ImportScreen
-import com.github.barmiro.syshclient.presentation.settings.ImportViewModel
 import com.github.barmiro.syshclient.presentation.startup.ConnectionErrorScreen
 import com.github.barmiro.syshclient.presentation.startup.SplashScreen
 import com.github.barmiro.syshclient.presentation.startup.StartupScreen
@@ -41,6 +43,7 @@ fun AppNavHost(navController: NavHostController,
                sessionVM: SessionViewModel,
                importVM: ImportViewModel,
                adminVM: AdminViewModel,
+               settingsVM: SettingsViewModel,
                onPickZipFile: () -> Unit,
                restartApp: () -> Unit) {
 
@@ -57,7 +60,7 @@ fun AppNavHost(navController: NavHostController,
         }
 
         composable<Login> {
-            LoginScreen(sessionVM, navController)
+            LoginScreen(sessionVM, startupVM, navController)
         }
         composable<Register> {
             RegisterScreen(sessionVM, navController)
@@ -78,7 +81,7 @@ fun AppNavHost(navController: NavHostController,
             SpotifyAuthScreen(sessionVM)
         }
         composable<Settings> {
-            SettingsScreen(sessionVM, navController)
+            SettingsScreen(sessionVM, settingsVM, navController)
         }
         composable<Import> {
             ImportScreen(importVM, onPickZipFile, restartApp)
@@ -88,6 +91,9 @@ fun AppNavHost(navController: NavHostController,
         }
         composable<ManageUsers> {
             ManageUsersScreen(adminVM)
+        }
+        composable<PasswordChange> {
+            PasswordChangeScreen(settingsVM, sessionVM)
         }
     }
 }
@@ -130,3 +136,6 @@ object ConnectionError
 
 @Serializable
 object ManageUsers
+
+@Serializable
+object PasswordChange

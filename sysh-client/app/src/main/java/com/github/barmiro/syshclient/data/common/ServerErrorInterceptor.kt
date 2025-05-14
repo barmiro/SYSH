@@ -18,7 +18,7 @@ class ServerErrorInterceptor(
             CoroutineScope(Dispatchers.IO).launch {
                 userPrefRepo.logout()
             }
-        } else if (response.code == 403) {
+        } else if (response.code == 412) {
             CoroutineScope(Dispatchers.IO).launch {
                 userPrefRepo.setAuthorizedWithSpotify(false)
             }

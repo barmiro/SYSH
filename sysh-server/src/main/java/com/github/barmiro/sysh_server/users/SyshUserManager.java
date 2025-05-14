@@ -35,6 +35,12 @@ private static final Logger log = LoggerFactory.getLogger(SyshUserManager.class)
 		}
 	}
 	
+	public SyshUser getUserByUsername(String username) {
+		Optional<SyshUser> user = userRepo.findByUsername(username);
+		
+		return user.orElseThrow();
+	}
+	
 	public void updateUserSpotifyAccessToken(String username, String spotifyAccessToken) {
 		int updated = userRepo.updateSpotifyAccessToken(username, spotifyAccessToken);
 		
@@ -117,6 +123,17 @@ private static final Logger log = LoggerFactory.getLogger(SyshUserManager.class)
 			throw new RuntimeException("User deletion failed");
 		}
 		return deleted;
+	}
+	
+	public int changePassword(String username, String newPassword, Boolean mustChangePassword) {
+		int changed = userRepo.changePassword(username, newPassword, mustChangePassword);
+		
+		if (changed == 1) {
+			log.info("Updated password for user " + username + ". Must change password: " + mustChangePassword);
+			return changed;
+		} else {
+			throw new RuntimeException("Password change for user " + username + " failed.");
+		}
 	}
 	
 }

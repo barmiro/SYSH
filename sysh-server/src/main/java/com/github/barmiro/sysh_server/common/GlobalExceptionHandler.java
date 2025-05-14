@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 						+ "' not authorized with Spotify");
 				log.error(message + ": " + e.getMessage());
 				return new ResponseEntity<String>(message,
-						HttpStatus.FORBIDDEN);
+						HttpStatus.PRECONDITION_FAILED);
 				
 			} else if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
 				log.error(e.getMessage());

@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -37,6 +38,7 @@ import androidx.navigation.NavHostController
 import com.github.barmiro.syshclient.presentation.common.Import
 import com.github.barmiro.syshclient.presentation.common.ManageUsers
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
+import com.github.barmiro.syshclient.presentation.settings.import.ChangePasswordItem
 import com.github.barmiro.syshclient.presentation.settings.import.SettingsItem
 import com.github.barmiro.syshclient.presentation.settings.import.SettingsScreenUserItem
 import com.github.barmiro.syshclient.presentation.top.components.SettingsScreenTopBar
@@ -44,6 +46,7 @@ import com.github.barmiro.syshclient.presentation.top.components.SettingsScreenT
 @Composable
 fun SettingsScreen(
     sessionVM: SessionViewModel,
+    settingsVM: SettingsViewModel,
     navController: NavHostController
 ) {
 
@@ -52,6 +55,7 @@ fun SettingsScreen(
     val userImageUrl by sessionVM.userImageUrl.collectAsState()
     val userRole by sessionVM.userRole.collectAsState()
     val isDemoVersion by sessionVM.isDemoVersion.collectAsState()
+    val isPasswordChanged by settingsVM.isPasswordChanged.collectAsState()
     var isLoading by remember { mutableStateOf(false) }
 
     if (isLoading) {
@@ -126,6 +130,26 @@ fun SettingsScreen(
                                 )
                             }
                         }
+
+                        item() {
+                            ChangePasswordItem(
+                                itemText = "Change Password",
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        contentDescription = "Change Password"
+                                    )
+                                },
+                                onChangePassword = { oldPassword, newPassword ->
+                                    settingsVM.changePassword(oldPassword, newPassword)
+                                },
+                                modifier = Modifier
+                                    .padding(top = 8.dp, start = 8.dp, end = 8.dp),
+                                isPasswordChanged
+                            )
+                        }
+
                         item() {
                             Row() {
                                 SettingsItem(

@@ -13,6 +13,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -21,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,94 +37,121 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.github.barmiro.syshclient.presentation.common.Register
 import com.github.barmiro.syshclient.presentation.common.Splash
+import com.github.barmiro.syshclient.presentation.startup.StartupViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(sessionVM: SessionViewModel,
+                startupVM: StartupViewModel,
                 navController: NavHostController
 ) {
     val serverUrl by sessionVM.serverUrl.collectAsState()
+    val serverInfo by startupVM.serverInfo.collectAsState()
     var isLoading by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
-    if (isLoading) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            CircularProgressIndicator(modifier = Modifier.size(48.dp))
-        }
-    } else {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding()
-                .background(color = MaterialTheme.colorScheme.background)
-        ) {
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+    ) { innerPadding ->
+        if (isLoading) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val username = remember {
-                    mutableStateOf(TextFieldValue())
-                }
-                val password = remember {
-                    mutableStateOf(TextFieldValue())
-                }
-
-                Text(text = "Welcome to SYSH!",
-                    color = MaterialTheme.colorScheme.onBackground )
-
-                Text(text = "Please log in:",
-                    color = MaterialTheme.colorScheme.onBackground )
-
-
-                OutlinedTextField(value = username.value,
-                    onValueChange = { username.value = it },
-                    label = {
-                        Text("Username")
-                    }
-                )
-                OutlinedTextField(value = password.value,
-                    onValueChange = { password.value = it },
-                    label = {
-                        Text("Password")
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    visualTransformation = PasswordVisualTransformation()
-                )
-
-                Button(
-                    onClick = {
-                        sessionVM.getToken(username.value.text, password.value.text)
-                        navController.navigate(Splash)
-                    }
+                CircularProgressIndicator(modifier = Modifier.size(48.dp))
+            }
+        } else {
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .background(color = MaterialTheme.colorScheme.background)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("log in")
-                }
-
-                TextButton(
-                    onClick = {
-                        navController.navigate(Register)
+                    val username = remember {
+                        mutableStateOf(TextFieldValue())
                     }
-                ) {
-                    Text("Create an account")
-                }
-                Spacer(modifier = Modifier.height(128.dp))
-                Text(text = "Connecting to server",
-                    modifier = Modifier.alpha(0.8f))
-                Text(text = serverUrl ?: "unknown",
-                    modifier = Modifier.alpha(0.8f))
-                TextButton(
-                    onClick = {
-                        isLoading = true
-                        sessionVM.clearAllPreferences()
+                    val password = remember {
+                        mutableStateOf(TextFieldValue())
                     }
 
-                ) {
-                    Text("Change server address")
+                    Text(text = "Welcome to SYSH!",
+                        color = MaterialTheme.colorScheme.onBackground )
+
+                    Text(text = "Please log in:",
+                        color = MaterialTheme.colorScheme.onBackground )
+
+
+                    OutlinedTextField(value = username.value,
+                        onValueChange = { username.value = it },
+                        label = {
+                            Text("Username")
+                        }
+                    )
+                    OutlinedTextField(value = password.value,
+                        onValueChange = { password.value = it },
+                        label = {
+                            Text("Password")
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        visualTransformation = PasswordVisualTransformation()
+                    )
+
+                    Button(
+                        onClick = {
+                            sessionVM.getToken(username.value.text, password.value.text)
+                            navController.navigate(Splash)
+                        }
+                    ) {
+                        Text("log in")
+                    }
+
+
+
+                    TextButton(
+                        onClick = {
+                            serverInfo?.let {
+                                if (it.is_restricted_mode) {
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "User registration disabled, contact your system administrator to create an account.",
+                                            actionLabel = "Dismiss",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
+                                } else {
+                                    navController.navigate(Register)
+                                }
+                            }
+                        }
+                    ) {
+                        Text("Create an account")
+                    }
+                    Spacer(modifier = Modifier.height(128.dp))
+                    Text(text = "Connecting to server",
+                        modifier = Modifier.alpha(0.8f))
+                    Text(text = serverUrl ?: "unknown",
+                        modifier = Modifier.alpha(0.8f))
+                    TextButton(
+                        onClick = {
+                            isLoading = true
+                            sessionVM.clearAllPreferences()
+                        }
+
+                    ) {
+                        Text("Change server address")
+                    }
                 }
             }
         }
+
     }
 }

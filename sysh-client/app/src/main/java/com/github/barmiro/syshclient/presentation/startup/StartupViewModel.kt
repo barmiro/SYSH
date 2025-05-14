@@ -2,6 +2,7 @@ package com.github.barmiro.syshclient.presentation.startup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.barmiro.syshclient.data.common.preferences.ServerInfo
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.data.common.startup.StartupDataRepository
 import com.github.barmiro.syshclient.data.common.startup.UrlValidationResult
@@ -30,6 +31,9 @@ class StartupViewModel @Inject constructor(
 
     private val _serverResponded = MutableStateFlow<Boolean?>(null)
     val serverResponded: StateFlow<Boolean?> = _serverResponded.asStateFlow()
+
+    private val _serverInfo = MutableStateFlow<ServerInfo?>(null)
+    val serverInfo: StateFlow<ServerInfo?> = _serverInfo.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val urlValidation: StateFlow<UrlValidationResult?> = _urlInput
@@ -71,6 +75,7 @@ class StartupViewModel @Inject constructor(
                 when (result) {
                     is Resource.Success -> {
                         _serverResponded.value = true
+                        _serverInfo.value = result.data
                     }
 //                    TODO: complete
                     is Resource.Error -> {

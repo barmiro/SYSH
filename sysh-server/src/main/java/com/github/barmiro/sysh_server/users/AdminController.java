@@ -40,11 +40,22 @@ public class AdminController {
 		
 		Optional<SyshUser> createdUserOptional;
 		
-		if (userManager.isUsernameTaken(user.username())) {
+		// because jackson assigns missing values to explicit null
+		SyshUser finalUser = new SyshUser(
+				user.username(),
+				user.password(),
+				user.role(),
+				user.timezone(),
+				user.spotify_state(),
+				true
+		);
+		
+		
+		if (userManager.isUsernameTaken(finalUser.username())) {
 			throw new HttpClientErrorException(HttpStatus.CONFLICT);
 		} else {
 			createdUserOptional = Optional.ofNullable(
-					userManager.createUser(user));
+					userManager.createUser(finalUser));
 		}
 		
 		RegisterResponse response = createdUserOptional.map(

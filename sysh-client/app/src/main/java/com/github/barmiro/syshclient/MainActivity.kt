@@ -31,12 +31,14 @@ import com.github.barmiro.syshclient.presentation.common.BottomNavBar
 import com.github.barmiro.syshclient.presentation.common.ConnectionError
 import com.github.barmiro.syshclient.presentation.common.Home
 import com.github.barmiro.syshclient.presentation.common.Login
+import com.github.barmiro.syshclient.presentation.common.PasswordChange
 import com.github.barmiro.syshclient.presentation.common.Splash
 import com.github.barmiro.syshclient.presentation.common.SpotifyAuth
 import com.github.barmiro.syshclient.presentation.common.Startup
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 import com.github.barmiro.syshclient.presentation.settings.ImportViewModel
+import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
 import com.github.barmiro.syshclient.presentation.settings.admin.AdminViewModel
 import com.github.barmiro.syshclient.presentation.settings.import.restartApp
 import com.github.barmiro.syshclient.presentation.startup.StartupViewModel
@@ -62,6 +64,7 @@ class MainActivity : ComponentActivity() {
     private val sessionVM: SessionViewModel by viewModels()
     private val importVM: ImportViewModel by viewModels()
     private val adminVM: AdminViewModel by viewModels()
+    private val settingsVM: SettingsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +78,7 @@ class MainActivity : ComponentActivity() {
             val storedUrl by sessionVM.serverUrl.collectAsState()
             val serverResponded by startupVM.serverResponded.collectAsState()
             val responseCode by sessionVM.responseCode.collectAsState()
+            val username by sessionVM.username.collectAsState()
             val isDemoVersion by sessionVM.isDemoVersion.collectAsState()
 
             val snackbarHostState = remember { SnackbarHostState() }
@@ -104,14 +108,16 @@ class MainActivity : ComponentActivity() {
                                     inclusive = true
                                 }
                             }
-                            coroutineScope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = errorMessage.takeIf { message ->
-                                        !message.isNullOrEmpty()
-                                    } ?: "You have been logged out",
-                                    actionLabel = "Dismiss",
-                                    duration = SnackbarDuration.Short
-                                )
+                            if (responseCode != 0) {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = errorMessage.takeIf { message ->
+                                            !message.isNullOrEmpty()
+                                        } ?: "You have been logged out",
+                                        actionLabel = "Dismiss",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
                             }
                         } else {
                             navController.navigate(Splash) {
@@ -158,6 +164,9 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     403 -> {
+                        navController.navigate(PasswordChange)
+                    }
+                    412 -> {
                         navController.navigate(SpotifyAuth)
                     }
 //            this means no error was encountered
@@ -233,6 +242,7 @@ class MainActivity : ComponentActivity() {
                                 sessionVM,
                                 importVM,
                                 adminVM,
+                                settingsVM,
                                 onPickZipFile = { pickZipFile() },
                                 restartApp = { restartApp(applicationContext) }
                             )

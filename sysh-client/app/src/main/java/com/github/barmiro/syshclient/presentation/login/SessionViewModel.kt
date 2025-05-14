@@ -47,6 +47,8 @@ class SessionViewModel @Inject constructor(
     private val _spotifyAuthUrl: MutableStateFlow<String?> = MutableStateFlow(null)
     val spotifyAuthUrl: StateFlow<String?> = _spotifyAuthUrl
 
+
+
     private val timezone: String = ZoneId.systemDefault().id
 
 
@@ -291,15 +293,8 @@ class SessionViewModel @Inject constructor(
             initialValue = null
         )
 
-//    init {
-//        viewModelScope.launch {
-////                !!! DELETE BEFORE PUBLISHING !!!
-//            userPreferencesRepository.clearAllPreferences()
-////          ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-//        }
-//    }
-
     fun clearAllPreferences() {
+        _responseCode.value = 0
         viewModelScope.launch {
             userPrefRepo.clearAllPreferences()
         }
@@ -323,6 +318,4 @@ class SessionViewModel @Inject constructor(
             getToken("demo-user", "password")
         }
     }
-
-
 }

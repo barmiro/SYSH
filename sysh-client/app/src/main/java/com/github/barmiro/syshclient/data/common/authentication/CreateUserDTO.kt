@@ -10,6 +10,12 @@ data class CreateUserDTO(
 )
 
 @Serializable
+data class PasswordChangeRequest(
+    val oldPassword: String,
+    val newPassword: String
+)
+
+@Serializable
 data class AdminCreateUserDTO(
     val username: String,
     val password: String,

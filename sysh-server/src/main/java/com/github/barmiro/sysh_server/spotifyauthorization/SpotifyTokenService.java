@@ -122,7 +122,7 @@ public class SpotifyTokenService {
 			return;
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
-			throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+			throw new HttpClientErrorException(HttpStatus.PRECONDITION_FAILED);
 		}
 		
 	}

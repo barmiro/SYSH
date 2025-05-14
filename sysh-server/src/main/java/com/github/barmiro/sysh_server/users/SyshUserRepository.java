@@ -147,9 +147,9 @@ public class SyshUserRepository {
 				.single();
 	}
 	
+	BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 	
 	public int createUser(SyshUser user) {
-		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 		
 		String passwordHash = passwordEncoder.encode(user.password());
 		String spotifyState = GetRandom.alphaNumeric(32);
@@ -159,13 +159,15 @@ public class SyshUserRepository {
 				+ "password,"
 				+ "role,"
 				+ "timezone,"
-				+ "spotify_state"
+				+ "spotify_state,"
+				+ "must_change_password"
 				+ ") VALUES ("
 				+ ":username,"
 				+ ":password,"
 				+ ":role,"
 				+ ":timezone,"
-				+ ":spotify_state"
+				+ ":spotify_state,"
+				+ ":must_change_password"
 				+ ") ON CONFLICT (username) "
 				+ "DO NOTHING")
 				.param("username", user.username(), Types.VARCHAR)
@@ -173,11 +175,25 @@ public class SyshUserRepository {
 				.param("role", user.role(), Types.OTHER)
 				.param("timezone", user.timezone())
 				.param("spotify_state", spotifyState, Types.VARCHAR)
+				.param("must_change_password", user.must_change_password(), Types.BOOLEAN)
 				.update();
 	}
 	
 	public int deleteUser(String username) {
 		return jdbc.sql("DELETE FROM Users WHERE username = :username;")
+				.param("username", username, Types.VARCHAR)
+				.update();
+	}
+	
+	public int changePassword(String username, String newPassword, Boolean mustChangePassword) {
+		String passwordHash = passwordEncoder.encode(newPassword);
+		
+		return jdbc.sql("UPDATE Users "
+				+ "SET password = :passwordHash, "
+				+ "must_change_password = :mustChangePassword "
+				+ "WHERE username = :username;")
+				.param("passwordHash", passwordHash, Types.VARCHAR)
+				.param("mustChangePassword", mustChangePassword, Types.BOOLEAN)
 				.param("username", username, Types.VARCHAR)
 				.update();
 	}

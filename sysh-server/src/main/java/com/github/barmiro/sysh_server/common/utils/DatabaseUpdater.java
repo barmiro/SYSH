@@ -32,7 +32,7 @@ public class DatabaseUpdater {
 		if (!isTestEnv) {
 			
 //			!!! CHANGE THIS WHEN ADDING A NEW UPDATE !!!
-			final String TARGET_DATABASE_VERSION = "0.0.4";
+			final String TARGET_DATABASE_VERSION = "0.0.5";
 			
 			updateLegacyDatabase();
 			
@@ -151,6 +151,23 @@ public class DatabaseUpdater {
 						Integer.class
 					);
 				
+				updater(
+						// expectedVersion
+						"0.0.4",
+						// targetVersion 
+						"0.0.5",
+						// updateSql
+						"ALTER TABLE Users "
+							+ "ADD COLUMN must_change_password BOOLEAN DEFAULT false;",
+						// verificationSql
+						"SELECT 1 "
+						+ "FROM information_schema.columns "
+						+ "WHERE table_name = 'users' "
+						+ "AND column_name = 'must_change_password' "
+						+ "LIMIT 1",
+						// verificationType
+						Integer.class
+					);
 				
 			} else {
 				log.info(

@@ -4,6 +4,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +35,7 @@ public class RegisterController {
 //		not handled in security config
 //		because I want this route to be completely disabled in restricted mode
 		if (isRestrictedMode) {
-			throw new HttpClientErrorException(HttpStatus.FORBIDDEN);
+			throw new HttpClientErrorException(HttpStatus.METHOD_NOT_ALLOWED);
 		}
 		
 		Optional<SyshUser> createdUserOptional;
@@ -76,6 +79,24 @@ public class RegisterController {
 
 		return response;
 	}
-			
+	
+	@PostMapping("/changePassword")
+	RegisterResponse changePassword(@RequestBody PasswordChangeRequest request) { //TODO: change to a different type
+		
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		SyshUser user = manager.getUserByUsername(username);
+		
+		PasswordEncoder encoder = new BCryptPasswordEncoder(10);
+		int passwordChanged = 0;
+		if (encoder.matches(request.oldPassword(), user.password())) {
+			passwordChanged = manager.changePassword(username, request.newPassword(), false);
+		}
+		
+		if (passwordChanged == 1) {
+			return new RegisterResponse(user.username(), user.role());
+		} else {
+			throw new RuntimeException();
+		}
+	}
 	
 }

@@ -8,7 +8,7 @@ public record SyshUser(
 		String spotify_state,
 		Boolean must_change_password) {
 	
-//	for user registration
+//	for user registration FIXME: I think jackson ignores this?
 	public SyshUser(String username, String password, String timezone) {
 		this(username,
 			password,
@@ -16,15 +16,5 @@ public record SyshUser(
 			timezone,
 			"state",
 			false);
-	}
-	
-//	for creating users as admin
-	public SyshUser(String username, String password, String timezone, UserRole role) {
-		this(username,
-			password,
-			role,
-			timezone,
-			"state",
-			true);
 	}
 }

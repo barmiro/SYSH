@@ -47,6 +47,8 @@ public class SecurityConfig {
 						.requestMatchers("/register").permitAll()
 						.requestMatchers("/callback").permitAll()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
+						.requestMatchers("/token").authenticated()
+						.requestMatchers("/changePassword").authenticated()
 						.anyRequest().hasAnyRole("ADMIN", "USER"))
 				.oauth2ResourceServer(oauth2 -> oauth2
 			            .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))

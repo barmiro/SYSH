@@ -371,6 +371,158 @@ fun CreateUserItem(
 }
 
 
+@Composable
+fun ChangePasswordItem(
+    itemText: String,
+    icon: @Composable () -> Unit,
+    onChangePassword: (String, String) -> Unit,
+    modifier: Modifier,
+    passwordChangeResult: Boolean?
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+    Surface(
+        modifier = modifier.animateContentSize(),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer
+    ) {
+        Column() {
+            Box(modifier = Modifier.clickable(onClick = {
+                isExpanded = !isExpanded
+            })) {
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        icon()
+                    }
+                    VerticalDivider(
+                        Modifier.height(48.dp).padding(horizontal = 8.dp)
+                    )
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Row(
+                        ) {
+                            Text(
+                                text = itemText,
+//                        fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1
+                            )
+                        }
+                    }
+                    Column(
+                        modifier = Modifier.weight(0.15f),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Row(
+                            modifier = Modifier.animateContentSize(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                contentDescription = "Go",
+                                modifier = Modifier.size(24.dp).alpha(0.8f)
+
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (isExpanded) {
+                val oldPassword = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+                val newPassword = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+                val confirmation = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(value = oldPassword.value,
+                        onValueChange = { oldPassword.value = it },
+                        label = {
+                            Text("Old password")
+                        }
+                    )
+                }
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(value = newPassword.value,
+                        onValueChange = { newPassword.value = it },
+                        label = {
+                            Text("New password")
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        visualTransformation = PasswordVisualTransformation()
+                    )
+
+                }
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(value = confirmation.value,
+                        onValueChange = { confirmation.value = it },
+                        label = {
+                            Text("Confirm new password")
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        visualTransformation = PasswordVisualTransformation(),
+                        isError = newPassword.value.text != confirmation.value.text
+                    )
+                }
+
+                if (newPassword.value.text != confirmation.value.text) {
+                    Text("Passwords do not match")
+                }
+
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = {
+                            onChangePassword(oldPassword.value.text, newPassword.value.text)
+                        },
+                        enabled = newPassword.value.text == confirmation.value.text
+                                && newPassword.value.text.isNotEmpty()
+                                && oldPassword.value.text.isNotEmpty()
+                    ) {
+                        Text("Change Password")
+                    }
+                    passwordChangeResult?.let { changed ->
+                        if (changed) {
+                            Text("Password changed successfully")
+                        } else {
+                            Text("Password change failed")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 fun SettingsScreenUserItem(username: String?,
