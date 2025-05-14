@@ -32,8 +32,8 @@ fun GeneralStatsItem(
     color: Color = Color.Transparent
 ) {
     Surface(
-        modifier = Modifier.padding(6.dp),
-        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.padding(5.dp),
+        shape = RoundedCornerShape(6.dp),
         color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Box(
@@ -41,10 +41,10 @@ fun GeneralStatsItem(
                 .background(
                     brush = Brush.radialGradient(
                         colors = listOf(
-                            color.copy(alpha = 0.2f),
+                            color.copy(alpha = 0.1f),
                             Color.Transparent
                         ),
-                        radius = 400f
+                        radius = 500f
                     )
                 )
         ) {
@@ -109,8 +109,8 @@ fun CollectionStatsItem(
     perDayValue: String? = null
 ) {
     Surface(
-        modifier = Modifier.padding(6.dp),
-        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.padding(5.dp),
+        shape = RoundedCornerShape(6.dp),
         color = MaterialTheme.colorScheme.secondaryContainer
     ) {
 

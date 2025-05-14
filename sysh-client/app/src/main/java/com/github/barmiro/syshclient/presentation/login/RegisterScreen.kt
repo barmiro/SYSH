@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -13,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,11 +26,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.navigation.NavController
 import com.github.barmiro.syshclient.presentation.common.Login
+import com.github.barmiro.syshclient.presentation.startup.StartupViewModel
+import com.github.barmiro.syshclient.presentation.startup.UrlInfoItem
 
 @Composable
 fun RegisterScreen(sessionVM: SessionViewModel,
+                   startupVM: StartupViewModel,
                    navController: NavController
 ) {
+
+    val serverInfo by startupVM.serverInfo.collectAsState()
 
     val username = remember {
         mutableStateOf(TextFieldValue())
@@ -91,7 +100,14 @@ fun RegisterScreen(sessionVM: SessionViewModel,
             )
 
             if (password.value.text != confirmation.value.text) {
-                Text("Passwords do not match")
+                UrlInfoItem(
+                    icon = {
+                        Icon(imageVector = Icons.Default.Close,
+                            tint = MaterialTheme.colorScheme.error,
+                            contentDescription = "Error")
+                    },
+                    text = "Passwords do not match"
+                )
             }
 
             Button(

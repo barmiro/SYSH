@@ -202,7 +202,9 @@ fun HomeScreen(
                             imageUrl = state.stats.top_track?.image_url,
                             streamCount = state.stats.top_track?.stream_count,
                             minutesStreamed = state.stats.top_track?.total_ms_played?.div(60000),
-                            placeholderID = R.drawable.music_note_24dp
+                            placeholderID = R.drawable.music_note_24dp,
+                            albumName = state.stats.top_track?.album_name,
+                            artistName = state.stats.top_track?.primary_artist_name
                         )
                     }
                     Row() {
@@ -211,7 +213,8 @@ fun HomeScreen(
                             imageUrl = state.stats.top_album?.image_url,
                             streamCount = state.stats.top_album?.stream_count,
                             minutesStreamed = state.stats.top_album?.total_ms_played?.div(60000),
-                            placeholderID = R.drawable.album_24dp
+                            placeholderID = R.drawable.album_24dp,
+                            artistName = state.stats.top_album?.primary_artist_name
                         )
                     }
                     Row() {

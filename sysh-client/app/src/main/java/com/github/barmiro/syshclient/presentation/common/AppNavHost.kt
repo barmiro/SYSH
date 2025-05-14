@@ -63,7 +63,7 @@ fun AppNavHost(navController: NavHostController,
             LoginScreen(sessionVM, startupVM, navController)
         }
         composable<Register> {
-            RegisterScreen(sessionVM, navController)
+            RegisterScreen(sessionVM, startupVM, navController)
         }
         composable<Home> {
             HomeScreen(homeVM)

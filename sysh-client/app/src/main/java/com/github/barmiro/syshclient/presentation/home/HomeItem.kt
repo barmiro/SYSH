@@ -49,7 +49,7 @@ fun HomeItem(
 ) {
     Surface(
         modifier = Modifier.padding(5.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(6.dp),
         color = MaterialTheme.colorScheme.secondaryContainer
     ) {
 
@@ -114,7 +114,7 @@ fun HomeDayItem(
     val year: Int = LocalDateTime.now().year
     Surface(
         modifier = Modifier.padding(5.dp),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(6.dp),
         color = MaterialTheme.colorScheme.secondaryContainer
     ) {
 
@@ -172,7 +172,9 @@ fun HomeTopItem(
     imageUrl: String?,
     streamCount: Int?,
     minutesStreamed: Int?,
-    placeholderID: Int
+    placeholderID: Int,
+    albumName: String? = null,
+    artistName: String? = null
 ) {
 
     val dominantColor = remember { mutableStateOf(Color.Transparent) }
@@ -230,16 +232,48 @@ fun HomeTopItem(
                             maxLines = 1
                         )
                     }
-                    Row(modifier = Modifier.weight(1f, fill = true), verticalAlignment = Alignment.Top) {
-                        Text(
-                            text = itemName,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            lineHeight = 20.sp,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 2
-                        )
+                    Box(modifier = Modifier.weight(1f, fill = true)) {
+                        Column() {
+                            Row(verticalAlignment = Alignment.Top) {
+                                Text(
+                                    text = itemName,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    lineHeight = 20.sp,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    overflow = TextOverflow.Ellipsis,
+                                    maxLines = 2
+                                )
+                            }
+                            artistName?.let {
+                                Row() {
+                                    Text(
+                                        text = it,
+                                        fontSize = 12.sp,
+                                        lineHeight = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        overflow = TextOverflow.Ellipsis,
+                                        maxLines = 2,
+                                        modifier = Modifier.alpha(0.5f)
+                                    )
+                                }
+                            }
+
+                            albumName?.let {
+                                Row() {
+                                    Text(
+                                        text = it,
+                                        fontSize = 12.sp,
+                                        lineHeight = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        overflow = TextOverflow.Ellipsis,
+                                        maxLines = 2,
+                                        modifier = Modifier.alpha(0.5f)
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     val format = NumberFormat.getInstance(Locale.US)
