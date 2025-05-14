@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.github.barmiro</groupId>
 	<artifactId>sysh-server</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<name>sysh-server</name>
 	<description>Backend API for SYSH</description>
 	<url/>

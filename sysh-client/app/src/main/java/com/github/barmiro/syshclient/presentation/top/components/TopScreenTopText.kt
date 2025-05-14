@@ -139,7 +139,7 @@ fun StatsScreenTopText(
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             Text(
-                text = targetRangeText,
+                text = targetRangeText.takeIf {it.isNotEmpty()} ?: " ",
                 fontSize = 14.sp,
                 lineHeight = 14.sp,
                 maxLines = 1,
@@ -179,7 +179,7 @@ fun HomeScreenTopText(
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
         Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
             Text(
-                text = targetRangeText,
+                text = targetRangeText.takeIf {it.isNotEmpty()} ?: " ",
                 fontSize = 14.sp,
                 lineHeight = 14.sp,
                 maxLines = 1,

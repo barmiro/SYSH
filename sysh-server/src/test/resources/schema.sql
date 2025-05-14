@@ -1,11 +1,11 @@
-CREATE TYPE user_role AS ENUM ('ADMIN', 'USER');
+CREATE TYPE user_role AS ENUM ('ADMIN', 'USER'); --'RESTRICTED' should never appear IN the db
 
 CREATE TABLE db_info (
     id BOOLEAN PRIMARY KEY DEFAULT TRUE CHECK (id),
     version VARCHAR NOT NULL
 );
 
-INSERT INTO db_info (version) VALUES ('0.0.4');
+INSERT INTO db_info (version) VALUES ('0.0.5');
 
 CREATE TABLE Users (
     username VARCHAR(64) PRIMARY KEY,
@@ -19,7 +19,8 @@ CREATE TABLE Users (
     display_name VARCHAR DEFAULT 'unknown username',
     image_url VARCHAR,
     timezone VARCHAR NOT NULL,
-    has_imported_data BOOLEAN DEFAULT false
+    has_imported_data BOOLEAN DEFAULT false,
+    must_change_password BOOLEAN DEFAULT false
 );
 
 CREATE TABLE SongStreams (
