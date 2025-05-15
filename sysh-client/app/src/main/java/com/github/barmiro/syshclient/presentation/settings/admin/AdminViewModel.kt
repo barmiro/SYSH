@@ -47,7 +47,7 @@ class AdminViewModel @Inject constructor(
                 val privilegesString = if (role == "ADMIN") " with admin privileges" else ""
                 when (result) {
                     is Resource.Success -> {
-                                _userCreationString.value = "User $username$privilegesString created successfully."
+                        _userCreationString.value = "User $username$privilegesString created successfully."
                     }
 
                     is Resource.Error -> {

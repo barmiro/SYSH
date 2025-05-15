@@ -99,7 +99,7 @@ fun AppNavHost(navController: NavHostController,
             ConnectionErrorScreen(navController)
         }
         composable<ManageUsers> {
-            ManageUsersScreen(adminVM)
+            ManageUsersScreen(adminVM, sessionVM)
         }
         composable<PasswordChange> {
             PasswordChangeScreen(settingsVM, sessionVM)

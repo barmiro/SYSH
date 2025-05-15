@@ -111,7 +111,7 @@ fun LoginScreen(sessionVM: SessionViewModel,
                             navController.navigate(Splash)
                         }
                     ) {
-                        Text("log in")
+                        Text("Log In")
                     }
 
 

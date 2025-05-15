@@ -26,10 +26,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.settings.ImportViewModel
 import com.github.barmiro.syshclient.presentation.startup.InfoItem
 
@@ -44,7 +49,7 @@ fun ImportScreen(
     val statusList by importVM.fileStatusList.collectAsState()
     val zipFileStatus by importVM.zipFileStatus.collectAsState()
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-
+    var openAlertDialog by remember { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -66,9 +71,36 @@ fun ImportScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onBackground
                 ),
+                actions = {
+                    IconButton(
+                        onClick = {
+                            openAlertDialog = true
+                        },
+                        content = {
+                            Icon(
+                                painter = painterResource(R.drawable.help_24dp),
+                                tint = MaterialTheme.colorScheme.onBackground,
+                                contentDescription = "Help")
+                        }
+                    )
+                }
             )
         }
     ) { innerPadding ->
+        if (openAlertDialog) {
+            InfoDialog(
+                onDismiss = {
+                    openAlertDialog = false
+                },
+                titleText = "What .zip file?",
+                bodyText = "1. Go to spotify.com/account/privacy\n" +
+                        "2. Scroll down to \"Download your data\"\n" +
+                        "3. Select only \"Extended Streaming History\" and click \"Request data\"\n" +
+                        "4. Confirm your request in the received email\n\n" +
+                        "You should receive your data within a couple of days. Download the .zip archive and select it for import.",
+                dismissText = "Got it!"
+            )
+        }
         Row(modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding()),
             horizontalArrangement = Arrangement.Center) {
             LazyColumn(

@@ -2,13 +2,19 @@ package com.github.barmiro.syshclient.presentation.home
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,12 +28,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.presentation.common.LoadImageWithGradient
+import com.github.barmiro.syshclient.util.drawMarqueeTextFadedEdge
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.util.Locale
@@ -214,16 +224,16 @@ fun HomeTopItem(
                     )
                 )
         ) {
-            Row() {
+            Row(Modifier.height(IntrinsicSize.Min)) {
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .height(116.dp)
-                        .padding(vertical = 8.dp, horizontal = 8.dp),
+                        .heightIn(min = 106.dp)
+                        .padding(vertical = 5.dp),
 //                horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly,
                 ) {
-                    Row() {
+                    Row(Modifier.padding(horizontal = 8.dp)) {
                         Text(
                             text = itemLabel,
                             fontSize = 14.sp,
@@ -232,9 +242,16 @@ fun HomeTopItem(
                             maxLines = 1
                         )
                     }
-                    Box(modifier = Modifier.weight(1f, fill = true)) {
+//                    Box(modifier = Modifier.weight(1f, fill = true)) {
                         Column() {
-                            Row(verticalAlignment = Alignment.Top) {
+                            Row(verticalAlignment = Alignment.Top,
+                                modifier = Modifier.fillMaxWidth().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                                .drawWithContent {
+                                    drawContent()
+                                    drawMarqueeTextFadedEdge(isRightEdge = false)
+                                    drawMarqueeTextFadedEdge(isRightEdge = true)
+                                }
+                            ) {
                                 Text(
                                     text = itemName,
                                     fontWeight = FontWeight.Bold,
@@ -242,39 +259,78 @@ fun HomeTopItem(
                                     lineHeight = 20.sp,
                                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                                     overflow = TextOverflow.Ellipsis,
-                                    maxLines = 2
+                                    maxLines = 1,
+                                    modifier = Modifier
+                                        .basicMarquee(
+                                            iterations = 3,
+                                            velocity = 48.dp,
+                                            repeatDelayMillis = 3000,
+                                            initialDelayMillis = 1000,
+                                            spacing = MarqueeSpacing(32.dp)
+                                        )
+                                        .padding(start = 8.dp)
                                 )
                             }
                             artistName?.let {
-                                Row() {
+                                Row(modifier = Modifier.fillMaxWidth().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                                    .drawWithContent {
+                                        drawContent()
+                                        drawMarqueeTextFadedEdge(isRightEdge = false)
+                                        drawMarqueeTextFadedEdge(isRightEdge = true)
+                                    }
+                                ) {
                                     Text(
                                         text = it,
                                         fontSize = 12.sp,
-                                        lineHeight = 12.sp,
+                                        lineHeight = 16.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                                         overflow = TextOverflow.Ellipsis,
-                                        maxLines = 2,
+                                        maxLines = 1,
                                         modifier = Modifier.alpha(0.5f)
+                                            .basicMarquee(
+                                                iterations = 3,
+                                                velocity = 48.dp,
+                                                repeatDelayMillis = 3000,
+                                                initialDelayMillis = 1000,
+                                                spacing = MarqueeSpacing(32.dp)
+                                            )
+                                            .padding(start = 8.dp)
                                     )
                                 }
                             }
 
                             albumName?.let {
-                                Row() {
+                                Row(modifier = Modifier.fillMaxWidth().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                                    .drawWithContent {
+                                        drawContent()
+                                        drawMarqueeTextFadedEdge(isRightEdge = false)
+                                        drawMarqueeTextFadedEdge(isRightEdge = true)
+                                    }
+                                ) {
                                     Text(
                                         text = it,
                                         fontSize = 12.sp,
-                                        lineHeight = 12.sp,
+                                        lineHeight = 16.sp,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                                         overflow = TextOverflow.Ellipsis,
                                         maxLines = 2,
                                         modifier = Modifier.alpha(0.5f)
+                                            .basicMarquee(
+                                                iterations = 3,
+                                                velocity = 48.dp,
+                                                repeatDelayMillis = 3000,
+                                                initialDelayMillis = 1000,
+                                                spacing = MarqueeSpacing(32.dp)
+                                            )
+                                            .padding(start = 8.dp)
                                     )
                                 }
                             }
-                        }
+//                        }
                     }
+
+                    Spacer(modifier = Modifier.weight(1f))
 
                     val format = NumberFormat.getInstance(Locale.US)
                     val streamCountString = streamCount?.let {
@@ -283,8 +339,14 @@ fun HomeTopItem(
                     val minutesStreamedString = minutesStreamed?.let {
                         format.format(it) + " minutes"
                     } ?: ""
-                    Row(verticalAlignment = Alignment.Bottom) {
-
+                    Row(verticalAlignment = Alignment.Bottom,
+                        modifier = Modifier.fillMaxWidth().graphicsLayer { compositingStrategy = CompositingStrategy.Offscreen }
+                            .drawWithContent {
+                                drawContent()
+                                drawMarqueeTextFadedEdge(isRightEdge = false)
+                                drawMarqueeTextFadedEdge(isRightEdge = true)
+                            }
+                    ) {
                         Text(
                             text = "$streamCountString • $minutesStreamedString",
                             fontSize = 12.sp,
@@ -293,13 +355,22 @@ fun HomeTopItem(
                             overflow = TextOverflow.Ellipsis,
                             maxLines = 1,
                             modifier = Modifier.alpha(0.5f)
+                                .basicMarquee(
+                                    iterations = 3,
+                                    velocity = 48.dp,
+                                    repeatDelayMillis = 3000,
+                                    initialDelayMillis = 1000,
+                                    spacing = MarqueeSpacing(32.dp)
+                                )
+                                .padding(start = 8.dp)
                         )
                     }
                 }
 
                 Column(
                     modifier = Modifier
-                        .padding(vertical = 8.dp, horizontal = 8.dp),
+                        .padding(vertical = 8.dp, horizontal = 8.dp)
+                        .fillMaxHeight(),
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.Center,
                 ) {

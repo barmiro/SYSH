@@ -3,6 +3,7 @@ package com.github.barmiro.syshclient.presentation.settings.import
 import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,8 +21,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +35,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
@@ -237,7 +245,6 @@ fun CreateUserItem(
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
-
     Surface(
         modifier = modifier.animateContentSize(),
         shape = RoundedCornerShape(8.dp),
@@ -284,13 +291,7 @@ fun CreateUserItem(
                             modifier = Modifier.animateContentSize(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                contentDescription = "Go",
-                                modifier = Modifier.size(24.dp).alpha(0.8f)
-
-                            )
+                            RotatingArrowIcon(isExpanded)
                         }
                     }
                 }
@@ -370,6 +371,100 @@ fun CreateUserItem(
     }
 }
 
+@Composable
+fun ManageUserItem(
+    itemText: String,
+    icon: @Composable () -> Unit,
+    onDeleteUser: () -> Unit,
+    modifier: Modifier,
+    isCurrentUser: Boolean = false
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Surface(
+        modifier = modifier.animateContentSize(),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer
+    ) {
+        Column() {
+            Box(modifier = Modifier.clickable(onClick = {
+                isExpanded = !isExpanded
+            })) {
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        icon()
+                    }
+                    VerticalDivider(
+                        Modifier.height(48.dp).padding(horizontal = 8.dp)
+                    )
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Row(
+                        ) {
+                            Text(
+                                text = if (isCurrentUser) "$itemText (You)" else itemText,
+//                        fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1
+                            )
+                        }
+                    }
+                    Column(
+                        modifier = Modifier.weight(0.15f),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Row(
+                            modifier = Modifier.animateContentSize(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RotatingArrowIcon(isExpanded)
+                        }
+                    }
+                }
+            }
+            if (isExpanded) {
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = {
+                            onDeleteUser()
+                            isExpanded = false
+                        },
+                        enabled = !isCurrentUser
+                    ) {
+                        Text("Delete user")
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
+fun RotatingArrowIcon(isExpanded: Boolean) {
+    val rotation by animateFloatAsState(
+        targetValue = if (isExpanded) -180f else 0f,
+        label = "arrowRotation"
+    )
+
+    Icon(
+        imageVector = Icons.Default.KeyboardArrowDown, // a down-facing chevron
+        contentDescription = "Expand",
+        modifier = Modifier.rotate(rotation).size(24.dp).alpha(0.8f)
+    )
+}
 
 @Composable
 fun ChangePasswordItem(
@@ -426,13 +521,7 @@ fun ChangePasswordItem(
                             modifier = Modifier.animateContentSize(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                contentDescription = "Go",
-                                modifier = Modifier.size(24.dp).alpha(0.8f)
-
-                            )
+                            RotatingArrowIcon(isExpanded)
                         }
                     }
                 }
@@ -693,6 +782,128 @@ fun ImportFileStatusItem(zipFileStatus: FileStatus,
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ConfirmDialog(
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+    titleText: String,
+    bodyText: String? = null,
+    confirmText: String
+) {
+    BasicAlertDialog(
+        onDismissRequest = { onDismiss() },
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardColors(
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 24.dp, horizontal = 16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = titleText,
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                bodyText?.let {
+                    Text(
+                        text = it,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    TextButton(
+                        onClick = { onDismiss() },
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    ) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = { onConfirm() },
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    ) {
+                        Text(confirmText)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InfoDialog(
+    onDismiss: () -> Unit,
+    titleText: String,
+    bodyText: String? = null,
+    dismissText: String
+) {
+    BasicAlertDialog(
+        onDismissRequest = { onDismiss() },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardColors(
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 24.dp, horizontal = 16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = titleText,
+                    fontSize = 24.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                bodyText?.let {
+                    Text(
+                        text = it,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Button(
+                        onClick = { onDismiss() },
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                    ) {
+                        Text(dismissText)
+                    }
+                }
+            }
+        }
+    }
+}
 
 
 fun totalStreams(statusList: List<FileStatus>): Int {

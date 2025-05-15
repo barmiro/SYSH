@@ -39,6 +39,7 @@ import com.github.barmiro.syshclient.presentation.common.Import
 import com.github.barmiro.syshclient.presentation.common.ManageUsers
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
 import com.github.barmiro.syshclient.presentation.settings.import.ChangePasswordItem
+import com.github.barmiro.syshclient.presentation.settings.import.ConfirmDialog
 import com.github.barmiro.syshclient.presentation.settings.import.SettingsItem
 import com.github.barmiro.syshclient.presentation.settings.import.SettingsScreenUserItem
 import com.github.barmiro.syshclient.presentation.top.components.SettingsScreenTopBar
@@ -57,6 +58,7 @@ fun SettingsScreen(
     val isDemoVersion by sessionVM.isDemoVersion.collectAsState()
     val isPasswordChanged by settingsVM.isPasswordChanged.collectAsState()
     var isLoading by remember { mutableStateOf(false) }
+    var openAlertDialog by remember { mutableStateOf(false) }
 
     if (isLoading) {
         Column(
@@ -74,6 +76,20 @@ fun SettingsScreen(
                 )
             }
         ) { innerPadding ->
+            if (openAlertDialog) {
+                ConfirmDialog(
+                    onDismiss = {
+                        openAlertDialog = false
+                    },
+                    onConfirm = {
+                        openAlertDialog = false
+                        isLoading = true
+                        sessionVM.logout()
+                    },
+                    titleText = "Are you sure?",
+                    confirmText = "Log Out"
+                )
+            }
             Row(modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding()),
                 horizontalArrangement = Arrangement.Center) {
                 LazyColumn(
@@ -164,10 +180,7 @@ fun SettingsScreen(
                                     modifier = Modifier
                                         .padding(top = 8.dp, start = 8.dp, end = 8.dp)
                                         .clickable(
-                                            onClick = {
-                                                isLoading = true
-                                                sessionVM.logout()
-                                            }
+                                            onClick = { openAlertDialog = true }
                                         )
                                 )
                             }
