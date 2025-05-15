@@ -30,7 +30,6 @@ public class GlobalExceptionHandler {
 			String username = auth.getName();
 			
 			if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-				e.printStackTrace();
 				String message = ("User '"
 						+ username 
 						+ "' not authorized with Spotify");

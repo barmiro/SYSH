@@ -293,6 +293,8 @@ class SessionViewModel @Inject constructor(
             initialValue = null
         )
 
+
+
     fun clearAllPreferences() {
         _responseCode.value = 0
         viewModelScope.launch {
@@ -318,4 +320,6 @@ class SessionViewModel @Inject constructor(
             getToken("demo-user", "password")
         }
     }
+
+
 }

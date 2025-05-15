@@ -35,10 +35,7 @@ public class SpotifyAuthorizationController {
 		String url = "https://accounts.spotify.com/authorize?"
 				+ "response_type=code&"
 				+ "client_id=" + clientId + "&"
-				+ "scope=user-read-recently-played%20"
-				+ "user-read-currently-playing%20"
-				+ "user-read-playback-state%20"
-				+ "user-modify-playback-state&"
+				+ "scope=user-read-recently-played&"
 //				TODO: IF THIS STOPS WORKING, ROLL BACK
 				+ "redirect_uri=http://127.0.0.1:5754/callback&"
 				+ "state=" + state;
@@ -56,8 +53,6 @@ public class SpotifyAuthorizationController {
 	public ResponseEntity<Void> callback(
 			@RequestParam(required=false) Optional<String> code,
 			@RequestParam String state) {
-		
-		System.out.println("RECEIVED STATE: " + state);
 		String username = userManager.getUsernameBySpotifyState(state);
 		
 		String codeValue = code.orElseThrow();

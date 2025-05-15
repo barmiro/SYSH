@@ -8,7 +8,7 @@ object PreferencesKeys {
     val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
     val USER_ROLE = stringPreferencesKey("user_role")
     val SERVER_URL = stringPreferencesKey("server_url")
-    val IS_FRESH_INSTALL = booleanPreferencesKey("is_fresh_install")
+    val IS_USERNAME_DISPLAYED = booleanPreferencesKey("is_username_displayed")
     val IS_DEMO_VERSION = booleanPreferencesKey("is_demo_version")
     val TOKEN = stringPreferencesKey("jwt_token")
     val USER_DISPLAY_NAME = stringPreferencesKey("user_display_name")

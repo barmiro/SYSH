@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
@@ -38,6 +39,7 @@ import androidx.navigation.NavHostController
 import com.github.barmiro.syshclient.presentation.common.Import
 import com.github.barmiro.syshclient.presentation.common.ManageUsers
 import com.github.barmiro.syshclient.presentation.login.SessionViewModel
+import com.github.barmiro.syshclient.presentation.settings.import.AppPreferencesItem
 import com.github.barmiro.syshclient.presentation.settings.import.ChangePasswordItem
 import com.github.barmiro.syshclient.presentation.settings.import.ConfirmDialog
 import com.github.barmiro.syshclient.presentation.settings.import.SettingsItem
@@ -56,6 +58,7 @@ fun SettingsScreen(
     val userImageUrl by sessionVM.userImageUrl.collectAsState()
     val userRole by sessionVM.userRole.collectAsState()
     val isDemoVersion by sessionVM.isDemoVersion.collectAsState()
+    val isUsernameDisplayed by settingsVM.isUsernameDisplayed.collectAsState()
     val isPasswordChanged by settingsVM.isPasswordChanged.collectAsState()
     var isLoading by remember { mutableStateOf(false) }
     var openAlertDialog by remember { mutableStateOf(false) }
@@ -107,12 +110,12 @@ fun SettingsScreen(
                         item() {
                             Row() {
                                 SettingsItem(
-                                    itemText = "Leave demo mode",
+                                    itemText = "Leave Demo Mode",
                                     icon = {
                                         Icon(
-                                            imageVector = Icons.Default.Add,
+                                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                                             tint = MaterialTheme.colorScheme.primary,
-                                            contentDescription = "Add"
+                                            contentDescription = "Leave demo mode"
                                         )
                                     },
                                     modifier = Modifier
@@ -162,7 +165,27 @@ fun SettingsScreen(
                                 },
                                 modifier = Modifier
                                     .padding(top = 8.dp, start = 8.dp, end = 8.dp),
-                                isPasswordChanged
+                                passwordChangeResult = isPasswordChanged,
+                                onClick = { settingsVM.onChangePasswordReset() }
+                            )
+                        }
+
+                        item() {
+                            AppPreferencesItem(
+                                itemText = "App Preferences",
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Edit,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        contentDescription = "Change Password"
+                                    )
+                                },
+                                modifier = Modifier
+                                    .padding(top = 8.dp, start = 8.dp, end = 8.dp),
+                                isUsernameDisplayed = isUsernameDisplayed ?: false,
+                                onChangeDisplayName = {
+                                    settingsVM.setIsUsernameDisplayed(!(isUsernameDisplayed ?: true))
+                                }
                             )
                         }
 

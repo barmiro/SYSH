@@ -8,7 +8,9 @@ import com.github.barmiro.syshclient.data.stats.StatsRepository
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -16,39 +18,49 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val statsRepository: StatsRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPrefRepo: UserPreferencesRepository
 ): ViewModel(), DefaultLifecycleObserver {
 
 //    DTO for now
     private val _homeState = MutableStateFlow(HomeState())
     val homeState: StateFlow<HomeState> = _homeState
 
-    private val _userDisplayName = MutableStateFlow<String?>(null)
-    val userDisplayName: StateFlow<String?> = _userDisplayName
 
-    private val _showImportAlert = MutableStateFlow<Boolean>(false)
-    val showImportAlert: StateFlow<Boolean> = _showImportAlert
+    val userDisplayName: StateFlow<String?> = userPrefRepo.userDisplayName
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
-    private val _isDemoVersion = MutableStateFlow<Boolean?>(false)
-    val isDemoVersion: StateFlow<Boolean?> = _isDemoVersion
+    val username: StateFlow<String?> = userPrefRepo.username
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
 
-    init {
-        viewModelScope.launch {
-            userPreferencesRepository.userDisplayName.collect {
-                _userDisplayName.value = it
-            }
-        }
-        viewModelScope.launch {
-            userPreferencesRepository.showImportAlert.collect {
-                _showImportAlert.value = it
-            }
-        }
-        viewModelScope.launch {
-            userPreferencesRepository.isDemoVersion.collect {
-                _isDemoVersion.value = it
-            }
-        }
-    }
+    val isDemoVersion: StateFlow<Boolean?> = userPrefRepo.isDemoVersion
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
+    val showImportAlert: StateFlow<Boolean> = userPrefRepo.showImportAlert
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val isUsernameDisplayed: StateFlow<Boolean?> = userPrefRepo.isUsernameDisplayed
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
 
     fun getStats() {
         viewModelScope.launch {

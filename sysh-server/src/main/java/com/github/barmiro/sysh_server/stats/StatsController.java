@@ -88,7 +88,6 @@ public class StatsController {
 				.toOffsetDateTime();
 		
 		List<HourlyStatsDTO> hourlyStats = statsRepo.getStatsByHour(startDate, endDate, username);
-//		System.out.println(hourlyStats);
 		return hourlyStats;
 		
 	}
@@ -103,7 +102,6 @@ public class StatsController {
 			@RequestParam
 			Optional<String> step) {
 		
-		long startTime = System.currentTimeMillis();
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		ZoneId userTimeZone = userRepository.getUserTimezone(username);
@@ -115,9 +113,7 @@ public class StatsController {
 		ZonedDateTime endValue = end
 				.map(endInput -> endInput.atZone(userTimeZone))
 				.orElse(Instant.now().atZone(userTimeZone));
-		
-		System.out.println("START = " + startValue);
-		System.out.println("END = " + endValue);
+	
 	
 		List<OffsetDateTimeRange> ranges = TimeUtils.generateOffsetDateTimeRangeSeries(startValue, endValue, step);
 
@@ -131,10 +127,6 @@ public class StatsController {
 				)
 			);
 		}
-		
-		long endTime = System.currentTimeMillis();
-		long time = (endTime - startTime);
-		System.out.println("Time elapsed: " + time);
 		
 		return statsList;
 	}

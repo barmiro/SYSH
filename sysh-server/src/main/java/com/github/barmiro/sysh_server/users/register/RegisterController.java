@@ -32,9 +32,7 @@ public class RegisterController {
 	public RegisterResponse registerUser(@RequestBody SyshUser user) {
 		
 		
-//		not handled in security config
-//		because I want this route to be completely disabled in restricted mode
-		if (isRestrictedMode) {
+		if (isRestrictedMode && manager.adminExists()) {
 			throw new HttpClientErrorException(HttpStatus.METHOD_NOT_ALLOWED);
 		}
 		

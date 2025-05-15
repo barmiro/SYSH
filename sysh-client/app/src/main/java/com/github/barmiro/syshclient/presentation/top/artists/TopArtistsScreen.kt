@@ -68,14 +68,16 @@ fun TopArtistsScreen(
                 }
             }
             is LoadState.Error -> {
-                Column(
+                LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(text = loadState.error.message ?: "Encountered unknown error",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center)
+                    item() {
+                        Text(text = loadState.error.message ?: "Encountered unknown error",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            textAlign = TextAlign.Center)
+                    }
                 }
             }
             else -> {

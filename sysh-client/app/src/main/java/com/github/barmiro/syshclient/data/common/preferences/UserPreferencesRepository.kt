@@ -80,9 +80,9 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
-    suspend fun setFreshInstall(isFreshInstall: Boolean) {
+    suspend fun setIsUsernameDisplayed(isUsernameDisplayed: Boolean) {
         dataStore.edit {
-            it[PreferencesKeys.IS_FRESH_INSTALL] = isFreshInstall
+            it[PreferencesKeys.IS_USERNAME_DISPLAYED] = isUsernameDisplayed
         }
     }
 
@@ -125,8 +125,8 @@ class UserPreferencesRepository @Inject constructor(
         it[PreferencesKeys.SHOW_IMPORT_ALERT] ?: false
     }
 
-    val isFreshInstall: Flow<Boolean> = dataStore.data.map {
-        it[PreferencesKeys.IS_FRESH_INSTALL] ?: true
+    val isUsernameDisplayed: Flow<Boolean> = dataStore.data.map {
+        it[PreferencesKeys.IS_USERNAME_DISPLAYED] ?: false
     }
 
     val isDemoVersion: Flow<Boolean?> = dataStore.data.map {

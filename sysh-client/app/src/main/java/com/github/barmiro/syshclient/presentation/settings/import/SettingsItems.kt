@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
@@ -63,6 +64,7 @@ import coil3.compose.AsyncImage
 import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.data.settings.dataimport.FileStatus
 import com.github.barmiro.syshclient.data.settings.dataimport.UploadStatus
+import com.github.barmiro.syshclient.presentation.startup.UrlInfoItem
 
 @Composable
 fun JsonFileUploadItem(
@@ -472,7 +474,8 @@ fun ChangePasswordItem(
     icon: @Composable () -> Unit,
     onChangePassword: (String, String) -> Unit,
     modifier: Modifier,
-    passwordChangeResult: Boolean?
+    passwordChangeResult: Boolean?,
+    onClick: () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     Surface(
@@ -483,6 +486,7 @@ fun ChangePasswordItem(
         Column() {
             Box(modifier = Modifier.clickable(onClick = {
                 isExpanded = !isExpanded
+                onClick()
             })) {
 
                 Row(
@@ -546,7 +550,9 @@ fun ChangePasswordItem(
                         onValueChange = { oldPassword.value = it },
                         label = {
                             Text("Old password")
-                        }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        visualTransformation = PasswordVisualTransformation()
                     )
                 }
 
@@ -580,10 +586,6 @@ fun ChangePasswordItem(
                     )
                 }
 
-                if (newPassword.value.text != confirmation.value.text) {
-                    Text("Passwords do not match")
-                }
-
 
                 Row(
                     modifier = Modifier.padding(8.dp),
@@ -599,13 +601,120 @@ fun ChangePasswordItem(
                     ) {
                         Text("Change Password")
                     }
-                    passwordChangeResult?.let { changed ->
+                }
+                if (newPassword.value.text != confirmation.value.text) {
+                    UrlInfoItem(
+                        icon = {
+                            Icon(imageVector = Icons.Default.Close,
+                                tint = MaterialTheme.colorScheme.error,
+                                contentDescription = "Error")
+                        },
+                        text = "Passwords do not match"
+                    )
+                }
+                passwordChangeResult?.let { changed ->
+                    Row() {
                         if (changed) {
-                            Text("Password changed successfully")
+                            UrlInfoItem(
+                                icon = {
+                                    Icon(imageVector = Icons.Default.CheckCircle,
+                                        contentDescription = "Success",
+                                        tint = Color(
+                                            red = 52,
+                                            green = 178,
+                                            blue = 51
+                                        ))
+                                },
+                                text = "Password changed successfully"
+                            )
                         } else {
-                            Text("Password change failed")
+                            UrlInfoItem(
+                                icon = {
+                                    Icon(imageVector = Icons.Default.Close,
+                                        tint = MaterialTheme.colorScheme.error,
+                                        contentDescription = "Error")
+                                },
+                                text = "Password change failed"
+                            )
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun AppPreferencesItem(
+    itemText: String,
+    icon: @Composable () -> Unit,
+    onChangeDisplayName: () -> Unit,
+    isUsernameDisplayed: Boolean,
+    modifier: Modifier
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+    Surface(
+        modifier = modifier.animateContentSize(),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer
+    ) {
+        Column() {
+            Box(modifier = Modifier.clickable(onClick = {
+                isExpanded = !isExpanded
+            })) {
+
+                Row(
+                    modifier = Modifier.padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        icon()
+                    }
+                    VerticalDivider(
+                        Modifier.height(48.dp).padding(horizontal = 8.dp)
+                    )
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Row(
+                        ) {
+                            Text(
+                                text = itemText,
+//                        fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1
+                            )
+                        }
+                    }
+                    Column(
+                        modifier = Modifier.weight(0.15f),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Row(
+                            modifier = Modifier.animateContentSize(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RotatingArrowIcon(isExpanded)
+                        }
+                    }
+                }
+            }
+
+            if (isExpanded) {
+                Row() {
+                    Text("Display SYSH username on Home Screen")
+                    Switch(
+                        checked = isUsernameDisplayed,
+                        onCheckedChange = {
+                            onChangeDisplayName()
+                        }
+                    )
                 }
             }
         }

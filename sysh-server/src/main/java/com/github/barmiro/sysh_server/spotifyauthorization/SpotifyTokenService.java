@@ -146,7 +146,6 @@ public class SpotifyTokenService {
 			log.error("User " + username + " not authenticated with Spotify");
 			throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
 		} else if (LocalDateTime.now().plusMinutes(5).isBefore(expirationTime)) {
-			log.info("Token valid until: " + expirationTime + ". Proceeding...");
 			return false;
 		} else {
 			log.info("Token expires: " + expirationTime + ". Getting new token...");			

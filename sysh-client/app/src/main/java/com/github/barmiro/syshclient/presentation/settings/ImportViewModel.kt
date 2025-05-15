@@ -83,55 +83,64 @@ class ImportViewModel @Inject constructor(
                     }
                 }
 
-
-                for (jsonFile in extractedFiles) {
-                    importRepo.uploadJsonFile(jsonFile).collect { result ->
-                        when (result) {
-                            is Resource.Success -> updateFileStatus(
-                                jsonFile,
-                                UploadStatus.Success(
-                                    message = result.data ?: -1))
-                            is Resource.Error -> updateFileStatus(
-                                jsonFile,
-                                UploadStatus.Failed(
-                                    message = result.message
-                                )
-                            )
-                            is Resource.Loading -> {
-                                if (result.isLoading) {
-                                    updateFileStatus(
-                                        jsonFile,
-                                        UploadStatus.Processing
+                try {
+                    for (jsonFile in extractedFiles) {
+                        importRepo.uploadJsonFile(jsonFile).collect { result ->
+                            when (result) {
+                                is Resource.Success -> updateFileStatus(
+                                    jsonFile,
+                                    UploadStatus.Success(
+                                        message = result.data ?: -1))
+                                is Resource.Error -> updateFileStatus(
+                                    jsonFile,
+                                    UploadStatus.Failed(
+                                        message = result.message
                                     )
+                                )
+                                is Resource.Loading -> {
+                                    if (result.isLoading) {
+                                        updateFileStatus(
+                                            jsonFile,
+                                            UploadStatus.Processing
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                importRepo.recent().collect { result ->
-                    when (result) {
-                        is Resource.Success -> {
-                            _zipFileStatus.value = FileStatus(
+                    importRepo.recent().collect { result ->
+                        when (result) {
+                            is Resource.Success -> {
+                                _zipFileStatus.value = FileStatus(
+                                    tempFile,
+                                    UploadStatus.Success(
+                                        message = 1
+                                    )
+                                )
+                            }
+                            is Resource.Loading -> _zipFileStatus.value = FileStatus(
                                 tempFile,
-                                UploadStatus.Success(
-                                    message = 1
+                                UploadStatus.Processing
+                            )
+                            is Resource.Error -> _zipFileStatus.value = FileStatus(
+                                tempFile,
+                                UploadStatus.Failed(
+                                    message = result.message
                                 )
                             )
                         }
-                        is Resource.Loading -> _zipFileStatus.value = FileStatus(
-                            tempFile,
-                            UploadStatus.Processing
-                        )
-                        is Resource.Error -> _zipFileStatus.value = FileStatus(
-                            tempFile,
-                            UploadStatus.Failed(
-                                message = result.message
-                            )
-                        )
+                    }
+                } finally {
+                    for (jsonFile in extractedFiles) {
+                        if (jsonFile.exists()) {
+                            jsonFile.delete()
+                        }
+                    }
+                    if (tempFile.exists()) {
+                        tempFile.delete()
                     }
                 }
-
             }
         }
     }

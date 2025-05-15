@@ -119,7 +119,7 @@ fun LoginScreen(sessionVM: SessionViewModel,
                     TextButton(
                         onClick = {
                             serverInfo?.let {
-                                if (it.is_restricted_mode) {
+                                if (it.is_restricted_mode && it.users_exist) {
                                     coroutineScope.launch {
                                         snackbarHostState.showSnackbar(
                                             message = "User registration disabled. Contact your system administrator to create an account.",

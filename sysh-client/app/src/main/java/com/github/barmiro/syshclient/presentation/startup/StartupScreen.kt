@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -204,7 +205,8 @@ fun UrlInfoItem(
 fun InfoItem(
     icon: @Composable () -> Unit,
     title: String,
-    text: String
+    text: String,
+    lineHeight: TextUnit = 14.sp
 ) {
     Surface(
         color = MaterialTheme.colorScheme.secondaryContainer,
@@ -231,7 +233,7 @@ fun InfoItem(
                     Row() {
                         Text(
                             text = text,
-                            lineHeight = 14.sp,
+                            lineHeight = lineHeight,
                             fontSize = 14.sp,
                             fontStyle = FontStyle.Italic,
                             modifier = Modifier.alpha(0.5f)

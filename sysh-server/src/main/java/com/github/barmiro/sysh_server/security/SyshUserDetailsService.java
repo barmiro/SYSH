@@ -22,7 +22,6 @@ public class SyshUserDetailsService implements UserDetailsService {
 	
 		SyshUser user = userRepo.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 		
-		System.out.println(user);
 		if (user.must_change_password()) {
 			user = new SyshUser(
 					user.username(),
@@ -33,7 +32,7 @@ public class SyshUserDetailsService implements UserDetailsService {
 					user.must_change_password()
 					);
 		}
-		System.out.println(user);
+		
 		return new SyshUserDetails(user);			
 	}
 	
