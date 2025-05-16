@@ -80,6 +80,8 @@ class MainActivity : ComponentActivity() {
             val responseCode by sessionVM.responseCode.collectAsState()
             val username by sessionVM.username.collectAsState()
             val isDemoVersion by sessionVM.isDemoVersion.collectAsState()
+            val appTheme by settingsVM.appTheme.collectAsState()
+
 
             val snackbarHostState = remember { SnackbarHostState() }
             val coroutineScope = rememberCoroutineScope()
@@ -207,7 +209,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            SyshClientTheme {
+            SyshClientTheme(
+                appTheme = appTheme
+            ) {
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()

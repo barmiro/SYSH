@@ -11,6 +11,7 @@ object PreferencesKeys {
     val IS_USERNAME_DISPLAYED = booleanPreferencesKey("is_username_displayed")
     val IS_DEMO_VERSION = booleanPreferencesKey("is_demo_version")
     val TOKEN = stringPreferencesKey("jwt_token")
+    val APP_THEME = stringPreferencesKey("app_theme")
     val USER_DISPLAY_NAME = stringPreferencesKey("user_display_name")
     val USER_IMAGE_URL = stringPreferencesKey("user_image_url")
     val IS_AUTHORIZED_WITH_SPOTIFY = booleanPreferencesKey("is_authorized_with_spotify")

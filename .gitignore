@@ -4,6 +4,7 @@ dbeaver-workspace.properties
 .env
 sysh-server/.env
 sysh-server/.mvn
+sysh-client/.kotlin/sessions/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

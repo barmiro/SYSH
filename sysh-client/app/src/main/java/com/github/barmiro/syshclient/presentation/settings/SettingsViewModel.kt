@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.data.settings.SettingsRepository
+import com.github.barmiro.syshclient.util.AppTheme
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,9 +33,22 @@ class SettingsViewModel @Inject constructor(
             initialValue = null
         )
 
+    val appTheme: StateFlow<AppTheme> = userPrefRepo.appTheme
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AppTheme.SYSTEM_DEFAULT
+        )
+
     fun setIsUsernameDisplayed(newValue: Boolean) {
         viewModelScope.launch {
             userPrefRepo.setIsUsernameDisplayed(newValue)
+        }
+    }
+
+    fun changeAppTheme(newAppTheme: AppTheme) {
+        viewModelScope.launch {
+            userPrefRepo.saveTheme(newAppTheme)
         }
     }
 

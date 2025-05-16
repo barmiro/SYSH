@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -60,6 +61,7 @@ fun SettingsScreen(
     val isDemoVersion by sessionVM.isDemoVersion.collectAsState()
     val isUsernameDisplayed by settingsVM.isUsernameDisplayed.collectAsState()
     val isPasswordChanged by settingsVM.isPasswordChanged.collectAsState()
+    val appTheme by settingsVM.appTheme.collectAsState()
     var isLoading by remember { mutableStateOf(false) }
     var openAlertDialog by remember { mutableStateOf(false) }
 
@@ -175,9 +177,9 @@ fun SettingsScreen(
                                 itemText = "App Preferences",
                                 icon = {
                                     Icon(
-                                        imageVector = Icons.Default.Edit,
+                                        imageVector = Icons.Default.Settings,
                                         tint = MaterialTheme.colorScheme.primary,
-                                        contentDescription = "Change Password"
+                                        contentDescription = "App Preferences"
                                     )
                                 },
                                 modifier = Modifier
@@ -185,7 +187,9 @@ fun SettingsScreen(
                                 isUsernameDisplayed = isUsernameDisplayed ?: false,
                                 onChangeDisplayName = {
                                     settingsVM.setIsUsernameDisplayed(!(isUsernameDisplayed ?: true))
-                                }
+                                },
+                                selectedAppTheme = appTheme,
+                                onChangeAppTheme = { settingsVM.changeAppTheme(it) }
                             )
                         }
 

@@ -3,6 +3,7 @@ package com.github.barmiro.syshclient.data.common.preferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import com.github.barmiro.syshclient.util.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -65,6 +66,12 @@ class UserPreferencesRepository @Inject constructor(
     suspend fun saveUserRole(userRole: String) {
         dataStore.edit {
             it[PreferencesKeys.USER_ROLE] = userRole
+        }
+    }
+
+    suspend fun saveTheme(theme: AppTheme) {
+        dataStore.edit {
+            it[PreferencesKeys.APP_THEME] = theme.name
         }
     }
 
@@ -132,6 +139,12 @@ class UserPreferencesRepository @Inject constructor(
     val isDemoVersion: Flow<Boolean?> = dataStore.data.map {
         it[PreferencesKeys.IS_DEMO_VERSION]
     }
+
+    val appTheme: Flow<AppTheme> = dataStore.data.map {
+            AppTheme.entries.firstOrNull { theme ->
+                theme.name == it[PreferencesKeys.APP_THEME]
+            } ?: AppTheme.DARK
+        }
 
     val isAuthorizedWithSpotify: Flow<Boolean> = dataStore.data.map {
         it[PreferencesKeys.IS_AUTHORIZED_WITH_SPOTIFY] ?: false

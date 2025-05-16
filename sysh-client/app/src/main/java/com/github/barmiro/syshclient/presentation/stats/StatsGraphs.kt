@@ -26,6 +26,7 @@ import com.github.barmiro.syshclient.data.stats.HourlyStatsDTO
 import com.github.barmiro.syshclient.data.stats.StatsSeriesChunkDTO
 import com.github.barmiro.syshclient.util.averageStreamLengthInterpolator
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
@@ -175,9 +176,17 @@ fun StreamingStatsChartScaffold(
         val pattern: String
         val spacing: Int
         when {
-            timeSpan <= 2 -> {
+            timeSpan <= 0 -> {
                 pattern = "H:mm"
                 spacing = 3
+            }
+            timeSpan <= 7 -> {
+                pattern = "EEE H:mm"
+                spacing = statsSeries.size / 6 + 1
+            }
+            timeSpan <= 26 -> {
+                pattern = "EEE dd"
+                spacing = statsSeries.size / 6 + 1
             }
             timeSpan <= 32 -> {
                 pattern = "EEE dd"
@@ -212,9 +221,11 @@ fun StreamingStatsChartScaffold(
                         rangeProvider = rangeProvider
                     ),
                     startAxis = VerticalAxis.rememberStart(
+                        label = rememberAxisLabelComponent(color = MaterialTheme.colorScheme.onBackground),
                         itemPlacer = remember { VerticalAxis.ItemPlacer.count(count = { 6 }) }
                     ),
                     bottomAxis = HorizontalAxis.rememberBottom(
+                        label = rememberAxisLabelComponent(color = MaterialTheme.colorScheme.onBackground),
                         itemPlacer = HorizontalAxis.ItemPlacer.aligned(spacing = {
                             spacing
                         }, addExtremeLabelPadding = false),
@@ -376,9 +387,11 @@ fun HourlyStatsChart(hourlyStats: List<HourlyStatsDTO>) {
                             })
                     ),
                     startAxis = VerticalAxis.rememberStart(
+                        label = rememberAxisLabelComponent(color = MaterialTheme.colorScheme.onBackground),
                         itemPlacer = remember { VerticalAxis.ItemPlacer.count(count = { 6 }) }
                     ),
                     bottomAxis = HorizontalAxis.rememberBottom(
+                        label = rememberAxisLabelComponent(color = MaterialTheme.colorScheme.onBackground),
                         itemPlacer = HorizontalAxis.ItemPlacer.aligned(
                             spacing = { 12 },
                             addExtremeLabelPadding = false),

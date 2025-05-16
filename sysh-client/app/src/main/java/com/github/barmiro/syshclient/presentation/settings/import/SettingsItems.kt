@@ -9,8 +9,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,8 +30,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -65,6 +71,7 @@ import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.data.settings.dataimport.FileStatus
 import com.github.barmiro.syshclient.data.settings.dataimport.UploadStatus
 import com.github.barmiro.syshclient.presentation.startup.UrlInfoItem
+import com.github.barmiro.syshclient.util.AppTheme
 
 @Composable
 fun JsonFileUploadItem(
@@ -651,7 +658,9 @@ fun AppPreferencesItem(
     icon: @Composable () -> Unit,
     onChangeDisplayName: () -> Unit,
     isUsernameDisplayed: Boolean,
-    modifier: Modifier
+    modifier: Modifier,
+    selectedAppTheme: AppTheme,
+    onChangeAppTheme: (AppTheme) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     Surface(
@@ -707,14 +716,75 @@ fun AppPreferencesItem(
             }
 
             if (isExpanded) {
-                Row() {
-                    Text("Display SYSH username on Home Screen")
-                    Switch(
-                        checked = isUsernameDisplayed,
-                        onCheckedChange = {
-                            onChangeDisplayName()
+                HorizontalDivider(Modifier.fillMaxWidth())
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    Column(modifier = Modifier.weight(1f).padding(12.dp).fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center) {
+                        Text(text = "Display SYSH username on Home Screen",
+                            fontSize = 16.sp,
+                            lineHeight = 18.sp
+
+                        )
+
+                    }
+                    Column(modifier = Modifier.padding(top = 12.dp, bottom = 12.dp, end = 12.dp).fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center) {
+                        Switch(
+                            checked = isUsernameDisplayed,
+                            onCheckedChange = {
+                                onChangeDisplayName()
+                            },
+                        )
+                    }
+                }
+                HorizontalDivider(Modifier.fillMaxWidth().padding(horizontal = 8.dp))
+
+                var isAppThemeExpanded by remember { mutableStateOf(false) }
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    Column(modifier = Modifier.weight(1f).padding(12.dp).fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center) {
+                        Text(text = "App theme",
+                            fontSize = 16.sp,
+                            lineHeight = 18.sp
+
+                        )
+
+                    }
+                    Column(modifier = Modifier.padding(top = 12.dp, bottom = 12.dp, end = 12.dp).fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center) {
+                        IconButton(onClick = { isAppThemeExpanded = !isAppThemeExpanded }) {
+                            RotatingArrowIcon(isAppThemeExpanded)
                         }
-                    )
+                        DropdownMenu(
+                            expanded = isAppThemeExpanded,
+                            onDismissRequest = { isAppThemeExpanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("System default") },
+                                onClick = {
+                                    onChangeAppTheme(AppTheme.SYSTEM_DEFAULT)
+                                    isAppThemeExpanded = false
+                                },
+                                enabled = selectedAppTheme != AppTheme.SYSTEM_DEFAULT
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Dark") },
+                                onClick = {
+                                    onChangeAppTheme(AppTheme.DARK)
+                                    isAppThemeExpanded = false
+                                },
+                                enabled = selectedAppTheme != AppTheme.DARK
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Light") },
+                                onClick = {
+                                    onChangeAppTheme(AppTheme.LIGHT)
+                                    isAppThemeExpanded = false
+                                },
+                                enabled = selectedAppTheme != AppTheme.LIGHT
+                            )
+                        }
+                    }
                 }
             }
         }

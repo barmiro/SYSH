@@ -50,7 +50,7 @@ fun StatsScreen(
 
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(state.dateRangeMode) {
         viewModel.getStatsSeries()
         viewModel.getStats()
         viewModel.getHourlyStats()

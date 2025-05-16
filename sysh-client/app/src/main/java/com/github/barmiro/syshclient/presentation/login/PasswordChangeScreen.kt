@@ -70,13 +70,6 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
                     },
                     text = "Password changed successfully. You can now log in using your new password."
                 )
-                TextButton(
-                    onClick = {
-                        sessionVM.logout()
-                    }
-                ) {
-                    Text("Return to login screen")
-                }
             } else {
                 Text(text = "You need to change your password:",
                     color = MaterialTheme.colorScheme.onBackground )
@@ -142,6 +135,14 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
                 ) {
                     Text("Change Password")
                 }
+            }
+
+            TextButton(
+                onClick = {
+                    sessionVM.logout()
+                }
+            ) {
+                Text("Return to login screen")
             }
 
             if (isPasswordChanged == false) {
