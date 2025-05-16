@@ -93,6 +93,7 @@ fun StartupScreen(
                             urlValidation?.let {
                                 startupVM.serverResponded
                                 val url = if (it.hasScheme) urlInput else "http://$urlInput"
+                                println(url)
                                 sessionVM.saveServerUrl(url) {
                                     startupVM.getServerInfo()
                                 }

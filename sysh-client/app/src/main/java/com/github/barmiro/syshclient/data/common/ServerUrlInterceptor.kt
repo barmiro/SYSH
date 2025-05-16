@@ -14,10 +14,14 @@ class ServerUrlInterceptor(
         val serverUrl = userPrefRepo.serverUrlFlow.value?.toHttpUrl()
         val requestUrl: HttpUrl = chain.request().url
 
+        val basePath = serverUrl?.encodedPath?.removeSuffix("/") ?: ""
+        val requestPath = requestUrl.encodedPath.removePrefix("/")
+
         val newUrl: HttpUrl = requestUrl.newBuilder()
             .scheme(serverUrl?.scheme ?: requestUrl.scheme)
             .host(serverUrl?.host ?: requestUrl.host)
             .port(serverUrl?.port ?: requestUrl.port)
+            .encodedPath("$basePath/$requestPath")
             .build()
 
         val request = chain.request().newBuilder()
