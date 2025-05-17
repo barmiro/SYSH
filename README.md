@@ -1,17 +1,17 @@
 # SYSH
 SYSH (See Your Streaming History) is a self-hosted Spotify streaming history manager, focused on deliberate data collection rules and accuracy over feature count. The goal is to do one thing and do it well, and any additional features must not interfere with data collection.
 
-At the time of writing, SYSH is composed of a dockerized server, which collects data from Spotify and direct JSON imports, and an android client. A web client is on the roadmap, but not very high up.
+At the time of writing, SYSH is composed of a dockerized server, which collects data from Spotify and direct JSON imports, and an android client. A web client should be available later this year.
 
 Short demo of what the client looks like:
-https://youtu.be/1_iDDmWinZM?si=Ui3jm5_HX4qQa-5o
+[https://youtu.be/1_iDDmWinZM?si=Ui3jm5_HX4qQa-5o](https://youtube.com/shorts/qZ0WcEmle28?feature=share)
 
 ## Setup
-1. Create a new app in Spotify's developer dashboard and add http://127.0.0.1:5754/callback as a redirect URI.
-2. Find your app's Client ID and Client secret and add them to your .env file (detailed environment variable list coming soon).
+1. Create a new app in Spotify's developer dashboard and add http://127.0.0.1:5754/callback as a redirect URI. If accounts other than the app owner will use your instance, add them in the User Management section.
+2. Find your app's Client ID and Client secret and add them to your .env file.
 3. Launch your application using Docker Compose (the only officially supported way to run SYSH at the moment).
 4. Install the Android client and follow the instructions to create an account and authorize SYSH to make API calls to Spotify.
-5. SYSH will automatically fetch and save your streaming data, but you'll need to get your streaming history from Spotify directly; these days it's a button in your Spotify account dashboard and the turnaround rarely exceeds 2-3 days, so it's a good idea to ask for the files after you've set up your SYSH server to avoid gaps in your streaming data.
+5. SYSH will automatically fetch and save your streaming data, but you'll need to get your streaming history from Spotify directly; these days it's a button in your Spotify account's privacy settings and the turnaround rarely exceeds 2-3 days, so it's a good idea to ask for the files after you've set up your SYSH account to avoid gaps in your streaming data.
 
 ## Installation
 To launch the server, run the command 'docker compose up' in a directory with compose.yaml and .env files created using these templates:
@@ -68,6 +68,12 @@ SPOTIFY_CLIENT_ID=yourclientid
 SPOTIFY_CLIENT_SECRET=yourclientsecret
 SYSH_SERVER_URL=yoururl.com # soon to be deprecated
 
+# When true, only the first user (with admin privileges by default) can self-register.
+# After that, the /register endpoint will be disabled and all subsequent accounts must be created by an admin.
+# Strongly recommended if your server is publicly accessible.
+SYSH_RESTRICTED_MODE=false
+
+
 # optional
 # SYSH_SERVER_PORT=0000 # if you want to override the default 5754 port
 # SYSH_TZ=Your/Timezone # mainly for server logs, each user has their own streaming data timezone
@@ -88,7 +94,7 @@ When an account is created, SYSH saves the user's timezone and saves it to the d
 
 > Does SYSH need to use HTTPS?
 
-No. Even though Spotify introduced an HTTPS requirement for redirect URIs in April of 2025, you can run SYSH over plain HTTP. The Android client uses a built-in transparent proxy to handle Spotify's redirects using 127.0.0.1 - a loopback address which is exempt from the requirement. That's why, regardless of your server's protocol, address or port number, you have to set http://127.0.0.1:5754/callback as the redirect URI in your Spotify Developer Dashboard.
+No. Even though Spotify introduced an HTTPS requirement for redirect URIs in April 2025, you can run SYSH over plain HTTP. The Android client uses a built-in transparent proxy to handle Spotify's redirects using 127.0.0.1 - a loopback address which is exempt from the requirement. That's why, regardless of your server's protocol, address or port number, you have to set http://127.0.0.1:5754/callback as the redirect URI in your Spotify Developer Dashboard.
 
 > Is using HTTP secure?
 
