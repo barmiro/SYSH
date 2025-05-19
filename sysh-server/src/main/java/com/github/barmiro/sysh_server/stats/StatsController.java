@@ -8,6 +8,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -169,36 +170,40 @@ public class StatsController {
 			Optional<String> sort
 			) {
 
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-
-		ZoneId userTimeZone = userRepository.getUserTimezone(username);
-		
-		ZonedDateTime userDateTime = ZonedDateTime.now(userTimeZone);
-		Integer year = userDateTime.getYear();
-		
-		String sortBy = sort.orElse("stream_count");
-		
-		OffsetDateTime dayStart = userDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0).toOffsetDateTime();
+		try {
+			String username = SecurityContextHolder.getContext().getAuthentication().getName();
+			
+			ZoneId userTimeZone = userRepository.getUserTimezone(username);
+			
+			ZonedDateTime userDateTime = ZonedDateTime.now(userTimeZone);
+			Integer year = userDateTime.getYear();
+			
+			String sortBy = sort.orElse("stream_count");
+			
+			OffsetDateTime dayStart = userDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0).toOffsetDateTime();
 //		could be simpler, but would introduce bugs on daylight savings days
-		OffsetDateTime dayEnd = userDateTime.withHour(23).withMinute(59).withSecond(59).withNano(0).toOffsetDateTime();
-		
-		OffsetDateTime yearStart = ZonedDateTime.of( year , 1, 1, 0, 0, 0, 0, userTimeZone).toOffsetDateTime();
-		OffsetDateTime yearEnd = ZonedDateTime.of(year + 1, 1, 1, 0, 0, 0, 0, userTimeZone).minusSeconds(1).toOffsetDateTime();
-		
-		StreamsMinutesPair streamsMinutesDay = statsRepo.homeStats(dayStart, dayEnd, username);
-		StreamsMinutesPair streamsMinutesYear = statsRepo.homeStats(yearStart, yearEnd, username);
-		
-		ArtistStats topArtist = artistRepo.topArtists(sortBy, yearStart, yearEnd, 0, "1", username).getFirst();
-		AlbumStats topAlbum = albumRepo.topAlbums(sortBy, yearStart, yearEnd, 0, "1", username).getFirst();
-		TrackStats topTrack = trackRepo.topTracks(sortBy, yearStart, yearEnd, 0, "1", username).getFirst();
-		
-		return new HomeStats(streamsMinutesDay.minutes(),
-				streamsMinutesDay.streams(),
-				streamsMinutesYear.minutes(),
-				streamsMinutesYear.streams(),
-				topArtist,
-				topAlbum,
-				topTrack);
+			OffsetDateTime dayEnd = userDateTime.withHour(23).withMinute(59).withSecond(59).withNano(0).toOffsetDateTime();
+			
+			OffsetDateTime yearStart = ZonedDateTime.of( year , 1, 1, 0, 0, 0, 0, userTimeZone).toOffsetDateTime();
+			OffsetDateTime yearEnd = ZonedDateTime.of(year + 1, 1, 1, 0, 0, 0, 0, userTimeZone).minusSeconds(1).toOffsetDateTime();
+			
+			StreamsMinutesPair streamsMinutesDay = statsRepo.homeStats(dayStart, dayEnd, username);
+			StreamsMinutesPair streamsMinutesYear = statsRepo.homeStats(yearStart, yearEnd, username);
+			
+			ArtistStats topArtist = artistRepo.topArtists(sortBy, yearStart, yearEnd, 0, "1", username).getFirst();
+			AlbumStats topAlbum = albumRepo.topAlbums(sortBy, yearStart, yearEnd, 0, "1", username).getFirst();
+			TrackStats topTrack = trackRepo.topTracks(sortBy, yearStart, yearEnd, 0, "1", username).getFirst();
+			
+			return new HomeStats(streamsMinutesDay.minutes(),
+					streamsMinutesDay.streams(),
+					streamsMinutesYear.minutes(),
+					streamsMinutesYear.streams(),
+					topArtist,
+					topAlbum,
+					topTrack);
+		} catch (NoSuchElementException e) {
+			return new HomeStats(null, null, null, null, null, null, null);
+		}
 	}
 	
 

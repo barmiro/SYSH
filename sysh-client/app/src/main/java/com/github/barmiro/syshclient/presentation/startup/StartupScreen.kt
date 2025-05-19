@@ -1,6 +1,5 @@
 package com.github.barmiro.syshclient.presentation.startup
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,11 +55,6 @@ fun StartupScreen(
 //        }
 //    }
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
-    ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -166,7 +160,6 @@ fun StartupScreen(
                             }
                         }
                     }
-                }
             }
         }
     }

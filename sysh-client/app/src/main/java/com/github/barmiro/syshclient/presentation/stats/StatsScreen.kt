@@ -100,11 +100,11 @@ fun StatsScreen(
                 isRefreshing = true
                 viewModel.onEvent(TopScreenEvent.Refresh)
                         },
-            modifier = Modifier.padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp, start = 8.dp, end = 8.dp)
+            modifier = Modifier.padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp)
         ) {
 
 
-        Row(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)) {
 //            if (homeState.isLoading) {
 //                Column(
 //                    modifier = Modifier.fillMaxWidth(),

@@ -25,10 +25,10 @@ data class StatsDTO(
 
 @Serializable
 data class HomeStatsDTO(
-    val day_minutes: Int = 0,
-    val day_streams: Int = 0,
-    val minutes_streamed: Int = 0,
-    val stream_count: Int = 0,
+    val day_minutes: Int? = null,
+    val day_streams: Int? = null,
+    val minutes_streamed: Int? = null,
+    val stream_count: Int? = null,
     val top_artist: ArtistDTO? = null,
     val top_album: AlbumDTO? = null,
     val top_track: TrackDTO? = null

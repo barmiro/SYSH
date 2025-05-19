@@ -46,6 +46,7 @@ public class SecurityConfig {
 						.requestMatchers("/info").permitAll()
 						.requestMatchers("/register").permitAll()
 						.requestMatchers("/callback").permitAll()
+						.requestMatchers("/callbackNew").permitAll()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						.requestMatchers("/token").authenticated()
 						.requestMatchers("/changePassword").authenticated()

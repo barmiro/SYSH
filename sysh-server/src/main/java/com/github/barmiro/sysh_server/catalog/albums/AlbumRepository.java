@@ -177,7 +177,6 @@ public class AlbumRepository extends CatalogRepository<Album> {
 				.list();
 		
 		if (checkForCache && rawList.isEmpty()) {
-			System.out.println("empty result");
 			updateTopAlbumsCache(username);
 
 		}

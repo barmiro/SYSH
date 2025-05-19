@@ -37,7 +37,7 @@ public class SpotifyAuthorizationController {
 				+ "client_id=" + clientId + "&"
 				+ "scope=user-read-recently-played&"
 //				TODO: IF THIS STOPS WORKING, ROLL BACK
-				+ "redirect_uri=http://127.0.0.1:5754/callback&"
+				+ "redirect_uri=sysh://open/callback&"
 				+ "state=" + state;
 		return url;
 	}
@@ -66,5 +66,17 @@ public class SpotifyAuthorizationController {
 				.header(HttpHeaders.LOCATION, redirectUrl)
 				.build();
 		
+	};
+	
+	@GetMapping("/callbackNew")
+	public void callbackNew(
+			@RequestParam String code,
+			@RequestParam String state) {
+		
+		String username = userManager.getUsernameBySpotifyState(state);
+		
+		tkn.getNewToken(code, username);
+		
+		return;
 	};
 }

@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -22,10 +24,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
 import com.github.barmiro.syshclient.presentation.startup.UrlInfoItem
 
@@ -71,6 +77,11 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
                     text = "Password changed successfully. You can now log in using your new password."
                 )
             } else {
+
+                val newPasswordFieldFocusRequester = remember { FocusRequester() }
+                val confirmationFieldFocusRequester = remember { FocusRequester() }
+
+
                 Text(text = "You need to change your password:",
                     color = MaterialTheme.colorScheme.onBackground )
 
@@ -79,16 +90,41 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
                     label = {
                         Text("Old password")
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    visualTransformation = PasswordVisualTransformation()
+                    modifier = Modifier.width(256.dp),
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Password
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            newPasswordFieldFocusRequester.requestFocus()
+                        }
+                    ),
+                    singleLine = true,
+                    maxLines = 1
                 )
+
                 OutlinedTextField(value = newPassword.value,
                     onValueChange = { newPassword.value = it },
                     label = {
                         Text("New password")
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    visualTransformation = PasswordVisualTransformation()
+                    modifier = Modifier
+                        .width(256.dp)
+                        .focusRequester(newPasswordFieldFocusRequester),
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Password
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            confirmationFieldFocusRequester.requestFocus()
+                        }
+                    ),
+                    singleLine = true,
+                    maxLines = 1
                 )
 
                 OutlinedTextField(value = confirmation.value,
@@ -96,10 +132,24 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
                     label = {
                         Text("Confirm new password")
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier
+                        .width(256.dp)
+                        .focusRequester(confirmationFieldFocusRequester),
                     visualTransformation = PasswordVisualTransformation(),
-                    isError = newPassword.value.text != confirmation.value.text
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Password
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            settingsVM.changePassword(oldPassword.value.text, newPassword.value.text)
+                        }
+                    ),
+                    singleLine = true,
+                    maxLines = 1
                 )
+
+
 
                 if (newPassword.value.text != confirmation.value.text) {
                     UrlInfoItem(

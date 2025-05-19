@@ -938,7 +938,7 @@ fun ImportFileStatusItem(zipFileStatus: FileStatus,
                         archiveText = "Imported $totalStreams entries"
                     }
                     is UploadStatus.Failed -> {
-                        archiveText = "Something went wrong"
+                        archiveText = zipFileStatus.status.message ?: "Something went wrong"
                     }
                 }
 

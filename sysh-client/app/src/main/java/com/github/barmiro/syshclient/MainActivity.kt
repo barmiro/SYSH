@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -80,6 +81,7 @@ class MainActivity : ComponentActivity() {
             val responseCode by sessionVM.responseCode.collectAsState()
             val username by sessionVM.username.collectAsState()
             val isDemoVersion by sessionVM.isDemoVersion.collectAsState()
+            val isCallbackSuccessful by sessionVM.isCallbackSuccessful.collectAsState()
             val appTheme by settingsVM.appTheme.collectAsState()
 
 
@@ -95,6 +97,13 @@ class MainActivity : ComponentActivity() {
 //                if (storedUrl != null) {
                     startupVM.getServerInfo()
 //                }
+            }
+//
+//            TODO: rethink this
+            LaunchedEffect(isCallbackSuccessful) {
+                if (isCallbackSuccessful == true) {
+                    restartApp(applicationContext)
+                }
             }
 
 
@@ -156,7 +165,7 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(responseCode) {
 //                no better idea where to stop it for now
-                sessionVM.stopRedirectServer()
+//                sessionVM.stopRedirectServer()
                 when (responseCode) {
                     200 -> {
                         navController.navigate(Home) {
@@ -256,6 +265,12 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        handleSpotifyCallback(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleSpotifyCallback(intent)
     }
 
     private val zipPickerLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -266,6 +281,17 @@ class MainActivity : ComponentActivity() {
 
     private fun pickZipFile() {
         zipPickerLauncher.launch(arrayOf("application/zip"))
+    }
+
+    private fun handleSpotifyCallback(intent: Intent?) {
+        val data = intent?.data ?: return
+
+        if (data.scheme == "sysh" && data.host == "open" && data.path?.startsWith("/callback") == true) {
+            val code = data.getQueryParameter("code")
+            val state = data.getQueryParameter("state")
+
+            sessionVM.callback(state, code)
+        }
     }
 
     private fun finalizeImport() {

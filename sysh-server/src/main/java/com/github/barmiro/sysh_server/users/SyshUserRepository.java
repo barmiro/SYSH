@@ -198,6 +198,15 @@ public class SyshUserRepository {
 				.update();
 	}
 	
+	public int updateUserTimezone(String username, String timezone) {
+		return jdbc.sql("UPDATE Users "
+				+ "set timezone = :timezone "
+				+ "WHERE username = :username")
+				.param("timezone", timezone, Types.VARCHAR)
+				.param("username", username, Types.VARCHAR)
+				.update();
+	}
+	
 	public int addSpotifyUserData(String username, SpotifyUserDataDTO userData) {
 		String imageUrl = null;
 		if (!userData.images().isEmpty()) {

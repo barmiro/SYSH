@@ -63,83 +63,89 @@ class ImportViewModel @Inject constructor(
 
             val inputStream = contentResolver.openInputStream(uri)
 
+
             inputStream?.use { stream ->
                 val tempFile = File(context.cacheDir, zipFileName)
-                tempFile.outputStream().use { output -> stream.copyTo(output) }
+                try {
 
-                _zipFileStatus.value = FileStatus(tempFile, UploadStatus.Waiting)
+                    tempFile.outputStream().use { output -> stream.copyTo(output) }
 
-                val extractedFiles = sortJsonFiles(
-                    importRepo.extractJsonFiles(tempFile)
-                )
+                    _zipFileStatus.value = FileStatus(tempFile, UploadStatus.Waiting)
+
+                    val extractedFiles = sortJsonFiles(
+                        importRepo.extractJsonFiles(tempFile)
+                    )
 
 //                so that all files don't appear in a single frame
-                viewModelScope.launch {
-                    for (file:File in extractedFiles) {
-                        _fileStatusList.update {
-                            it + FileStatus(file, UploadStatus.Waiting)
+                    viewModelScope.launch {
+                        for (file:File in extractedFiles) {
+                            _fileStatusList.update {
+                                it + FileStatus(file, UploadStatus.Waiting)
+                            }
+                            delay(30)
                         }
-                        delay(30)
                     }
-                }
 
-                try {
-                    for (jsonFile in extractedFiles) {
-                        importRepo.uploadJsonFile(jsonFile).collect { result ->
-                            when (result) {
-                                is Resource.Success -> updateFileStatus(
-                                    jsonFile,
-                                    UploadStatus.Success(
-                                        message = result.data ?: -1))
-                                is Resource.Error -> updateFileStatus(
-                                    jsonFile,
-                                    UploadStatus.Failed(
-                                        message = result.message
-                                    )
-                                )
-                                is Resource.Loading -> {
-                                    if (result.isLoading) {
-                                        updateFileStatus(
-                                            jsonFile,
-                                            UploadStatus.Processing
+                    try {
+                        for (jsonFile in extractedFiles) {
+                            importRepo.uploadJsonFile(jsonFile).collect { result ->
+                                when (result) {
+                                    is Resource.Success -> updateFileStatus(
+                                        jsonFile,
+                                        UploadStatus.Success(
+                                            message = result.data ?: -1))
+                                    is Resource.Error -> updateFileStatus(
+                                        jsonFile,
+                                        UploadStatus.Failed(
+                                            message = result.message
                                         )
+                                    )
+                                    is Resource.Loading -> {
+                                        if (result.isLoading) {
+                                            updateFileStatus(
+                                                jsonFile,
+                                                UploadStatus.Processing
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    importRepo.recent().collect { result ->
-                        when (result) {
-                            is Resource.Success -> {
-                                _zipFileStatus.value = FileStatus(
+                        importRepo.recent().collect { result ->
+                            when (result) {
+                                is Resource.Success -> {
+                                    _zipFileStatus.value = FileStatus(
+                                        tempFile,
+                                        UploadStatus.Success(
+                                            message = 1
+                                        )
+                                    )
+                                }
+                                is Resource.Loading -> _zipFileStatus.value = FileStatus(
                                     tempFile,
-                                    UploadStatus.Success(
-                                        message = 1
+                                    UploadStatus.Processing
+                                )
+                                is Resource.Error -> _zipFileStatus.value = FileStatus(
+                                    tempFile,
+                                    UploadStatus.Failed(
+                                        message = result.message
                                     )
                                 )
                             }
-                            is Resource.Loading -> _zipFileStatus.value = FileStatus(
-                                tempFile,
-                                UploadStatus.Processing
-                            )
-                            is Resource.Error -> _zipFileStatus.value = FileStatus(
-                                tempFile,
-                                UploadStatus.Failed(
-                                    message = result.message
-                                )
-                            )
+                        }
+                    } finally {
+                        for (jsonFile in extractedFiles) {
+                            if (jsonFile.exists()) {
+                                jsonFile.delete()
+                            }
+                        }
+                        if (tempFile.exists()) {
+                            tempFile.delete()
                         }
                     }
-                } finally {
-                    for (jsonFile in extractedFiles) {
-                        if (jsonFile.exists()) {
-                            jsonFile.delete()
-                        }
-                    }
-                    if (tempFile.exists()) {
-                        tempFile.delete()
-                    }
+                } catch (e: Exception) {
+                    _zipFileStatus.value = FileStatus(tempFile, UploadStatus.Failed(e.message))
                 }
             }
         }

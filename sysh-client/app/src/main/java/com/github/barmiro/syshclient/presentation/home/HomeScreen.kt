@@ -66,6 +66,10 @@ fun HomeScreen(
             isRefreshing = false
         }
     }
+    val dayMinutes = state.stats.day_minutes ?: 0
+    val dayStreams = state.stats.day_streams ?: 0
+    val minutesStreamed = state.stats.minutes_streamed ?: 0
+    val streamCount = state.stats.stream_count ?: 0
 
     Scaffold(
         topBar = {
@@ -85,7 +89,7 @@ fun HomeScreen(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(
-                    end = 8.dp
+                    horizontal = 5.dp
                 )
             ) {
                 val today = LocalDate.now()
@@ -102,13 +106,13 @@ fun HomeScreen(
                         && fractionPassedWrappedLower > 0.0
                         && fractionPassedWrappedUpper > 0.0) { }
 
-                val projectedMinutesYear: Int = (state.stats.minutes_streamed / fractionPassedYear).toInt()
+                val projectedMinutesYear: Int = (minutesStreamed / fractionPassedYear).toInt()
                 val projectedMinutesWrappedLower: Int = ((
-                        state.stats.minutes_streamed / fractionPassedWrappedLower
+                        minutesStreamed / fractionPassedWrappedLower
                         ).toInt() / 100) * 100
 
                 val projectedMinutesWrappedUpper: Int = ((
-                        state.stats.minutes_streamed / fractionPassedWrappedUpper
+                        minutesStreamed / fractionPassedWrappedUpper
                         ).toInt() / 100) * 100
 
                 val numberFormat = NumberFormat.getInstance(Locale.US)
@@ -170,11 +174,11 @@ fun HomeScreen(
                                 Column (
                                     modifier = Modifier.weight(1f),
                                 ) {
-                                    val streamsString = numberFormat.format(state.stats.day_streams)
-                                    val averageStreams = state.stats.stream_count / daysPassed
+                                    val streamsString = numberFormat.format(dayStreams)
+                                    val averageStreams = streamCount / daysPassed
 //                            this obviously shouldn't happen, but just in case
                                     val streamsPercent: Int? = if (averageStreams == 0.0) null else {
-                                        (state.stats.day_streams / averageStreams * 100).toInt()
+                                        (dayStreams / averageStreams * 100).toInt()
                                     }
                                     HomeDayItem(
                                         itemText = "Streams",
@@ -185,11 +189,11 @@ fun HomeScreen(
                                 Column (
                                     modifier = Modifier.weight(1f),
                                 ) {
-                                    val minutesString = numberFormat.format(state.stats.day_minutes)
-                                    val averageMinutes = state.stats.minutes_streamed / daysPassed
+                                    val minutesString = numberFormat.format(dayMinutes)
+                                    val averageMinutes = minutesStreamed / daysPassed
 //                            this obviously shouldn't happen, but just in case
                                     val minutesPercent: Int? = if (averageMinutes == 0.0) null else {
-                                        (state.stats.day_minutes / averageMinutes * 100).toInt()
+                                        (dayMinutes / averageMinutes * 100).toInt()
                                     }
                                     HomeDayItem(
                                         itemText = "Minutes",
@@ -221,19 +225,19 @@ fun HomeScreen(
                                     modifier = Modifier.weight(1f),
                                 ) {
                                     HomeItem(itemText = "Streams",
-                                        itemValue = numberFormat.format(state.stats.stream_count))
+                                        itemValue = numberFormat.format(streamCount))
                                 }
                                 Column (
                                     modifier = Modifier.weight(1f),
                                 ) {
                                     HomeItem(itemText = "Minutes",
-                                        itemValue = numberFormat.format(state.stats.minutes_streamed))
+                                        itemValue = numberFormat.format(minutesStreamed))
                                 }
                                 Column (
                                     modifier = Modifier.weight(1f),
                                 ) {
                                     HomeItem(itemText = "Hours",
-                                        itemValue = numberFormat.format(state.stats.minutes_streamed / 60))
+                                        itemValue = numberFormat.format(minutesStreamed / 60))
                                 }
                             }
                         }

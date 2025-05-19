@@ -2,6 +2,7 @@ package com.github.barmiro.syshclient.data.settings
 
 import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
+import com.github.barmiro.syshclient.data.common.authentication.CreateUserDTO
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.PasswordChangeRequest
 import com.github.barmiro.syshclient.data.common.handleNetworkException
@@ -59,7 +60,38 @@ class SettingsRepository @Inject constructor(
                         )
                     } ?: emit(
                         Error(
-                            message = "User registration failed"
+                            message = "Password update failed"
+                        )
+                    )
+                } else {
+                    emit(
+                        Error(
+                            message = response.message(),
+                            code = response.code()
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
+            }
+            emit(Resource.Loading(false))
+        }
+    }
+    fun updateTimezone(timezone: String): Flow<Resource<Unit>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                val response = settingsApi.updateTimezone(CreateUserDTO("user", "pass", timezone))
+                if (response.isSuccessful) {
+                    response.body()?.let {
+                        emit(
+                            Resource.Success(Unit)
+                        )
+                    } ?: emit(
+                        Error(
+                            message = "Timezone change failed"
                         )
                     )
                 } else {

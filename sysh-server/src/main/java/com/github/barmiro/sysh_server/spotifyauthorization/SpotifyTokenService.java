@@ -102,7 +102,7 @@ public class SpotifyTokenService {
 		
 		newBody.add("grant_type", "authorization_code");
 		newBody.add("code", code);
-		newBody.add("redirect_uri", "http://127.0.0.1:5754/callback");
+		newBody.add("redirect_uri", "sysh://open/callback");
 		
 		ResponseEntity<String> newEntity = tokenClient
 				.post()

@@ -66,12 +66,15 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(NoSuchElementException.class)
 	public ResponseEntity<String> handleNoSuchElement(NoSuchElementException e) {
+		log.error("Encountered error: " + e.getMessage() + "\nAll changes rolled back.");
+		e.printStackTrace();
 		return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@ExceptionHandler(UnresolvedAddressException.class)
 	public ResponseEntity<String> handleUnresolvedAddress(UnresolvedAddressException e) {
 		log.error("Encountered error: " + e.getMessage() + "\nAll changes rolled back.");
+		e.printStackTrace();
 		return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	

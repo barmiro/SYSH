@@ -69,6 +69,12 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun saveUserTimezone(timezone: String) {
+        dataStore.edit {
+            it[PreferencesKeys.USER_TIMEZONE] = timezone
+        }
+    }
+
     suspend fun saveTheme(theme: AppTheme) {
         dataStore.edit {
             it[PreferencesKeys.APP_THEME] = theme.name
@@ -152,6 +158,10 @@ class UserPreferencesRepository @Inject constructor(
 
     val userDisplayName: Flow<String?> = dataStore.data.map {
         it[PreferencesKeys.USER_DISPLAY_NAME]
+    }
+
+    val userTimezone: Flow<String?> = dataStore.data.map {
+        it[PreferencesKeys.USER_TIMEZONE]
     }
 
     val userRole: Flow<String?> = dataStore.data.map {

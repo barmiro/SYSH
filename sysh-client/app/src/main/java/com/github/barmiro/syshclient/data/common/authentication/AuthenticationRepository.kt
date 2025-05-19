@@ -116,15 +116,34 @@ class AuthenticationRepository @Inject constructor(
         }
     }
 
-    suspend fun callback(state: String, code: String): Int {
-        try {
-            val response = authApi.callback(state, code)
-            return response.code()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return 600
-        }
+    fun callback(state: String?, code: String?): Flow<Resource<Int>> {
+        return flow {
+            emit(Resource.Loading(true))
 
+            if (state == null || code == null) {
+                emit(Resource.Error("Spotify responded in an unexpected way", 600))
+            } else {
+
+                try {
+                    val response = authApi.callback(state,  code)
+                    if (response.isSuccessful) {
+                        emit(Resource.Success(200))
+                    } else {
+                        emit(
+                            Error(
+                                message = response.message(),
+                                code = response.code()
+                            )
+                        )
+                    }
+                } catch (e: Exception) {
+                    val errorValues = handleNetworkException(e)
+                    emit(Error(errorValues.message, 600))
+                }
+            }
+            emit(Resource.Loading(false))
+        }
     }
+
 
 }

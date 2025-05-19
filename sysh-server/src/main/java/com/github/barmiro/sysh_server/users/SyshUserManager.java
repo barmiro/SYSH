@@ -114,6 +114,18 @@ private static final Logger log = LoggerFactory.getLogger(SyshUserManager.class)
 		}
 	}
 	
+	public int updateUserTimezone(String username, String timezone) {
+		int updated = userRepo.updateUserTimezone(username, timezone);
+		if (updated == 1) {
+
+			log.info("Timezone for user " + username + " changed to: " + timezone);
+		} else {
+			log.error("Timezone change operation for " + username + " failed: " + updated);
+			throw new RuntimeException("Timezone change failed");
+		}
+		return updated;
+	}
+	
 	public int deleteUser(String username) {
 		int deleted = userRepo.deleteUser(username);
 		if (deleted == 1) {

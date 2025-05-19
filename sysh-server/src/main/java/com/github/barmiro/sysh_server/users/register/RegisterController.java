@@ -78,23 +78,4 @@ public class RegisterController {
 		return response;
 	}
 	
-	@PostMapping("/changePassword")
-	RegisterResponse changePassword(@RequestBody PasswordChangeRequest request) { //TODO: change to a different type
-		
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		SyshUser user = manager.getUserByUsername(username);
-		
-		PasswordEncoder encoder = new BCryptPasswordEncoder(10);
-		int passwordChanged = 0;
-		if (encoder.matches(request.oldPassword(), user.password())) {
-			passwordChanged = manager.changePassword(username, request.newPassword(), false);
-		}
-		
-		if (passwordChanged == 1) {
-			return new RegisterResponse(user.username(), user.role());
-		} else {
-			throw new RuntimeException();
-		}
-	}
-	
 }

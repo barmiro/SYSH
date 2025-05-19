@@ -4,8 +4,10 @@ package com.github.barmiro.syshclient.presentation.top.artists
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -105,6 +107,9 @@ fun TopArtistsScreen(
                                 placeholderID = R.drawable.artist_24dp
                             )
                         }
+                    }
+                    item() {
+                        Spacer(modifier = Modifier.height(56.dp))
                     }
                 }
             }

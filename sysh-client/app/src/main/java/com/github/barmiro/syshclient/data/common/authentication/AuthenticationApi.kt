@@ -21,9 +21,9 @@ interface AuthenticationApi {
 
 //    this should be a POST request,
 //    GET to keep it consistent with how Spotify handles this
-    @GET("callback")
+    @GET("callbackNew")
     suspend fun callback(
         @Query("state") state: String,
         @Query("code") code: String
-    ) : Response<Void>
+    ) : Response<Unit>
 }

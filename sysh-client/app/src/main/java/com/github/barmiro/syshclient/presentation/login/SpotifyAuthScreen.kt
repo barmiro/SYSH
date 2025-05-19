@@ -36,7 +36,7 @@ fun SpotifyAuthScreen(
             coroutineScope.launch {
                 openWebsite(context, url)
             }
-            sessionVM.startRedirectServer()
+//            sessionVM.startRedirectServer()
         }
     }
 

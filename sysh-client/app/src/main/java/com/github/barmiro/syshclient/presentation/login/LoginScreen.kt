@@ -1,6 +1,5 @@
 package com.github.barmiro.syshclient.presentation.login
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,7 +18,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,6 +30,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -56,6 +59,7 @@ fun LoginScreen(sessionVM: SessionViewModel,
             SnackbarHost(hostState = snackbarHostState)
         },
     ) { innerPadding ->
+
         if (isLoading) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -65,14 +69,8 @@ fun LoginScreen(sessionVM: SessionViewModel,
                 CircularProgressIndicator(modifier = Modifier.size(48.dp))
             }
         } else {
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .background(color = MaterialTheme.colorScheme.background)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
+            Column(
+                    modifier = Modifier.fillMaxSize().padding(innerPadding),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -82,6 +80,8 @@ fun LoginScreen(sessionVM: SessionViewModel,
                     val password = remember {
                         mutableStateOf(TextFieldValue())
                     }
+
+                    val passwordFieldFocusRequester = remember { FocusRequester() }
 
                     Text(text = "Welcome to SYSH!",
                         color = MaterialTheme.colorScheme.onBackground )
@@ -94,15 +94,40 @@ fun LoginScreen(sessionVM: SessionViewModel,
                         onValueChange = { username.value = it },
                         label = {
                             Text("Username")
-                        }
+                        },
+                        modifier = Modifier.width(256.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Next,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                passwordFieldFocusRequester.requestFocus()
+                            }
+                        ),
+                        singleLine = true,
+                        maxLines = 1
                     )
                     OutlinedTextField(value = password.value,
                         onValueChange = { password.value = it },
                         label = {
                             Text("Password")
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        visualTransformation = PasswordVisualTransformation()
+                        modifier = Modifier
+                            .width(256.dp)
+                            .focusRequester(passwordFieldFocusRequester),
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Password
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                sessionVM.getToken(username.value.text, password.value.text)
+                                navController.navigate(Splash)
+                            }
+                        ),
+                        singleLine = true,
+                        maxLines = 1
                     )
 
                     Button(
@@ -151,7 +176,7 @@ fun LoginScreen(sessionVM: SessionViewModel,
                     }
                 }
             }
-        }
+        
 
     }
 }
