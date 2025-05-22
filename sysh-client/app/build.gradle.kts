@@ -15,8 +15,8 @@ android {
         applicationId = "com.github.barmiro.syshclient"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.0 RC1"
+        versionCode = 6
+        versionName = "1.0.0 RC3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -64,7 +64,6 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.converter.kotlinx.serialization)
-    implementation(libs.nanohttpd)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
     implementation(libs.androidx.datastore.preferences)

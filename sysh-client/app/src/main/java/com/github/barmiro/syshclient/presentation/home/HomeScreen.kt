@@ -116,7 +116,7 @@ fun HomeScreen(
                         ).toInt() / 100) * 100
 
                 val numberFormat = NumberFormat.getInstance(Locale.US)
-                val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd")
+                val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd").withLocale(Locale.US)
 
                 if (state.isLoading) {
                     Column(

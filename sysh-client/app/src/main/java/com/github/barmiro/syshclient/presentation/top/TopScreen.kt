@@ -73,7 +73,8 @@ fun TopScreen(
             onDateRangeModeChange = { viewModel.onEvent(it) },
             onDismiss = {
                 isDateRangePickerVisible = false
-            }
+            },
+            oldestStreamDate = state.oldestStreamDate
         )
     }
 

@@ -45,6 +45,7 @@ import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer.PointCo
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -201,7 +202,7 @@ fun StreamingStatsChartScaffold(
                 spacing = statsSeries.size / 6 + 1
             }
         }
-        val formatter = DateTimeFormatter.ofPattern(pattern)
+        val formatter = DateTimeFormatter.ofPattern(pattern).withLocale(Locale.US)
 
         Row {
             CartesianChartHost(

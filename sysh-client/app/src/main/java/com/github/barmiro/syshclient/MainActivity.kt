@@ -3,11 +3,13 @@ package com.github.barmiro.syshclient
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.barmiro.syshclient.presentation.common.AppNavHost
@@ -49,6 +52,7 @@ import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
 import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
+import com.github.barmiro.syshclient.util.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -88,9 +92,9 @@ class MainActivity : ComponentActivity() {
             val snackbarHostState = remember { SnackbarHostState() }
             val coroutineScope = rememberCoroutineScope()
             val errorMessage by sessionVM.errorMessage.collectAsState()
-
-//            TODO: find out why there's a loop
             var loginSuccessful by remember { mutableStateOf(false) }
+
+
 
 
             LaunchedEffect(storedUrl) {
@@ -98,11 +102,10 @@ class MainActivity : ComponentActivity() {
                     startupVM.getServerInfo()
 //                }
             }
-//
-//            TODO: rethink this
+
             LaunchedEffect(isCallbackSuccessful) {
                 if (isCallbackSuccessful == true) {
-                    restartApp(applicationContext)
+                    startupVM.getServerInfo()
                 }
             }
 
@@ -123,7 +126,7 @@ class MainActivity : ComponentActivity() {
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar(
                                         message = errorMessage.takeIf { message ->
-                                            !message.isNullOrEmpty()
+                                            !message.isNullOrBlank()
                                         } ?: "You have been logged out",
                                         actionLabel = "Dismiss",
                                         duration = SnackbarDuration.Short
@@ -145,7 +148,7 @@ class MainActivity : ComponentActivity() {
                                     inclusive = true
                                 }
                             }
-                            if (!storedUrl.isNullOrEmpty()){
+                            if (!storedUrl.isNullOrBlank()){
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar(
                                         message = "Couldn't connect to the server"
@@ -164,8 +167,6 @@ class MainActivity : ComponentActivity() {
             }
 
             LaunchedEffect(responseCode) {
-//                no better idea where to stop it for now
-//                sessionVM.stopRedirectServer()
                 when (responseCode) {
                     200 -> {
                         navController.navigate(Home) {
@@ -186,7 +187,7 @@ class MainActivity : ComponentActivity() {
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(
                                 message = errorMessage.takeIf {
-                                    !it.isNullOrEmpty()
+                                    !it.isNullOrBlank()
                                 } ?: "You have been logged out",
                                 actionLabel = "Dismiss",
                                 duration = SnackbarDuration.Short
@@ -207,20 +208,64 @@ class MainActivity : ComponentActivity() {
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(
                                 message = errorMessage.takeIf {
-                                    !it.isNullOrEmpty()
+                                    !it.isNullOrBlank()
                                 } ?: "An unknown error occurred",
                                 actionLabel = "Dismiss",
                                 duration = SnackbarDuration.Short
                             )
                         }
-
                     }
                 }
             }
 
+
             SyshClientTheme(
                 appTheme = appTheme
             ) {
+                // Override status bar icon colors
+                val statusBarColor = MaterialTheme.colorScheme.background.toArgb()
+                val navigationBarColor = MaterialTheme.colorScheme.secondaryContainer.toArgb()
+
+                val isLightTheme: Boolean = if (appTheme == AppTheme.SYSTEM_DEFAULT) {
+                    !isSystemInDarkTheme()
+                } else {
+                    appTheme == AppTheme.LIGHT
+                }
+
+                LaunchedEffect(isLightTheme, loginSuccessful) {
+                    if (isLightTheme) {
+                        enableEdgeToEdge(
+                            statusBarStyle = SystemBarStyle.light(
+                                statusBarColor, statusBarColor
+                            ),
+                            navigationBarStyle = if (loginSuccessful) {
+                                SystemBarStyle.light(
+                                    navigationBarColor, navigationBarColor
+                                )
+                            } else {
+                                SystemBarStyle.light(
+                                    statusBarColor, statusBarColor
+                                )
+                            }
+                        )
+                    } else {
+                        enableEdgeToEdge(
+                            statusBarStyle = SystemBarStyle.dark(
+                                statusBarColor,
+                            ),
+                            navigationBarStyle = if(loginSuccessful) {
+                                SystemBarStyle.dark(
+                                    navigationBarColor
+                                )
+                            } else {
+                                SystemBarStyle.dark(
+                                    statusBarColor
+                                )
+                            }
+                        )
+                    }
+                }
+
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
@@ -297,7 +342,6 @@ class MainActivity : ComponentActivity() {
     private fun finalizeImport() {
         topScreenVM.getOldestStreamDate()
         homeVM.getStats()
-
     }
 }
 

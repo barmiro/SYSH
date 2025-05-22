@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.barmiro.syshclient.R
+import com.github.barmiro.syshclient.data.settings.dataimport.UploadStatus
 import com.github.barmiro.syshclient.presentation.settings.ImportViewModel
 import com.github.barmiro.syshclient.presentation.startup.InfoItem
 
@@ -50,6 +51,12 @@ fun ImportScreen(
     val zipFileStatus by importVM.zipFileStatus.collectAsState()
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var openAlertDialog by remember { mutableStateOf(false) }
+
+    val isImportInProgress = zipFileStatus?.status == UploadStatus.Waiting
+            || zipFileStatus?.status == UploadStatus.Processing
+
+    val importItemModifier = if (isImportInProgress) Modifier.alpha(0.7f)
+            else Modifier.clickable(onClick = { onPickZipFile() })
     Scaffold(
         topBar = {
             TopAppBar(
@@ -110,7 +117,7 @@ fun ImportScreen(
                 item() {
                     Row() {
                         SettingsItem(
-                            itemText = "Select .zip file",
+                            itemText = if (isImportInProgress) "Import in progress" else "Select .zip file",
                             icon = {
                                 Icon(
                                     imageVector = Icons.Default.Add,
@@ -118,11 +125,9 @@ fun ImportScreen(
                                     contentDescription = "Add"
                                 )
                             },
-                            modifier = Modifier
+                            modifier = importItemModifier
                                 .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-                                .clickable(
-                                    onClick = onPickZipFile
-                                )
+
                         )
                     }
                 }

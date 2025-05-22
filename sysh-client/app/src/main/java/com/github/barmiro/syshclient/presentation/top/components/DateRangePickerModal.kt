@@ -11,6 +11,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DateRangePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDateRangePickerState
@@ -20,18 +21,42 @@ import androidx.compose.ui.unit.dp
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.util.setToEndOfDay
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateRangePickerModal(
     onVMSearchParameterChange: (TopScreenEvent.OnSearchParameterChange) -> Unit,
     onDateRangeModeChange: (TopScreenEvent.OnDateRangeModeChange) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    oldestStreamDate: LocalDate
 ) {
-    val dateRangePickerState = rememberDateRangePickerState()
+
+    val oldestStreamDateMillis = LocalDateTime
+        .of(oldestStreamDate, LocalTime.MIN)
+        .atOffset(ZoneOffset.UTC)
+        .toInstant()
+        .toEpochMilli()
+
+    val epochMillisNow = LocalDateTime.now()
+        .atOffset(ZoneOffset.UTC)
+        .toInstant()
+        .toEpochMilli()
+
+    val notInTheFuture: SelectableDates = object : SelectableDates {
+        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+            return utcTimeMillis in oldestStreamDateMillis..<epochMillisNow
+        }
+    }
+
+    val dateRangePickerState = rememberDateRangePickerState(
+        selectableDates = notInTheFuture
+    )
 
     DatePickerDialog(
         modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -39,13 +64,14 @@ fun DateRangePickerModal(
         confirmButton = {
             TextButton(
                 onClick = {
-                    dateRangePickerState.selectedStartDateMillis?.let { startDateMillis ->
+                    dateRangePickerState.selectedStartDateMillis?.let { rawStartDateMillis ->
+
+
 
                         val endDateMillis = dateRangePickerState.selectedEndDateMillis
-                            ?: LocalDateTime.now()
-                            .atOffset(ZoneOffset.UTC)
-                            .toInstant()
-                            .toEpochMilli()
+                            ?: epochMillisNow
+
+                        val startDateMillis = min(rawStartDateMillis, endDateMillis)
 
                         if (dateRangePickerState.selectedEndDateMillis == null) {
                             dateRangePickerState.setSelection(
@@ -66,9 +92,15 @@ fun DateRangePickerModal(
                             ZoneId.of("UTC")
                             )
                         )
-
-                        onVMSearchParameterChange(TopScreenEvent.OnSearchParameterChange(null, start, end))
-                        onDateRangeModeChange(TopScreenEvent.OnDateRangeModeChange("custom"))
+//                        onDateRangeModeChange(TopScreenEvent.OnDateRangeModeChange("custom"))
+                        onVMSearchParameterChange(
+                            TopScreenEvent.OnSearchParameterChange(
+                                start = start,
+                                end = end,
+                                dateRangeMode = "custom",
+                                dateRangePage = -1
+                            )
+                        )
                     }
                     onDismiss()
                 },
@@ -112,3 +144,4 @@ fun DateRangePickerModal(
         )
     }
 }
+

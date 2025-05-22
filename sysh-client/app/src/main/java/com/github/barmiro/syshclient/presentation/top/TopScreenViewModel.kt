@@ -55,7 +55,9 @@ class TopScreenViewModel @Inject constructor(
                 stateManager.updateState(
                     start = event.start,
                     end = event.end,
-                    sort = event.sort
+                    sort = event.sort,
+                    dateRangeMode = event.dateRangeMode,
+                    dateRangePageNumber = event.dateRangePage
                 )
             }
             is TopScreenEvent.OnDateRangeModeChange -> {

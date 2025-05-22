@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -41,6 +44,7 @@ import androidx.navigation.NavHostController
 import com.github.barmiro.syshclient.presentation.common.Register
 import com.github.barmiro.syshclient.presentation.common.Splash
 import com.github.barmiro.syshclient.presentation.startup.StartupViewModel
+import com.github.barmiro.syshclient.presentation.startup.UrlInfoItem
 import kotlinx.coroutines.launch
 
 @Composable
@@ -81,6 +85,8 @@ fun LoginScreen(sessionVM: SessionViewModel,
                         mutableStateOf(TextFieldValue())
                     }
 
+                    val isInputValid = canEncodeInput(username.value.text) && canEncodeInput(password.value.text)
+
                     val passwordFieldFocusRequester = remember { FocusRequester() }
 
                     Text(text = "Welcome to SYSH!",
@@ -98,6 +104,7 @@ fun LoginScreen(sessionVM: SessionViewModel,
                         modifier = Modifier.width(256.dp),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             imeAction = ImeAction.Next,
+                            keyboardType = KeyboardType.Ascii
                         ),
                         keyboardActions = KeyboardActions(
                             onNext = {
@@ -105,7 +112,8 @@ fun LoginScreen(sessionVM: SessionViewModel,
                             }
                         ),
                         singleLine = true,
-                        maxLines = 1
+                        maxLines = 1,
+                        isError = !canEncodeInput(username.value.text)
                     )
                     OutlinedTextField(value = password.value,
                         onValueChange = { password.value = it },
@@ -127,14 +135,25 @@ fun LoginScreen(sessionVM: SessionViewModel,
                             }
                         ),
                         singleLine = true,
-                        maxLines = 1
+                        maxLines = 1,
+                        isError = !canEncodeInput(password.value.text)
                     )
-
+                    if (!isInputValid) {
+                        UrlInfoItem(
+                            icon = {
+                                Icon(imageVector = Icons.Default.Close,
+                                    tint = MaterialTheme.colorScheme.error,
+                                    contentDescription = "Error")
+                            },
+                            text = "Some fields contain invalid characters"
+                        )
+                    }
                     Button(
                         onClick = {
                             sessionVM.getToken(username.value.text, password.value.text)
                             navController.navigate(Splash)
-                        }
+                        },
+                        enabled = isInputValid
                     ) {
                         Text("Log In")
                     }
@@ -180,3 +199,8 @@ fun LoginScreen(sessionVM: SessionViewModel,
 
     }
 }
+
+public fun canEncodeInput(input: String): Boolean {
+    return Charsets.ISO_8859_1.newEncoder().canEncode(input)
+}
+

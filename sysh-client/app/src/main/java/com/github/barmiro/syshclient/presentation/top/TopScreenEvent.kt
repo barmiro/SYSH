@@ -7,7 +7,9 @@ sealed class TopScreenEvent {
     data class OnSearchParameterChange(
         val sort: String? = null,
         val start: LocalDateTime? = null,
-        val end: LocalDateTime? = null
+        val end: LocalDateTime? = null,
+        val dateRangeMode: String? = null,
+        val dateRangePage: Int? = null
     ): TopScreenEvent()
 
     data class OnDateRangeModeChange(

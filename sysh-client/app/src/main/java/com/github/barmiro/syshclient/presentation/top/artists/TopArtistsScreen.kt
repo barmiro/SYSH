@@ -1,7 +1,6 @@
 package com.github.barmiro.syshclient.presentation.top.artists
 
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -94,9 +93,6 @@ fun TopArtistsScreen(
                                 sort = state.sort,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable {
-                                        //TODO
-                                    }
                                     .padding(vertical = 12.dp, horizontal = 10.dp),
                                 onColorExtracted = { color: Color ->
                                     if (dominantColors[i] != color) {

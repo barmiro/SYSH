@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -54,12 +55,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -70,6 +74,8 @@ import coil3.compose.AsyncImage
 import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.data.settings.dataimport.FileStatus
 import com.github.barmiro.syshclient.data.settings.dataimport.UploadStatus
+import com.github.barmiro.syshclient.data.settings.dataimport.uploadStatusMessageParser
+import com.github.barmiro.syshclient.presentation.login.canEncodeInput
 import com.github.barmiro.syshclient.presentation.startup.UrlInfoItem
 import com.github.barmiro.syshclient.util.AppTheme
 
@@ -132,7 +138,6 @@ fun JsonFileUploadItem(
                                 modifier = Modifier.alpha(0.5f),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 fontStyle = FontStyle.Italic,
-                                lineHeight = 48.sp
                             )
                         }
                         is UploadStatus.Processing -> {
@@ -141,7 +146,6 @@ fun JsonFileUploadItem(
                                 modifier = Modifier.alpha(0.5f),
                                 color = MaterialTheme.colorScheme.onBackground,
                                 fontStyle = FontStyle.Italic,
-                                lineHeight = 48.sp
                             )
                             CircularProgressIndicator(modifier = Modifier.size(42.dp).padding(8.dp),
                                 strokeCap = StrokeCap.Round)
@@ -153,7 +157,6 @@ fun JsonFileUploadItem(
                                 } ?: "File processed, but no message from server",
                                 color = MaterialTheme.colorScheme.onBackground,
                                 fontSize = 16.sp,
-                                lineHeight = 48.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.padding(end = 4.dp)
@@ -171,9 +174,18 @@ fun JsonFileUploadItem(
                         }
                         is UploadStatus.Failed -> {
                             Text(
-                                text = fileStatus.status.message ?: "File upload failed",
-                                color = MaterialTheme.colorScheme.onBackground,
-                                lineHeight = 48.sp
+                                text = uploadStatusMessageParser(
+                                    fileStatus.status.message,
+                                    "File upload failed",
+                                    replaceConnectionError = true
+                                ),
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Error",
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(32.dp).padding(start = 8.dp)
                             )
                         }
                     }
@@ -485,6 +497,8 @@ fun ChangePasswordItem(
     onClick: () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
+    val newPasswordFieldFocusRequester = remember { FocusRequester() }
+    val confirmationFieldFocusRequester = remember { FocusRequester() }
     Surface(
         modifier = modifier.animateContentSize(),
         shape = RoundedCornerShape(8.dp),
@@ -549,6 +563,10 @@ fun ChangePasswordItem(
                     mutableStateOf(TextFieldValue())
                 }
 
+                val isInputValid = canEncodeInput(oldPassword.value.text)
+                        && canEncodeInput(newPassword.value.text)
+                        && canEncodeInput(confirmation.value.text)
+
                 Row(
                     modifier = Modifier.padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -558,8 +576,20 @@ fun ChangePasswordItem(
                         label = {
                             Text("Old password")
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        visualTransformation = PasswordVisualTransformation()
+                        modifier = Modifier.width(256.dp),
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Next,
+                            keyboardType = KeyboardType.Password
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                newPasswordFieldFocusRequester.requestFocus()
+                            }
+                        ),
+                        singleLine = true,
+                        maxLines = 1,
+                        isError = !canEncodeInput(oldPassword.value.text)
                     )
                 }
 
@@ -572,8 +602,22 @@ fun ChangePasswordItem(
                         label = {
                             Text("New password")
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        visualTransformation = PasswordVisualTransformation()
+                        modifier = Modifier
+                            .width(256.dp)
+                            .focusRequester(newPasswordFieldFocusRequester),
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Next,
+                            keyboardType = KeyboardType.Password
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                confirmationFieldFocusRequester.requestFocus()
+                            }
+                        ),
+                        singleLine = true,
+                        maxLines = 1,
+                        isError = !canEncodeInput(newPassword.value.text)
                     )
 
                 }
@@ -587,9 +631,23 @@ fun ChangePasswordItem(
                         label = {
                             Text("Confirm new password")
                         },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        modifier = Modifier
+                            .width(256.dp)
+                            .focusRequester(confirmationFieldFocusRequester),
                         visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Password
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                onChangePassword(oldPassword.value.text, newPassword.value.text)
+                            }
+                        ),
+                        singleLine = true,
+                        maxLines = 1,
                         isError = newPassword.value.text != confirmation.value.text
+                                && !canEncodeInput(confirmation.value.text)
                     )
                 }
 
@@ -605,9 +663,20 @@ fun ChangePasswordItem(
                         enabled = newPassword.value.text == confirmation.value.text
                                 && newPassword.value.text.isNotEmpty()
                                 && oldPassword.value.text.isNotEmpty()
+                                && isInputValid
                     ) {
                         Text("Change Password")
                     }
+                }
+                if (!isInputValid) {
+                    UrlInfoItem(
+                        icon = {
+                            Icon(imageVector = Icons.Default.Close,
+                                tint = MaterialTheme.colorScheme.error,
+                                contentDescription = "Error")
+                        },
+                        text = "Some fields contain invalid characters"
+                    )
                 }
                 if (newPassword.value.text != confirmation.value.text) {
                     UrlInfoItem(
@@ -938,7 +1007,13 @@ fun ImportFileStatusItem(zipFileStatus: FileStatus,
                         archiveText = "Imported $totalStreams entries"
                     }
                     is UploadStatus.Failed -> {
-                        archiveText = zipFileStatus.status.message ?: "Something went wrong"
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Error",
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(48.dp).padding(horizontal = 8.dp)
+                        )
+                        archiveText = uploadStatusMessageParser(zipFileStatus.status.message, "Something went wrong")
                     }
                 }
 

@@ -44,6 +44,10 @@ class TopScreenStateManager @Inject constructor() {
             dateRangePageNumber = handleNullOrNegativeInt(dateRangePageNumber, _state.value.dateRangePageNumber)
         )
     }
+
+    fun wipeState() {
+        _state.value = TopScreenState()
+    }
 }
 
 //These are for explicitly resetting values to null. More elegant way?

@@ -118,3 +118,16 @@ sealed class UploadStatus {
     data class Failed(val message: String?) : UploadStatus()
 }
 
+fun uploadStatusMessageParser(message: String?,
+                              placeholder: String,
+                              replaceConnectionError: Boolean = false): String {
+    return message?.let {
+        when {
+            it.contains("ENOENT") -> placeholder
+            it.contains("ENOSPC") -> "No space left on device"
+            replaceConnectionError && it.contains("connect") -> placeholder
+            else -> it
+        }
+    } ?: placeholder
+}
+

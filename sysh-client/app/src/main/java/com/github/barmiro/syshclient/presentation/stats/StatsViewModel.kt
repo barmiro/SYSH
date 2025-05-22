@@ -50,11 +50,10 @@ class StatsViewModel @Inject constructor(
                 stateManager.updateState(
                     start = event.start,
                     end = event.end,
-                    sort = event.sort
+                    sort = event.sort,
+                    dateRangeMode = event.dateRangeMode,
+                    dateRangePageNumber = event.dateRangePage
                 )
-                getStats()
-                getStatsSeries()
-                getHourlyStats()
             }
             is TopScreenEvent.OnDateRangeModeChange -> {
                 stateManager.updateState(

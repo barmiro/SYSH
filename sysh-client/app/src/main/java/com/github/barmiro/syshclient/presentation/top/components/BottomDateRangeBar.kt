@@ -43,6 +43,7 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 @Composable
 fun TopScreenBottomBar(
@@ -51,7 +52,7 @@ fun TopScreenBottomBar(
     onDateRangePageChange: (TopScreenEvent.OnDateRangePageChange) -> Unit
     ) {
 
-    var pageCount by remember { mutableIntStateOf(100) }
+    var pageCount by remember { mutableIntStateOf(1000) }
     var pagerState = rememberPagerState(pageCount = { pageCount }, initialPage = pageCount - 1)
     var targetPage by remember { mutableIntStateOf(pagerState.currentPage) }
     var pageTextGenerator by remember { mutableStateOf<((Int) -> String)>({ "Page $it" }) }
@@ -83,6 +84,8 @@ fun TopScreenBottomBar(
             else -> 1
         }
         targetPage = state.dateRangePageNumber ?: (pageCount - 1)
+        println("TARGET PAGE: $targetPage")
+        println("STATE PAGE: ${state.dateRangePageNumber}")
     }
 
     LaunchedEffect(targetPage, state.dateRangeMode) {
@@ -103,7 +106,9 @@ fun TopScreenBottomBar(
                 onVMSearchParameterChange(
                     TopScreenEvent.OnSearchParameterChange(
                         start = yearToStart(year),
-                        end = yearToEnd(year)))
+                        end = yearToEnd(year)
+                    )
+                )
             }
 
             if (state.dateRangeMode == "monthly") {
@@ -123,8 +128,6 @@ fun TopScreenBottomBar(
                     val year = monthYear.year
                     "$monthName $year"
                 }
-
-//                onDateRangeChange(monthToDateRange(month))
                 onVMSearchParameterChange(
                     TopScreenEvent.OnSearchParameterChange(
                         start = monthToStart(month),
@@ -143,11 +146,15 @@ fun TopScreenBottomBar(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Bottom
             ) {
-                Column(modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).background(MaterialTheme.colorScheme.background)) {
+
+                Column(modifier = Modifier.fillMaxWidth()
+                                    .heightIn(min = 48.dp)
+                                    .background(MaterialTheme.colorScheme.background),
+                    verticalArrangement = Arrangement.Center) {
                     HorizontalDivider(thickness = 2.dp, modifier = Modifier.alpha(0.5f))
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 46.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -243,7 +250,7 @@ fun pageNumberToMonth(page: Int, pageCount: Int): YearMonth {
 @Composable
 fun BottomBarNewCustomText(start: LocalDateTime?, end: LocalDateTime?) {
     if (start != null && end != null) {
-        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy")
+        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy").withLocale(Locale.US)
         val formattedStart = start.format(formatter)
         val formattedEnd = end.format(formatter)
 

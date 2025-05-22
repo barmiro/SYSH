@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Info
@@ -27,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -78,7 +83,25 @@ fun StartupScreen(
                         },
                         isError = urlValidation?.let {
                             !it.isValidUrl
-                        } ?: false
+                        } ?: false,
+                        modifier = Modifier.width(256.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Uri
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                urlValidation?.let {
+                                    startupVM.serverResponded
+                                    val url = if (it.hasScheme) urlInput else "http://$urlInput"
+                                    sessionVM.saveServerUrl(url) {
+                                        startupVM.getServerInfo()
+                                    }
+                                }
+                            }
+                        ),
+                        singleLine = true,
+                        maxLines = 1
                     )
                 }
                 Row {
@@ -87,7 +110,6 @@ fun StartupScreen(
                             urlValidation?.let {
                                 startupVM.serverResponded
                                 val url = if (it.hasScheme) urlInput else "http://$urlInput"
-                                println(url)
                                 sessionVM.saveServerUrl(url) {
                                     startupVM.getServerInfo()
                                 }

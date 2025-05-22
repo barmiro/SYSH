@@ -1,6 +1,5 @@
 package com.github.barmiro.syshclient.presentation.login
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +13,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -52,11 +50,14 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
         mutableStateOf(TextFieldValue())
     }
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
-    ) {
+    val isInputValid = canEncodeInput(oldPassword.value.text)
+            && canEncodeInput(newPassword.value.text)
+            && canEncodeInput(confirmation.value.text)
+
+    val isValueTooLong = oldPassword.value.text.length > 72
+            || newPassword.value.text.length > 72
+            || confirmation.value.text.length > 72
+
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
@@ -102,7 +103,9 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
                         }
                     ),
                     singleLine = true,
-                    maxLines = 1
+                    maxLines = 1,
+                    isError = !canEncodeInput(oldPassword.value.text)
+                            || oldPassword.value.text.length > 72
                 )
 
                 OutlinedTextField(value = newPassword.value,
@@ -124,7 +127,9 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
                         }
                     ),
                     singleLine = true,
-                    maxLines = 1
+                    maxLines = 1,
+                    isError = !canEncodeInput(newPassword.value.text)
+                            || newPassword.value.text.length > 72
                 )
 
                 OutlinedTextField(value = confirmation.value,
@@ -146,12 +151,37 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
                         }
                     ),
                     singleLine = true,
-                    maxLines = 1
+                    maxLines = 1,
+                    isError = newPassword.value.text != confirmation.value.text
+                            || !canEncodeInput(confirmation.value.text)
+                            || confirmation.value.text.length > 72
                 )
 
 
+                if (!isInputValid) {
+                    UrlInfoItem(
+                        icon = {
+                            Icon(imageVector = Icons.Default.Close,
+                                tint = MaterialTheme.colorScheme.error,
+                                contentDescription = "Error")
+                        },
+                        text = "Some fields contain invalid characters"
+                    )
+                }
 
-                if (newPassword.value.text != confirmation.value.text) {
+                if (isValueTooLong) {
+                    UrlInfoItem(
+                        icon = {
+                            Icon(imageVector = Icons.Default.Close,
+                                tint = MaterialTheme.colorScheme.error,
+                                contentDescription = "Error")
+                        },
+                        text = "Password can't be longer than 72 characters"
+                    )
+                }
+
+                if (newPassword.value.text != confirmation.value.text
+                    && newPassword.value.text.isNotEmpty()) {
                     UrlInfoItem(
                         icon = {
                             Icon(imageVector = Icons.Default.Close,
@@ -182,6 +212,8 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
                             && newPassword.value.text != oldPassword.value.text
                             && newPassword.value.text.isNotEmpty()
                             && oldPassword.value.text.isNotEmpty()
+                            && isInputValid
+                            && !isValueTooLong
                 ) {
                     Text("Change Password")
                 }
@@ -207,5 +239,4 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
             }
 
         }
-    }
 }

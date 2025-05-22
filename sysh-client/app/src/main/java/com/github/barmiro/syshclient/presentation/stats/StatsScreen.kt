@@ -6,8 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,11 +24,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.barmiro.syshclient.presentation.startup.InfoItem
 import com.github.barmiro.syshclient.presentation.top.TopScreenEvent
 import com.github.barmiro.syshclient.presentation.top.components.DateRangePickerModal
 import com.github.barmiro.syshclient.presentation.top.components.StatsScreenTopText
@@ -50,10 +56,8 @@ fun StatsScreen(
 
     var isDateRangePickerVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(state.dateRangeMode) {
-        viewModel.getStatsSeries()
-        viewModel.getStats()
-        viewModel.getHourlyStats()
+    LaunchedEffect(state.start, state.end) {
+        viewModel.onEvent(TopScreenEvent.Refresh)
     }
 
     if (isDateRangePickerVisible) {
@@ -62,7 +66,8 @@ fun StatsScreen(
             onDateRangeModeChange = { viewModel.onEvent(it) },
             onDismiss = {
                 isDateRangePickerVisible = false
-            }
+            },
+            oldestStreamDate = state.oldestStreamDate
         )
     }
 
@@ -105,25 +110,6 @@ fun StatsScreen(
 
 
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 5.dp)) {
-//            if (homeState.isLoading) {
-//                Column(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    verticalArrangement = Arrangement.Center,
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    CircularProgressIndicator(modifier = Modifier.size(48.dp))
-//                }
-//            }  else if (!viewModel.errorMessage.collectAsState().value.isNullOrEmpty()) {
-//                Column(
-//                    modifier = Modifier.fillMaxSize(),
-//                    verticalArrangement = Arrangement.Center,
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    Text(text = viewModel.errorMessage.collectAsState().value!!,
-//                        color = MaterialTheme.colorScheme.onBackground,
-//                        textAlign = TextAlign.Center)
-//                }
-//            } else {
                 val numberFormat = NumberFormat.getInstance(Locale.US)
 
                 val startDate: LocalDate = state.start?.toLocalDate()
@@ -274,9 +260,21 @@ fun StatsScreen(
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.Center
                             ) {
-                                Text("no data to show")
+                                InfoItem(
+                                    icon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Info,
+                                            contentDescription = "No data found",
+                                            modifier = Modifier.size(18.dp).alpha(0.8f)
+                                        )
+                                    },
+                                    title = "No data to show",
+                                    text = "Continue listening or import streaming data.",
+                                    lineHeight = 16.sp
+                                )
                             }
                         } else {
+
                             Row(
                                 modifier = Modifier.fillMaxWidth()
                                     .padding(top = 16.dp, bottom = 8.dp),
