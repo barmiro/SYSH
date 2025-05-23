@@ -1,6 +1,8 @@
 package com.github.barmiro.syshclient
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -28,6 +30,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.github.barmiro.syshclient.presentation.common.AppNavHost
@@ -55,6 +59,7 @@ import com.github.barmiro.syshclient.ui.theme.SyshClientTheme
 import com.github.barmiro.syshclient.util.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -70,6 +75,7 @@ class MainActivity : ComponentActivity() {
     private val importVM: ImportViewModel by viewModels()
     private val adminVM: AdminViewModel by viewModels()
     private val settingsVM: SettingsViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,6 +101,8 @@ class MainActivity : ComponentActivity() {
             var loginSuccessful by remember { mutableStateOf(false) }
 
 
+            val config = LocalConfiguration.current
+            val context = LocalContext.current
 
 
             LaunchedEffect(storedUrl) {
@@ -312,6 +320,21 @@ class MainActivity : ComponentActivity() {
         }
         handleSpotifyCallback(intent)
     }
+
+    private fun Context.setLocale(locale: Locale): Context {
+        val config = resources.configuration
+        val newConfig = Configuration(config)
+        newConfig.setLocale(locale)
+        return createConfigurationContext(newConfig)
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        // i know this is bad, but it's the only way to force ISO date format
+        val locale = Locale.CANADA
+        val context = newBase.setLocale(locale)
+        super.attachBaseContext(context)
+    }
+
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)

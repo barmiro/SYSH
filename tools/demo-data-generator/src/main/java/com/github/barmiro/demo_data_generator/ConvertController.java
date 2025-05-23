@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.github.barmiro.demo_data_generator.dto.FilterStreamDTO;
 import com.github.barmiro.demo_data_generator.dto.StreamDTO;
 
 @RestController
@@ -46,6 +47,27 @@ public class ConvertController {
 		
 		System.out.println(index);
 		return convertedStreams;
+	}
+	
+	@PostMapping("/filter")
+	List<StreamDTO> filterStreams(@RequestBody List<FilterStreamDTO> unfilteredStreams) {
+		List<StreamDTO> filteredStreams = new ArrayList<>();
+		
+		for (FilterStreamDTO stream:unfilteredStreams) {
+			if (!stream.conn_country().equals("A1") 
+					&& !stream.conn_country().equals("ZZ")) {
+				filteredStreams.add(
+						new StreamDTO(
+								stream.ts(),
+								stream.ms_played(),
+								stream.spotify_track_uri()
+						)
+				);
+			}
+		}
+		
+		return filteredStreams;
+		
 	}
 	
 	

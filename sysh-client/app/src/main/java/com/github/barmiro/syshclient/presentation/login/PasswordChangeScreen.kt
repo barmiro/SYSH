@@ -152,7 +152,8 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
                     ),
                     singleLine = true,
                     maxLines = 1,
-                    isError = newPassword.value.text != confirmation.value.text
+                    isError = (newPassword.value.text != confirmation.value.text
+                            && confirmation.value.text.isNotEmpty())
                             || !canEncodeInput(confirmation.value.text)
                             || confirmation.value.text.length > 72
                 )
