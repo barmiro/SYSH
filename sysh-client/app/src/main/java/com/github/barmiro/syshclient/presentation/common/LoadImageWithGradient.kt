@@ -89,3 +89,47 @@ fun LoadImageWithGradient(
         }
     }
 }
+
+@Composable
+fun LoadImage(
+    itemName: String,
+    imageUrl: String?,
+    placeholderID: Int,
+    modifier: Modifier
+) {
+    var isImageEmpty by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val request = imageUrl?.let { url ->
+        ImageRequest.Builder(context)
+            .data(url)
+            .allowHardware(false)
+            .listener(
+                onSuccess = { _, _ ->
+                    isImageEmpty = false},
+                onError = { _, _ ->
+                    isImageEmpty = true
+                }
+            )
+            .build()
+    }
+    Box(
+        modifier = modifier
+            .background(Color.Gray.copy(alpha = 0.1f)),
+        contentAlignment = Alignment.Center) {
+        if(!isImageEmpty) {
+            AsyncImage(
+                model = request,
+                contentScale = ContentScale.Crop,
+                contentDescription = "Thumbnail for item $itemName",
+                modifier = modifier,
+            )
+        } else {
+            Icon(
+                painter = painterResource(id = placeholderID),
+                tint = IconButtonDefaults.iconButtonColors().contentColor,
+                contentDescription = "Placeholder for item $itemName",
+                modifier = Modifier.size(28.dp).alpha(0.8f)
+            )
+        }
+    }
+}

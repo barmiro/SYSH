@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.barmiro.syshclient.R
 import com.github.barmiro.syshclient.domain.top.TopItemData
+import com.github.barmiro.syshclient.presentation.common.LoadImage
 import com.github.barmiro.syshclient.presentation.common.LoadImageWithGradient
 import com.github.barmiro.syshclient.presentation.top.components.TopItemSortParamDisplay
 import com.github.barmiro.syshclient.presentation.top.components.TopListIndexText
@@ -53,22 +54,42 @@ fun TopItem(
     modifier: Modifier = Modifier,
     onColorExtracted: (Color) -> Unit,
     startColor: Color,
-    placeholderID: Int
+    placeholderID: Int,
+    isGradientEnabled: Boolean
 ) {
+    var gradientModifier: Modifier = Modifier
     val dominantColor = remember { mutableStateOf(startColor) }
-    val animatedColor = animateColorAsState(
-        targetValue = dominantColor.value,
-        animationSpec = tween(durationMillis = 400)
-    )
 
-    val imageBrush = ShaderBrush(
-        ImageShader(
-            image = ImageBitmap.imageResource(
-                id = R.drawable.noise_128x128),
-            tileModeX = TileMode.Repeated,
-            tileModeY = TileMode.Repeated
+    if (isGradientEnabled) {
+        val animatedColor = animateColorAsState(
+            targetValue = dominantColor.value,
+            animationSpec = tween(durationMillis = 400)
         )
-    )
+
+        val imageBrush = ShaderBrush(
+            ImageShader(
+                image = ImageBitmap.imageResource(
+                    id = R.drawable.noise_128x128),
+                tileModeX = TileMode.Repeated,
+                tileModeY = TileMode.Repeated
+            )
+        )
+
+        gradientModifier = Modifier
+            .background(
+                brush = imageBrush,
+                alpha = 0.01f
+            )
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.secondaryContainer,
+                        animatedColor.value
+                    ),
+                    startX = 80f
+                )
+            )
+    }
 
     Surface(
         modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
@@ -76,20 +97,7 @@ fun TopItem(
         color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Box(
-            modifier = Modifier
-                .background(
-                    brush = imageBrush,
-                    alpha = 0.01f
-                )
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.secondaryContainer,
-                            animatedColor.value
-                        ),
-                        startX = 80f
-                    )
-                )
+            modifier = gradientModifier
         ) {
             Row(
                 modifier = modifier,
@@ -105,18 +113,27 @@ fun TopItem(
                 }
                 Column(
                 ) {
-                    LoadImageWithGradient(
-                        itemName = itemData.name,
-                        imageUrl = itemData.thumbnailUrl,
-                        placeholderID = placeholderID,
-                        onGradientColorChange = {
-                            dominantColor.value = it
-                            onColorExtracted(it)
-                        },
-                        modifier = Modifier.height(50.dp).width(50.dp)
-                            .clip(RoundedCornerShape(2.dp))
-                    )
-
+                    if (isGradientEnabled) {
+                        LoadImageWithGradient(
+                            itemName = itemData.name,
+                            imageUrl = itemData.thumbnailUrl,
+                            placeholderID = placeholderID,
+                            onGradientColorChange = {
+                                dominantColor.value = it
+                                onColorExtracted(it)
+                            },
+                            modifier = Modifier.height(50.dp).width(50.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                        )
+                    } else {
+                        LoadImage(
+                            itemName = itemData.name,
+                            imageUrl = itemData.thumbnailUrl,
+                            placeholderID = placeholderID,
+                            modifier = Modifier.height(50.dp).width(50.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                        )
+                    }
                 }
                 Column(
                     modifier = Modifier.weight(5f)

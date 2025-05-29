@@ -99,6 +99,12 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun setIsGradientEnabled(isGradientEnabled: Boolean) {
+        dataStore.edit {
+            it[PreferencesKeys.IS_GRADIENT_ENABLED] = isGradientEnabled
+        }
+    }
+
     suspend fun setAuthorizedWithSpotify(isAuthorizedWithSpotify: Boolean) {
         dataStore.edit {
             it[PreferencesKeys.IS_AUTHORIZED_WITH_SPOTIFY] = isAuthorizedWithSpotify
@@ -144,6 +150,10 @@ class UserPreferencesRepository @Inject constructor(
 
     val isDemoVersion: Flow<Boolean?> = dataStore.data.map {
         it[PreferencesKeys.IS_DEMO_VERSION]
+    }
+
+    val isGradientEnabled: Flow<Boolean> = dataStore.data.map {
+        it[PreferencesKeys.IS_GRADIENT_ENABLED] ?: true
     }
 
     val appTheme: Flow<AppTheme> = dataStore.data.map {

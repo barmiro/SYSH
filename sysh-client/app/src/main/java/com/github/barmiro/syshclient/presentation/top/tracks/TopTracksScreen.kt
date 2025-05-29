@@ -36,7 +36,8 @@ import com.github.barmiro.syshclient.util.tintFromColor
 
 @Composable
 fun TopTracksScreen(
-    viewModel: TopTracksViewModel
+    viewModel: TopTracksViewModel,
+    isGradientEnabled: Boolean
 ) {
     val state by viewModel.state.collectAsState()
     viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
@@ -100,7 +101,8 @@ fun TopTracksScreen(
                                     }
                                 },
                                 startColor = dominantColors[i] ?: tintFromColor(Color.Gray),
-                                placeholderID = R.drawable.music_note_24dp
+                                placeholderID = R.drawable.music_note_24dp,
+                                isGradientEnabled = isGradientEnabled
                             )
                         }
                     }

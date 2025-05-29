@@ -30,7 +30,6 @@ import com.github.barmiro.syshclient.presentation.stats.StatsScreen
 import com.github.barmiro.syshclient.presentation.stats.StatsViewModel
 import com.github.barmiro.syshclient.presentation.top.TopScreen
 import com.github.barmiro.syshclient.presentation.top.TopScreenViewModel
-import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsScreen
 import com.github.barmiro.syshclient.presentation.top.albums.TopAlbumsViewModel
 import com.github.barmiro.syshclient.presentation.top.artists.TopArtistsViewModel
 import com.github.barmiro.syshclient.presentation.top.tracks.TopTracksViewModel
@@ -50,6 +49,7 @@ fun AppNavHost(navController: NavHostController,
                adminVM: AdminViewModel,
                settingsVM: SettingsViewModel,
                importStatus: ImportStatusDTO?,
+               isGradientEnabled: Boolean,
                onPickZipFile: () -> Unit,
                restartApp: () -> Unit) {
 
@@ -77,19 +77,16 @@ fun AppNavHost(navController: NavHostController,
             RegisterScreen(sessionVM, startupVM, navController)
         }
         composable<Home> {
-            HomeScreen(homeVM)
+            HomeScreen(homeVM, isGradientEnabled)
             ImportProgressOverlay(importStatus, restartApp)
         }
         composable<Top> {
-            TopScreen(topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM)
+            TopScreen(topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM, isGradientEnabled)
             ImportProgressOverlay(importStatus, restartApp)
         }
         composable<Stats> {
             StatsScreen(statsVM)
             ImportProgressOverlay(importStatus, restartApp)
-        }
-        composable<TopAlbums> {
-            TopAlbumsScreen(topAlbumsVM)
         }
         composable<SpotifyAuth> {
             SpotifyAuthScreen(sessionVM)

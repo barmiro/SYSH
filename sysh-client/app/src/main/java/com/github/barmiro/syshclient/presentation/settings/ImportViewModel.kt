@@ -29,6 +29,9 @@ class ImportViewModel @Inject constructor(
     private val _isConnected = MutableStateFlow(false)
     val isConnected: StateFlow<Boolean> = _isConnected
 
+    private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
 
     fun startImportStateSseConnection() {
         importRepo.startSseConnection(
@@ -100,6 +103,7 @@ class ImportViewModel @Inject constructor(
                                         status = FileProcessingStatus.ERROR
                                     )
                                 )
+                                _errorMessage.value = result.message
                             }
                         }
                     }
@@ -110,6 +114,7 @@ class ImportViewModel @Inject constructor(
                             status = FileProcessingStatus.ERROR
                         )
                     )
+                    _errorMessage.value = e.message
                 } finally {
                     if (tempFile.exists()) {
                         tempFile.delete()

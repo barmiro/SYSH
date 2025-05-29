@@ -15,8 +15,8 @@ android {
         applicationId = "com.github.barmiro.syshclient"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.0.0 RC3"
+        versionCode = 7
+        versionName = "1.0.0 RC4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

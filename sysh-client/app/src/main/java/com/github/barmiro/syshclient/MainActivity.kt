@@ -94,6 +94,7 @@ class MainActivity : ComponentActivity() {
             val isDemoVersion by sessionVM.isDemoVersion.collectAsState()
             val isCallbackSuccessful by sessionVM.isCallbackSuccessful.collectAsState()
             val appTheme by settingsVM.appTheme.collectAsState()
+            val isGradientEnabled by settingsVM.isGradientEnabled.collectAsState()
 
 
             val snackbarHostState = remember { SnackbarHostState() }
@@ -313,6 +314,7 @@ class MainActivity : ComponentActivity() {
                                 adminVM,
                                 settingsVM,
                                 importStatus,
+                                isGradientEnabled,
                                 onPickZipFile = { pickZipFile() },
                                 restartApp = { restartApp(applicationContext) }
                             )

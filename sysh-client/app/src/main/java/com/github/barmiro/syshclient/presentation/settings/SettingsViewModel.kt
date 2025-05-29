@@ -45,9 +45,22 @@ class SettingsViewModel @Inject constructor(
             initialValue = AppTheme.SYSTEM_DEFAULT
         )
 
+    val isGradientEnabled: StateFlow<Boolean> = userPrefRepo.isGradientEnabled
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = true
+        )
+
     fun setIsUsernameDisplayed(newValue: Boolean) {
         viewModelScope.launch {
             userPrefRepo.setIsUsernameDisplayed(newValue)
+        }
+    }
+
+    fun setIsGradientEnabled(newValue: Boolean) {
+        viewModelScope.launch {
+            userPrefRepo.setIsGradientEnabled(newValue)
         }
     }
 

@@ -258,7 +258,7 @@ public class JsonController {
 
 	    emitter.onCompletion(() -> statusEmitterMap.getOrDefault(username, new CopyOnWriteArrayList<>()).remove(emitter));
 	    emitter.onTimeout(() -> statusEmitterMap.getOrDefault(username, new CopyOnWriteArrayList<>()).remove(emitter));
-	    
+	    emitter.onError((e) -> statusEmitterMap.getOrDefault(username, new CopyOnWriteArrayList<>()).remove(emitter));
 
 	    ZipUploadItem item = zipStatusMap.get(username);
 	    if (item != null && item.status() == FileProcessingStatus.SUCCESS) {

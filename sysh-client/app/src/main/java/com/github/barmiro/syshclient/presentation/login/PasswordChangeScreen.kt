@@ -54,9 +54,9 @@ fun PasswordChangeScreen(settingsVM: SettingsViewModel,
             && canEncodeInput(newPassword.value.text)
             && canEncodeInput(confirmation.value.text)
 
-    val isValueTooLong = oldPassword.value.text.length > 72
+    val isValueTooLong = (oldPassword.value.text.length > 72
             || newPassword.value.text.length > 72
-            || confirmation.value.text.length > 72
+            || confirmation.value.text.length > 72)
 
         Column(
             modifier = Modifier.fillMaxSize(),

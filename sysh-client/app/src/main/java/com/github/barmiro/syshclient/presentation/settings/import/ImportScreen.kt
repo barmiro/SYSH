@@ -48,7 +48,7 @@ fun ImportScreen(
 ) {
 
     val importStatus by importVM.importStatus.collectAsState()
-    val isConnected by importVM.isConnected.collectAsState()
+    val errorMessage by importVM.errorMessage.collectAsState()
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var openAlertDialog by remember { mutableStateOf(false) }
 
@@ -158,6 +158,7 @@ fun ImportScreen(
                                     }
                                     sum
                                 },
+                                errorMessage = errorMessage,
                                 progress = processingProgress,
                                 restartApp = { restartApp() }
                             )

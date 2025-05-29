@@ -184,45 +184,49 @@ fun HomeTopItem(
     minutesStreamed: Int?,
     placeholderID: Int,
     albumName: String? = null,
-    artistName: String? = null
+    artistName: String? = null,
+    isGradientEnabled: Boolean
 ) {
 
+    var gradientModifier: Modifier = Modifier
     val dominantColor = remember { mutableStateOf(Color.Transparent) }
 
-    val animatedColor = animateColorAsState(
-        targetValue = dominantColor.value,
-        animationSpec = tween(durationMillis = 400)
-    )
-
-    val imageBrush = ShaderBrush(
-        ImageShader(
-            image = ImageBitmap.imageResource(
-                id = R.drawable.noise_128x128),
-            tileModeX = TileMode.Repeated,
-            tileModeY = TileMode.Repeated
+    if(isGradientEnabled) {
+        val animatedColor = animateColorAsState(
+            targetValue = dominantColor.value,
+            animationSpec = tween(durationMillis = 400)
         )
-    )
 
+        val imageBrush = ShaderBrush(
+            ImageShader(
+                image = ImageBitmap.imageResource(
+                    id = R.drawable.noise_128x128),
+                tileModeX = TileMode.Repeated,
+                tileModeY = TileMode.Repeated
+            )
+        )
+        gradientModifier = Modifier
+            .background(
+                brush = imageBrush,
+                alpha = 0.01f
+            )
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        MaterialTheme.colorScheme.secondaryContainer,
+                        animatedColor.value
+                    ),
+                    startX = 80f
+                )
+            )
+    }
     Surface(
         modifier = Modifier.padding(5.dp),
         shape = RoundedCornerShape(6.dp),
         color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Box(
-            modifier = Modifier
-                .background(
-                    brush = imageBrush,
-                    alpha = 0.01f
-                )
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.secondaryContainer,
-                            animatedColor.value
-                        ),
-                        startX = 80f
-                    )
-                )
+            modifier = gradientModifier
         ) {
             Row(Modifier.height(IntrinsicSize.Min)) {
                 Column(

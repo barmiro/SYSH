@@ -70,6 +70,7 @@ fun SettingsScreen(
     val isPasswordChanged by settingsVM.isPasswordChanged.collectAsState()
     val isTimezoneChanged by settingsVM.isTimezoneChanged.collectAsState()
     val appTheme by settingsVM.appTheme.collectAsState()
+    val isGradientEnabled by settingsVM.isGradientEnabled.collectAsState()
 
     var isLoading by remember { mutableStateOf(false) }
     var openLogoutAlertDialog by remember { mutableStateOf(false) }
@@ -214,7 +215,9 @@ fun SettingsScreen(
                                     settingsVM.setIsUsernameDisplayed(!(isUsernameDisplayed ?: true))
                                 },
                                 selectedAppTheme = appTheme,
-                                onChangeAppTheme = { settingsVM.changeAppTheme(it) }
+                                onChangeAppTheme = { settingsVM.changeAppTheme(it) },
+                                isGradientEnabled = isGradientEnabled,
+                                onSetIsGradientEnabled = { settingsVM.setIsGradientEnabled(!isGradientEnabled) }
                             )
                         }
 

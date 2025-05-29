@@ -56,7 +56,8 @@ fun TopScreen(
     viewModel: TopScreenViewModel,
     topTracksVM: TopTracksViewModel,
     topAlbumsVM: TopAlbumsViewModel,
-    topArtistsVM: TopArtistsViewModel
+    topArtistsVM: TopArtistsViewModel,
+    isGradientEnabled: Boolean
 ) {
 
     val state by viewModel.state.collectAsState()
@@ -188,9 +189,9 @@ fun TopScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         when (page) {
-                            0 -> TopTracksScreen(topTracksVM)
-                            1 -> TopAlbumsScreen(topAlbumsVM)
-                            2 -> TopArtistsScreen(topArtistsVM)
+                            0 -> TopTracksScreen(topTracksVM, isGradientEnabled)
+                            1 -> TopAlbumsScreen(topAlbumsVM, isGradientEnabled)
+                            2 -> TopArtistsScreen(topArtistsVM, isGradientEnabled)
                             else -> Text("Something went wrong with the pager")
                         }
                     }

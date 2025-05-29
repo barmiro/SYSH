@@ -47,7 +47,8 @@ import java.util.Locale
 @SuppressLint("DefaultLocale")
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    isGradientEnabled: Boolean
 ) {
 
     val state by viewModel.homeState.collectAsState()
@@ -250,7 +251,8 @@ fun HomeScreen(
                                     minutesStreamed = state.stats.top_track?.total_ms_played?.div(60000),
                                     placeholderID = R.drawable.music_note_24dp,
                                     albumName = state.stats.top_track?.album_name,
-                                    artistName = state.stats.top_track?.primary_artist_name
+                                    artistName = state.stats.top_track?.primary_artist_name,
+                                    isGradientEnabled = isGradientEnabled
                                 )
                             }
                             Row() {
@@ -260,7 +262,8 @@ fun HomeScreen(
                                     streamCount = state.stats.top_album?.stream_count,
                                     minutesStreamed = state.stats.top_album?.total_ms_played?.div(60000),
                                     placeholderID = R.drawable.album_24dp,
-                                    artistName = state.stats.top_album?.primary_artist_name
+                                    artistName = state.stats.top_album?.primary_artist_name,
+                                    isGradientEnabled = isGradientEnabled
                                 )
                             }
                             Row() {
@@ -269,7 +272,8 @@ fun HomeScreen(
                                     imageUrl = state.stats.top_artist?.image_url,
                                     streamCount = state.stats.top_artist?.stream_count,
                                     minutesStreamed = state.stats.top_artist?.total_ms_played?.div(60000),
-                                    placeholderID = R.drawable.artist_24dp
+                                    placeholderID = R.drawable.artist_24dp,
+                                    isGradientEnabled = isGradientEnabled
                                 )
                             }
                         }

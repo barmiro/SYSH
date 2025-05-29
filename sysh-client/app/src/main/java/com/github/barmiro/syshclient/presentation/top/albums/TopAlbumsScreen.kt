@@ -37,7 +37,8 @@ import com.github.barmiro.syshclient.util.tintFromColor
 
 @Composable
 fun TopAlbumsScreen(
-    viewModel: TopAlbumsViewModel
+    viewModel: TopAlbumsViewModel,
+    isGradientEnabled: Boolean
 ) {
     val state by viewModel.state.collectAsState()
     viewModel.observeLifecycle(LocalLifecycleOwner.current.lifecycle)
@@ -102,7 +103,8 @@ fun TopAlbumsScreen(
                                         }
                                     },
                                     startColor = dominantColors[i] ?: tintFromColor(Color.Gray),
-                                    placeholderID = R.drawable.album_24dp
+                                    placeholderID = R.drawable.album_24dp,
+                                    isGradientEnabled = isGradientEnabled
                                 )
                             }
                         }

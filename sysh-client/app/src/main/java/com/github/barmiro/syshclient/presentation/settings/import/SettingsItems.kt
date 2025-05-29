@@ -52,6 +52,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -84,6 +85,7 @@ import com.github.barmiro.syshclient.data.common.startup.JsonInfo
 import com.github.barmiro.syshclient.data.common.startup.ZipUploadItem
 import com.github.barmiro.syshclient.data.settings.dataimport.FileStatus
 import com.github.barmiro.syshclient.data.settings.dataimport.UploadStatus
+import com.github.barmiro.syshclient.data.settings.dataimport.uploadStatusMessageParser
 import com.github.barmiro.syshclient.presentation.login.canEncodeInput
 import com.github.barmiro.syshclient.presentation.startup.UrlInfoItem
 import com.github.barmiro.syshclient.util.AppTheme
@@ -535,9 +537,10 @@ fun ChangePasswordItem(
     ) {
         Column() {
             Box(modifier = Modifier.clickable(onClick = {
-                isExpanded = !isExpanded
-                onClick()
-            })) {
+                    isExpanded = !isExpanded
+                    onClick()
+                }).animateContentSize()
+            ) {
 
                 Row(
                     modifier = Modifier.padding(8.dp),
@@ -596,12 +599,99 @@ fun ChangePasswordItem(
                         && canEncodeInput(newPassword.value.text)
                         && canEncodeInput(confirmation.value.text)
 
+                val isPasswordSame = newPassword.value.text.isNotEmpty() && oldPassword.value.text == newPassword.value.text
+
+                val mustChangeField = remember {
+                    mutableStateOf(false)
+                }
+
+                var result by remember { mutableStateOf(passwordChangeResult) }
+
+                LaunchedEffect(passwordChangeResult, result) {
+                    if (result == null && passwordChangeResult != null) {
+                        result = passwordChangeResult
+                    }
+                }
+
+                LaunchedEffect(result) {
+                    if (result == true) {
+                        oldPassword.value = TextFieldValue()
+                        newPassword.value = TextFieldValue()
+                        confirmation.value = TextFieldValue()
+                    } else if (result == false) {
+                        mustChangeField.value = true
+                    }
+                }
+
+                Row(modifier = Modifier.animateContentSize()) {
+                    result?.let { changed ->
+                        if (changed) {
+                            UrlInfoItem(
+                                icon = {
+                                    Icon(imageVector = Icons.Default.CheckCircle,
+                                        contentDescription = "Success",
+                                        tint = Color(
+                                            red = 52,
+                                            green = 178,
+                                            blue = 51
+                                        ))
+                                },
+                                text = "Password changed successfully"
+                            )
+
+                        } else {
+                            UrlInfoItem(
+                                icon = {
+                                    Icon(imageVector = Icons.Default.Close,
+                                        tint = MaterialTheme.colorScheme.error,
+                                        contentDescription = "Error")
+                                },
+                                text = "Password change failed"
+                            )
+                        }
+                    }
+                }
+
+                if (!isInputValid) {
+                    UrlInfoItem(
+                        icon = {
+                            Icon(imageVector = Icons.Default.Close,
+                                tint = MaterialTheme.colorScheme.error,
+                                contentDescription = "Error")
+                        },
+                        text = "Some fields contain invalid characters"
+                    )
+                }
+                if (newPassword.value.text != confirmation.value.text && confirmation.value.text.isNotEmpty()) {
+                    UrlInfoItem(
+                        icon = {
+                            Icon(imageVector = Icons.Default.Close,
+                                tint = MaterialTheme.colorScheme.error,
+                                contentDescription = "Error")
+                        },
+                        text = "Passwords do not match"
+                    )
+                }
+                if (isPasswordSame) {
+                    UrlInfoItem(
+                        icon = {
+                            Icon(imageVector = Icons.Default.Close,
+                                tint = MaterialTheme.colorScheme.error,
+                                contentDescription = "Error")
+                        },
+                        text = "New password can't be the same as the old password"
+                    )
+                }
+
                 Row(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(value = oldPassword.value,
-                        onValueChange = { oldPassword.value = it },
+                        onValueChange = {
+                            mustChangeField.value = false
+                            oldPassword.value = it
+                        },
                         label = {
                             Text("Old password")
                         },
@@ -623,11 +713,14 @@ fun ChangePasswordItem(
                 }
 
                 Row(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(value = newPassword.value,
-                        onValueChange = { newPassword.value = it },
+                        onValueChange = {
+                            mustChangeField.value = false
+                            newPassword.value = it
+                        },
                         label = {
                             Text("New password")
                         },
@@ -652,11 +745,14 @@ fun ChangePasswordItem(
                 }
 
                 Row(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(value = confirmation.value,
-                        onValueChange = { confirmation.value = it },
+                        onValueChange = {
+                            mustChangeField.value = false
+                            confirmation.value = it
+                        },
                         label = {
                             Text("Confirm new password")
                         },
@@ -687,63 +783,21 @@ fun ChangePasswordItem(
                 ) {
                     Button(
                         onClick = {
+                            result = null
                             onChangePassword(oldPassword.value.text, newPassword.value.text)
                         },
                         enabled = newPassword.value.text == confirmation.value.text
                                 && newPassword.value.text.isNotEmpty()
                                 && oldPassword.value.text.isNotEmpty()
                                 && isInputValid
+                                && !mustChangeField.value
+                                && !isPasswordSame
                     ) {
                         Text("Change Password")
                     }
                 }
-                if (!isInputValid) {
-                    UrlInfoItem(
-                        icon = {
-                            Icon(imageVector = Icons.Default.Close,
-                                tint = MaterialTheme.colorScheme.error,
-                                contentDescription = "Error")
-                        },
-                        text = "Some fields contain invalid characters"
-                    )
-                }
-                if (newPassword.value.text != confirmation.value.text) {
-                    UrlInfoItem(
-                        icon = {
-                            Icon(imageVector = Icons.Default.Close,
-                                tint = MaterialTheme.colorScheme.error,
-                                contentDescription = "Error")
-                        },
-                        text = "Passwords do not match"
-                    )
-                }
-                passwordChangeResult?.let { changed ->
-                    Row() {
-                        if (changed) {
-                            UrlInfoItem(
-                                icon = {
-                                    Icon(imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = "Success",
-                                        tint = Color(
-                                            red = 52,
-                                            green = 178,
-                                            blue = 51
-                                        ))
-                                },
-                                text = "Password changed successfully"
-                            )
-                        } else {
-                            UrlInfoItem(
-                                icon = {
-                                    Icon(imageVector = Icons.Default.Close,
-                                        tint = MaterialTheme.colorScheme.error,
-                                        contentDescription = "Error")
-                                },
-                                text = "Password change failed"
-                            )
-                        }
-                    }
-                }
+
+
             }
         }
     }
@@ -758,7 +812,9 @@ fun AppPreferencesItem(
     isUsernameDisplayed: Boolean,
     modifier: Modifier,
     selectedAppTheme: AppTheme,
-    onChangeAppTheme: (AppTheme) -> Unit
+    onChangeAppTheme: (AppTheme) -> Unit,
+    isGradientEnabled: Boolean,
+    onSetIsGradientEnabled: () -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     Surface(
@@ -835,6 +891,28 @@ fun AppPreferencesItem(
                         )
                     }
                 }
+                HorizontalDivider(Modifier.fillMaxWidth())
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    Column(modifier = Modifier.weight(1f).padding(12.dp).fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center) {
+                        Text(text = "Draw image-based gradients",
+                            fontSize = 16.sp,
+                            lineHeight = 18.sp
+
+                        )
+
+                    }
+                    Column(modifier = Modifier.padding(top = 12.dp, bottom = 12.dp, end = 12.dp).fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center) {
+                        Switch(
+                            checked = isGradientEnabled,
+                            onCheckedChange = {
+                                onSetIsGradientEnabled()
+                            },
+                        )
+                    }
+                }
+
                 HorizontalDivider(Modifier.fillMaxWidth().padding(horizontal = 8.dp))
 
                 var isAppThemeExpanded by remember { mutableStateOf(false) }
@@ -884,6 +962,7 @@ fun AppPreferencesItem(
                         }
                     }
                 }
+
             }
         }
     }
@@ -975,6 +1054,7 @@ fun SettingsScreenUserItem(username: String?,
 @Composable
 fun ImportFileStatusItem(zipFile: ZipUploadItem,
                          totalStreams: Int?,
+                         errorMessage: String?,
                          progress: Float?,
                          restartApp: () -> Unit) {
 
@@ -1049,7 +1129,7 @@ fun ImportFileStatusItem(zipFile: ZipUploadItem,
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(48.dp).padding(horizontal = 8.dp)
                         )
-                        archiveText = "Import failed" // uploadStatusMessageParser(zipFileStatus.status.message, "Something went wrong")
+                        archiveText = uploadStatusMessageParser(errorMessage, "Something went wrong")
                     }
 
 
@@ -1139,10 +1219,10 @@ fun ImportProgressOverlay(importStatus: ImportStatusDTO?, restartApp: () -> Unit
                             .padding(8.dp),
                         shape = RoundedCornerShape(6.dp),
                         colors = CardColors(
-                            containerColor = MaterialTheme.colorScheme.background,
-                            contentColor = MaterialTheme.colorScheme.onBackground,
-                            disabledContainerColor = MaterialTheme.colorScheme.background,
-                            disabledContentColor = MaterialTheme.colorScheme.onBackground
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer
                         ),
                         border = BorderStroke(width = 1.dp, MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.2f))
                     ) {
