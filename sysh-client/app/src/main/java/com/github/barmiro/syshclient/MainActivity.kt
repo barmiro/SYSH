@@ -90,6 +90,7 @@ class MainActivity : ComponentActivity() {
             val serverResponded by startupVM.serverResponded.collectAsState()
             val responseCode by sessionVM.responseCode.collectAsState()
             val username by sessionVM.username.collectAsState()
+            val importStatus by importVM.importStatus.collectAsState()
             val isDemoVersion by sessionVM.isDemoVersion.collectAsState()
             val isCallbackSuccessful by sessionVM.isCallbackSuccessful.collectAsState()
             val appTheme by settingsVM.appTheme.collectAsState()
@@ -288,6 +289,8 @@ class MainActivity : ComponentActivity() {
                                 if (!loginSuccessful) {
                                     topScreenVM.getOldestStreamDate()
                                     homeVM.getStats()
+                                    if(isDemoVersion != true) importVM.startImportStateSseConnection()
+
                                     loginSuccessful = true
                                 }
                             }
@@ -309,6 +312,7 @@ class MainActivity : ComponentActivity() {
                                 importVM,
                                 adminVM,
                                 settingsVM,
+                                importStatus,
                                 onPickZipFile = { pickZipFile() },
                                 restartApp = { restartApp(applicationContext) }
                             )
@@ -361,10 +365,7 @@ class MainActivity : ComponentActivity() {
             sessionVM.callback(state, code)
         }
     }
-
-    private fun finalizeImport() {
-        topScreenVM.getOldestStreamDate()
-        homeVM.getStats()
-    }
 }
+
+
 

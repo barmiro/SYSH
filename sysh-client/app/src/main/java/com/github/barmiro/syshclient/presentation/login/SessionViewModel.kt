@@ -49,7 +49,6 @@ class SessionViewModel @Inject constructor(
     val isCallbackSuccessful: StateFlow<Boolean?> = _isCallbackSuccessful
 
 
-
     private val timezone: String = ZoneId.systemDefault().id
 
 

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.github.barmiro.syshclient.data.common.startup.ImportStatusDTO
 import com.github.barmiro.syshclient.presentation.home.HomeScreen
 import com.github.barmiro.syshclient.presentation.home.HomeViewModel
 import com.github.barmiro.syshclient.presentation.login.LoginScreen
@@ -19,6 +20,7 @@ import com.github.barmiro.syshclient.presentation.settings.SettingsScreen
 import com.github.barmiro.syshclient.presentation.settings.SettingsViewModel
 import com.github.barmiro.syshclient.presentation.settings.admin.AdminViewModel
 import com.github.barmiro.syshclient.presentation.settings.admin.ManageUsersScreen
+import com.github.barmiro.syshclient.presentation.settings.import.ImportProgressOverlay
 import com.github.barmiro.syshclient.presentation.settings.import.ImportScreen
 import com.github.barmiro.syshclient.presentation.startup.ConnectionErrorScreen
 import com.github.barmiro.syshclient.presentation.startup.SplashScreen
@@ -47,6 +49,7 @@ fun AppNavHost(navController: NavHostController,
                importVM: ImportViewModel,
                adminVM: AdminViewModel,
                settingsVM: SettingsViewModel,
+               importStatus: ImportStatusDTO?,
                onPickZipFile: () -> Unit,
                restartApp: () -> Unit) {
 
@@ -63,7 +66,6 @@ fun AppNavHost(navController: NavHostController,
         composable<Splash> {
             SplashScreen()
         }
-
         composable<Startup> {
             StartupScreen(startupVM, sessionVM, navController)
         }
@@ -76,12 +78,15 @@ fun AppNavHost(navController: NavHostController,
         }
         composable<Home> {
             HomeScreen(homeVM)
+            ImportProgressOverlay(importStatus, restartApp)
         }
         composable<Top> {
             TopScreen(topScreenVM, topTracksVM, topAlbumsVM, topArtistsVM)
+            ImportProgressOverlay(importStatus, restartApp)
         }
         composable<Stats> {
             StatsScreen(statsVM)
+            ImportProgressOverlay(importStatus, restartApp)
         }
         composable<TopAlbums> {
             TopAlbumsScreen(topAlbumsVM)
@@ -91,6 +96,7 @@ fun AppNavHost(navController: NavHostController,
         }
         composable<Settings> {
             SettingsScreen(sessionVM, settingsVM, navController)
+            ImportProgressOverlay(importStatus, restartApp)
         }
         composable<Import> {
             ImportScreen(importVM, onPickZipFile, restartApp)
@@ -104,6 +110,7 @@ fun AppNavHost(navController: NavHostController,
         composable<PasswordChange> {
             PasswordChangeScreen(settingsVM, sessionVM)
         }
+
     }
 }
 

@@ -5,17 +5,15 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.barmiro.syshclient.data.settings.dataimport.FileStatus
+import com.github.barmiro.syshclient.data.common.startup.FileProcessingStatus
+import com.github.barmiro.syshclient.data.common.startup.ImportStatusDTO
+import com.github.barmiro.syshclient.data.common.startup.ZipUploadItem
 import com.github.barmiro.syshclient.data.settings.dataimport.ImportRepository
-import com.github.barmiro.syshclient.data.settings.dataimport.UploadStatus
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -25,25 +23,27 @@ class ImportViewModel @Inject constructor(
     private val importRepo: ImportRepository
 ) : ViewModel() {
 
-    private val _fileStatusList = MutableStateFlow<List<FileStatus>>(emptyList())
-    val fileStatusList: StateFlow<List<FileStatus>> = _fileStatusList.asStateFlow()
+    private val _importStatus: MutableStateFlow<ImportStatusDTO?> = MutableStateFlow(null)
+    val importStatus: StateFlow<ImportStatusDTO?> = _importStatus
 
-    private val _zipFileStatus = MutableStateFlow<FileStatus?>(null)
-    val zipFileStatus: StateFlow<FileStatus?> = _zipFileStatus
+    private val _isConnected = MutableStateFlow(false)
+    val isConnected: StateFlow<Boolean> = _isConnected
 
-    private fun updateFileStatus(file: File, status: UploadStatus) {
-        _fileStatusList.value = _fileStatusList.value.map { entry ->
-            if (entry.file == file) {
-                entry.copy(status = status)
-            } else {
-                entry
+
+    fun startImportStateSseConnection() {
+        importRepo.startSseConnection(
+            onStatusReceived = { status ->
+                _isConnected.value = true
+                _importStatus.value = status
+            },
+            onDisconnect = {
+                _isConnected.value = false
             }
-        }
+        )
     }
 
     fun handleZipFile(uri: Uri, context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            _fileStatusList.value = emptyList()
             val contentResolver = context.contentResolver
 
             val zipFileName = contentResolver.query(
@@ -63,104 +63,60 @@ class ImportViewModel @Inject constructor(
 
             val inputStream = contentResolver.openInputStream(uri)
 
-
             inputStream?.use { stream ->
                 val tempFile = File(context.cacheDir, zipFileName)
+
                 try {
-
-                    tempFile.outputStream().use { output -> stream.copyTo(output) }
-
-                    _zipFileStatus.value = FileStatus(tempFile, UploadStatus.Waiting)
-
-                    val extractedFiles = sortJsonFiles(
-                        importRepo.extractJsonFiles(tempFile)
-                    )
-
-//                so that all files don't appear in a single frame
-                    viewModelScope.launch {
-                        for (file:File in extractedFiles) {
-                            _fileStatusList.update {
-                                it + FileStatus(file, UploadStatus.Waiting)
-                            }
-                            delay(30)
-                        }
+                    tempFile.outputStream().use { output ->
+                       stream.copyTo(output)
                     }
 
-                    try {
-                        for (jsonFile in extractedFiles) {
-                            importRepo.uploadJsonFile(jsonFile).collect { result ->
-                                when (result) {
-                                    is Resource.Success -> updateFileStatus(
-                                        jsonFile,
-                                        UploadStatus.Success(
-                                            message = result.data ?: -1))
-                                    is Resource.Error -> updateFileStatus(
-                                        jsonFile,
-                                        UploadStatus.Failed(
-                                            message = result.message
-                                        )
-                                    )
-                                    is Resource.Loading -> {
-                                        if (result.isLoading) {
-                                            updateFileStatus(
-                                                jsonFile,
-                                                UploadStatus.Processing
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    if (!_isConnected.value) {
+                        startImportStateSseConnection()
+                    }
 
-                        importRepo.recent().collect { result ->
-                            when (result) {
-                                is Resource.Success -> {
-                                    _zipFileStatus.value = FileStatus(
-                                        tempFile,
-                                        UploadStatus.Success(
-                                            message = 1
-                                        )
-                                    )
-                                }
-                                is Resource.Loading -> _zipFileStatus.value = FileStatus(
-                                    tempFile,
-                                    UploadStatus.Processing
-                                )
-                                is Resource.Error -> _zipFileStatus.value = FileStatus(
-                                    tempFile,
-                                    UploadStatus.Failed(
-                                        message = result.message
+                    importRepo.uploadZipFile(tempFile).collect { result ->
+                        when (result) {
+                            is Resource.Success -> {
+                                _importStatus.value = ImportStatusDTO(
+                                    ZipUploadItem(
+                                        zipName = zipFileName,
+                                        status = FileProcessingStatus.PREPARING
                                     )
                                 )
                             }
-                        }
-                    } finally {
-                        for (jsonFile in extractedFiles) {
-                            if (jsonFile.exists()) {
-                                jsonFile.delete()
+                            is Resource.Loading -> {
+                                _importStatus.value = ImportStatusDTO(
+                                    ZipUploadItem(
+                                        zipName = zipFileName,
+                                        status = FileProcessingStatus.WAITING
+                                    )
+                                )
                             }
-                        }
-                        if (tempFile.exists()) {
-                            tempFile.delete()
+                            is Resource.Error -> {
+                                _importStatus.value = ImportStatusDTO(
+                                    ZipUploadItem(
+                                        zipName = zipFileName,
+                                        status = FileProcessingStatus.ERROR
+                                    )
+                                )
+                            }
                         }
                     }
                 } catch (e: Exception) {
-                    _zipFileStatus.value = FileStatus(tempFile, UploadStatus.Failed(e.message))
+                    _importStatus.value = ImportStatusDTO(
+                        ZipUploadItem(
+                            zipName = zipFileName,
+                            status = FileProcessingStatus.ERROR
+                        )
+                    )
+                } finally {
+                    if (tempFile.exists()) {
+                        tempFile.delete()
+                    }
                 }
             }
+
         }
-    }
-
-
-
-}
-
-
-fun sortJsonFiles(jsonFiles: List<File>): List<File> {
-    return jsonFiles.sortedBy { file ->
-        file.name
-            .substringAfterLast("_")
-            .substringBefore(".")
-            .toIntOrNull() ?: Int.MAX_VALUE
     }
 }

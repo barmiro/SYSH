@@ -5,19 +5,27 @@ import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.handleNetworkException
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
+import com.github.barmiro.syshclient.data.common.startup.ImportStatusDTO
 import com.github.barmiro.syshclient.util.Resource
 import com.github.barmiro.syshclient.util.Resource.Error
+import com.here.oksse.OkSse
+import com.here.oksse.ServerSentEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import java.io.File
-import java.io.FileInputStream
 import java.util.concurrent.TimeUnit
-import java.util.zip.ZipInputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,8 +42,6 @@ class ImportRepository @Inject constructor(
         .writeTimeout(60, TimeUnit.SECONDS)
         .readTimeout(300, TimeUnit.SECONDS)
         .build()
-
-
     val retrofit = Retrofit.Builder()
         .baseUrl("http://localhost/")
         .client(client)
@@ -43,25 +49,29 @@ class ImportRepository @Inject constructor(
 
     val importApi = retrofit.create(ImportApi::class.java)
 
+    fun uploadZipFile(zipFile: File): Flow<Resource<String>> {
+        return flow {
+            emit(Resource.Loading(true))
+            try {
+                val requestFile = zipFile.asRequestBody("application/zip".toMediaTypeOrNull())
+                val multipartBody = MultipartBody.Part.createFormData(
+                    name = "file",
+                    filename = zipFile.name,
+                    body = requestFile
+                )
 
-    fun extractJsonFiles(zipFile: File): List<File> {
-        val extractedFiles = mutableListOf<File>()
-        val zipInputStream = ZipInputStream(FileInputStream(zipFile))
-        zipInputStream.use { inputStream ->
-            var entry = inputStream.nextEntry
-            while (entry != null) {
-//                this is very fragile
-                if (entry.name.matches(Regex(".*/Streaming_History_Audio.*\\.json"))) {
-                    val outputFile = File(zipFile.parent, File(entry.name).name)
-                    outputFile.outputStream().use { output ->
-                        inputStream.copyTo(output)
-                    }
-                    extractedFiles.add(outputFile)
+                val response = importApi.uploadZip(multipartBody)
+
+                if (response.isSuccessful) {
+                    emit(Resource.Success(response.body()?.string()))
+                } else {
+                    emit(Error(response.message()))
                 }
-                entry = inputStream.nextEntry
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
             }
         }
-        return extractedFiles
     }
 
 
@@ -104,13 +114,60 @@ class ImportRepository @Inject constructor(
             }
         }
     }
+
+
+    private val oksse = OkSse(client)
+    private val requestUrl = "http://localhost/".toHttpUrl()
+    private val serverUrl = userPrefRepo.serverUrlFlow.value?.toHttpUrl()
+
+    val url: HttpUrl = requestUrl.newBuilder()
+        .scheme(serverUrl?.scheme ?: requestUrl.scheme)
+        .host(serverUrl?.host ?: requestUrl.host)
+        .port(serverUrl?.port ?: requestUrl.port)
+        .encodedPath("/zipStatusStream")
+        .build()
+
+    private val request = Request.Builder().url(url).build()
+
+    fun startSseConnection(onStatusReceived: (ImportStatusDTO) -> Unit, onDisconnect: () -> Unit) {
+        oksse.newServerSentEvent(request, object : ServerSentEvent.Listener {
+            override fun onOpen(sse: ServerSentEvent, response: Response) {
+                println("Connection opened")
+            }
+
+            override fun onMessage(
+                sse: ServerSentEvent,
+                id: String?,
+                event: String?,
+                message: String
+            ) {
+                if(event == "status") {
+                    val status = Json.decodeFromString<ImportStatusDTO>(message)
+                    onStatusReceived(status)
+
+                }
+            }
+
+            override fun onComment(sse: ServerSentEvent, comment: String) {}
+            override fun onRetryTime(sse: ServerSentEvent, milliseconds: Long): Boolean = true
+            override fun onRetryError(sse: ServerSentEvent, throwable: Throwable, response: Response?): Boolean = false
+            override fun onClosed(sse: ServerSentEvent) {
+                onDisconnect()
+                println("Connection closed")
+            }
+
+            override fun onPreRetry(sse: ServerSentEvent?, originalRequest: Request?): Request {
+                TODO("Not yet implemented")
+            }
+        })
+    }
+
 }
 
 data class FileStatus(
     val file: File,
     val status: UploadStatus
 )
-
 sealed class UploadStatus {
     object Waiting : UploadStatus()
     object Processing : UploadStatus()

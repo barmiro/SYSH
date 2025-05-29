@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.5</version>
+		<version>3.5.0</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.github.barmiro</groupId>
@@ -38,7 +38,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-docker-compose</artifactId>
@@ -56,9 +55,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-          <groupId>org.springframework.boot</groupId>
-          <artifactId>spring-boot-testcontainers</artifactId>
-          <scope>test</scope>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-testcontainers</artifactId>
+              <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -76,9 +75,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>org.testcontainers</groupId>
-          <artifactId>postgresql</artifactId>
-          <scope>test</scope>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -96,6 +95,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 	</dependencies>
 

@@ -35,7 +35,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.barmiro.syshclient.R
-import com.github.barmiro.syshclient.data.settings.dataimport.UploadStatus
+import com.github.barmiro.syshclient.data.common.startup.FileProcessingStatus
 import com.github.barmiro.syshclient.presentation.settings.ImportViewModel
 import com.github.barmiro.syshclient.presentation.startup.InfoItem
 
@@ -47,16 +47,31 @@ fun ImportScreen(
     restartApp: () -> Unit
 ) {
 
-    val statusList by importVM.fileStatusList.collectAsState()
-    val zipFileStatus by importVM.zipFileStatus.collectAsState()
+    val importStatus by importVM.importStatus.collectAsState()
+    val isConnected by importVM.isConnected.collectAsState()
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var openAlertDialog by remember { mutableStateOf(false) }
 
-    val isImportInProgress = zipFileStatus?.status == UploadStatus.Waiting
-            || zipFileStatus?.status == UploadStatus.Processing
+    val isImportInProgress = listOf(
+            FileProcessingStatus.WAITING,
+            FileProcessingStatus.PREPARING,
+            FileProcessingStatus.PROCESSING,
+            FileProcessingStatus.FINALIZING)
+        .contains(importStatus?.zipUploadItem?.status)
+
+    val processingProgressDividend: Int? = importStatus?.jsonInfoList?.filter {
+        listOf(FileProcessingStatus.SUCCESS, FileProcessingStatus.ERROR).contains(it.status)
+    }?.size?.takeIf { it > 0}
+    val processingProgressDivisor: Int? = importStatus?.jsonInfoList?.size?.takeIf { it > 0}
+    val processingProgress: Float? = processingProgressDividend?.let { dividend ->
+        processingProgressDivisor?.let { divisor ->
+            1f * dividend / divisor
+        }
+    }
 
     val importItemModifier = if (isImportInProgress) Modifier.alpha(0.7f)
             else Modifier.clickable(onClick = { onPickZipFile() })
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -131,41 +146,50 @@ fun ImportScreen(
                         )
                     }
                 }
+                importStatus?.let { status ->
+                    status.zipUploadItem?.let { zipFile ->
+                        item() {
+                            ImportFileStatusItem(
+                                zipFile = zipFile,
+                                totalStreams = status.jsonInfoList?.let { list ->
+                                    var sum = 0
+                                    for (file in list) {
+                                        sum += file.entriesAdded ?: 0
+                                    }
+                                    sum
+                                },
+                                progress = processingProgress,
+                                restartApp = { restartApp() }
+                            )
+                        }
 
-                zipFileStatus?.let {
-                    item() {
-                        ImportFileStatusItem(
-                            zipFileStatus = it,
-                            totalStreams = totalStreams(statusList),
-                            restartApp = { restartApp() }
-                        )
-                        InfoItem(
-                            icon = {
-                                Icon(imageVector = Icons.Default.Info,
-                                    contentDescription = "Info",
-                                    modifier = Modifier.alpha(0.8f))
-                            },
-                            title = "Each entry is a valid play event.",
-                            text = "Plays shorter than 30 seconds don't count as streams, but are included in other statistics."
-                        )
+                        if (zipFile.status != FileProcessingStatus.COMPLETE) {
+                            item() {
+                                InfoItem(
+                                    icon = {
+                                        Icon(imageVector = Icons.Default.Info,
+                                            contentDescription = "Info",
+                                            modifier = Modifier.alpha(0.8f))
+                                    },
+                                    title = "Each entry is a valid play event.",
+                                    text = "Plays shorter than 30 seconds don't count as streams, but are included in other statistics."
+                                )
+                            }
+                            status.jsonInfoList?.let { list ->
+                                items(items = list, key = { it.filename }) { item ->
+                                    val index = list.indexOf(item)
+                                    JsonFileUploadItem(
+                                        index + 1,
+                                        list[index],
+                                        Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp).animateItem(
+                                            placementSpec = spring()
+                                        ))
+                                }
+                            }
+                        }
+
                     }
                 }
-                items(items = statusList, key = { it.file.name }) { item ->
-                    val index = statusList.indexOf(item)
-                    JsonFileUploadItem(
-                        index + 1,
-                        statusList[index],
-                        Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp).animateItem(
-                            placementSpec = spring()
-                        ))
-                }
-//                items(statusList.size) { i ->
-//                    JsonFileUploadItem(
-//                        i + 1,
-//                        statusList[i],
-//                        Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp).animateItem())
-//                }
-
                 item() {
                     Spacer(modifier = Modifier.height(8.dp))
                 }
@@ -173,3 +197,22 @@ fun ImportScreen(
         }
     }
 }
+
+//@Composable
+//fun ImportProgressOverlay() {
+//    AnimatedVisibility(visible = importStatus != null) {
+//        Card(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(8.dp)
+//                .clickable {  },
+//            shape = RoundedCornerShape(12.dp)
+//        ) {
+//            Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+//                CircularProgressIndicator(modifier = Modifier.size(24.dp))
+//                Spacer(Modifier.width(12.dp))
+//                Text("Importing...")
+//            }
+//        }
+//    }
+//}

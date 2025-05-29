@@ -79,6 +79,7 @@ fun TopScreen(
     }
 
 
+
 //    workaround for the refresh indicator not disappearing
     var isRefreshing by remember { mutableStateOf(false) }
     LaunchedEffect(isRefreshing) {

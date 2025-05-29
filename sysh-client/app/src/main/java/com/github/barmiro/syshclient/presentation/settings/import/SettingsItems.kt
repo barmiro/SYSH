@@ -3,7 +3,10 @@ package com.github.barmiro.syshclient.presentation.settings.import
 import android.content.Context
 import android.content.Intent
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +16,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +30,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -38,6 +43,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -72,17 +78,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.github.barmiro.syshclient.R
+import com.github.barmiro.syshclient.data.common.startup.FileProcessingStatus
+import com.github.barmiro.syshclient.data.common.startup.ImportStatusDTO
+import com.github.barmiro.syshclient.data.common.startup.JsonInfo
+import com.github.barmiro.syshclient.data.common.startup.ZipUploadItem
 import com.github.barmiro.syshclient.data.settings.dataimport.FileStatus
 import com.github.barmiro.syshclient.data.settings.dataimport.UploadStatus
-import com.github.barmiro.syshclient.data.settings.dataimport.uploadStatusMessageParser
 import com.github.barmiro.syshclient.presentation.login.canEncodeInput
 import com.github.barmiro.syshclient.presentation.startup.UrlInfoItem
 import com.github.barmiro.syshclient.util.AppTheme
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun JsonFileUploadItem(
     index: Int,
-    fileStatus: FileStatus,
+    jsonInfo: JsonInfo,
     modifier: Modifier
 ) {
     Surface(
@@ -112,7 +123,7 @@ fun JsonFileUploadItem(
                 Row(
                 ) {
                     Text(
-                        text = fileStatus.file.name
+                        text = jsonInfo.filename
                             .substringAfter("Streaming_History_Audio_")
                             .substringBefore("_"),
                         fontWeight = FontWeight.Bold,
@@ -131,8 +142,9 @@ fun JsonFileUploadItem(
                     modifier = Modifier.animateContentSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    when (fileStatus.status) {
-                        is UploadStatus.Waiting -> {
+                    when (jsonInfo.status) {
+
+                        FileProcessingStatus.WAITING -> {
                             Text(
                                 text = "Waiting",
                                 modifier = Modifier.alpha(0.5f),
@@ -140,7 +152,16 @@ fun JsonFileUploadItem(
                                 fontStyle = FontStyle.Italic,
                             )
                         }
-                        is UploadStatus.Processing -> {
+                        FileProcessingStatus.PREPARING -> {
+                            Text(
+                                text = "Preparing",
+                                modifier = Modifier.alpha(0.5f),
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontStyle = FontStyle.Italic,
+                            )
+                        }
+
+                        FileProcessingStatus.PROCESSING -> {
                             Text(
                                 text = "Processing",
                                 modifier = Modifier.alpha(0.5f),
@@ -150,9 +171,19 @@ fun JsonFileUploadItem(
                             CircularProgressIndicator(modifier = Modifier.size(42.dp).padding(8.dp),
                                 strokeCap = StrokeCap.Round)
                         }
-                        is UploadStatus.Success -> {
+                        FileProcessingStatus.FINALIZING -> {
                             Text(
-                                text = fileStatus.status.message?.let{ streams ->
+                                text = "Finalizing",
+                                modifier = Modifier.alpha(0.5f),
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontStyle = FontStyle.Italic,
+                            )
+                            CircularProgressIndicator(modifier = Modifier.size(42.dp).padding(8.dp),
+                                strokeCap = StrokeCap.Round)
+                        }
+                        FileProcessingStatus.SUCCESS -> {
+                            Text(
+                                text = jsonInfo.entriesAdded?.let{ streams ->
                                     "$streams entries"
                                 } ?: "File processed, but no message from server",
                                 color = MaterialTheme.colorScheme.onBackground,
@@ -172,13 +203,9 @@ fun JsonFileUploadItem(
                                 modifier = Modifier.size(18.dp).alpha(0.8f)
                             )
                         }
-                        is UploadStatus.Failed -> {
+                        FileProcessingStatus.ERROR -> {
                             Text(
-                                text = uploadStatusMessageParser(
-                                    fileStatus.status.message,
-                                    "File upload failed",
-                                    replaceConnectionError = true
-                                ),
+                                text = "File upload failed",
                                 color = MaterialTheme.colorScheme.onBackground
                             )
                             Icon(
@@ -188,6 +215,8 @@ fun JsonFileUploadItem(
                                 modifier = Modifier.size(32.dp).padding(start = 8.dp)
                             )
                         }
+
+                        else -> {}
                     }
                 }
             }
@@ -944,9 +973,14 @@ fun SettingsScreenUserItem(username: String?,
 
 
 @Composable
-fun ImportFileStatusItem(zipFileStatus: FileStatus,
+fun ImportFileStatusItem(zipFile: ZipUploadItem,
                          totalStreams: Int?,
+                         progress: Float?,
                          restartApp: () -> Unit) {
+
+    val fluidProgress = updateTransition(progress).animateFloat(
+        targetValueByState = { it ?: 0f }
+    )
 
 
     Surface(
@@ -956,43 +990,45 @@ fun ImportFileStatusItem(zipFileStatus: FileStatus,
         color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Column(
-            modifier = Modifier.padding(8.dp).fillMaxWidth()
+            modifier = Modifier.padding(16.dp).fillMaxWidth()
         ) {
             Row(
-                modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
             ) {
                 Text(
-                    text = "Importing archive",
+                    text = if (zipFile.status == FileProcessingStatus.COMPLETE) {
+                        "Last import"
+                    } else {
+                        "Importing archive"
+                    },
                     fontSize = 24.sp
                 )
             }
             Row(
-                modifier = Modifier.padding(horizontal = 8.dp),
             ) {
                 Text(
-                    text = zipFileStatus.file.name,
+                    text = zipFile.zipName,
                     fontStyle = FontStyle.Italic,
                     modifier = Modifier.alpha(0.5f)
                 )
             }
             Row(
-                modifier = Modifier.padding(end = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 val archiveText: String
-                when (zipFileStatus.status) {
-                    is UploadStatus.Waiting -> {
-                        CircularProgressIndicator(modifier = Modifier.size(42.dp).padding(8.dp),
-                            strokeCap = StrokeCap.Round)
-                        archiveText = "Processing... "
+                when (zipFile.status) {
+                    FileProcessingStatus.WAITING -> {
+                        archiveText = "Uploading... "
                     }
-                    is UploadStatus.Processing -> {
-                        CircularProgressIndicator(modifier = Modifier.size(42.dp).padding(8.dp),
-                            strokeCap = StrokeCap.Round)
-                        archiveText = "Finalizing..."
+                    FileProcessingStatus.PREPARING -> {
+                        archiveText = "Unpacking... "
                     }
-                    is UploadStatus.Success -> {
-                        Spacer(modifier = Modifier.width(8.dp))
+                    FileProcessingStatus.PROCESSING -> {
+                        archiveText = "Processing..."
+                    }
+                    FileProcessingStatus.FINALIZING -> {
+                        archiveText = "Finalizing... "
+                    }
+                    FileProcessingStatus.SUCCESS -> {
                         Icon(
                             imageVector = Icons.Default.CheckCircle,
                             contentDescription = "Success",
@@ -1006,14 +1042,24 @@ fun ImportFileStatusItem(zipFileStatus: FileStatus,
                         Spacer(modifier = Modifier.width(4.dp))
                         archiveText = "Imported $totalStreams entries"
                     }
-                    is UploadStatus.Failed -> {
+                    FileProcessingStatus.ERROR -> {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Error",
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(48.dp).padding(horizontal = 8.dp)
                         )
-                        archiveText = uploadStatusMessageParser(zipFileStatus.status.message, "Something went wrong")
+                        archiveText = "Import failed" // uploadStatusMessageParser(zipFileStatus.status.message, "Something went wrong")
+                    }
+
+
+                    FileProcessingStatus.COMPLETE -> {
+                        val completedOn = zipFile.completedOn?.toLocalDateTime()
+                        val dateString = DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.US)
+                            .format(completedOn)
+                        val timeString = DateTimeFormatter.ofPattern("h:mm a", Locale.US)
+                            .format(completedOn)
+                        archiveText = "Completed on $dateString at $timeString"
                     }
                 }
 
@@ -1021,9 +1067,40 @@ fun ImportFileStatusItem(zipFileStatus: FileStatus,
                     text = archiveText
                 )
             }
-            if (zipFileStatus.status is UploadStatus.Success) {
+            if (zipFile.status == FileProcessingStatus.PROCESSING) {
                 Row(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    LinearProgressIndicator(
+                        progress = { fluidProgress.value },
+                        trackColor = Color.Gray.copy(alpha = 0.2f),
+                        drawStopIndicator = {},
+                        modifier = Modifier.fillMaxWidth(),
+                        gapSize = (-2).dp
+                    )
+                }
+            } else if (
+                    listOf(
+                        FileProcessingStatus.WAITING,
+                        FileProcessingStatus.PREPARING,
+                        FileProcessingStatus.FINALIZING)
+                        .contains(zipFile.status)
+            ) {
+                Row(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    LinearProgressIndicator(
+                        trackColor = Color.Gray.copy(alpha = 0.2f),
+                        modifier = Modifier.fillMaxWidth(),
+                        gapSize = (-2).dp
+                    )
+                }
+            }
+            if (zipFile.status == FileProcessingStatus.SUCCESS) {
+                Row(
+                    modifier = Modifier.padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(onClick = { restartApp() }) {
@@ -1032,6 +1109,147 @@ fun ImportFileStatusItem(zipFileStatus: FileStatus,
                 }
             }
 
+        }
+    }
+}
+
+
+@Composable
+fun ImportProgressOverlay(importStatus: ImportStatusDTO?, restartApp: () -> Unit) {
+    importStatus?.let { status ->
+        status.zipUploadItem?.let { zipFile ->
+            if (zipFile.status != FileProcessingStatus.COMPLETE) {
+                val processingProgressDividend: Int? = importStatus.jsonInfoList?.filter {
+                    listOf(FileProcessingStatus.SUCCESS, FileProcessingStatus.ERROR).contains(it.status)
+                }?.size?.takeIf { it > 0}
+                val processingProgressDivisor: Int? = importStatus.jsonInfoList?.size?.takeIf { it > 0}
+                val processingProgress: Float? = processingProgressDividend?.let { dividend ->
+                    processingProgressDivisor?.let { divisor ->
+                        1f * dividend / divisor
+                    }
+                }
+
+                val fluidProgress = updateTransition(processingProgress).animateFloat(
+                    targetValueByState = { it ?: 0f }
+                )
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        shape = RoundedCornerShape(6.dp),
+                        colors = CardColors(
+                            containerColor = MaterialTheme.colorScheme.background,
+                            contentColor = MaterialTheme.colorScheme.onBackground,
+                            disabledContainerColor = MaterialTheme.colorScheme.background,
+                            disabledContentColor = MaterialTheme.colorScheme.onBackground
+                        ),
+                        border = BorderStroke(width = 1.dp, MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.2f))
+                    ) {
+                        Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                            .animateContentSize()) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(
+                                ) {
+                                    Text(
+                                        text = if (zipFile.status == FileProcessingStatus.SUCCESS) {
+                                            "Import successful"
+                                        } else {
+                                            "Import in progress"
+                                        }
+                                    )
+                                }
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    val archiveText: String
+                                    when (zipFile.status) {
+                                        FileProcessingStatus.WAITING -> {
+                                            archiveText = "Uploading... "
+                                        }
+                                        FileProcessingStatus.PREPARING -> {
+                                            archiveText = "Unpacking... "
+                                        }
+                                        FileProcessingStatus.PROCESSING -> {
+                                            archiveText = "Processing..."
+                                        }
+                                        FileProcessingStatus.FINALIZING -> {
+                                            archiveText = "Finalizing... "
+                                        }
+                                        FileProcessingStatus.SUCCESS -> {
+                                            archiveText = "Reload app to see new data"
+                                        }
+                                        FileProcessingStatus.ERROR -> {
+                                            Icon(
+                                                imageVector = Icons.Default.Close,
+                                                contentDescription = "Error",
+                                                tint = MaterialTheme.colorScheme.error,
+                                                modifier = Modifier.size(48.dp).padding(horizontal = 8.dp)
+                                            )
+                                            archiveText = "Import failed" // uploadStatusMessageParser(zipFileStatus.status.message, "Something went wrong")
+                                        }
+                                        else -> { archiveText = "Complete"}
+                                    }
+
+                                    Text(
+                                        text = archiveText,
+                                        fontStyle = FontStyle.Italic,
+                                        modifier = Modifier.alpha(0.5f)
+
+                                    )
+                                }
+                                if (zipFile.status == FileProcessingStatus.PROCESSING) {
+                                    Row(
+                                        modifier = Modifier.padding(vertical = 8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        LinearProgressIndicator(
+                                            progress = { fluidProgress.value },
+                                            trackColor = Color.Gray.copy(alpha = 0.2f),
+                                            drawStopIndicator = {},
+                                            modifier = Modifier.fillMaxWidth(),
+                                            gapSize = (-2).dp
+                                        )
+                                    }
+                                } else if (
+                                    listOf(
+                                        FileProcessingStatus.WAITING,
+                                        FileProcessingStatus.PREPARING,
+                                        FileProcessingStatus.FINALIZING)
+                                        .contains(zipFile.status)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(vertical = 8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        LinearProgressIndicator(
+                                            trackColor = Color.Gray.copy(alpha = 0.2f),
+                                            modifier = Modifier.fillMaxWidth(),
+                                            gapSize = (-2).dp
+                                        )
+                                    }
+                                }
+                            }
+                            if (zipFile.status == FileProcessingStatus.SUCCESS) {
+                                Column() {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        IconButton(onClick = { restartApp() }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Refresh,
+                                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                                contentDescription = "Reload app"
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -75,6 +75,7 @@ dependencies {
 
     implementation(libs.logging.interceptor)
 
+    implementation(libs.oksse)
 
     ksp(libs.hilt.compiler)
 }

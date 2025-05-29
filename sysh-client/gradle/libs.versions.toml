@@ -14,6 +14,7 @@ composeBom = "2025.05.01"
 loggingInterceptor = "4.12.0"
 navigationCompose = "2.9.0"
 okhttp = "4.12.0"
+oksse = "0.9.0"
 paging = "3.3.6"
 palette = "1.0.0"
 retrofit = "2.11.0"
@@ -47,6 +48,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+oksse = { module = "com.github.heremaps:oksse", version.ref = "oksse" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android" , version.ref = "hilt" }
