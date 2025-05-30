@@ -158,6 +158,7 @@ class MainActivity : ComponentActivity() {
                                     inclusive = true
                                 }
                             }
+                            importVM.closeImportStateSseConnection()
                             if (!storedUrl.isNullOrBlank()){
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar(
@@ -192,7 +193,7 @@ class MainActivity : ComponentActivity() {
                         navController.navigate(SpotifyAuth)
                     }
 //            this means no error was encountered
-                    0 -> {}
+                    0 -> { importVM.closeImportStateSseConnection() }
                     401 -> {
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(
@@ -208,6 +209,7 @@ class MainActivity : ComponentActivity() {
                                 inclusive = true
                             }
                         }
+//                        importVM.closeImportStateSseConnection()
                     }
                     else -> {
                         navController.navigate(Login) {
@@ -315,7 +317,7 @@ class MainActivity : ComponentActivity() {
                                 settingsVM,
                                 importStatus,
                                 isGradientEnabled,
-                                onPickZipFile = { pickZipFile() },
+                                onPickZipFile = { pickZipFile(isDemoVersion) },
                                 restartApp = { restartApp(applicationContext) }
                             )
                         }
@@ -353,8 +355,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun pickZipFile() {
-        zipPickerLauncher.launch(arrayOf("application/zip"))
+    private fun pickZipFile(isDemoVersion: Boolean?) {
+        if (isDemoVersion == true) {
+            importVM.mockZipImport()
+        } else {
+            zipPickerLauncher.launch(arrayOf("application/zip"))
+        }
     }
 
     private fun handleSpotifyCallback(intent: Intent?) {

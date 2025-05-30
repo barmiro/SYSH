@@ -1,5 +1,6 @@
 package com.github.barmiro.syshclient.data.settings.dataimport
 
+import com.github.barmiro.syshclient.data.common.authentication.CreateUserDTO
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -22,6 +23,12 @@ interface ImportApi {
     suspend fun uploadZip(
         @Part zip: MultipartBody.Part
     ) : Response<ResponseBody>
+
+    @POST("/mockZipUpload")
+    suspend fun mockZipUpload(
+        @Body user: CreateUserDTO
+    ) : Response<ResponseBody>
+
 
     @GET("recent")
     suspend fun recent() : Response<Unit>

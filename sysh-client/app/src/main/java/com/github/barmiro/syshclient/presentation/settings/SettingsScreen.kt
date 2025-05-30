@@ -102,6 +102,7 @@ fun SettingsScreen(
                         openLogoutAlertDialog = false
                         isLoading = true
                         sessionVM.logout()
+
                     },
                     titleText = "Are you sure?",
                     confirmText = "Log Out"
@@ -135,6 +136,25 @@ fun SettingsScreen(
                             modifier = Modifier.fillMaxWidth().padding(top = 8.dp, start = 8.dp, end = 8.dp))
                     }
                     if (isDemoVersion == true) {
+                        item() {
+                            Row() {
+                                SettingsItem(
+                                    itemText = "Import Streaming Data",
+                                    icon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            contentDescription = "Add"
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+                                        .clickable(
+                                            onClick = { navController.navigate(Import) }
+                                        )
+                                )
+                            }
+                        }
                         item() {
                             Row() {
                                 SettingsItem(

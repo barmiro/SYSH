@@ -104,8 +104,8 @@ public class JsonController {
 			if (status != FileProcessingStatus.SUCCESS && status != FileProcessingStatus.ERROR && status != FileProcessingStatus.COMPLETE) {
 				throw new DuplicateKeyException("User " + username + " is already importing a zip file");
 			} else {
-				zipStatusMap.remove("username");
-				jsonStatusMap.remove("username");
+				zipStatusMap.remove(username);
+				jsonStatusMap.remove(username);
 			}
 		}
 		

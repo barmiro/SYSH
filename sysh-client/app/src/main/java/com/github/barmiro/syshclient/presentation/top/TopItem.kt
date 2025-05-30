@@ -149,7 +149,7 @@ fun TopItem(
                     ) {
                         Text(
                             text = when{
-                                itemData.name.isEmpty() -> "[ Deleted track ]"
+                                itemData.name.isEmpty() -> "[ Deleted by Spotify ]"
                                 else -> itemData.name
                             },
                             fontWeight = FontWeight.Bold,

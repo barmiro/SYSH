@@ -2,6 +2,7 @@ package com.github.barmiro.syshclient.data.settings.dataimport
 
 import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
+import com.github.barmiro.syshclient.data.common.authentication.CreateUserDTO
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.handleNetworkException
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -24,7 +26,9 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.File
+import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -44,6 +48,9 @@ class ImportRepository @Inject constructor(
         .build()
     val retrofit = Retrofit.Builder()
         .baseUrl("http://localhost/")
+        .addConverterFactory(
+            Json.asConverterFactory(
+                "application/json; charset=UTF8".toMediaType()))
         .client(client)
         .build()
 
@@ -61,6 +68,32 @@ class ImportRepository @Inject constructor(
                 )
 
                 val response = importApi.uploadZip(multipartBody)
+
+                if (response.isSuccessful) {
+                    emit(Resource.Success(response.body()?.string()))
+                } else {
+                    emit(Error(response.message()))
+                }
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
+            }
+        }
+    }
+
+    fun mockZipUpload(uploadID: String?): Flow<Resource<String>> {
+        return flow {
+            emit(Resource.Loading(true))
+            try {
+
+                // temporary workaround
+                val response = importApi.mockZipUpload(
+                    CreateUserDTO(
+                        uploadID ?: "",
+                        "",
+                        ZoneId.systemDefault().id
+                    )
+                )
 
                 if (response.isSuccessful) {
                     emit(Resource.Success(response.body()?.string()))
@@ -120,17 +153,25 @@ class ImportRepository @Inject constructor(
     private val requestUrl = "http://localhost/".toHttpUrl()
     private val serverUrl = userPrefRepo.serverUrlFlow.value?.toHttpUrl()
 
-    val url: HttpUrl = requestUrl.newBuilder()
+    var urlBuilder: HttpUrl.Builder = requestUrl.newBuilder()
         .scheme(serverUrl?.scheme ?: requestUrl.scheme)
         .host(serverUrl?.host ?: requestUrl.host)
         .port(serverUrl?.port ?: requestUrl.port)
         .encodedPath("/zipStatusStream")
-        .build()
 
-    private val request = Request.Builder().url(url).build()
+    var event: ServerSentEvent? = null
 
-    fun startSseConnection(onStatusReceived: (ImportStatusDTO) -> Unit, onDisconnect: () -> Unit) {
-        oksse.newServerSentEvent(request, object : ServerSentEvent.Listener {
+    fun startSseConnection(onStatusReceived: (ImportStatusDTO) -> Unit,
+                           onDisconnect: () -> Unit,
+                           uploadID: String?) {
+
+        // for demo version
+        if (uploadID != null) {
+            urlBuilder = urlBuilder.addQueryParameter("username", uploadID)
+        }
+        val request = Request.Builder().url(urlBuilder.build()).build()
+
+        val listener = object : ServerSentEvent.Listener {
             override fun onOpen(sse: ServerSentEvent, response: Response) {
                 println("Connection opened")
             }
@@ -159,9 +200,17 @@ class ImportRepository @Inject constructor(
             override fun onPreRetry(sse: ServerSentEvent?, originalRequest: Request?): Request {
                 TODO("Not yet implemented")
             }
-        })
+
+        }
+        event = oksse.newServerSentEvent(request, listener)
     }
 
+    fun closeSseConnection() {
+        event?.let {
+            it.close()
+            event = null
+        }
+    }
 }
 
 data class FileStatus(

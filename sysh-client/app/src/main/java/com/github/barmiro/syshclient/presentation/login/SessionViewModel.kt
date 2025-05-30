@@ -270,7 +270,7 @@ class SessionViewModel @Inject constructor(
         viewModelScope.launch {
             userPrefRepo.setDemoVersion(true)
             userPrefRepo.isDemoVersion.first()
-            userPrefRepo.saveServerUrl("https://sysh.app/demo")
+            userPrefRepo.saveServerUrl("http://192.168.0.147:5755")
             userPrefRepo.serverUrl.first()
             getToken("demo-user", "password")
         }

@@ -32,8 +32,9 @@ class ImportViewModel @Inject constructor(
     private val _errorMessage: MutableStateFlow<String?> = MutableStateFlow(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
+    private val _demoUploadID: MutableStateFlow<String?> = MutableStateFlow(null)
 
-    fun startImportStateSseConnection() {
+    fun startImportStateSseConnection(uploadID: String? = null) {
         importRepo.startSseConnection(
             onStatusReceived = { status ->
                 _isConnected.value = true
@@ -41,8 +42,17 @@ class ImportViewModel @Inject constructor(
             },
             onDisconnect = {
                 _isConnected.value = false
-            }
+            },
+            uploadID = uploadID
         )
+    }
+
+    fun closeImportStateSseConnection() {
+        importRepo.closeSseConnection()
+        _isConnected.value = false
+        _importStatus.value = null
+        _errorMessage.value = null
+        _demoUploadID.value = null
     }
 
     fun handleZipFile(uri: Uri, context: Context) {
@@ -121,7 +131,55 @@ class ImportViewModel @Inject constructor(
                     }
                 }
             }
-
         }
     }
+    fun mockZipImport() {
+        viewModelScope.launch() {
+            val zipFileName = "example-archive.zip"
+            try {
+                importRepo.mockZipUpload(_demoUploadID.value).collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            if (!_isConnected.value) {
+                                startImportStateSseConnection(result.data)
+                            }
+                            _demoUploadID.value = result.data
+                            _importStatus.value = ImportStatusDTO(
+                                ZipUploadItem(
+                                    zipName = zipFileName,
+                                    status = FileProcessingStatus.PREPARING
+                                )
+                            )
+                        }
+                        is Resource.Loading -> {
+                            _importStatus.value = ImportStatusDTO(
+                                ZipUploadItem(
+                                    zipName = zipFileName,
+                                    status = FileProcessingStatus.WAITING
+                                )
+                            )
+                        }
+                        is Resource.Error -> {
+                            _importStatus.value = ImportStatusDTO(
+                                ZipUploadItem(
+                                    zipName = zipFileName,
+                                    status = FileProcessingStatus.ERROR
+                                )
+                            )
+                            _errorMessage.value = result.message
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                _importStatus.value = ImportStatusDTO(
+                    ZipUploadItem(
+                        zipName = zipFileName,
+                        status = FileProcessingStatus.ERROR
+                    )
+                )
+                _errorMessage.value = e.message
+            }
+        }
+    }
+
 }
