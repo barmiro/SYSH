@@ -115,6 +115,7 @@ public class JsonController {
 				uploadID,
 				zipName,
 				FileProcessingStatus.PREPARING,
+				null,
 				null
 		);
 		
@@ -135,11 +136,15 @@ public class JsonController {
 				
 				Map<String, List<StreamDTO>> jsonFiles = zipProcessor.processExtendedStreamingHistory(zipBytes, username);
 				
-				zipStatusMap.put(username, new ZipUploadItem(uploadID, zipName, FileProcessingStatus.PROCESSING, null));
+				zipStatusMap.put(username, new ZipUploadItem(uploadID, zipName, FileProcessingStatus.PROCESSING, null, null));
 				emitStatus(username);
 				
 				log.info("Found " + jsonFiles.size() + " json files");
-				
+				if (jsonFiles.size() == 0) {
+					zipStatusMap.put(username, new ZipUploadItem(uploadID, zipName, FileProcessingStatus.ERROR, null, "Archive contains no valid data"));
+					emitStatus(username);
+					return;
+				}
 				CopyOnWriteArrayList<JsonInfo> jsonInfoList = new CopyOnWriteArrayList<>();
 				for (Map.Entry<String, List<StreamDTO>> jsonFile : jsonFiles.entrySet()) {
 					jsonInfoList.add(
@@ -153,6 +158,8 @@ public class JsonController {
 				
 				jsonStatusMap.put(username, jsonInfoList);
 				emitStatus(username);
+				
+				int totalEntriesAdded = 0;
 				
 				for (Map.Entry<String, List<StreamDTO>> jsonFile : jsonFiles.entrySet()) {
 					CopyOnWriteArrayList<JsonInfo> tempList = jsonStatusMap.get(username);
@@ -177,6 +184,8 @@ public class JsonController {
 						if (!streams.isEmpty()) {
 							entriesAdded = addToCatalog.adder(streams, username);
 						}
+						
+						totalEntriesAdded += entriesAdded;
 						
 						if (entriesAdded == 0) {
 							tempList = updateJsonInfo(
@@ -212,12 +221,17 @@ public class JsonController {
 					}
 				}
 				
-				zipStatusMap.put(username, new ZipUploadItem(uploadID, zipName, FileProcessingStatus.FINALIZING, null));
+				if (totalEntriesAdded == 0) {
+					zipStatusMap.put(username, new ZipUploadItem(uploadID, zipName, FileProcessingStatus.ERROR, null, "No entries found"));
+					emitStatus(username);
+					return;
+				}
+				zipStatusMap.put(username, new ZipUploadItem(uploadID, zipName, FileProcessingStatus.FINALIZING, null, null));
 				emitStatus(username);
 				cacheService.cacheGenerator(username);
 				
 				userRepo.setHasImportedData(username, true);
-				zipStatusMap.put(username, new ZipUploadItem(uploadID, zipName, FileProcessingStatus.SUCCESS, Instant.now().atZone(userRepo.getUserTimezone(username))));
+				zipStatusMap.put(username, new ZipUploadItem(uploadID, zipName, FileProcessingStatus.SUCCESS, Instant.now().atZone(userRepo.getUserTimezone(username)), null));
 				emitStatus(username);
 				log.info("Finished zip file import for user " + username + ": " + zipName);
 				
@@ -227,7 +241,7 @@ public class JsonController {
 				
 			} catch (Exception e) {
 				e.printStackTrace();
-				zipStatusMap.put(username, new ZipUploadItem(uploadID, zipName, FileProcessingStatus.ERROR, null));
+				zipStatusMap.put(username, new ZipUploadItem(uploadID, zipName, FileProcessingStatus.ERROR, null, e.getMessage()));
 				emitStatus(username);
 			}	
 		});
@@ -268,7 +282,8 @@ public class JsonController {
 				    			item.uploadID(),
 				    			item.zipName(),
 				    			FileProcessingStatus.COMPLETE,
-				    			item.completedOn()
+				    			item.completedOn(),
+				    			item.message()
 			    		)
 		    	);
 	    }
@@ -287,9 +302,10 @@ public class JsonController {
 									.name("status")
 									.data(zipUploadStatus(username))
 							);
-				} catch (IOException e) {
+				} catch (IOException | IllegalStateException e) {
 					emitter.complete();
 				} catch (Exception ex) {
+					ex.printStackTrace();
 					emitter.completeWithError(ex);
 					zipStatusMap.remove(username);
 				}

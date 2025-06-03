@@ -68,4 +68,18 @@ public class AdminController {
 		return response;
 	}
 	
+	@PostMapping("/users/resetPassword")
+	RegisterResponse resetPassword(@RequestBody SyshUser user) {
+		
+		int passwordChanged = 0;
+		
+		passwordChanged = userManager.changePassword(user.username(), user.password(), true);
+		
+		if (passwordChanged == 1) {
+			return new RegisterResponse(user.username(), user.role());
+		} else {
+			throw new RuntimeException();
+		}
+	}
+	
 }

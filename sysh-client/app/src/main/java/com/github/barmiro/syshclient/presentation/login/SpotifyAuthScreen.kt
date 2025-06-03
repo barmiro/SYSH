@@ -79,7 +79,7 @@ fun SpotifyAuthScreen(
 
             TextButton(
                 onClick = {
-                    sessionVM.logout()
+                    sessionVM.logout {}
                 }
             ) {
                 Text("Return to login screen")

@@ -50,6 +50,7 @@ fun ManageUsersScreen(
 
     val usernameList by adminVM.usernameList.collectAsState()
     val userCreationString by adminVM.userCreationString.collectAsState()
+    val passwordResetMap by adminVM.passwordResetMap.collectAsState()
     var openAlertDialog by remember { mutableStateOf(false) }
     var selectedUser by remember { mutableStateOf<UserDataDTO?>(null) }
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -122,24 +123,27 @@ fun ManageUsersScreen(
                 }
 
 
-                usernameList?.let {
-                    items(it.size) { index ->
+                usernameList?.let { list ->
+                    items(list.size) { index ->
                         ManageUserItem(
-                            itemText = it[index].username,
+                            itemText = list[index].username,
                             icon = {
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    contentDescription = "Icon for user ${it[index].username}"
+                                    contentDescription = "Icon for user ${list[index].username}"
                                 )
                             },
                             onDeleteUser = {
-                                selectedUser = it[index]
+                                selectedUser = list[index]
                                 openAlertDialog = true
                             },
+                            onResetPassword = { newPassword ->
+                                adminVM.resetPassword(list[index].username, newPassword)
+                            },
                             modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp),
-                            isCurrentUser = it[index].username == username
-
+                            isCurrentUser = list[index].username == username,
+                            isResetSuccessful = passwordResetMap[list[index].username]
                         )
                         }
                     }

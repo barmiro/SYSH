@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -23,7 +24,8 @@ import com.github.barmiro.syshclient.presentation.common.Startup
 
 @Composable
 fun ConnectionErrorScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    restartApp: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(8.dp),
@@ -49,6 +51,17 @@ fun ConnectionErrorScreen(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Button(
+                onClick = restartApp
+            ) {
+                Text(text = "Try again",
+                    fontSize = 16.sp)
+            }
+        }
+        Spacer(Modifier.height(32.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
                 color = MaterialTheme.colorScheme.onBackground,
                 textAlign = TextAlign.Center,
@@ -58,7 +71,7 @@ fun ConnectionErrorScreen(
             TextButton(
                 onClick = {
                     navController.navigate(Startup) {
-                        popUpTo(navController.graph.startDestinationId) {
+                        popUpTo(0) {
                             inclusive = true
                         }
                     }

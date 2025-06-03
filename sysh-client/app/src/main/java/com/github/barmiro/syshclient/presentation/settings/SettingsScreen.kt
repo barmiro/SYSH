@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
@@ -57,7 +56,8 @@ import java.time.ZoneId
 fun SettingsScreen(
     sessionVM: SessionViewModel,
     settingsVM: SettingsViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    restartApp: () -> Unit
 ) {
 
     val username by sessionVM.username.collectAsState()
@@ -101,7 +101,7 @@ fun SettingsScreen(
                     onConfirm = {
                         openLogoutAlertDialog = false
                         isLoading = true
-                        sessionVM.logout()
+                        sessionVM.logout(restartApp)
 
                     },
                     titleText = "Are you sure?",
@@ -139,7 +139,7 @@ fun SettingsScreen(
                         item() {
                             Row() {
                                 SettingsItem(
-                                    itemText = "Import Streaming Data",
+                                    itemText = "Import Streaming Data [DEMO]",
                                     icon = {
                                         Icon(
                                             imageVector = Icons.Default.Add,
@@ -154,6 +154,28 @@ fun SettingsScreen(
                                         )
                                 )
                             }
+                        }
+                        item() {
+                            AppPreferencesItem(
+                                itemText = "App Preferences",
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.Settings,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        contentDescription = "App Preferences"
+                                    )
+                                },
+                                modifier = Modifier
+                                    .padding(top = 8.dp, start = 8.dp, end = 8.dp),
+                                isUsernameDisplayed = isUsernameDisplayed ?: false,
+                                onChangeDisplayName = {
+                                    settingsVM.setIsUsernameDisplayed(!(isUsernameDisplayed ?: true))
+                                },
+                                selectedAppTheme = appTheme,
+                                onChangeAppTheme = { settingsVM.changeAppTheme(it) },
+                                isGradientEnabled = isGradientEnabled,
+                                onSetIsGradientEnabled = { settingsVM.setIsGradientEnabled(!isGradientEnabled) }
+                            )
                         }
                         item() {
                             Row() {
@@ -171,7 +193,7 @@ fun SettingsScreen(
                                         .clickable(
                                             onClick = {
                                                 isLoading = true
-                                                sessionVM.clearAllPreferences()
+                                                sessionVM.clearAllPreferences(restartApp)
                                             }
                                         )
                                 )
@@ -331,25 +353,6 @@ fun SettingsScreen(
                                             .clickable(
                                                 onClick = {
                                                     navController.navigate(ManageUsers)
-                                                }
-                                            )
-                                    )
-                                }
-                                Row() {
-                                    SettingsItem(
-                                        itemText = "About server",
-                                        icon = {
-                                            Icon(
-                                                imageVector = Icons.Default.Info,
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                contentDescription = "About server"
-                                            )
-                                        },
-                                        modifier = Modifier
-                                            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-                                            .clickable(
-                                                onClick = {
-//                                        TODO
                                                 }
                                             )
                                     )

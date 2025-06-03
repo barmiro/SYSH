@@ -16,7 +16,8 @@ data class ZipUploadItem(
     val zipName: String,
     val status: FileProcessingStatus,
     @Serializable(with = ZonedDateTimeSerializer::class)
-    val completedOn: ZonedDateTime? = null
+    val completedOn: ZonedDateTime? = null,
+    val message: String? = null
 )
 
 @Serializable

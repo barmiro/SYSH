@@ -24,7 +24,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.File
@@ -41,7 +40,6 @@ class ImportRepository @Inject constructor(
     val client = OkHttpClient.Builder()
         .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(JwtInterceptor(userPrefRepo))
-        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
         .addInterceptor(ServerErrorInterceptor(userPrefRepo))
         .writeTimeout(60, TimeUnit.SECONDS)
         .readTimeout(300, TimeUnit.SECONDS)
@@ -173,7 +171,6 @@ class ImportRepository @Inject constructor(
 
         val listener = object : ServerSentEvent.Listener {
             override fun onOpen(sse: ServerSentEvent, response: Response) {
-                println("Connection opened")
             }
 
             override fun onMessage(
@@ -183,8 +180,12 @@ class ImportRepository @Inject constructor(
                 message: String
             ) {
                 if(event == "status") {
-                    val status = Json.decodeFromString<ImportStatusDTO>(message)
-                    onStatusReceived(status)
+                    try {
+                        val status = Json.decodeFromString<ImportStatusDTO>(message)
+                        onStatusReceived(status)
+                    } catch (e: Exception) {
+                        sse.close()
+                    }
 
                 }
             }
@@ -194,11 +195,10 @@ class ImportRepository @Inject constructor(
             override fun onRetryError(sse: ServerSentEvent, throwable: Throwable, response: Response?): Boolean = false
             override fun onClosed(sse: ServerSentEvent) {
                 onDisconnect()
-                println("Connection closed")
             }
 
-            override fun onPreRetry(sse: ServerSentEvent?, originalRequest: Request?): Request {
-                TODO("Not yet implemented")
+            override fun onPreRetry(sse: ServerSentEvent?, originalRequest: Request?): Request? {
+                return null
             }
 
         }

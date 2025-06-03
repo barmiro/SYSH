@@ -28,6 +28,9 @@ class AdminViewModel @Inject constructor(
     private val _userCreationString = MutableStateFlow<String?>(null)
     val userCreationString: StateFlow<String?> = _userCreationString.asStateFlow()
 
+    private val _passwordResetMap = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+    val passwordResetMap: StateFlow<Map<String, Boolean>> = _passwordResetMap.asStateFlow()
+
     private val timezone: String = ZoneId.systemDefault().id
 
     fun getUsers() {
@@ -62,17 +65,41 @@ class AdminViewModel @Inject constructor(
         }
     }
 
+    fun resetPassword(username: String, password: String) {
+        viewModelScope.launch {
+            adminRepo.resetPassword(username, password).collect { result ->
+                when (result) {
+                    is Resource.Success -> {
+                        _passwordResetMap.value = _passwordResetMap.value.toMutableMap().apply {
+                            result.data?.let { username ->
+                                this[username] = true
+                            }
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        _passwordResetMap.value = _passwordResetMap.value.toMutableMap().apply {
+                            result.data?.let { username ->
+                                this[username] = false
+                            }
+                        }
+                    }
+                    is Resource.Loading -> {
+                    }
+                }
+            }
+        }
+    }
+
 
     fun deleteUser(username: String) {
         viewModelScope.launch {
             adminRepo.deleteUser(username).collect { result ->
                 when(result) {
                     is Resource.Success -> {
-                        println("Deleted user $username")
                         getUsers()
                     }
                     else -> {
-                        println(result.message)
                     }
                 }
             }

@@ -84,8 +84,6 @@ fun TopScreenBottomBar(
             else -> 1
         }
         targetPage = state.dateRangePageNumber ?: (pageCount - 1)
-        println("TARGET PAGE: $targetPage")
-        println("STATE PAGE: ${state.dateRangePageNumber}")
     }
 
     LaunchedEffect(targetPage, state.dateRangeMode) {

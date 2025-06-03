@@ -6,6 +6,7 @@ import com.github.barmiro.syshclient.data.common.authentication.AuthenticationRe
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
 import com.github.barmiro.syshclient.data.common.startup.StartupDataRepository
 import com.github.barmiro.syshclient.presentation.top.TopScreenStateManager
+import com.github.barmiro.syshclient.util.AppConstants
 import com.github.barmiro.syshclient.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -177,10 +178,11 @@ class SessionViewModel @Inject constructor(
         }
     }
 
-    fun logout() {
+    fun logout(onComplete: () -> Unit) {
         stateManager.wipeState()
         viewModelScope.launch {
             userPrefRepo.logout()
+            onComplete()
         }
     }
 
@@ -250,10 +252,12 @@ class SessionViewModel @Inject constructor(
 
 
 
-    fun clearAllPreferences() {
+    fun clearAllPreferences(onComplete: () -> Unit) {
         _responseCode.value = 0
         viewModelScope.launch {
             userPrefRepo.clearAllPreferences()
+            userPrefRepo.serverUrl.first()
+            onComplete()
         }
     }
     fun saveServerUrl(serverUrl: String, onComplete: () -> Unit) {
@@ -270,11 +274,20 @@ class SessionViewModel @Inject constructor(
         viewModelScope.launch {
             userPrefRepo.setDemoVersion(true)
             userPrefRepo.isDemoVersion.first()
-            userPrefRepo.saveServerUrl("http://192.168.0.147:5755")
+            userPrefRepo.saveServerUrl(AppConstants.DEMO_URL)
             userPrefRepo.serverUrl.first()
-            getToken("demo-user", "password")
+            getToken(AppConstants.DEMO_USERNAME, AppConstants.DEMO_PASSWORD)
         }
     }
 
+    fun wipeDemo(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            if (userPrefRepo.isDemoVersion.first() == true) {
+                clearAllPreferences {
+                    onComplete()
+                }
+            }
+        }
+    }
 
 }

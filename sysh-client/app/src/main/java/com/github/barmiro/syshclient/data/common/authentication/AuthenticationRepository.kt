@@ -12,7 +12,6 @@ import kotlinx.serialization.json.Json
 import okhttp3.Credentials
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Inject
@@ -25,7 +24,6 @@ class AuthenticationRepository @Inject constructor(
 
     val client = OkHttpClient.Builder()
         .addInterceptor(ServerUrlInterceptor(userPrefRepo))
-        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
         .addInterceptor(ServerErrorInterceptor(userPrefRepo))
         .build()
 

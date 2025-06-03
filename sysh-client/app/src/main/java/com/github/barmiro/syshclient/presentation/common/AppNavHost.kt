@@ -92,14 +92,14 @@ fun AppNavHost(navController: NavHostController,
             SpotifyAuthScreen(sessionVM)
         }
         composable<Settings> {
-            SettingsScreen(sessionVM, settingsVM, navController)
+            SettingsScreen(sessionVM, settingsVM, navController, restartApp)
             ImportProgressOverlay(importStatus, restartApp)
         }
         composable<Import> {
             ImportScreen(importVM, onPickZipFile, restartApp)
         }
         composable<ConnectionError> {
-            ConnectionErrorScreen(navController)
+            ConnectionErrorScreen(navController, restartApp)
         }
         composable<ManageUsers> {
             ManageUsersScreen(adminVM, sessionVM)

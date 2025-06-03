@@ -38,6 +38,9 @@ class ImportViewModel @Inject constructor(
         importRepo.startSseConnection(
             onStatusReceived = { status ->
                 _isConnected.value = true
+                status.zipUploadItem?.message?.let {
+                    _errorMessage.value = it
+                }
                 _importStatus.value = status
             },
             onDisconnect = {

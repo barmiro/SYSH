@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -141,7 +143,7 @@ fun JsonFileUploadItem(
                 horizontalAlignment = Alignment.End
             ) {
                 Row(
-                    modifier = Modifier.animateContentSize(),
+                    modifier = Modifier.heightIn(min = 42.dp).animateContentSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     when (jsonInfo.status) {
@@ -428,8 +430,10 @@ fun ManageUserItem(
     itemText: String,
     icon: @Composable () -> Unit,
     onDeleteUser: () -> Unit,
+    onResetPassword: (String) -> Unit,
     modifier: Modifier,
-    isCurrentUser: Boolean = false
+    isCurrentUser: Boolean = false,
+    isResetSuccessful: Boolean?
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -462,7 +466,6 @@ fun ManageUserItem(
                         ) {
                             Text(
                                 text = if (isCurrentUser) "$itemText (You)" else itemText,
-//                        fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 color = MaterialTheme.colorScheme.onBackground,
                                 overflow = TextOverflow.Ellipsis,
@@ -484,6 +487,118 @@ fun ManageUserItem(
                 }
             }
             if (isExpanded) {
+                HorizontalDivider(Modifier.fillMaxWidth())
+                var isResetPasswordExpanded by remember { mutableStateOf(false) }
+                Row(
+                    Modifier.height(IntrinsicSize.Min)
+                ) {
+                    if (isResetPasswordExpanded) {
+                        val newPassword = remember {
+                            mutableStateOf(TextFieldValue())
+                        }
+                        Column(
+                            modifier = Modifier.weight(1f).padding(12.dp).fillMaxHeight(),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            OutlinedTextField(value = newPassword.value,
+                                onValueChange = {
+                                    newPassword.value = it
+                                },
+                                label = {
+                                    Text("New one-time password")
+                                },
+                                modifier = Modifier
+                                    .width(256.dp),
+                                visualTransformation = PasswordVisualTransformation(),
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    imeAction = ImeAction.Done,
+                                    keyboardType = KeyboardType.Password
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        onResetPassword(newPassword.value.text)
+                                    }
+                                ),
+                                singleLine = true,
+                                maxLines = 1,
+                                isError = !canEncodeInput(newPassword.value.text)
+                            )
+
+                        }
+                        Column(
+                            modifier = Modifier.padding(top = 12.dp, bottom = 12.dp, end = 12.dp)
+                                .fillMaxHeight(),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Button(
+                                onClick = {
+                                    onResetPassword(newPassword.value.text)
+                                    isResetPasswordExpanded = false
+                                },
+                                enabled = newPassword.value.text.isNotBlank()
+                                        && canEncodeInput(newPassword.value.text)
+                            ) {
+                                Text("Reset")
+                            }
+                        }
+                    } else if (isResetSuccessful == true) {
+                        Column(modifier = Modifier.clickable(
+                            onClick = {
+                                isResetPasswordExpanded = true
+                            },
+                            onClickLabel = "Reset password again"
+                        )) {
+                            UrlInfoItem(
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Default.CheckCircle,
+                                        contentDescription = "Success",
+                                        tint = Color(
+                                            red = 52,
+                                            green = 178,
+                                            blue = 51
+                                        ),
+                                        modifier = Modifier.size(18.dp).alpha(0.8f)
+                                    )
+                                },
+                                text = "Password reset successful"
+                            )
+                        }
+                    } else if (isResetSuccessful == false) {
+                        Column(modifier = Modifier.clickable(
+                            onClick = {
+                                isResetPasswordExpanded = true
+                            },
+                            onClickLabel = "Reset password again"
+                        )) {
+                            UrlInfoItem(
+                                icon = {
+                                    Icon(imageVector = Icons.Default.Close,
+                                        tint = MaterialTheme.colorScheme.error,
+                                        contentDescription = "Error")
+                                },
+                                text = "Password reset failed"
+                            )
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier.weight(1f).padding(vertical = 24.dp, horizontal = 16.dp).fillMaxHeight().clickable(
+                                onClick = { isResetPasswordExpanded = true },
+                                onClickLabel = "Expand password reset"
+                            ),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "Reset Password",
+                                fontSize = 16.sp,
+                                lineHeight = 18.sp
+                            )
+
+                        }
+                    }
+                }
+
+                HorizontalDivider(Modifier.fillMaxWidth())
                 Row(
                     modifier = Modifier.padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -499,7 +614,6 @@ fun ManageUserItem(
                     }
                 }
             }
-
         }
     }
 }
@@ -1059,7 +1173,10 @@ fun ImportFileStatusItem(zipFile: ZipUploadItem,
                          restartApp: () -> Unit) {
 
     val fluidProgress = updateTransition(progress).animateFloat(
-        targetValueByState = { it ?: 0f }
+        targetValueByState = { it ?: 0f },
+        transitionSpec = {
+            spring(stiffness = 500f, dampingRatio = 1f)
+        }
     )
 
 
@@ -1198,7 +1315,7 @@ fun ImportFileStatusItem(zipFile: ZipUploadItem,
 fun ImportProgressOverlay(importStatus: ImportStatusDTO?, restartApp: () -> Unit) {
     importStatus?.let { status ->
         status.zipUploadItem?.let { zipFile ->
-            if (zipFile.status != FileProcessingStatus.COMPLETE) {
+            if (zipFile.status != FileProcessingStatus.COMPLETE && zipFile.status != FileProcessingStatus.ERROR) {
                 val processingProgressDividend: Int? = importStatus.jsonInfoList?.filter {
                     listOf(FileProcessingStatus.SUCCESS, FileProcessingStatus.ERROR).contains(it.status)
                 }?.size?.takeIf { it > 0}
@@ -1210,7 +1327,10 @@ fun ImportProgressOverlay(importStatus: ImportStatusDTO?, restartApp: () -> Unit
                 }
 
                 val fluidProgress = updateTransition(processingProgress).animateFloat(
-                    targetValueByState = { it ?: 0f }
+                    targetValueByState = { it ?: 0f },
+                    transitionSpec = {
+                        spring(stiffness = 500f, dampingRatio = 1f)
+                    }
                 )
                 Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
                     Card(
@@ -1258,15 +1378,6 @@ fun ImportProgressOverlay(importStatus: ImportStatusDTO?, restartApp: () -> Unit
                                         }
                                         FileProcessingStatus.SUCCESS -> {
                                             archiveText = "Reload app to see new data"
-                                        }
-                                        FileProcessingStatus.ERROR -> {
-                                            Icon(
-                                                imageVector = Icons.Default.Close,
-                                                contentDescription = "Error",
-                                                tint = MaterialTheme.colorScheme.error,
-                                                modifier = Modifier.size(48.dp).padding(horizontal = 8.dp)
-                                            )
-                                            archiveText = "Import failed" // uploadStatusMessageParser(zipFileStatus.status.message, "Something went wrong")
                                         }
                                         else -> { archiveText = "Complete"}
                                     }
@@ -1472,5 +1583,5 @@ fun restartApp(context: Context) {
     val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
     intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
     context.startActivity(intent)
-    Runtime.getRuntime().exit(0) // kill the current process
+    Runtime.getRuntime().exit(0)
 }

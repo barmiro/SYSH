@@ -187,7 +187,7 @@ fun LoginScreen(sessionVM: SessionViewModel,
                     TextButton(
                         onClick = {
                             isLoading = true
-                            sessionVM.clearAllPreferences()
+                            sessionVM.clearAllPreferences {}
                         }
 
                     ) {
@@ -200,7 +200,7 @@ fun LoginScreen(sessionVM: SessionViewModel,
     }
 }
 
-public fun canEncodeInput(input: String): Boolean {
+fun canEncodeInput(input: String): Boolean {
     return Charsets.ISO_8859_1.newEncoder().canEncode(input)
 }
 

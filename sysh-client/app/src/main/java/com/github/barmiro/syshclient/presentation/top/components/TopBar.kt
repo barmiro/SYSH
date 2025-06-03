@@ -81,10 +81,6 @@ fun TopScreenTopBar(
                 DropdownMenuItem(
                     text = { Text("All time") },
                     onClick = {
-//                        onDateRangeModeChange("")
-//                        onDateRangePageChange(
-//                            TopScreenEvent.OnDateRangePageChange(-1)
-//                        )
                         onVMSearchParameterChange(
                             TopScreenEvent.OnSearchParameterChange(
                                 start = LocalDateTime.MIN,
@@ -101,10 +97,6 @@ fun TopScreenTopBar(
                     onClick = {
                         if (state.dateRangeMode != "yearly") {
                             val year: Int = LocalDate.now().year
-//                            onDateRangeModeChange("yearly")
-//                            onDateRangePageChange(
-//                                TopScreenEvent.OnDateRangePageChange(-1)
-//                            )
                             onVMSearchParameterChange(
                                 TopScreenEvent.OnSearchParameterChange(
                                     start = yearToStart(year),
@@ -123,10 +115,6 @@ fun TopScreenTopBar(
                     onClick = {
                         if (state.dateRangeMode != "monthly") {
                             val month: YearMonth = YearMonth.now()
-//                            onDateRangeModeChange("monthly")
-//                            onDateRangePageChange(
-//                                TopScreenEvent.OnDateRangePageChange(-1)
-//                            )
                             onVMSearchParameterChange(
                                 TopScreenEvent.OnSearchParameterChange(
                                     start = monthToStart(month),

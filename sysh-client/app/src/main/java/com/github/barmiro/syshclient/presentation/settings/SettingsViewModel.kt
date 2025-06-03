@@ -100,8 +100,8 @@ class SettingsViewModel @Inject constructor(
             settingsRepo.updateTimezone(timezone).collect { result ->
                 when (result) {
                     is Resource.Success -> {
-                        importRepo.recent().collect { }
                         _isTimezoneChanged.value = true
+                        importRepo.recent().collect { }
                     }
 
                     is Resource.Error -> {

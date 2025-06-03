@@ -121,7 +121,7 @@ fun TopScreen(
                             Icon(
                                 painter = painterResource(id = R.drawable.sort_24px),
                                 tint = IconButtonDefaults.iconButtonColors().contentColor,
-                                contentDescription = "Sort icon"
+                                contentDescription = "Sort items by stream count"
                             )
                         }
                     } else {
@@ -133,7 +133,7 @@ fun TopScreen(
                             Icon(
                                 painter = painterResource(id = R.drawable.sort_24px),
                                 tint = IconButtonDefaults.iconButtonColors().contentColor,
-                                contentDescription = "Sort icon"
+                                contentDescription = "Sort items by time streamed"
                             )
                         }
                     }

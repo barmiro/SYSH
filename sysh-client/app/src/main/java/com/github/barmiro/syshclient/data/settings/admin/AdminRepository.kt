@@ -3,6 +3,7 @@ package com.github.barmiro.syshclient.data.settings.admin
 import com.github.barmiro.syshclient.data.common.ServerErrorInterceptor
 import com.github.barmiro.syshclient.data.common.ServerUrlInterceptor
 import com.github.barmiro.syshclient.data.common.authentication.AdminCreateUserDTO
+import com.github.barmiro.syshclient.data.common.authentication.CreateUserDTO
 import com.github.barmiro.syshclient.data.common.authentication.JwtInterceptor
 import com.github.barmiro.syshclient.data.common.handleNetworkException
 import com.github.barmiro.syshclient.data.common.preferences.UserPreferencesRepository
@@ -14,7 +15,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Inject
@@ -24,10 +24,10 @@ import javax.inject.Singleton
 class AdminRepository @Inject constructor(
     private val userPrefRepo: UserPreferencesRepository
 ){
+
     val client = OkHttpClient.Builder()
         .addInterceptor(ServerUrlInterceptor(userPrefRepo))
         .addInterceptor(JwtInterceptor(userPrefRepo))
-        .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
         .addInterceptor(ServerErrorInterceptor(userPrefRepo))
         .build()
 
@@ -76,7 +76,46 @@ class AdminRepository @Inject constructor(
                     response.body()?.takeIf {
                         it.username == username
                     }?.let {
-                        println(it)
+                        emit(
+                            Resource.Success(
+                                data = it.username
+                            )
+                        )
+                    } ?: emit(
+                        Error(
+                            message = "User creation failed"
+                        )
+                    )
+                } else {
+                    emit(
+                        Error(
+                            message = response.message(),
+                            code = response.code()
+                        )
+                    )
+                }
+            } catch (e: Exception) {
+                val errorValues = handleNetworkException(e)
+                emit(Error(errorValues.message, errorValues.code))
+            }
+            emit(Resource.Loading(false))
+        }
+    }
+
+    fun resetPassword(username: String,
+                   password: String): Flow<Resource<String>> {
+        return flow {
+            emit(Resource.Loading(true))
+
+            try {
+                val response = adminApi.resetPassword(
+                    CreateUserDTO(username, password, "UTC")
+                )
+
+                if (response.isSuccessful) {
+                    response.body()?.takeIf {
+                        it.username == username
+                    }?.let {
                         emit(
                             Resource.Success(
                                 data = it.username

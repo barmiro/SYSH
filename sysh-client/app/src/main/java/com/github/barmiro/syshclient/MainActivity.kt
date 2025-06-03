@@ -80,6 +80,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        sessionVM.wipeDemo { restartApp(applicationContext) }
+        importVM.closeImportStateSseConnection()
         enableEdgeToEdge()
         setContent {
 
@@ -128,7 +130,7 @@ class MainActivity : ComponentActivity() {
                         } else if (isDemoVersion != true) {
                             loginSuccessful = false
                             navController.navigate(Login) {
-                                popUpTo(navController.graph.startDestinationId) {
+                                popUpTo(0) {
                                     inclusive = true
                                 }
                             }
@@ -145,7 +147,7 @@ class MainActivity : ComponentActivity() {
                             }
                         } else {
                             navController.navigate(Splash) {
-                                popUpTo(navController.graph.startDestinationId) {
+                                popUpTo(0) {
                                     inclusive = true
                                 }
                             }
@@ -154,11 +156,10 @@ class MainActivity : ComponentActivity() {
                         loginSuccessful = false
                         if (!isLoggedIn) {
                             navController.navigate(Startup) {
-                                popUpTo(navController.graph.startDestinationId) {
+                                popUpTo(0) {
                                     inclusive = true
                                 }
                             }
-                            importVM.closeImportStateSseConnection()
                             if (!storedUrl.isNullOrBlank()){
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar(
@@ -168,7 +169,7 @@ class MainActivity : ComponentActivity() {
                             }
                         } else {
                             navController.navigate(ConnectionError) {
-                                popUpTo(navController.graph.startDestinationId) {
+                                popUpTo(0) {
                                     inclusive = true
                                 }
                             }
@@ -181,7 +182,7 @@ class MainActivity : ComponentActivity() {
                 when (responseCode) {
                     200 -> {
                         navController.navigate(Home) {
-                            popUpTo(navController.graph.startDestinationId) {
+                            popUpTo(0) {
                                 inclusive = true
                             }
                         }
@@ -193,7 +194,7 @@ class MainActivity : ComponentActivity() {
                         navController.navigate(SpotifyAuth)
                     }
 //            this means no error was encountered
-                    0 -> { importVM.closeImportStateSseConnection() }
+                    0 -> {}
                     401 -> {
                         coroutineScope.launch {
                             snackbarHostState.showSnackbar(
@@ -205,15 +206,14 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         navController.navigate(Login) {
-                            popUpTo(navController.graph.startDestinationId) {
+                            popUpTo(0) {
                                 inclusive = true
                             }
                         }
-//                        importVM.closeImportStateSseConnection()
                     }
                     else -> {
                         navController.navigate(Login) {
-                            popUpTo(navController.graph.startDestinationId) {
+                            popUpTo(0) {
                                 inclusive = true
                             }
                         }

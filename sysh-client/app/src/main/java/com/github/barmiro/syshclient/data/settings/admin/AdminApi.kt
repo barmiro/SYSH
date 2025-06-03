@@ -2,6 +2,7 @@ package com.github.barmiro.syshclient.data.settings.admin
 
 
 import com.github.barmiro.syshclient.data.common.authentication.AdminCreateUserDTO
+import com.github.barmiro.syshclient.data.common.authentication.CreateUserDTO
 import com.github.barmiro.syshclient.data.common.authentication.RegisterResponse
 import com.github.barmiro.syshclient.data.common.startup.UserDataDTO
 import retrofit2.Response
@@ -17,6 +18,11 @@ interface AdminApi {
     @POST("admin/users/create")
     suspend fun createUser(
         @Body user: AdminCreateUserDTO
+    ) : Response<RegisterResponse>
+
+    @POST("admin/users/resetPassword")
+    suspend fun resetPassword(
+        @Body user: CreateUserDTO
     ) : Response<RegisterResponse>
 
     @POST("admin/users/delete")
