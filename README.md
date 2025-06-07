@@ -1,7 +1,7 @@
 # SYSH
 SYSH (See Your Streaming History) is a self-hosted Spotify streaming history dashboard, accessed and managed using an Android client, with the main focus being accurate data collection and representation. 
 
-SYSH was created as a FOSS alternative to existing, commercial sevices. While they have an impressive user base, they seem to prioritize user engagement and monetization over improving the service or fixing data accuracy issues.
+SYSH was created as a FOSS alternative to existing, commercial services. While they have an impressive user base, they seem to prioritize user engagement and monetization over improving the service or fixing data accuracy issues.
 
 The project was inspired in part by [Yooooomi/your-spotify](https://github.com/Yooooomi/your_spotify). I wanted to bring similar functionality to a mobile app, accessible on the go, and rethink some design decisions - including the way streaming statistics were calculated. If you're looking for a more established solution or prefer a web app interface, I highly recommend checking out their repo as well!
 
