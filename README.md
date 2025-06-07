@@ -1,13 +1,15 @@
 # SYSH
-SYSH (See Your Streaming History) is a self-hosted Spotify streaming history manager, focused on deliberate data collection rules and accuracy over feature count. The goal is to do one thing and do it well, and any additional features must not interfere with data collection.
+SYSH (See Your Streaming History) is a self-hosted Spotify streaming history dashboard, accessed and managed using an Android client, with the main focus being accurate data collection and representation. 
 
-At the time of writing, SYSH is composed of a dockerized server, which collects data from Spotify and direct JSON imports, and an android client. A web client should be available later this year.
+SYSH was created as a FOSS alternative to existing, commercial sevices. While they have an impressive user base, they seem to prioritize user engagement and monetization over improving the service or fixing data accuracy issues.
 
-Short demo of what the client looks like:
-[https://youtu.be/1_iDDmWinZM?si=Ui3jm5_HX4qQa-5o](https://youtube.com/shorts/qZ0WcEmle28?feature=share)
+The project was inspired in part by [Yooooomi/your-spotify](https://github.com/Yooooomi/your_spotify). I wanted to bring similar functionality to a mobile app, accessible on the go, and rethink some design decisions - including the way streaming statistics were calculated. If you're looking for a more established solution or prefer a web app interface, I highly recommend checking out their repo as well!
+
+The Android app is available for download on the [Google Play Store](https://play.google.com/store/apps/details?id=com.github.barmiro.syshclient). If you're not sure whether SYSH is right for you, the app includes access to a demo server, allowing you to explore its features without the need to set up your own instance.
 
 ## Setup
-1. Create a new app in Spotify's developer dashboard and add http://127.0.0.1:5754/callback as a redirect URI. If accounts other than the app owner will use your instance, add them in the User Management section.
+
+1. Create a new app in Spotify's developer dashboard and add sysh://open/callback as a redirect URI. If accounts other than the app owner will use your instance, add them in the User Management section.
 2. Find your app's Client ID and Client secret and add them to your .env file.
 3. Launch your application using Docker Compose (the only officially supported way to run SYSH at the moment).
 4. Install the Android client and follow the instructions to create an account and authorize SYSH to make API calls to Spotify.
@@ -66,7 +68,6 @@ POSTGRES_USER=yourusername
 POSTGRES_PASSWORD=yourpassword
 SPOTIFY_CLIENT_ID=yourclientid
 SPOTIFY_CLIENT_SECRET=yourclientsecret
-SYSH_SERVER_URL=yoururl.com # soon to be deprecated
 
 # When true, only the first user (with admin privileges by default) can self-register.
 # After that, the /register endpoint will be disabled and all subsequent accounts must be created by an admin.
@@ -79,6 +80,45 @@ SYSH_RESTRICTED_MODE=false
 # SYSH_TZ=Your/Timezone # mainly for server logs, each user has their own streaming data timezone
 ```
 
+## Recommended nginx config
+If you're using nginx: SYSH uses server-sent events. To make sure they work correctly, a separate config for one of the endpoints is required:
+
+```nginx
+# SYSH SSE Endpoint
+# Replace /your-path/ with your app's base path
+location /your-path/zipStatusStream {
+	proxy_pass http://localhost:5754/zipStatusStream; # or your custom port
+	proxy_http_version 1.1;
+	proxy_set_header Connection '';
+	proxy_buffering off;
+	proxy_read_timeout 3600s;
+	proxy_send_timeout 3600s;
+	add_header Cache-Control no-cache;
+}
+
+# SYSH General endpoint
+# Replace /your-path/ with your app's base path
+location /your-path/ {
+	proxy_pass http://localhost:5754/; # or your custom port
+	proxy_set_header Host $host;
+	proxy_set_header X-Real-IP $remote_addr;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header X-Forwarded-Proto $scheme;
+	client_max_body_size 128M;
+	proxy_connect_timeout 180s;
+	proxy_send_timeout 180s;
+	proxy_read_timeout 180s;
+
+	# Strip your app's base path (not needed if set to '/')
+	rewrite ^/your-path(/.*)$ $1 break;
+
+	# Optional rate limiting setting
+	# limit_req zone=api_limit burst=10 nodelay;
+	# also requires in nginx.conf: limit_req_zone $binary_remote_addr zone=api_limit:10m rate=5r/s;
+}
+
+```
+
 ## FAQ
 > How often should I do a manual import?
 
@@ -86,15 +126,15 @@ As often as you'd like! Spotify's recent streams API is a great way to stay up-t
 
 > What about duplicate streams? How will SYSH know which streams to keep and which to import?
 
-It doesn't have to. On import, all streams for the detected timestamp range are wiped and replaced with what's in the JSON files, making duplicates and inconsistencies virtually impossible.
+On import, all streams for the detected timestamp range are wiped and replaced with what's in the JSON files, making duplicates and inconsistencies virtually impossible.
 
 > How does SYSH deal with users in different timezones?
 
-When an account is created, SYSH saves the user's timezone and saves it to the database. Every time a user logs in, if the detected timezone differs from what's saved in the database, the user will be prompted whether they want to change their timezone. This change is completely non-destructive and only changes how the data is displayed. After a timezone change, some data might take longer to load until all caches are re-generated.
+When an account is created, SYSH saves the user's timezone and saves it to the database. Every time a user logs in, if the detected timezone differs from what's saved in the database, the user will have an option to update their timezone in the app's settings. This change is completely non-destructive and only changes how the data is displayed.
 
 > Does SYSH need to use HTTPS?
 
-No. Even though Spotify introduced an HTTPS requirement for redirect URIs in April 2025, you can run SYSH over plain HTTP. The Android client uses a built-in transparent proxy to handle Spotify's redirects using 127.0.0.1 - a loopback address which is exempt from the requirement. That's why, regardless of your server's protocol, address or port number, you have to set http://127.0.0.1:5754/callback as the redirect URI in your Spotify Developer Dashboard.
+No. Even though Spotify introduced an HTTPS requirement for redirect URIs in April 2025, you can run SYSH over plain HTTP. The Android client uses sysh://open/callback - a local deep link which, as a loopback address, is exempt from the requirement.
 
 > Is using HTTP secure?
 
@@ -102,4 +142,8 @@ All communication with Spotify takes place over HTTPS, regardless of your setup.
 
 > How many users does SYSH support?
 
-Spotify imposes a limit of 25 users per app. With the current setup, the upper limit of reliability is probably closer to 15. 25 users would make for 1440 updates per day, each requiring at least one API call (more if new tracks/albums/artists are found). Reducing the rate of updates is trivial, but may in rare cases lead to missed streams. In internal testing, the 24-hour limit seems to be around 1500 calls, but this is undocumented and may vary day to day. It's also not recommended to onboard more than 10 users per day due to streaming history imports requiring many API calls.
+Spotify imposes a limit of 25 users per app. With the current setup, the upper limit of reliability is probably closer to 15. 25 users would make for 1440 updates per day, each requiring at least one API call (more if new tracks/albums/artists are found). In internal testing, the 24-hour limit seems to be around 1500 calls, but this is undocumented and may vary day to day. An option to reduce the rate of updates is coming, but may in rare cases lead to missed streams.
+
+When onboarding users, keep in mind a single user's history import may use up to 400 API calls at once (typically 100-200). 
+
+The API call limit is per developer account - it's possible to run multiple instances of SYSH on one machine and register them with separate developer accounts if it's an issue.
