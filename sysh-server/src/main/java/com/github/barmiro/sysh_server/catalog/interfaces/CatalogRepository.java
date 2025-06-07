@@ -62,7 +62,6 @@ public abstract class CatalogRepository<EntityClass extends CatalogEntity> {
 				.query(String.class)
 				.optional();
 
-//		System.out.println(entity.getId() + " : " + entity.getName() + " : " + checkIfExistsSql);
 		if (checkIfExistsSql.isPresent()) {
 			log.error(
 					entity.getName() 

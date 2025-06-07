@@ -252,9 +252,7 @@ public class TrackRepository extends CatalogRepository<Track> {
 				.list();
 		
 		if (checkForCache && rawList.isEmpty()) {
-			System.out.println("empty result");
 			updateTopTracksCache(username);
-
 		}
 		
 		return jdbc.sql(sql)

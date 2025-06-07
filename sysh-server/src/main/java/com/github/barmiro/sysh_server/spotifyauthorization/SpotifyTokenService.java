@@ -84,8 +84,6 @@ public class SpotifyTokenService {
 		}
 	}
 	
-	private final String serverUrl = System.getenv("SYSH_SERVER_URL");
-	private final String serverPort = System.getenv("SYSH_SERVER_PORT");
 	
     @Retryable(
             value = { 
