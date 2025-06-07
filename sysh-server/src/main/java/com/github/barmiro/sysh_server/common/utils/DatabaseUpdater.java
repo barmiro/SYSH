@@ -32,7 +32,7 @@ public class DatabaseUpdater {
 		if (!isTestEnv) {
 			
 //			!!! CHANGE THIS WHEN ADDING A NEW UPDATE !!!
-			final String TARGET_DATABASE_VERSION = "0.0.5";
+			final String TARGET_DATABASE_VERSION = "1.0.0";
 			
 			updateLegacyDatabase();
 			
@@ -165,6 +165,20 @@ public class DatabaseUpdater {
 						+ "WHERE table_name = 'users' "
 						+ "AND column_name = 'must_change_password' "
 						+ "LIMIT 1",
+						// verificationType
+						Integer.class
+					);
+				
+//				dummy update for first official release
+				updater(
+						// expectedVersion
+						"0.0.5",
+						// targetVersion 
+						"1.0.0",
+						// updateSql
+						"",
+						// verificationSql
+						"SELECT 1;",
 						// verificationType
 						Integer.class
 					);

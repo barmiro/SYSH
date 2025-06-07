@@ -5,7 +5,7 @@ CREATE TABLE db_info (
     version VARCHAR NOT NULL
 );
 
-INSERT INTO db_info (version) VALUES ('0.0.5');
+INSERT INTO db_info (version) VALUES ('1.0.0');
 
 CREATE TABLE Users (
     username VARCHAR(64) PRIMARY KEY,
