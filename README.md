@@ -37,6 +37,8 @@ services:
       - SYSH_SERVER_PORT=${SYSH_SERVER_PORT:-5754}
     ports:
       - '${SYSH_SERVER_PORT:-5754}:${SYSH_SERVER_PORT:-5754}'
+    volumes:
+      - syshkeys:/keys
     depends_on:
       - postgres
     restart: always
@@ -57,6 +59,7 @@ services:
 
 volumes:
   syshdb:
+  syshkeys:
 
 ```
 
