@@ -29,7 +29,6 @@ public class KeyPairManager {
     public KeyPairManager(@Value("${key.store.path:/keys}") String keyStorePath) {
     	this.PRIVATE_KEY_PATH = keyStorePath + "/private.der";
     	this.PUBLIC_KEY_PATH = keyStorePath + "/public.der";
-    	
     	if (keysExist()) {
     		this.keyPair = loadExistingKeys();
     	} else {
