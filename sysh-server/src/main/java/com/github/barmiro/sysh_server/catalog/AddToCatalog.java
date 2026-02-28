@@ -103,6 +103,9 @@ public class AddToCatalog {
 		
 		List <ApiTrackAlbum> apiTrackAlbums = new ArrayList<>();
 		for (ApiTrack apiTrack:apiTracks) {
+			if (apiTrack == null) {
+				continue;
+			}
 			if (!apiTrackAlbums.contains(apiTrack.album())) {
 				apiTrackAlbums.add(apiTrack.album());				
 			}
