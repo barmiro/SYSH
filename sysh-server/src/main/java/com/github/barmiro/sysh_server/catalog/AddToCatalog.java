@@ -116,6 +116,9 @@ public class AddToCatalog {
 		albumsTracks.updateJoinTable(tracks);
 		
 		for (ApiTrack apiTrack:apiTracks) {
+			if (apiTrack == null) {
+				continue;
+			}
 			for (ApiTrackArtist artist:apiTrack.artists()) {
 				artistIDs.add(artist.id());
 			}
