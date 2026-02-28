@@ -96,7 +96,18 @@ public class ConvertDTOs {
 		
 		List<Track> addedTracks = new ArrayList<>();
 		
+		if (apiTracks == null) return addedTracks;
+
 		for (ApiTrack track:apiTracks) {
+
+			if (track == null) {
+				continue; 
+			}
+
+			if (track.album() == null) {
+				continue;
+			}
+			
 			String spotify_track_id = track.id();
 			String name = track.name();
 			Integer duration_ms = track.duration_ms();
