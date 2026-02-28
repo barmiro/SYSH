@@ -38,8 +38,11 @@ public class TracksArtists {
 		
 		int added = 0;
 		for (ApiTrack apiTrack:apiTracks) {
-			List<ApiTrackArtist> artists = apiTrack.artists();
+			if (apiTrack == null) {
+				continue;
+			}
 			
+			List<ApiTrackArtist> artists = apiTrack.artists();
 			
 			for(int i = 0; i < artists.size(); i++) {
 				

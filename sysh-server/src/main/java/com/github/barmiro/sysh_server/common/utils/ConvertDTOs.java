@@ -99,7 +99,6 @@ public class ConvertDTOs {
 		if (apiTracks == null) return addedTracks;
 
 		for (ApiTrack track:apiTracks) {
-
 			if (track == null) {
 				continue; 
 			}
