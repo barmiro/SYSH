@@ -43,5 +43,5 @@ jobs:
         with:
           context: .
           push: true
-          # 2. We reference the output from the 'prep' step
+          target: app 
           tags: ghcr.io/${{ steps.prep.outputs.repo }}:latest
