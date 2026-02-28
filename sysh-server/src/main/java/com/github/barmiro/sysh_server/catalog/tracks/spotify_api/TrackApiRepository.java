@@ -36,18 +36,34 @@ public class TrackApiRepository extends SpotifyApiRepository<
 
 	public List<ApiTrack> getApiTracks(List<String> track_ids, String username) throws JsonProcessingException, ClassCastException {
 		
-		List<String> newIDs = getNewIDs(track_ids, "spotify_track_id");
-		log.info("Found " + newIDs.size() + " new tracks.");
-		List<String> packets = new ArrayList<>();
-		
-		packets = prepIdPackets(newIDs, 50);			
+		// Safety check: ensure we have IDs to look for
+		if (track_ids == null || track_ids.isEmpty()) {
+			return new ArrayList<>();
+		}
 
+		// Defensive: Make sure we aren't looking up the same ID twice in one go
+		List<String> uniqueIds = track_ids.stream().distinct().toList();
+
+		List<String> newIDs = getNewIDs(uniqueIds, "spotify_track_id");
+		log.info("Found " + newIDs.size() + " new tracks.");
+
+		if (newIDs.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		List<String> packets = prepIdPackets(newIDs, 50);
 		
 		List<ApiTrack> apiTracks = new ArrayList<>();
 		for (String packet:packets) {
-			
-			ResponseEntity<String> response = null;
-			response = getResponse(packet, username);
+			try {
+				// Sleep for 1000ms (1 second) between batches
+				Thread.sleep(1000); 
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				log.error("Thread was interrupted", e);
+			}
+
+			ResponseEntity<String> response = getResponse(packet, username);
 			
 			if (response == null) {
 				log.error("Response for " + packet + " is null.");
@@ -68,11 +84,17 @@ public class TrackApiRepository extends SpotifyApiRepository<
 		
 	public List<Track> addNewTracks (List<ApiTrack> apiTracks) throws IllegalAccessException, InvocationTargetException {
 		
+		// If there's nothing to add, stop here to prevent NPEs in ConvertDTOs
+		if (apiTracks == null || apiTracks.isEmpty()) {
+			return new ArrayList<>();
+		}
+
 		List<Track> tracks = ConvertDTOs.apiTracks(apiTracks);
 		
-		catalogRepository.addTracks(tracks);
+		if (tracks != null && !tracks.isEmpty()) {
+			catalogRepository.addTracks(tracks);
+		}
 		
-		return tracks;
-		
+		return tracks != null ? tracks : new ArrayList<>();
 	}
 }
