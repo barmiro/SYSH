@@ -147,8 +147,12 @@ public abstract class SpotifyApiRepository<
             label = "SpotifyApiRepository.getResponse"
         )
 	protected ResponseEntity<String> getResponse(String packet, String username) {
-		
-		
+		try {
+			Thread.sleep(1000); 
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+
 		ResponseEntity<String> response = apiClient
 				.get()
 				.uri(packet)

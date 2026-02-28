@@ -55,14 +55,6 @@ public class TrackApiRepository extends SpotifyApiRepository<
 		
 		List<ApiTrack> apiTracks = new ArrayList<>();
 		for (String packet:packets) {
-			try {
-				// Sleep for 1000ms (1 second) between batches
-				Thread.sleep(1000); 
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				log.error("Thread was interrupted", e);
-			}
-
 			ResponseEntity<String> response = getResponse(packet, username);
 			
 			if (response == null) {
