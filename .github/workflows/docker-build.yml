@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main" ] # Or "master", whichever your branch is named
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -15,6 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 1. We create an output called 'repo' in a step with the ID 'prep'
+      - name: Lowercase repo name
+        id: prep
+        run: echo "repo=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -23,6 +28,7 @@ jobs:
           cache: maven
 
       - name: Build with Maven
+        working-directory: sysh-server 
         run: mvn clean package -DskipTests
 
       - name: Log in to GitHub Container Registry
@@ -37,4 +43,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_lowercased }}:latest
+          # 2. We reference the output from the 'prep' step
+          tags: ghcr.io/${{ steps.prep.outputs.repo }}:latest
