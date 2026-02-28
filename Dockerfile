@@ -1,4 +1,4 @@
-FROM openjdk:21 AS app
+FROM eclipse-temurin:21-jre AS app
 COPY sysh-server/target/sysh-server-*.jar app.jar
 COPY .env /app/.env
 ENTRYPOINT ["java", "-jar", "/app.jar"]
