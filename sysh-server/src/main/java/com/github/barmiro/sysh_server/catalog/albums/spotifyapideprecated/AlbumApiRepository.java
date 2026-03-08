@@ -51,7 +51,7 @@ public class AlbumApiRepository extends SpotifyApiRepository<
 			ResponseEntity<String> response = getResponse(packet, username);				
 
 			try {
-				apiAlbums.addAll(mapResponse(response));
+				apiAlbums.add(mapResponse(response, ApiAlbum.class));
 			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 				System.out.println("Method mapApiAlbums threw an exception");

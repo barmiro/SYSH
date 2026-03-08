@@ -59,17 +59,17 @@ public abstract class SpotifyApiRepository<
 	
 	
 	@SuppressWarnings("unchecked")
-	protected List<ApiEntityClass> mapResponse(
-			ResponseEntity<String> response
+	protected ApiEntityClass mapResponse(
+			ResponseEntity<String> response, Class<?> apiClass
 			) throws JsonProcessingException {
 		
-		Class<WrapperClass> wrapper = getWrapperClass();
+//		Class<WrapperClass> wrapper = getWrapperClass();
 		
 		ObjectMapper mapper = new ObjectMapper()
 				.configure(DeserializationFeature
 						.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		
-		return (List<ApiEntityClass>) mapper.readValue(response.getBody(), wrapper).unwrap();
+		return (ApiEntityClass) mapper.readValue(response.getBody(), apiClass);
 	}
 	
 	
@@ -121,17 +121,24 @@ public abstract class SpotifyApiRepository<
 			int limit
 			) {
 
-		int listSize = IDlist.size();
+//		int listSize = IDlist.size();
 		
 		List<String> idPackets = new ArrayList<>();
 		
-		for(int i = 0; i < listSize; i += limit) {
-			if (i + limit >= listSize) {
-				limit = listSize - i;
-			}
-			String idPacket = stringify(IDlist.subList(i, i + limit));
-			idPackets.add(idPacket);
+		Class<EntityClass> entCls = getEntityClass();
+		
+		// Temporary fix for Spotify's API endpoint deprecation
+		for(String id : IDlist) {
+			idPackets.add(entCls.getSimpleName().toLowerCase() + "s/" + id);
 		}
+		
+//		for(int i = 0; i < listSize; i += limit) {
+//			if (i + limit >= listSize) {
+//				limit = listSize - i;
+//			}
+//			String idPacket = stringify(IDlist.subList(i, i + limit));
+//			idPackets.add(idPacket);
+//		}
 		
 		return idPackets;
 	}

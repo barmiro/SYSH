@@ -46,7 +46,7 @@ public class ArtistApiRepository extends SpotifyApiRepository<
 		List<ApiArtist> apiArtists = new ArrayList<>();
 		for (String packet:packets) {
 			ResponseEntity<String> response = getResponse(packet, username);
-			apiArtists.addAll(mapResponse(response));
+			apiArtists.add(mapResponse(response, ApiArtist.class));
 
 		}
 		

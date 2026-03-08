@@ -54,7 +54,7 @@ public class TrackApiRepository extends SpotifyApiRepository<
 				continue;
 			}
 
-			apiTracks.addAll(mapResponse(response));
+			apiTracks.add(mapResponse(response, ApiTrack.class));
 
 		}
 		

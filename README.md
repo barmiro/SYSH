@@ -7,6 +7,10 @@ SYSH was created as a FOSS alternative to existing, commercial services. While t
 
 The project was inspired in part by [Yooooomi/your-spotify](https://github.com/Yooooomi/your_spotify). I wanted to bring similar functionality to a mobile app, accessible on the go, and rethink some design decisions - including the way streaming statistics were calculated. If you're looking for a more established solution or prefer a web app interface, I highly recommend checking out their repo as well!
 
+The Android app is available for download on the [Google Play Store](https://play.google.com/store/apps/details?id=com.github.barmiro.syshclient). If you're not sure whether SYSH is right for you, the app includes access to a demo server, allowing you to explore its features without the need to set up your own instance.
+
+WARNING (2026-03): Spotify has disabled the endpoints for fetching multiple artists, albums and tracks in a single call. This decision makes it extremely tedious to import your streaming history - until now, importing even an extensive history could be done 2-3 times a day within the API limits; now it would take multiple weeks (on the order of 20-50x more calls needed). The app is in a working state if you have set it up already, just do a docker compose pull && docker compose up. I don't have the time to deal with this properly right now, so importing a new streaming history is going to be difficult, if not impossible. Sorry about that, that's what I get for making my project dependent on proprietary APIs. Consider supporting your favourite artists on Bandcamp, there are some amazing self-hosted music streaming options.
+
 ## Setup
 
 1. Create a new app in Spotify's developer dashboard and add sysh://open/callback as a redirect URI. If accounts other than the app owner will use your instance, add them in the User Management section.
